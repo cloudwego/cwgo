@@ -49,7 +49,6 @@ layouts:
       }
       {{end}}
     update_behavior:
-      # 自定义的 import 插入模板
       import_tpl:
         - |-
           {{$OutDirs := GetUniqueHandlerOutDir .Methods}}
@@ -87,7 +86,7 @@ layouts:
   - path: "biz/service/{{.HandlerGenPath}}/{{ToSnakeCase .MethodName}}.go"
     loop_method: true
     update_behavior:
-      behavior: "skip"
+      type: "skip"
     body: |-
       package {{.FilePackage}}
       import (
@@ -118,7 +117,7 @@ layouts:
   - path: "biz/service/{{.HandlerGenPath}}/{{ToSnakeCase .MethodName}}_test.go"
     loop_method: true
     update_behavior:
-      behavior: "skip"
+      type: "skip"
     body: |-
       package {{.FilePackage}}
       import (
@@ -145,7 +144,7 @@ layouts:
   - path: "{{.HandlerDir}}/{{.GenPackage}}/{{ToSnakeCase .ServiceName}}_test.go"
     loop_service: true
     update_behavior:
-      behavior: "append"
+      type: "append"
       append_key: "method"
       insert_key: "Test{{$.Name}}"
       append_tpl: |-
