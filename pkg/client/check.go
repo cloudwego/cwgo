@@ -83,11 +83,11 @@ func check(ca *config.ClientArgument) error {
 		if ca.GoMod == "" {
 			ca.GoMod = ca.GoPkg
 		}
-		if ca.Module != "" && ca.Module != ca.GoPkg {
-			return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", ca.Module, ca.GoPkg)
+		if ca.GoMod != "" && ca.GoMod != ca.GoPkg {
+			return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", ca.GoMod, ca.GoPkg)
 		}
-		if ca.Module == "" {
-			ca.Module = ca.GoPkg
+		if ca.GoMod == "" {
+			ca.GoMod = ca.GoPkg
 		}
 	}
 	return nil

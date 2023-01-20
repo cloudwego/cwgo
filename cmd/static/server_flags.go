@@ -26,7 +26,7 @@ func serverFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{Name: "service", Usage: "Specify the service name.", Destination: &globalArgs.ServerArgument.Service},
 		&cli.StringFlag{Name: "type", Usage: "Specify the generate type. (RPC or HTTP)", Value: config.RPC},
-		&cli.StringFlag{Name: "module", Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ServerArgument.Module},
+		&cli.StringFlag{Name: "module", Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ServerArgument.GoMod},
 		&cli.StringFlag{Name: "idl", Usage: "Specify the IDL file path. (.thrift or .proto)", Destination: &globalArgs.ServerArgument.IdlPath},
 		&cli.StringFlag{Name: "out_dir", Value: ".", Aliases: []string{"o"}, Usage: "Specify the output path.", Destination: &globalArgs.ServerArgument.OutDir},
 		&cli.StringFlag{Name: "template", Usage: "Specify the layout template.", Destination: &globalArgs.ServerArgument.Template, Value: config.Standard},

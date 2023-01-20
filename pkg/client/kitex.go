@@ -39,7 +39,7 @@ import (
 func convertKitexArgs(sa *config.ClientArgument, kitexArgument *kargs.Arguments) (err error) {
 	f := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 
-	kitexArgument.ModuleName = sa.Module
+	kitexArgument.ModuleName = sa.GoMod
 	kitexArgument.ServiceName = sa.Service
 	kitexArgument.Includes = sa.SliceParam.ProtoSearchPath
 	kitexArgument.Version = kitex.Version

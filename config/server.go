@@ -32,7 +32,6 @@ type ServerArgument struct {
 
 	Cwd    string
 	GoSrc  string
-	GoMod  string
 	GoPkg  string
 	GoPath string
 }
@@ -40,7 +39,7 @@ type ServerArgument struct {
 type CommonParam struct {
 	Service  string // service name
 	Type     string // GenerateType: RPC or HTTP
-	Module   string // Go Mod name
+	GoMod    string // Go Mod name
 	IdlPath  string
 	OutDir   string // output path
 	Registry string

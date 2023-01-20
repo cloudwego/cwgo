@@ -79,11 +79,11 @@ func check(sa *config.ServerArgument) error {
 		if sa.GoMod == "" {
 			sa.GoMod = sa.GoPkg
 		}
-		if sa.Module != "" && sa.Module != sa.GoPkg {
-			return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", sa.Module, sa.GoPkg)
+		if sa.GoMod != "" && sa.GoMod != sa.GoPkg {
+			return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", sa.GoMod, sa.GoPkg)
 		}
-		if sa.Module == "" {
-			sa.Module = sa.GoPkg
+		if sa.GoMod == "" {
+			sa.GoMod = sa.GoPkg
 		}
 	}
 	return nil

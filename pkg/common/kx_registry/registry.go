@@ -27,13 +27,13 @@ import (
 func HandleRegistry(ca *config.CommonParam, dir string) {
 	te := &generator.TemplateExtension{
 		Dependencies: map[string]string{
-			ca.Module + "/conf":                      "conf",
+			ca.GoMod + "/conf":                       "conf",
 			"github.com/cloudwego/kitex/pkg/klog":    "klog",
 			"github.com/cloudwego/kitex/pkg/rpcinfo": "rpcinfo",
 		},
 	}
 
-	importPath := []string{ca.Module + "/conf", "github.com/cloudwego/kitex/pkg/klog"}
+	importPath := []string{ca.GoMod + "/conf", "github.com/cloudwego/kitex/pkg/klog"}
 
 	switch ca.Registry {
 	case config.Etcd:
