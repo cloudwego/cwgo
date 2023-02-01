@@ -43,7 +43,7 @@ func commonQuestion() []*survey.Question {
 			Validate: survey.Required,
 		},
 		{
-			Name: "module",
+			Name: "GoMod",
 			Prompt: &survey.Input{
 				Message: "Please input module",
 			},
