@@ -101,6 +101,7 @@ const (
 	Pass            = "pass"
 	ProtoSearchPath = "proto_search_path"
 
+	C            = "c"
 	DSN          = "dsn"
 	DBType       = "db_type"
 	Tables       = "tables"
