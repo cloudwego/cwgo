@@ -60,7 +60,7 @@ db 询问的信息为：
 
 ## 静态命令行
 
-静态命令行参数可以通过 `cwgo -h` 查看
+### 命令说明
 
 ```
 $ cwgo -h
@@ -82,7 +82,7 @@ GLOBAL OPTIONS:
    --version, -v  打印工具版本
 ```
 
-Server 和 Client 参数
+### Server 和 Client 命令
 
 ```
 --service    指定服务名称
@@ -96,9 +96,16 @@ Server 和 Client 参数
 --pass value 传递给 hz 和 kitex 的参数
 ```
 
-传递给工具的参数，hz 参考[文档](https://www.cloudwego.io/docs/hertz/tutorials/toolkit/toolkit/#command-line-parameter-description)，kitex 参考[文档](https://www.cloudwego.io/docs/kitex/tutorials/code-gen/code_generation/)。
+pass 参数说明：
 
-Model 参数
+如传递 `hz` 的 `handler_dir" 参数, 则应输入 --pass "--handler_dir" --pass "./handler"
+
+
+传递给工具的参数
+hz 参考[文档](https://www.cloudwego.io/docs/hertz/tutorials/toolkit/toolkit/#command-line-parameter-description)，
+kitex 参考[文档](https://www.cloudwego.io/docs/kitex/tutorials/code-gen/code_generation/)。
+
+### Model 命令
 
 ```
 --dsn         指定数据库 DSN
