@@ -29,8 +29,8 @@ import (
 )
 
 const (
-	layoutFile        = "layout.yaml:"
-	packageLayoutFile = "package.yaml:"
+	layoutFile        = "layout.yaml|"
+	packageLayoutFile = "package.yaml|"
 )
 
 func convertHzArgument(sa *config.ServerArgument, hzArgument *hzConfig.Argument) (err error) {

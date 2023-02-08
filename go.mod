@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/cloudwego/hertz v0.4.1
-	github.com/cloudwego/hertz/cmd/hz v0.5.1
+	github.com/cloudwego/hertz/cmd/hz v0.5.3-0.20230208061226-42701b832677
 	github.com/cloudwego/kitex v0.4.5-0.20230116114602-da3b1d74cb3e
 	github.com/urfave/cli/v2 v2.23.5
 	gorm.io/driver/mysql v1.4.4

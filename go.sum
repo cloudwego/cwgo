@@ -37,6 +37,8 @@ github.com/cloudwego/hertz v0.4.1 h1:EcL7v+MGeCt+qsLC1JGvlkPTm3kHmwNQg43FcrMyd+s
 github.com/cloudwego/hertz v0.4.1/go.mod h1:K1U0RlU07CDeBINfHNbafH/3j9uSgIW8otbjUys3OPY=
 github.com/cloudwego/hertz/cmd/hz v0.5.1 h1:dhS6wEsOhAF7HeNdFXKCxit8LIk2Xgr3ESoZDYkTJeE=
 github.com/cloudwego/hertz/cmd/hz v0.5.1/go.mod h1:E0aFlBM6C9+wYa/nhZ7CGmNEJ2ivZ83hGkh3vTeHZY4=
+github.com/cloudwego/hertz/cmd/hz v0.5.3-0.20230208061226-42701b832677 h1:GH+W40zugpy7B3i2W7BXjRcDjvzl51v4eTsTKhfC+6c=
+github.com/cloudwego/hertz/cmd/hz v0.5.3-0.20230208061226-42701b832677/go.mod h1:E0aFlBM6C9+wYa/nhZ7CGmNEJ2ivZ83hGkh3vTeHZY4=
 github.com/cloudwego/kitex v0.3.2/go.mod h1:/XD07VpUD9VQWmmoepASgZ6iw//vgWikVA9MpzLC5i0=
 github.com/cloudwego/kitex v0.4.5-0.20230116114602-da3b1d74cb3e h1:4XnmQWYRCso8Ozc/wXAQwmyqT1iDB540GQAp6pxgYdk=
 github.com/cloudwego/kitex v0.4.5-0.20230116114602-da3b1d74cb3e/go.mod h1:xCNS+VfHun8cFlEIy/SHpHcP2TG2NuaC4x8ch7jU/cA=
