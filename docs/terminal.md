@@ -98,7 +98,7 @@ GLOBAL OPTIONS:
 
 pass 参数说明：
 
-如传递 `hz` 的 `handler_dir" 参数, 则应输入 --pass "--handler_dir" --pass "./handler"
+如传递 `hz` 的 `handler_dir" 参数, 则应输入 --pass "--handler_dir ./handler"
 
 
 传递给工具的参数
