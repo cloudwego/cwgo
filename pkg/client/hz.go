@@ -36,7 +36,6 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 	hzArgument.IdlPaths = []string{abPath}
 	hzArgument.Gomod = ca.GoMod
 	hzArgument.ServiceName = ca.Service
-	hzArgument.ClientDir = ca.OutDir
 	hzArgument.Includes = ca.SliceParam.ProtoSearchPath
 	hzArgument.Cwd = ca.Cwd
 	hzArgument.Gosrc = ca.GoSrc
@@ -53,6 +52,7 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 	f := flag.NewFlagSet("", flag.ContinueOnError)
 	f.StringVar(&hzArgument.HandlerDir, "handler_dir", "", "")
 	f.StringVar(&hzArgument.ModelDir, "model_dir", "hertz_gen", "")
+	f.StringVar(&hzArgument.ClientDir, "client_dir", ca.OutDir, "")
 	var excludeFile, thriftgo, protoc, thriftPlugins, protocPlugins utils.FlagStringSlice
 	f.Var(&excludeFile, "exclude_file", "")
 	f.Var(&thriftgo, "thriftgo", "")
