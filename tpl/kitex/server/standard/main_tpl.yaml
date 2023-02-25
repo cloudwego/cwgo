@@ -9,7 +9,9 @@ body: |-
 
     "github.com/cloudwego/kitex/pkg/klog"
     "github.com/cloudwego/kitex/pkg/rpcinfo"
+    {{- if eq .Codec "thrift"}}
     "github.com/cloudwego/kitex/pkg/transmeta"
+    {{- end }}
     "github.com/cloudwego/kitex/server"
     kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
     "{{.Module}}/conf"
@@ -19,7 +21,7 @@ body: |-
 
   func main() {
     opts := kitexInit()
-  
+
     svr := {{ToLower .ServiceName}}.NewServer(new({{.ServiceName}}Impl), opts...)
 
     err := svr.Run()
