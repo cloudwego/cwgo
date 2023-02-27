@@ -76,7 +76,7 @@ func defaultConfig() []*survey.Question {
 
 func protoSearch() []*survey.Question {
 	return []*survey.Question{{
-		Name: "protoSearch",
+		Name: "proto_search_path",
 		Prompt: &survey.Input{
 			Message: "Please input proto search path if exists, space as separator",
 		},
