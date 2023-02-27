@@ -72,6 +72,9 @@ func Terminal(*cli.Context) error {
 			return err
 		}
 		if !cfg.DefaultConfig {
+			if err = survey.Ask(registryConfig(), sa.CommonParam); err != nil {
+				return err
+			}
 			err = survey.Ask(customConfig(), sa.SliceParam)
 			if err != nil {
 				return err
@@ -111,6 +114,9 @@ func Terminal(*cli.Context) error {
 				return err
 			}
 			if !cfg.DefaultConfig {
+				if err = survey.Ask(registryConfig(), ca.CommonParam); err != nil {
+					return err
+				}
 				err = survey.Ask(customConfig(), ca.SliceParam)
 				if err != nil {
 					return err

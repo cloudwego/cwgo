@@ -86,18 +86,23 @@ func protoSearch() []*survey.Question {
 func customConfig() []*survey.Question {
 	return []*survey.Question{
 		{
+			Name: "pass",
+			Prompt: &survey.Input{
+				Message: "Please input custom param",
+			},
+		},
+	}
+}
+
+func registryConfig() []*survey.Question {
+	return []*survey.Question{
+		{
 			Name: "registry",
 			Prompt: &survey.Select{
 				Message: "Please select a registry",
 				Options: []string{config.Zk, config.Polaris, config.Etcd, config.Nacos},
 			},
 			Validate: survey.Required,
-		},
-		{
-			Name: "pass",
-			Prompt: &survey.Input{
-				Message: "Please input custom param",
-			},
 		},
 	}
 }
