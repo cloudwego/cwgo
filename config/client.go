@@ -32,7 +32,6 @@ type ClientArgument struct {
 
 	Cwd    string
 	GoSrc  string
-	GoMod  string
 	GoPkg  string
 	GoPath string
 }

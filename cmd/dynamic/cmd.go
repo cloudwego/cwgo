@@ -60,8 +60,9 @@ func Terminal(*cli.Context) error {
 		if err != nil {
 			return err
 		}
+
 		if t, _ := utils.GetIdlType(sa.IdlPath); t == meta.IdlProto {
-			err = survey.Ask(protoSearch(), sa)
+			err = survey.Ask(protoSearch(), sa.SliceParam)
 			if err != nil {
 				return err
 			}
@@ -71,6 +72,9 @@ func Terminal(*cli.Context) error {
 			return err
 		}
 		if !cfg.DefaultConfig {
+			if err = survey.Ask(registryConfig(), sa.CommonParam); err != nil {
+				return err
+			}
 			err = survey.Ask(customConfig(), sa.SliceParam)
 			if err != nil {
 				return err
@@ -100,7 +104,7 @@ func Terminal(*cli.Context) error {
 				return err
 			}
 			if t, _ := utils.GetIdlType(ca.IdlPath); t == meta.IdlProto {
-				err = survey.Ask(protoSearch(), ca)
+				err = survey.Ask(protoSearch(), ca.SliceParam)
 				if err != nil {
 					return err
 				}
@@ -110,6 +114,9 @@ func Terminal(*cli.Context) error {
 				return err
 			}
 			if !cfg.DefaultConfig {
+				if err = survey.Ask(registryConfig(), ca.CommonParam); err != nil {
+					return err
+				}
 				err = survey.Ask(customConfig(), ca.SliceParam)
 				if err != nil {
 					return err
