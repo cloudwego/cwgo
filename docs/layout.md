@@ -7,12 +7,6 @@ cwgo 工具支持目前支持生成 MVC Layout，未来还会拓展更多的模�
 
 ```
 ├── biz // 业务逻辑目录
-│   ├── dal // 数据访问层
-│   │   ├── init.go
-│   │   ├── mysql  
-│   │   │   └── init.go
-│   │   └── redis
-│   │       └── init.go
 │   ├── handler // view 层
 │   │   └── hello
 │   │       └── example
@@ -48,12 +42,6 @@ RPC 项目目录如下
 
 ```
 ├── biz // 业务逻辑目录
-│   ├── dal // 数据访问层
-│   │   ├── init.go
-│   │   ├── mysql
-│   │   │   └── init.go
-│   │   └── redis
-│   │       └── init.go
 │   └── service // service 层，业务逻辑存放的地方。更新时，新的方法会追加文件。
 │       ├── HelloMethod.go
 │       └── HelloMethod_test.go

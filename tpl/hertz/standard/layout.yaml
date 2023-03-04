@@ -28,8 +28,6 @@ layouts:
       )
 
       func main() {
-        // init dal
-        // dal.Init()
       	address := conf.GetConf().Hertz.Address
       	h := server.New(server.WithHostPorts(address))
 
@@ -292,81 +290,6 @@ layouts:
         address: "127.0.0.1:6379"
         password: ""
 
-
-  - path: biz/dal/init.go
-    delims:
-      - ""
-      - ""
-    body: |-
-      package dal
-
-      import (
-      	"{{.GoModule}}/biz/dal/mysql"
-      	"{{.GoModule}}/biz/dal/redis"
-      )
-
-      func Init() {
-      	redis.Init()
-      	mysql.Init()
-      }
-
-  - path: biz/dal/mysql/init.go
-    delims:
-      - ""
-      - ""
-    body: |-
-      package mysql
-
-      import (
-      	"{{.GoModule}}/conf"
-      	"gorm.io/driver/mysql"
-      	"gorm.io/gorm"
-      )
-
-      var (
-      	DB  *gorm.DB
-      	err error
-      )
-
-      func Init() {
-      	DB, err = gorm.Open(mysql.Open(conf.GetConf().MySQL.DSN),
-      		&gorm.Config{
-      			PrepareStmt:            true,
-      			SkipDefaultTransaction: true,
-      		},
-      	)
-      	if err != nil {
-      		panic(err)
-      	}
-      }
-
-
-  - path: biz/dal/redis/init.go
-    delims:
-      - ""
-      - ""
-    body: |-
-      package redis
-
-      import (
-      	"context"
-
-      	"github.com/go-redis/redis/v8"
-      	"{{.GoModule}}/conf"
-      )
-
-      var RedisClient *redis.Client
-
-      func Init() {
-      	RedisClient = redis.NewClient(&redis.Options{
-      		Addr:     conf.GetConf().Redis.Address,
-      		Password: conf.GetConf().Redis.Password,
-      	})
-      	if err := RedisClient.Ping(context.Background()).Err(); err != nil {
-      		panic(err)
-      	}
-      }
-
   - path: docker-compose.yaml
     delims:
       - ""
@@ -412,7 +335,6 @@ layouts:
       | hertz_gen  | Hertz generated model |
       | biz/handler  | Used for request processing, validation and return of response. |
       | biz/service  | The actual business logic. |
-      | biz/dal  | Logic for operating the storage layer |
       | biz/route  | Routing and middleware registration |
       | biz/utils  | Wrapped some common methods |
 
