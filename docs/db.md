@@ -18,6 +18,7 @@ USAGE:
    cwgo model [command options] [arguments...]
 
 OPTIONS:
+   --c value                          Specify the config file path
    --dsn value                        Specify the database source name. (https://gorm.io/docs/connecting_to_the_database.html)
    --db_type value                    Specify database type. (mysql or sqlserver or sqlite or postgres) (default: mysql)
    --out_dir value                    Specify output directory (default: biz/dao/query)
@@ -38,6 +39,7 @@ OPTIONS:
 ## 详细参数
 
 ```
+   --c value                          指定配置文件路径
    --dsn value                        指定数据库DSN
    --db_type value                    指定数据库类型(mysql or sqlserver or sqlite or postgres) (默认 mysql)
    --out_dir value                    指定输出目录路径，默认为 biz/dao/query
@@ -58,4 +60,37 @@ OPTIONS:
 
 ```
 cwgo  model --db_type mysql --dsn "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8&parseTime=True&loc=Local"
+```
+
+or
+
+```
+cwgo model --c ./gen.yml
+```
+
+```yaml
+version: "0.1"
+database:
+  # consult[https://gorm.io/docs/connecting_to_the_database.html]"
+  dsn : "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8&parseTime=True&loc=Local"
+  # input mysql or postgres or sqlite or sqlserver. consult[https://gorm.io/docs/connecting_to_the_database.html]
+  db  : "mysql"
+  # enter the required data table or leave it blank.You can input : orders,users,goods
+  tables  : "table1,table2"
+  # only generate model
+  onlyModel: false
+  # specify a directory for output
+  outPath :  "./dao/query"
+  # query code file name, default: gen.go
+  outFile :  ""
+  # generate unit test for query code
+  withUnitTest  : false
+  # generated model code's package name
+  modelPkgName  : ""
+  # generate with pointer when field is nullable
+  fieldNullable : false
+  # generate field with gorm index tag
+  fieldWithIndexTag : false
+  # generate field with gorm column type tag
+  fieldWithTypeTag  : false
 ```
