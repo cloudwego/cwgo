@@ -51,12 +51,12 @@ GOPROXY=https://goproxy.cn/,direct go install github.com/cloudwego/cwgo@latest
 
 ### Command Line Tool
 
-Contains detailed documentation on how cwgo CLI works -see this [document](./docs/terminal.md)
+Contains detailed documentation on how cwgo CLI works -see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/cli/)
 
 ### Layout
 
 This documents explains Layouts discussing how layout are generated ,
-documentation [Layout Description Here](./docs/layout.md).
+documentation [Layout Description Here](https://www.cloudwego.io/docs/cwgo/tutorials/layout/).
 
 ### Client
 
@@ -70,7 +70,7 @@ Codes. [Report Located Right Here Within..](./docs/db.md)
 
 ### Template Extension
 
-Instructions on how to customize templates can be found in the [documentation](./docs/template.md).
+Instructions on how to customize templates can be found in the [documentation](https://www.cloudwego.io/docs/cwgo/tutorials/templete-extension/).
 
 ## Open Source License
 
