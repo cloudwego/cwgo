@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/cloudwego/cwgo/config"
@@ -86,7 +87,6 @@ func Server(c *config.ServerArgument) error {
 				if module != c.GoMod {
 					return fmt.Errorf("module name given by the '-module' option ('%s') is not consist with the name defined in go.mod ('%s' from %s)", c.GoMod, module, path)
 				}
-				c.GoMod = module
 			}
 			err = app.GenerateLayout(args)
 			if err != nil {
@@ -98,6 +98,20 @@ func Server(c *config.ServerArgument) error {
 			err = manifest.Validate(c.OutDir)
 			if err != nil {
 				return cli.Exit(err, meta.LoadError)
+			}
+			module, path, ok := util.SearchGoMod(".", false)
+			if ok {
+				// go.mod exists
+				if c.GoMod != "" && module != c.GoMod {
+					return fmt.Errorf("module name given by the '-module' option ('%s') is not consist with the name defined in go.mod ('%s' from %s)", c.GoMod, module, path)
+				}
+				args.Gomod = module
+			} else {
+				workPath, err := filepath.Abs(".")
+				if err != nil {
+					return fmt.Errorf(err.Error())
+				}
+				return fmt.Errorf("go.mod not found in %s", workPath)
 			}
 			logs.Debugf("Args: %#v\n", args)
 			defer func() {
