@@ -37,11 +37,10 @@ the developer experience. The main features of cwgo tool are as follows:
 ## Install cwgo Tool
 
 ```
-# Go version prior to 1.15 
+# Go 1.15 and earlier version
 GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get github.com/cloudwego/cwgo@latest
 
-
-# Go version after using above than v1.16
+# Go 1.16 and later version
 GOPROXY=https://goproxy.cn/,direct go install github.com/cloudwego/cwgo@latest
 ```
 
@@ -71,8 +70,7 @@ Instructions on how to customize templates can be found in the [document](https:
 
 ## Open Source License
 
-cwgo has got Apache License2.0 licensing
-format, [Apache License](https://github.com/cloudswego/cwgo/blob/main/LICENSE). Its dependent
+cwgo is based on Apache License 2.0, [Apache License](https://github.com/cloudswego/cwgo/blob/main/LICENSE). Its dependent
 third-party component open-source licenses will include Licenses.
 
 
