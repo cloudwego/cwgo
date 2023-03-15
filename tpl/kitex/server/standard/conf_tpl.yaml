@@ -28,6 +28,7 @@ body: |-
   	MySQL    MySQL    `yaml:"mysql"`
   	Redis    Redis    `yaml:"redis"`
   	Registry Registry `yaml:"registry"`
+    Log      Log      `yaml:"log"`
   }
 
   type MySQL struct {
@@ -46,15 +47,18 @@ body: |-
     EnablePprof     bool     `yaml:"enable_pprof"`
     EnableGzip      bool     `yaml:"enable_gzip"`
     EnableAccessLog bool     `yaml:"enable_access_log"`
-    LogLevel        string   `yaml:"log_level"`
-    LogFileName     string   `yaml:"log_file_name"`
-    LogMaxSize      int      `yaml:"log_max_size"`
-    LogMaxBackups   int      `yaml:"log_max_backups"`
-    LogMaxAge       int      `yaml:"log_max_age"`
+  }
+  
+  type Log struct {
+    Level        string   `yaml:"level"`
+    Filename     string   `yaml:"filename"`
+    MaxSize      int      `yaml:"max_size"`
+    MaxBackups   int      `yaml:"max_backups"`
+    MaxAge       int      `yaml:"max_age"`
   }
 
   type Registry struct {
-  	RegistryAddress []string `yaml:"registry_address"`
+  	RegistryAddress []string `yaml:"addresses"`
   	Username        string   `yaml:"username"`
   	Password        string   `yaml:"password"`
   }

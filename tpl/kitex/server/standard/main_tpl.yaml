@@ -53,10 +53,10 @@ body: |-
     klog.SetLogger(logger)
     klog.SetLevel(conf.LogLevel())
     klog.SetOutput(&lumberjack.Logger{
-          		Filename:   conf.GetConf().Kitex.LogFileName,
-          		MaxSize:    conf.GetConf().Kitex.LogMaxSize,
-          		MaxBackups: conf.GetConf().Kitex.LogMaxBackups,
-          		MaxAge:     conf.GetConf().Kitex.LogMaxAge,
+          		Filename:   conf.GetConf().Kitex.Log.Filename,
+          		MaxSize:    conf.GetConf().Kitex.Log.MaxSize,
+          		MaxBackups: conf.GetConf().Kitex.Log.MaxBackups,
+          		MaxAge:     conf.GetConf().Kitex.Log.MaxAge,
           	})
     return
   }
