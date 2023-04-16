@@ -148,6 +148,8 @@ layouts:
       type Redis struct {
       	Address  string `yaml:"address"`
       	Password string `yaml:"password"`
+        Username string `yaml:"username"`
+        DB       int    `yaml:"db"`
       }
 
       type Hertz struct {
@@ -244,7 +246,9 @@ layouts:
 
       redis:
         address: "127.0.0.1:6379"
+        username: ""
         password: ""
+        db: 0
 
   - path: conf/online/conf.yaml
     delims:
@@ -253,7 +257,7 @@ layouts:
     body: |-
       hertz:
         address: ":8080"
-        enable_pprof: true
+        enable_pprof: false
         enable_gzip: true
         enable_access_log: true
         log_level: info
@@ -267,7 +271,9 @@ layouts:
 
       redis:
         address: "127.0.0.1:6379"
+        username: ""
         password: ""
+        db: 0
 
   - path: conf/test/conf.yaml
     delims:
@@ -290,7 +296,9 @@ layouts:
 
       redis:
         address: "127.0.0.1:6379"
+        username: ""
         password: ""
+        db: 0
 
 
   - path: biz/dal/init.go
@@ -351,7 +359,7 @@ layouts:
       import (
       	"context"
 
-      	"github.com/go-redis/redis/v8"
+      	"github.com/redis/go-redis/v9"
       	"{{.GoModule}}/conf"
       )
 

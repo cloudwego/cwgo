@@ -7,7 +7,7 @@ body: |-
   import (
     "context"
 
-    "github.com/go-redis/redis/v8"
+    "github.com/redis/go-redis/v9"
     "{{.Module}}/conf"
   )
 
@@ -20,6 +20,7 @@ body: |-
       Addr:     conf.GetConf().Redis.Address,
       Username: conf.GetConf().Redis.Username,
       Password: conf.GetConf().Redis.Password,
+      DB:       conf.GetConf().Redis.Db,
     })
     if err := RedisClient.Ping(context.Background()).Err(); err != nil {
       panic(err)
