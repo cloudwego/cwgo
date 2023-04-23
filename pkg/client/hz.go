@@ -19,11 +19,19 @@ package client
 import (
 	"flag"
 	"fmt"
+	"path"
 	"path/filepath"
+
+	"github.com/cloudwego/cwgo/tpl"
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
+)
+
+const (
+	layoutFile        = "layout.yaml|"
+	packageLayoutFile = "package.yaml|"
 )
 
 func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument) (err error) {
@@ -31,6 +39,14 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 	abPath, err := filepath.Abs(ca.IdlPath)
 	if err != nil {
 		return fmt.Errorf("idl path %s is not absolute", ca.IdlPath)
+	}
+
+	if ca.Template != config.Standard {
+		hzArgument.CustomizeLayout = path.Join(ca.Template, layoutFile)
+		hzArgument.CustomizePackage = path.Join(ca.Template, packageLayoutFile)
+	} else {
+		hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, "client", ca.Template, layoutFile)
+		hzArgument.CustomizePackage = path.Join(tpl.HertzDir, "client", ca.Template, packageLayoutFile)
 	}
 
 	hzArgument.IdlPaths = []string{abPath}
@@ -54,6 +70,8 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 	f.StringVar(&hzArgument.HandlerDir, "handler_dir", "", "")
 	f.StringVar(&hzArgument.ModelDir, "model_dir", "hertz_gen", "")
 	f.StringVar(&hzArgument.ClientDir, "client_dir", ca.OutDir, "")
+	f.StringVar(&hzArgument.Use, "use", "", "")
+	f.StringVar(&hzArgument.BaseDomain, "base_domain", "", "")
 	var excludeFile, thriftgo, protoc, thriftPlugins, protocPlugins utils.FlagStringSlice
 	f.Var(&excludeFile, "exclude_file", "")
 	f.Var(&thriftgo, "thriftgo", "")

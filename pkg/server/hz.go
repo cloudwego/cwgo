@@ -44,8 +44,8 @@ func convertHzArgument(sa *config.ServerArgument, hzArgument *hzConfig.Argument)
 		hzArgument.CustomizeLayout = path.Join(sa.Template, layoutFile)
 		hzArgument.CustomizePackage = path.Join(sa.Template, packageLayoutFile)
 	} else {
-		hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, sa.Template, layoutFile)
-		hzArgument.CustomizePackage = path.Join(tpl.HertzDir, sa.Template, packageLayoutFile)
+		hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, "server", sa.Template, layoutFile)
+		hzArgument.CustomizePackage = path.Join(tpl.HertzDir, "server", sa.Template, packageLayoutFile)
 	}
 
 	hzArgument.IdlPaths = []string{abPath}
@@ -68,6 +68,8 @@ func convertHzArgument(sa *config.ServerArgument, hzArgument *hzConfig.Argument)
 	f := flag.NewFlagSet("", flag.ContinueOnError)
 	handlerDir := f.String("handler_dir", "", "")
 	modelDir := f.String("model_dir", "hertz_gen", "")
+	routerDir := f.String("router_dir", "", "")
+	use := f.String("use", "", "")
 	var excludeFile, thriftgo, protoc, thriftPlugins, protocPlugins utils.FlagStringSlice
 	f.Var(&excludeFile, "exclude_file", "")
 	f.Var(&thriftgo, "thriftgo", "")
@@ -87,6 +89,8 @@ func convertHzArgument(sa *config.ServerArgument, hzArgument *hzConfig.Argument)
 	}
 	hzArgument.HandlerDir = *handlerDir
 	hzArgument.ModelDir = *modelDir
+	hzArgument.RouterDir = *routerDir
+	hzArgument.Use = *use
 	hzArgument.Excludes = excludeFile
 	hzArgument.ThriftOptions = thriftgo
 	hzArgument.ProtocOptions = protoc

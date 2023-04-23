@@ -5,8 +5,7 @@ go 1.18
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2
-	github.com/cloudwego/hertz v0.4.1
-	github.com/cloudwego/hertz/cmd/hz v0.5.3-0.20230208061226-42701b832677
+	github.com/cloudwego/hertz/cmd/hz v0.6.2
 	github.com/cloudwego/kitex v0.4.5-0.20230116114602-da3b1d74cb3e
 	github.com/creack/pty v1.1.17
 	github.com/hinshun/vt10x v0.0.0-20220119200601-820417d04eec

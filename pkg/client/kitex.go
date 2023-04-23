@@ -92,7 +92,14 @@ Flags:
 	}
 
 	kitexArgument.GenerateMain = false
-	kitexArgument.TemplateDir = path.Join(tpl.KitexDir, "client", config.Standard)
+
+	// Non-standard template
+	if sa.Template != config.Standard {
+		kitexArgument.TemplateDir = sa.Template
+	} else {
+		kitexArgument.TemplateDir = path.Join(tpl.KitexDir, "client", sa.Template)
+	}
+
 	return checkKitexArgs(kitexArgument)
 }
 
