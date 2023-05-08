@@ -46,6 +46,17 @@ layouts:
       }
 
       func registerMiddleware(h *server.Hertz) {
+      	// log
+      	logger := hertzlogrus.NewLogger()
+      	hlog.SetLogger(logger)
+      	hlog.SetLevel(conf.LogLevel())
+      	hlog.SetOutput(&lumberjack.Logger{
+      		Filename:   conf.GetConf().Hertz.LogFileName,
+      		MaxSize:    conf.GetConf().Hertz.LogMaxSize,
+      		MaxBackups: conf.GetConf().Hertz.LogMaxBackups,
+      		MaxAge:     conf.GetConf().Hertz.LogMaxAge,
+      	})
+
       	// pprof
       	if conf.GetConf().Hertz.EnablePprof {
       		pprof.Register(h)
@@ -59,17 +70,6 @@ layouts:
         if conf.GetConf().Hertz.EnableAccessLog {
           h.Use(accesslog.New())
         }
-
-      	// log
-      	logger := hertzlogrus.NewLogger()
-      	hlog.SetLogger(logger)
-      	hlog.SetLevel(conf.LogLevel())
-      	hlog.SetOutput(&lumberjack.Logger{
-      		Filename:   conf.GetConf().Hertz.LogFileName,
-      		MaxSize:    conf.GetConf().Hertz.LogMaxSize,
-      		MaxBackups: conf.GetConf().Hertz.LogMaxBackups,
-      		MaxAge:     conf.GetConf().Hertz.LogMaxAge,
-      	})
 
         // recovery
         h.Use(recovery.Recovery())
