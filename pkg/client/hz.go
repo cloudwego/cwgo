@@ -21,17 +21,17 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
-
-	"github.com/cloudwego/cwgo/tpl"
+	"strings"
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/tpl"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
 )
 
 const (
-	layoutFile        = "layout.yaml|"
-	packageLayoutFile = "package.yaml|"
+	layoutFile        = "layout.yaml"
+	packageLayoutFile = "package.yaml"
 )
 
 func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument) (err error) {
@@ -41,12 +41,26 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 		return fmt.Errorf("idl path %s is not absolute", ca.IdlPath)
 	}
 
-	if ca.Template != config.Standard {
-		hzArgument.CustomizeLayout = path.Join(ca.Template, layoutFile)
-		hzArgument.CustomizePackage = path.Join(ca.Template, packageLayoutFile)
+	if strings.HasSuffix(ca.Template, ".git") {
+		err = utils.GitClone(ca.Template, path.Join(tpl.HertzDir, "client"))
+		if err != nil {
+			return err
+		}
+		gitPath, err := utils.GitPath(ca.Template)
+		if err != nil {
+			return err
+		}
+		gitPath = path.Join(tpl.HertzDir, "client", gitPath)
+		hzArgument.CustomizeLayout = path.Join(gitPath, layoutFile)
+		hzArgument.CustomizePackage = path.Join(gitPath, packageLayoutFile)
 	} else {
-		hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, "client", ca.Template, layoutFile)
-		hzArgument.CustomizePackage = path.Join(tpl.HertzDir, "client", ca.Template, packageLayoutFile)
+		if len(ca.Template) != 0 {
+			hzArgument.CustomizeLayout = path.Join(ca.Template, layoutFile)
+			hzArgument.CustomizePackage = path.Join(ca.Template, packageLayoutFile)
+		} else {
+			hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, "client", config.Standard, layoutFile)
+			hzArgument.CustomizePackage = path.Join(tpl.HertzDir, "client", config.Standard, packageLayoutFile)
+		}
 	}
 
 	hzArgument.IdlPaths = []string{abPath}

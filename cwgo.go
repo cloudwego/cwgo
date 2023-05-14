@@ -18,11 +18,10 @@ package main
 import (
 	"os"
 
-	"github.com/cloudwego/hertz/cmd/hz/util/logs"
-
 	"github.com/cloudwego/cwgo/cmd/static"
 	"github.com/cloudwego/cwgo/tpl"
 	"github.com/cloudwego/hertz/cmd/hz/app"
+	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/protoc"
 	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/thriftgo"

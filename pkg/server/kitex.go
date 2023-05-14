@@ -92,10 +92,23 @@ Flags:
 	}
 
 	// Non-standard template
-	if sa.Template != config.Standard {
-		kitexArgument.TemplateDir = sa.Template
+	if strings.HasSuffix(sa.Template, ".git") {
+		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, "server"))
+		if err != nil {
+			return err
+		}
+		gitPath, err := utils.GitPath(sa.Template)
+		if err != nil {
+			return err
+		}
+		gitPath = path.Join(tpl.KitexDir, "server", gitPath)
+		kitexArgument.TemplateDir = gitPath
 	} else {
-		kitexArgument.TemplateDir = path.Join(tpl.KitexDir, "server", sa.Template)
+		if len(sa.Template) != 0 {
+			kitexArgument.TemplateDir = sa.Template
+		} else {
+			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, "server", config.Standard)
+		}
 	}
 
 	kitexArgument.GenerateMain = false

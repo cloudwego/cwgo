@@ -40,7 +40,6 @@ func NewClientArgument() *ClientArgument {
 	return &ClientArgument{
 		SliceParam:  &SliceParam{},
 		CommonParam: &CommonParam{},
-		Template:    Standard,
 	}
 }
 

@@ -87,6 +87,8 @@ func Server(c *config.ServerArgument) error {
 					return fmt.Errorf("module name given by the '-module' option ('%s') is not consist with the name defined in go.mod ('%s' from %s)", c.GoMod, module, path)
 				}
 				c.GoMod = module
+			} else {
+				args.NeedGoMod = true
 			}
 			err = app.GenerateLayout(args)
 			if err != nil {
