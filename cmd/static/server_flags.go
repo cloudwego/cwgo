@@ -24,14 +24,14 @@ import (
 func serverFlags() []cli.Flag {
 	globalArgs := config.GetGlobalArgs()
 	return []cli.Flag{
-		&cli.StringFlag{Name: "service", Usage: "Specify the service name.", Destination: &globalArgs.ServerArgument.Service},
-		&cli.StringFlag{Name: "type", Usage: "Specify the generate type. (RPC or HTTP)", Value: config.RPC},
-		&cli.StringFlag{Name: "module", Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ServerArgument.GoMod},
-		&cli.StringFlag{Name: "idl", Usage: "Specify the IDL file path. (.thrift or .proto)", Destination: &globalArgs.ServerArgument.IdlPath},
-		&cli.StringFlag{Name: "out_dir", Value: ".", Aliases: []string{"o"}, Usage: "Specify the output path.", Destination: &globalArgs.ServerArgument.OutDir},
-		&cli.StringFlag{Name: "template", Usage: "Specify the layout template.", Destination: &globalArgs.ServerArgument.Template, Value: config.Standard},
-		&cli.StringFlag{Name: "registry", Usage: "Specify the registry, default is None"},
-		&cli.StringSliceFlag{Name: "proto_search_path", Aliases: []string{"I"}, Usage: "Add an IDL search path for includes. (Valid only if idl is protobuf)"},
-		&cli.StringSliceFlag{Name: "pass", Usage: "pass param to hz or kitex"},
+		&cli.StringFlag{Name: config.Service, Usage: "Specify the service name.", Destination: &globalArgs.ServerArgument.Service},
+		&cli.StringFlag{Name: config.ServiceType, Usage: "Specify the generate type. (RPC or HTTP)", Value: config.RPC},
+		&cli.StringFlag{Name: config.Module, Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ServerArgument.GoMod},
+		&cli.StringFlag{Name: config.IDLPath, Usage: "Specify the IDL file path. (.thrift or .proto)", Destination: &globalArgs.ServerArgument.IdlPath},
+		&cli.StringFlag{Name: config.OutDir, Value: ".", Aliases: []string{"o"}, Usage: "Specify the output path. Currently cwgo supports git templates, such as `--template https://github.com/***/cwgo_template.git`", Destination: &globalArgs.ServerArgument.OutDir},
+		&cli.StringFlag{Name: config.Template, Usage: "Specify the layout template.", Destination: &globalArgs.ServerArgument.Template},
+		&cli.StringFlag{Name: config.Registry, Usage: "Specify the registry, default is None"},
+		&cli.StringSliceFlag{Name: config.ProtoSearchPath, Aliases: []string{"I"}, Usage: "Add an IDL search path for includes. (Valid only if idl is protobuf)"},
+		&cli.StringSliceFlag{Name: config.Pass, Usage: "pass param to hz or kitex"},
 	}
 }

@@ -28,12 +28,12 @@ type ClientArgument struct {
 
 	SliceParam *SliceParam
 
-	Verbose bool
-
-	Cwd    string
-	GoSrc  string
-	GoPkg  string
-	GoPath string
+	Verbose  bool
+	Template string
+	Cwd      string
+	GoSrc    string
+	GoPkg    string
+	GoPath   string
 }
 
 func NewClientArgument() *ClientArgument {

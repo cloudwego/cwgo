@@ -90,8 +90,9 @@ const (
 )
 
 const (
-	OutDir  = "out_dir"
-	Verbose = "verbose"
+	OutDir   = "out_dir"
+	Verbose  = "verbose"
+	Template = "template"
 
 	Service         = "service"
 	ServiceType     = "type"

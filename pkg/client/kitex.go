@@ -92,7 +92,27 @@ Flags:
 	}
 
 	kitexArgument.GenerateMain = false
-	kitexArgument.TemplateDir = path.Join(tpl.KitexDir, "client", config.Standard)
+
+	// Non-standard template
+	if strings.HasSuffix(sa.Template, ".git") {
+		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, "client"))
+		if err != nil {
+			return err
+		}
+		gitPath, err := utils.GitPath(sa.Template)
+		if err != nil {
+			return err
+		}
+		gitPath = path.Join(tpl.KitexDir, "client", gitPath)
+		kitexArgument.TemplateDir = gitPath
+	} else {
+		if len(sa.Template) != 0 {
+			kitexArgument.TemplateDir = sa.Template
+		} else {
+			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, "client", config.Standard)
+		}
+	}
+
 	return checkKitexArgs(kitexArgument)
 }
 

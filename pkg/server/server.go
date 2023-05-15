@@ -30,7 +30,6 @@ import (
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 	"github.com/cloudwego/hertz/cmd/hz/util"
-	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"
 	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/thriftgo"
@@ -87,18 +86,31 @@ func Server(c *config.ServerArgument) error {
 				if module != c.GoMod {
 					return fmt.Errorf("module name given by the '-module' option ('%s') is not consist with the name defined in go.mod ('%s' from %s)", c.GoMod, module, path)
 				}
+				c.GoMod = module
+			} else {
+				args.NeedGoMod = true
 			}
 			err = app.GenerateLayout(args)
 			if err != nil {
 				return cli.Exit(err, meta.GenerateLayoutError)
 			}
+			defer func() {
+				// ".hz" file converges to the hz tool
+				manifest := new(meta.Manifest)
+				args.InitManifest(manifest)
+				err = manifest.Persist(args.OutDir)
+				if err != nil {
+					err = cli.Exit(fmt.Errorf("persist manifest failed: %v", err), meta.PersistError)
+				}
+			}()
 		} else {
 			args.CmdType = meta.CmdUpdate
 			manifest := new(meta.Manifest)
-			err = manifest.Validate(c.OutDir)
+			err = manifest.InitAndValidate(args.OutDir)
 			if err != nil {
 				return cli.Exit(err, meta.LoadError)
 			}
+
 			module, path, ok := util.SearchGoMod(".", false)
 			if ok {
 				// go.mod exists
@@ -113,10 +125,14 @@ func Server(c *config.ServerArgument) error {
 				}
 				return fmt.Errorf("go.mod not found in %s", workPath)
 			}
-			logs.Debugf("Args: %#v\n", args)
+
+			// update argument by ".hz", can automatically get "handler_dir"/"model_dir"/"router_dir"
+			args.UpdateByManifest(manifest)
+
 			defer func() {
-				manifest.Version = meta.GoVersion
-				err = manifest.Persist(".")
+				// If the "handler_dir"/"model_dir" is updated, write it back to ".hz"
+				args.UpdateManifest(manifest)
+				err = manifest.Persist(args.OutDir)
 				if err != nil {
 					err = cli.Exit(fmt.Errorf("persist manifest failed: %v", err), meta.PersistError)
 				}

@@ -19,11 +19,19 @@ package client
 import (
 	"flag"
 	"fmt"
+	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/tpl"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
+)
+
+const (
+	layoutFile        = "layout.yaml"
+	packageLayoutFile = "package.yaml"
 )
 
 func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument) (err error) {
@@ -31,6 +39,28 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 	abPath, err := filepath.Abs(ca.IdlPath)
 	if err != nil {
 		return fmt.Errorf("idl path %s is not absolute", ca.IdlPath)
+	}
+
+	if strings.HasSuffix(ca.Template, ".git") {
+		err = utils.GitClone(ca.Template, path.Join(tpl.HertzDir, "client"))
+		if err != nil {
+			return err
+		}
+		gitPath, err := utils.GitPath(ca.Template)
+		if err != nil {
+			return err
+		}
+		gitPath = path.Join(tpl.HertzDir, "client", gitPath)
+		hzArgument.CustomizeLayout = path.Join(gitPath, layoutFile)
+		hzArgument.CustomizePackage = path.Join(gitPath, packageLayoutFile)
+	} else {
+		if len(ca.Template) != 0 {
+			hzArgument.CustomizeLayout = path.Join(ca.Template, layoutFile)
+			hzArgument.CustomizePackage = path.Join(ca.Template, packageLayoutFile)
+		} else {
+			hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, "client", config.Standard, layoutFile)
+			hzArgument.CustomizePackage = path.Join(tpl.HertzDir, "client", config.Standard, packageLayoutFile)
+		}
 	}
 
 	hzArgument.IdlPaths = []string{abPath}
@@ -54,6 +84,8 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 	f.StringVar(&hzArgument.HandlerDir, "handler_dir", "", "")
 	f.StringVar(&hzArgument.ModelDir, "model_dir", "hertz_gen", "")
 	f.StringVar(&hzArgument.ClientDir, "client_dir", ca.OutDir, "")
+	f.StringVar(&hzArgument.Use, "use", "", "")
+	f.StringVar(&hzArgument.BaseDomain, "base_domain", "", "")
 	var excludeFile, thriftgo, protoc, thriftPlugins, protocPlugins utils.FlagStringSlice
 	f.Var(&excludeFile, "exclude_file", "")
 	f.Var(&thriftgo, "thriftgo", "")

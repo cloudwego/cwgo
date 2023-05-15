@@ -29,6 +29,7 @@ func clientFlags() []cli.Flag {
 		&cli.StringFlag{Name: config.Module, Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ClientArgument.GoMod},
 		&cli.StringFlag{Name: config.IDLPath, Usage: "Specify the IDL file path. (.thrift or .proto)", Destination: &globalArgs.ClientArgument.IdlPath},
 		&cli.StringFlag{Name: config.OutDir, Aliases: []string{"o"}, Usage: "Specify the output path.", Destination: &globalArgs.ClientArgument.OutDir},
+		&cli.StringFlag{Name: config.Template, Usage: "Specify the output path. Currently cwgo supports git templates, such as `--template https://github.com/***/cwgo_template.git`", Destination: &globalArgs.ClientArgument.Template},
 		&cli.StringFlag{Name: config.Registry, Usage: "Specify the registry, default is None"},
 		&cli.StringSliceFlag{Name: config.ProtoSearchPath, Aliases: []string{"I"}, Usage: "Add an IDL search path for includes. (Valid only if idl is protobuf)"},
 		&cli.StringSliceFlag{Name: config.Pass, Usage: "pass param to hz or kitex"},

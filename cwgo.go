@@ -21,7 +21,7 @@ import (
 	"github.com/cloudwego/cwgo/cmd/static"
 	"github.com/cloudwego/cwgo/tpl"
 	"github.com/cloudwego/hertz/cmd/hz/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/protoc"
 	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/thriftgo"
@@ -38,7 +38,7 @@ func main() {
 
 	err := cli.Run(os.Args)
 	if err != nil {
-		hlog.Errorf("%v\n", err)
+		logs.Errorf("%v\n", err)
 	}
 }
 

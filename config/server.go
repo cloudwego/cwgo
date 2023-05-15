@@ -49,7 +49,6 @@ func NewServerArgument() *ServerArgument {
 	return &ServerArgument{
 		SliceParam:  &SliceParam{},
 		CommonParam: &CommonParam{},
-		Template:    Standard,
 	}
 }
 
