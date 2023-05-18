@@ -75,6 +75,7 @@ func convertKitexArgs(sa *config.ClientArgument, kitexArgument *kargs.Arguments)
 	f.BoolVar(&kitexArgument.Record, "record", false, "Record Kitex cmd into kitex-all.sh.")
 	f.StringVar(&kitexArgument.GenPath, "gen-path", generator.KitexGenPath,
 		"Specify a code gen path.")
+	f.Var(&kitexArgument.ProtobufPlugins, "protobuf-plugin", "Specify protobuf plugin arguments for the protobuf compiler.(plugin_name:options:out_dir)")
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, `Version %s

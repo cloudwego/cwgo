@@ -63,6 +63,7 @@ func convertKitexArgs(sa *config.ServerArgument, kitexArgument *kargs.Arguments)
 	f.Var(&kitexArgument.ThriftOptions, "thrift", "Specify arguments for the thrift go compiler.")
 	f.DurationVar(&kitexArgument.ThriftPluginTimeLimit, "thrift-plugin-time-limit", generator.DefaultThriftPluginTimeLimit, "Specify thrift plugin execution time limit.")
 	f.Var(&kitexArgument.ThriftPlugins, "thrift-plugin", "Specify thrift plugin arguments for the thrift compiler.")
+	f.Var(&kitexArgument.ProtobufPlugins, "protobuf-plugin", "Specify protobuf plugin arguments for the protobuf compiler.(plugin_name:options:out_dir)")
 	f.Var(&kitexArgument.ProtobufOptions, "protobuf", "Specify arguments for the protobuf compiler.")
 	f.BoolVar(&kitexArgument.CombineService, "combine-service", false,
 		"Combine services in root thrift file.")
