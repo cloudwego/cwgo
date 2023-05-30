@@ -45,6 +45,7 @@ func modelFlags() []cli.Flag {
 		&cli.BoolFlag{Name: config.OnlyModel, Usage: "Specify only generate model code", Value: false, DefaultText: "false"},
 		&cli.StringFlag{Name: config.ModelPkgName, Usage: "Specify model package name", Value: "", DefaultText: ""},
 		&cli.BoolFlag{Name: config.Nullable, Usage: "Specify generate with pointer when field is nullable", Value: false, DefaultText: "false"},
+		&cli.BoolFlag{Name: config.Signable, Usage: "Specify detect integer field's unsigned type, adjust generated data type", Value: false, DefaultText: "false"},
 		&cli.BoolFlag{Name: config.TypeTag, Usage: "Specify generate field with gorm column type tag", Value: false, DefaultText: "false"},
 		&cli.BoolFlag{Name: config.IndexTag, Usage: "Specify generate field with gorm index tag", Value: false, DefaultText: "false"},
 	}

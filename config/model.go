@@ -32,6 +32,7 @@ type ModelArgument struct {
 	WithUnitTest      bool
 	ModelPkgName      string
 	FieldNullable     bool
+	FieldSignable     bool
 	FieldWithIndexTag bool
 	FieldWithTypeTag  bool
 }
@@ -53,6 +54,7 @@ func (c *ModelArgument) ParseCli(ctx *cli.Context) error {
 	c.WithUnitTest = ctx.Bool(UnitTest)
 	c.ModelPkgName = ctx.String(ModelPkgName)
 	c.FieldNullable = ctx.Bool(Nullable)
+	c.FieldSignable = ctx.Bool(Signable)
 	c.FieldWithIndexTag = ctx.Bool(IndexTag)
 	c.FieldWithTypeTag = ctx.Bool(TypeTag)
 	return nil
