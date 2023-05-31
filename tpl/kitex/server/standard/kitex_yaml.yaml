@@ -4,4 +4,4 @@ update_behavior:
 body: |-
   kitexinfo:
     ServiceName: '{{.RealServiceName}}'
-    ToolVersion: '{{.Version}}
+    ToolVersion: '{{.Version}}'
