@@ -69,6 +69,7 @@ func parsePass(da *config.ModelArgument, pass string) error {
 	f.BoolVar(&da.OnlyModel, config.OnlyModel, false, "")
 	f.StringVar(&da.ModelPkgName, config.ModelPkgName, "", "")
 	f.BoolVar(&da.FieldNullable, config.Nullable, false, "")
+	f.BoolVar(&da.FieldSignable, config.Signable, false, "")
 	f.BoolVar(&da.FieldWithTypeTag, config.TypeTag, false, "")
 	f.BoolVar(&da.FieldWithIndexTag, config.IndexTag, false, "")
 	var tables utils.FlagStringSlice

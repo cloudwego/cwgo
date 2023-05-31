@@ -38,6 +38,7 @@ func Model(c *config.ModelArgument) error {
 		ModelPkgPath:      c.ModelPkgName,
 		WithUnitTest:      c.WithUnitTest,
 		FieldNullable:     c.FieldNullable,
+		FieldSignable:     c.FieldSignable,
 		FieldWithIndexTag: c.FieldWithIndexTag,
 	})
 

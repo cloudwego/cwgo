@@ -110,6 +110,7 @@ const (
 	UnitTest     = "unittest"
 	ModelPkgName = "model_pkg"
 	Nullable     = "nullable"
+	Signable     = "signable"
 	IndexTag     = "index_tag"
 	TypeTag      = "type_tag"
 )
