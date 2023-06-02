@@ -103,7 +103,7 @@ func Server(c *config.ServerArgument) error {
 					err = cli.Exit(fmt.Errorf("persist manifest failed: %v", err), meta.PersistError)
 				}
 				if !args.NeedGoMod && args.IsNew() {
-					fmt.Println(meta.AddThriftReplace)
+					log.Warn(meta.AddThriftReplace)
 				}
 			}()
 		} else {
