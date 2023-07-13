@@ -43,8 +43,8 @@ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDk
 github.com/cloudwego/fastpb v0.0.4 h1:/ROVVfoFtpfc+1pkQLzGs+azjxUbSOsAqSY4tAAx4mg=
 github.com/cloudwego/fastpb v0.0.4/go.mod h1:/V13XFTq2TUkxj2qWReV8MwfPC4NnPcy6FsrojnsSG0=
 github.com/cloudwego/frugal v0.1.6/go.mod h1:9ElktKsh5qd2zDBQ5ENhPSQV7F2dZ/mXlr1eaZGDBFs=
-github.com/cloudwego/hertz/cmd/hz v0.6.2 h1:tvDM0s95jXxMgtAUb9wHx1zA7/FYg1/kOdVaxNuWG2A=
-github.com/cloudwego/hertz/cmd/hz v0.6.2/go.mod h1:E0aFlBM6C9+wYa/nhZ7CGmNEJ2ivZ83hGkh3vTeHZY4=
+github.com/cloudwego/hertz/cmd/hz v0.6.5 h1:gHG10r7sg+csyo86iNAUm5fOWoAmRK7d1BNfqDfusAg=
+github.com/cloudwego/hertz/cmd/hz v0.6.5/go.mod h1:E0aFlBM6C9+wYa/nhZ7CGmNEJ2ivZ83hGkh3vTeHZY4=
 github.com/cloudwego/kitex v0.5.3-0.20230516135828-f75a959baa55 h1:CNzB+aoGrpLzL0HEYvRKRSFN1aSAcq+3XZPc2bXC8Lk=
 github.com/cloudwego/kitex v0.5.3-0.20230516135828-f75a959baa55/go.mod h1:G5V6M3X2qfFfu99OdfX6BwfYuRf77CwUzvBpqqIC1KI=
 github.com/cloudwego/netpoll v0.3.2/go.mod h1:xVefXptcyheopwNDZjDPcfU6kIjZXZ4nY550k1yH9eQ=
