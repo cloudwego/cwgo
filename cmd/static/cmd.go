@@ -105,7 +105,7 @@ const (
 	ServerUsage = `generate RPC or HTTP server
 
 Examples:
-  # Generate RPR server code 
+  # Generate RPC server code 
   cwgo server --type RPC --idl  {{path/to/IDL_file.thrift}} --service {{svc_name}}
   
   # Generate HTTP server code 
@@ -116,7 +116,7 @@ Examples:
 	ClientUsage = `generate RPC or HTTP client
 
 Examples:
-  # Generate RPR client code 
+  # Generate RPC client code 
   cwgo client --type RPC --idl  {{path/to/IDL_file.thrift}} --service {{svc_name}}
   
   # Generate HTTP client code 
