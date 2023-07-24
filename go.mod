@@ -6,7 +6,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2
 	github.com/cloudwego/hertz/cmd/hz v0.6.5
-	github.com/cloudwego/kitex v0.6.2-0.20230724061933-f0eeadc3ac91
+	github.com/cloudwego/kitex v0.6.2-0.20230724065132-d12de3d166da
 	github.com/creack/pty v1.1.17
 	github.com/hinshun/vt10x v0.0.0-20220119200601-820417d04eec
 	github.com/stretchr/testify v1.8.2
