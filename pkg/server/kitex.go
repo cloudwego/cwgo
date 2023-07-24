@@ -19,6 +19,7 @@ package server
 import (
 	"flag"
 	"fmt"
+	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 	"os"
 	"os/exec"
 	"path"
@@ -92,6 +93,7 @@ Flags:
 		return
 	}
 
+	logs.Info("template_name = " + sa.Template)
 	// Non-standard template
 	if strings.HasSuffix(sa.Template, ".git") {
 		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, "server"))
