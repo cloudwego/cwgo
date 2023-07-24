@@ -69,6 +69,8 @@ github.com/cloudwego/kitex v0.4.4/go.mod h1:3FcH5h9Qw+dhRljSzuGSpWuThttA8DvK0BsL
 github.com/cloudwego/kitex v0.6.1/go.mod h1:zI1GBrjT0qloTikcCfQTgxg3Ws+yQMyaChEEOcGNUvA=
 github.com/cloudwego/kitex v0.6.2-0.20230724061933-f0eeadc3ac91 h1:UyqU94UzcSOxpTIM84J8a51bdif3haJlerS9JKNE5jo=
 github.com/cloudwego/kitex v0.6.2-0.20230724061933-f0eeadc3ac91/go.mod h1:f1vwi6EjJMmGFn9Zk3urNXLgLU6yUR0McjRBaCwIGbE=
+github.com/cloudwego/kitex v0.6.2-0.20230724065132-d12de3d166da h1:x7JogvV1it1BMp+92Ek35/i0RYblb6VpjXxswpvYueE=
+github.com/cloudwego/kitex v0.6.2-0.20230724065132-d12de3d166da/go.mod h1:f1vwi6EjJMmGFn9Zk3urNXLgLU6yUR0McjRBaCwIGbE=
 github.com/cloudwego/netpoll v0.2.4/go.mod h1:1T2WVuQ+MQw6h6DpE45MohSvDTKdy2DlzCx2KsnPI4E=
 github.com/cloudwego/netpoll v0.3.1/go.mod h1:1T2WVuQ+MQw6h6DpE45MohSvDTKdy2DlzCx2KsnPI4E=
 github.com/cloudwego/netpoll v0.4.0/go.mod h1:xVefXptcyheopwNDZjDPcfU6kIjZXZ4nY550k1yH9eQ=
