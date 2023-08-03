@@ -29,6 +29,7 @@ type ServerArgument struct {
 	Template   string
 	SliceParam *SliceParam
 	Verbose    bool
+	Hex        bool // add http listen for kitex
 
 	Cwd    string
 	GoSrc  string

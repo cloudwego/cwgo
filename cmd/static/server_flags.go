@@ -34,5 +34,6 @@ func serverFlags() []cli.Flag {
 		&cli.StringSliceFlag{Name: config.ProtoSearchPath, Aliases: []string{"I"}, Usage: "Add an IDL search path for includes. (Valid only if idl is protobuf)"},
 		&cli.StringSliceFlag{Name: config.Pass, Usage: "pass param to hz or kitex"},
 		&cli.BoolFlag{Name: config.Verbose, Usage: "Turn on verbose mode."},
+		&cli.BoolFlag{Name: config.HexTag, Usage: "Add HTTP listen for Kitex.", Destination: &globalArgs.Hex},
 	}
 }
