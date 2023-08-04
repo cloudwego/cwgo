@@ -321,18 +321,18 @@ func (t *transHandler) OnRead(ctx context.Context, conn net.Conn) error {
 }
 
 func initHertz() *route.Engine {
-	h := hertzServer.New()
-
+	h := hertzServer.New(hertzServer.WithIdleTimeout(0))
 	// add a ping route to test
 	h.GET("/ping", func(c context.Context, ctx *app.RequestContext) {
 		ctx.JSON(consts.StatusOK, utils.H{"ping": "pong"})
 	})
-
 	router.GeneratedRegister(h)
-	err := h.Engine.Init()
-	if err != nil {
+	if err := h.Engine.Init(); err != nil {
 		panic(err)
 	}
+	//if err := h.Engine.SetEngineRun(); err != nil {
+	//	panic(err)
+	//}
 	return h.Engine
 }
 
@@ -343,6 +343,9 @@ func init() {
 }
 
 `
+	if util.Exists("hex_trans_handler.go") {
+		return nil
+	}
 	tmpl := template.Must(template.New("hex_trans_handler").Parse(tmplContent))
 	file, err := os.Create("hex_trans_handler.go")
 	if err != nil {
