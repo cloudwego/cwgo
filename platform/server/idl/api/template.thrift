@@ -8,8 +8,9 @@ struct Template{
 
 struct TemplateItem{
     1: i64 id
-    2: string name
-    3: string content
+    2: i64 template_id
+    3: string name
+    4: string content
 }
 
 struct AddTemplateReq{
