@@ -12,7 +12,7 @@ struct RegisterRes{
 }
 
 struct LoginReq{
-    1: string usernmae (api.form="username,required")
+    1: string username (api.form="username,required")
     2: string password (api.form="password,required")
 }
 struct LoginRes{
