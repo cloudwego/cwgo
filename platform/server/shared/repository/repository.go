@@ -25,7 +25,6 @@ import (
 )
 
 type IRepository interface {
-	GetRepoInfo(owner, repoName string) (*Repository, error)
 	GetFile(owner, repoName, filePath, ref string) (*File, error)
 	PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error
 }
@@ -41,29 +40,6 @@ type GitLabApi struct {
 type File struct {
 	Name    string
 	Content []byte
-}
-
-type Repository struct {
-	ID          int
-	Name        string
-	Description string
-	URL         string
-	LastUpdate  string
-}
-
-func (g *GitHubApi) GetRepoInfo(owner, repoName string) (*Repository, error) {
-	repo, _, err := g.Client.Repositories.Get(context.Background(), owner, repoName)
-	if err != nil {
-		return nil, err
-	}
-	repo.GetUpdatedAt().String()
-	return &Repository{
-		ID:          int(repo.GetID()),
-		Name:        repo.GetName(),
-		Description: repo.GetDescription(),
-		URL:         repo.GetURL(),
-		LastUpdate:  repo.GetUpdatedAt().String(),
-	}, nil
 }
 
 func (g *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
@@ -127,20 +103,6 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	}
 
 	return nil
-}
-
-func (gl *GitLabApi) GetRepoInfo(owner, repoName string) (*Repository, error) {
-	repo, _, err := gl.Client.Projects.GetProject(fmt.Sprintf("%s/%s", owner, repoName), nil)
-	if err != nil {
-		return nil, err
-	}
-	return &Repository{
-		ID:          repo.ID,
-		Name:        repo.Name,
-		Description: repo.Description,
-		URL:         repo.WebURL,
-		LastUpdate:  repo.LastActivityAt.String(),
-	}, nil
 }
 
 func (gl *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
