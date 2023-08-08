@@ -18,27 +18,24 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/go-github/v53/github"
 	"github.com/xanzy/go-gitlab"
 	"io/ioutil"
 )
 
 type IRepository interface {
-	GetRepoInfo() (*Repository, error)
-	GetFile(filePath, ref string) (*File, error)
-	PushFilesToRepository(files map[string][]byte, branch, commitMessage string) error
+	GetRepoInfo(owner, repoName string) (*Repository, error)
+	GetFile(owner, repoName, filePath, ref string) (*File, error)
+	PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error
 }
 
 type GitHubApi struct {
-	Client   github.Client
-	Owner    string
-	RepoName string
+	Client github.Client
 }
 
 type GitLabApi struct {
-	Client    gitlab.Client
-	Owner     string
-	ProjectID int
+	Client gitlab.Client
 }
 
 type File struct {
@@ -47,24 +44,30 @@ type File struct {
 }
 
 type Repository struct {
-	Name string
-	URL  string
+	ID          int
+	Name        string
+	Description string
+	URL         string
+	LastUpdate  string
 }
 
-func (g *GitHubApi) GetRepoInfo() (*Repository, error) {
-	repo, _, err := g.Client.Repositories.Get(context.Background(), g.Owner, g.RepoName)
+func (g *GitHubApi) GetRepoInfo(owner, repoName string) (*Repository, error) {
+	repo, _, err := g.Client.Repositories.Get(context.Background(), owner, repoName)
 	if err != nil {
 		return nil, err
 	}
-
+	repo.GetUpdatedAt().String()
 	return &Repository{
-		Name: repo.GetName(),
-		URL:  repo.GetURL(),
+		ID:          int(repo.GetID()),
+		Name:        repo.GetName(),
+		Description: repo.GetDescription(),
+		URL:         repo.GetURL(),
+		LastUpdate:  repo.GetUpdatedAt().String(),
 	}, nil
 }
 
-func (g *GitHubApi) GetFile(filePath, ref string) (*File, error) {
-	fileContent, _, err := g.Client.Repositories.DownloadContents(context.Background(), g.Owner, g.RepoName, filePath, &github.RepositoryContentGetOptions{Ref: ref})
+func (g *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
+	fileContent, _, err := g.Client.Repositories.DownloadContents(context.Background(), owner, repoName, filePath, &github.RepositoryContentGetOptions{Ref: ref})
 	if err != nil {
 		return nil, err
 	}
@@ -81,9 +84,9 @@ func (g *GitHubApi) GetFile(filePath, ref string) (*File, error) {
 	}, nil
 }
 
-func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, branch, commitMessage string) error {
+func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
 	// Get a reference to the default branch
-	ref, _, err := g.Client.Git.GetRef(context.Background(), g.Owner, g.RepoName, "refs/heads/"+branch)
+	ref, _, err := g.Client.Git.GetRef(context.Background(), owner, repoName, "refs/heads/"+branch)
 	if err != nil {
 		return err
 	}
@@ -97,13 +100,13 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, branch, commi
 			Mode:    github.String("100644"),
 		})
 	}
-	newTree, _, err := g.Client.Git.CreateTree(context.Background(), g.Owner, g.RepoName, *ref.Object.SHA, treeEntries)
+	newTree, _, err := g.Client.Git.CreateTree(context.Background(), owner, repoName, *ref.Object.SHA, treeEntries)
 	if err != nil {
 		return err
 	}
 
 	// Create a new commit object, using the new tree as its foundation
-	newCommit, _, err := g.Client.Git.CreateCommit(context.Background(), g.Owner, g.RepoName, &github.Commit{
+	newCommit, _, err := g.Client.Git.CreateCommit(context.Background(), owner, repoName, &github.Commit{
 		Message: github.String(commitMessage),
 		Tree:    newTree,
 	})
@@ -112,7 +115,7 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, branch, commi
 	}
 
 	// Update branch references to point to new submissions
-	_, _, err = g.Client.Git.UpdateRef(context.Background(), g.Owner, g.RepoName, &github.Reference{
+	_, _, err = g.Client.Git.UpdateRef(context.Background(), owner, repoName, &github.Reference{
 		Ref: github.String("refs/heads/" + branch),
 		Object: &github.GitObject{
 			SHA:  newCommit.SHA,
@@ -126,20 +129,22 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, branch, commi
 	return nil
 }
 
-func (gl *GitLabApi) GetRepoInfo() (*Repository, error) {
-	proj, _, err := gl.Client.Projects.GetProject(gl.ProjectID, nil)
+func (gl *GitLabApi) GetRepoInfo(owner, repoName string) (*Repository, error) {
+	repo, _, err := gl.Client.Projects.GetProject(fmt.Sprintf("%s/%s", owner, repoName), nil)
 	if err != nil {
 		return nil, err
 	}
-
 	return &Repository{
-		Name: proj.Name,
-		URL:  proj.WebURL,
+		ID:          repo.ID,
+		Name:        repo.Name,
+		Description: repo.Description,
+		URL:         repo.WebURL,
+		LastUpdate:  repo.LastActivityAt.String(),
 	}, nil
 }
 
-func (gl *GitLabApi) GetFile(filePath, ref string) (*File, error) {
-	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(gl.ProjectID, filePath, &gitlab.GetFileOptions{Ref: &ref})
+func (gl *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
+	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +155,7 @@ func (gl *GitLabApi) GetFile(filePath, ref string) (*File, error) {
 	}, nil
 }
 
-func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, branch, commitMessage string) error {
+func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
 	// Implement PushFilesToRepository for GitLab
 	for filePath, content := range files {
 		contentStr := string(content)
@@ -160,7 +165,7 @@ func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, branch, comm
 			Content:       &contentStr,
 		}
 
-		_, _, err := gl.Client.RepositoryFiles.CreateFile(gl.ProjectID, filePath, opts)
+		_, _, err := gl.Client.RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
 		if err != nil {
 			return err
 		}
