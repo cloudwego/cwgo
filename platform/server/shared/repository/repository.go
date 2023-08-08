@@ -82,13 +82,13 @@ func (g *GitHubApi) GetFile(filePath, ref string) (*File, error) {
 }
 
 func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, branch, commitMessage string) error {
-	// 获取默认分支的引用
+	// Get a reference to the default branch
 	ref, _, err := g.Client.Git.GetRef(context.Background(), g.Owner, g.RepoName, "refs/heads/"+branch)
 	if err != nil {
 		return err
 	}
 
-	// 为要推送的文件创建新的树（Tree）对象
+	// Create a new Tree object for the file to be pushed
 	var treeEntries []*github.TreeEntry
 	for filePath, content := range files {
 		treeEntries = append(treeEntries, &github.TreeEntry{
@@ -102,7 +102,7 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, branch, commi
 		return err
 	}
 
-	// 创建一个新的提交（Commit）对象，将新树作为其基础
+	// Create a new commit object, using the new tree as its foundation
 	newCommit, _, err := g.Client.Git.CreateCommit(context.Background(), g.Owner, g.RepoName, &github.Commit{
 		Message: github.String(commitMessage),
 		Tree:    newTree,
@@ -111,7 +111,7 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, branch, commi
 		return err
 	}
 
-	// 更新分支引用，将其指向新提交
+	// Update branch references to point to new submissions
 	_, _, err = g.Client.Git.UpdateRef(context.Background(), g.Owner, g.RepoName, &github.Reference{
 		Ref: github.String("refs/heads/" + branch),
 		Object: &github.GitObject{
