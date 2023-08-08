@@ -111,7 +111,7 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, branch, commi
 		return err
 	}
 
-	// Update branch references to point to new submissions
+	// Update branch references to point to new submission
 	_, _, err = g.Client.Git.UpdateRef(context.Background(), g.Owner, g.RepoName, &github.Reference{
 		Ref: github.String("refs/heads/" + branch),
 		Object: &github.GitObject{
