@@ -13,7 +13,7 @@ struct AddRepositoryReq{
     1: string repository_url (api.body="repository_url,required")
     2: string token (api.body="token")
 }
-struct AddRepositroyRes{
+struct AddRepositoryRes{
     1: i32 code
     2: string msg
 }
