@@ -56,7 +56,7 @@ struct SyncRepositoryByIdRes{
 }
 
 service IDLService {
-    AddRepositroyRes AddIDL(1: AddRepositoryReq req) (api.post="/repo")
+    AddRepositoryRes AddIDL(1: AddRepositoryReq req) (api.post="/repo")
     DeleteRepositoriesRes DeleteIDL(1: DeleteRepositoriesReq req) (api.delete="/repo")
     UpdateRepositoryRes UpdateIDL(1: UpdateRepositoryReq req) (api.patch="/repo")
     GetRepositoriesRes GetIDL(1: GetRepositoriesReq req) (api.get="/repo")
