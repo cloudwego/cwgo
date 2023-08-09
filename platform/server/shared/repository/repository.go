@@ -18,28 +18,43 @@ package repository
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"github.com/google/go-github/v53/github"
 	"github.com/xanzy/go-gitlab"
+	"golang.org/x/oauth2"
 	"io/ioutil"
+	"strings"
 )
 
 type IRepository interface {
+	InitClient(token string) error
 	GetFile(owner, repoName, filePath, ref string) (*File, error)
 	PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error
 }
 
 type GitHubApi struct {
-	Client github.Client
+	Client *github.Client
 }
 
 type GitLabApi struct {
-	Client gitlab.Client
+	Client *gitlab.Client
 }
 
 type File struct {
 	Name    string
 	Content []byte
+}
+
+func (g *GitHubApi) InitClient(token string) error {
+	ctx := context.Background()
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	g.Client = github.NewClient(tc)
+
+	return nil
 }
 
 func (g *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
@@ -105,15 +120,37 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	return nil
 }
 
+func (gl *GitLabApi) InitClient(token string) error {
+	client, err := gitlab.NewClient(token)
+	if err != nil {
+		return err
+	}
+	gl.Client = client
+
+	return nil
+}
+
 func (gl *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
 	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
 
+	name := filePath
+	index := strings.LastIndex(filePath, "/")
+	if index != -1 {
+		name = name[index+1:]
+	}
+
+	// 对base64编码的文件内容进行解码
+	decodedContent, err := base64.StdEncoding.DecodeString(fileContent.Content)
+	if err != nil {
+		return nil, err
+	}
+
 	return &File{
-		Name:    filePath,
-		Content: []byte(fileContent.Content),
+		Name:    name,
+		Content: decodedContent,
 	}, nil
 }
 

@@ -55,11 +55,11 @@ struct SyncRepositoryByIdRes{
     2: string msg
 }
 
-service IDLService {
-    AddRepositoryRes AddIDL(1: AddRepositoryReq req) (api.post="/repo")
-    DeleteRepositoriesRes DeleteIDL(1: DeleteRepositoriesReq req) (api.delete="/repo")
-    UpdateRepositoryRes UpdateIDL(1: UpdateRepositoryReq req) (api.patch="/repo")
-    GetRepositoriesRes GetIDL(1: GetRepositoriesReq req) (api.get="/repo")
+service RepositoryService {
+    AddRepositoryRes AddRepository(1: AddRepositoryReq req) (api.post="/repo")
+    DeleteRepositoriesRes DeleteRepository(1: DeleteRepositoriesReq req) (api.delete="/repo")
+    UpdateRepositoryRes UpdateRepository(1: UpdateRepositoryReq req) (api.patch="/repo")
+    GetRepositoriesRes GetRepository(1: GetRepositoriesReq req) (api.get="/repo")
 
-    SyncRepositoryByIdRes SyncIDL(1: SyncRepositoryByIdReq req) (api.post="/repo/sync")
+    SyncRepositoryByIdRes SyncRepository(1: SyncRepositoryByIdReq req) (api.post="/repo/sync")
 }

@@ -15,3 +15,28 @@
  */
 
 package config
+
+import "gorm.io/gorm"
+
+type IRepository interface {
+	GetTokenByID(id int64) string
+}
+
+type MysqlRepository struct {
+	db *gorm.DB
+}
+
+type Repository struct {
+	id             int64
+	repositoryUrl  string
+	lastUpdateTime string
+	lastSyncTime   string
+	token          string
+	status         string
+}
+
+func (sql *MysqlRepository) GetTokenByID(id int64) string {
+	var repo Repository
+	sql.db.Model(&repo).Where("id = ?", id).First(&repo)
+	return repo.token
+}
