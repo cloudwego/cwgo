@@ -31,9 +31,10 @@ const (
 	MainRef         = "main"
 )
 
-func AddIDL(repoID int64, idlPath string) error {
+func AddIDL(repoID int64, idlPath, serviceName string) error {
 	var gl repository.GitLabApi
-	token := "" //添加数据库操作
+	// TODO: 查数据库
+	token := ""
 
 	err := gl.InitClient(token)
 	if err != nil {
@@ -84,8 +85,8 @@ func AddIDL(repoID int64, idlPath string) error {
 	cwgoCmd := exec.Command("cwgo", "client",
 		"--idl", file.Name,
 		"--type", "rpc",
-		"--service", "hello",
-		"--module", "testCwgo")
+		"--service", serviceName,
+		"--module", serviceName)
 	cwgoCmd.Dir = tempDir
 
 	if err := cwgoCmd.Run(); err != nil {
@@ -93,7 +94,7 @@ func AddIDL(repoID int64, idlPath string) error {
 	}
 
 	filesM := make(map[string][]byte)
-	if err := pushFilesToRepository(filesM, tempDir, "kitex_gen", "rpc"); err != nil {
+	if err := processFolders(filesM, tempDir, "kitex_gen", "rpc"); err != nil {
 		return err
 	}
 
@@ -102,42 +103,22 @@ func AddIDL(repoID int64, idlPath string) error {
 		return err
 	}
 
+	// TODO: 数据库操作，添加idl记录
+
 	return nil
 }
 
-func pushFilesToRepository(filesM map[string][]byte, sourceDir string, folders ...string) error {
-	for _, folder := range folders {
-		// 递归处理文件夹
-		if err := processFolder(filesM, sourceDir+"/"+folder, folder); err != nil {
-			return err
-		}
-	}
+func DeleteIDLs(ids []int64) error {
+	//TODO: 数据库操作，删除idl记录
 	return nil
 }
 
-func processFolder(filesM map[string][]byte, folderPath, targetPath string) error {
-	files, err := ioutil.ReadDir(folderPath)
-	if err != nil {
-		return err
-	}
+func UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
+	//TODO: 数据库操作，更新idl数据
+	return nil
+}
 
-	for _, file := range files {
-		if file.IsDir() {
-			// process the subfolders
-			subFolder := targetPath + "/" + file.Name()
-			if err := processFolder(filesM, folderPath+"/"+file.Name(), subFolder); err != nil {
-				return err
-			}
-		} else {
-			// process the file
-			filePath := folderPath + "/" + file.Name()
-			content, err := ioutil.ReadFile(filePath)
-			filesM[targetPath+"/"+file.Name()] = content
-			if err != nil {
-				return err
-			}
-		}
-	}
-
+func GetIDLs(limit, page int32) error {
+	//TODO: 数据库操作，得到idl数据
 	return nil
 }

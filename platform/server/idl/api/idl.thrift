@@ -1,10 +1,11 @@
 namespace go idl
 
 struct IDL{
-    1: i64 repository_id
-    2: string main_idl_path
-    3: string idl_hash
-    4: string service_name
+    1: i64 id
+    2: i64 repository_id
+    3: string main_idl_path
+    4: string idl_hash
+    5: string service_name
 }
 
 struct AddIDLReq{
@@ -58,10 +59,10 @@ struct SyncIDLByIdRes{
 }
 
 service IDLService {
-    AddIDLRes AddIDL(1: AddIDLReq req) (api.post="/idl")
-    DeleteIDLsRes DeleteIDL(1: DeleteIDLsReq req) (api.delete="/idl")
-    UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/idl")
-    GetIDLsRes GetIDL(1: GetIDLsReq req) (api.get="/idl")
+    AddIDLRes AddIDL(1: AddIDLReq req) (api.post="/idl/add")
+    DeleteIDLsRes DeleteIDL(1: DeleteIDLsReq req) (api.delete="/idl/delete")
+    UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/idl/update")
+    GetIDLsRes GetIDLs(1: GetIDLsReq req) (api.get="/idl/get")
 
     SyncIDLByIdRes SyncIDL(1: SyncIDLByIdReq req) (api.post="/idl/sync")
 }

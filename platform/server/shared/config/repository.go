@@ -16,10 +16,18 @@
 
 package config
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type IRepository interface {
-	GetTokenByID(id int64) string
+	GetTokenByID(id int64) (string, error)
+	GetRepoTypeByID(id int64) (int64, error)
+
+	AddIDL(repoId int64, idlPath, idlHash, serviceName string) error
+	DeleteIDLs(id int64) error
+	UpdateIDL(id, repoId int64, idlPath, serviceName string) error
+	GetIDLs(page, limit int32) []IDL
 }
 
 type MysqlRepository struct {
@@ -27,16 +35,91 @@ type MysqlRepository struct {
 }
 
 type Repository struct {
-	id             int64
-	repositoryUrl  string
-	lastUpdateTime string
-	lastSyncTime   string
-	token          string
-	status         string
+	Id             int64
+	RepositoryUrl  string
+	LastUpdateTime string
+	LastSyncTime   string
+	Token          string
+	Status         string
+	RepoType       int64
 }
 
-func (sql *MysqlRepository) GetTokenByID(id int64) string {
+type IDL struct {
+	Id           int64
+	RepositoryId int64
+	MainIdlPath  string
+	IdlHash      string
+	ServiceName  string
+}
+
+func (r *MysqlRepository) GetTokenByID(id int64) (string, error) {
 	var repo Repository
-	sql.db.Model(&repo).Where("id = ?", id).First(&repo)
-	return repo.token
+	result := r.db.Model(&repo).Where("id = ?", id).First(&repo)
+	if result.Error != nil {
+		return "", result.Error
+	}
+
+	return repo.Token, nil
+}
+
+func (r *MysqlRepository) GetRepoTypeByID(id int64) (int64, error) {
+	var repo Repository
+	result := r.db.Model(&repo).Where("id = ?", id).First(&repo)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return repo.RepoType, nil
+}
+
+func (r *MysqlRepository) AddIDL(repoId int64, idlPath, idlHash, serviceName string) error {
+	idl := IDL{
+		RepositoryId: repoId,
+		MainIdlPath:  idlPath,
+		IdlHash:      idlHash,
+		ServiceName:  serviceName,
+	}
+	result := r.db.Model(&idl).Create(&idl)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlRepository) DeleteIDLs(ids []int64) error {
+	var idl IDL
+	result := r.db.Delete(&idl, ids)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlRepository) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName string) error {
+	idl := IDL{
+		Id:           id,
+		RepositoryId: repoId,
+		MainIdlPath:  idlPath,
+		IdlHash:      idlHash,
+		ServiceName:  serviceName,
+	}
+	result := r.db.Save(&idl)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlRepository) GetIDLs(page, limit int32) ([]IDL, error) {
+	var IDLs []IDL
+	offset := (page - 1) * limit
+	result := r.db.Offset(int(offset)).Limit(int(limit)).Find(&IDLs)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return IDLs, nil
 }

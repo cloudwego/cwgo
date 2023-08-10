@@ -18,6 +18,7 @@ package idl
 
 import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/idl/gitlab"
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"net/http"
 )
 
@@ -32,13 +33,48 @@ type AddIDLRes struct {
 	Msg  string
 }
 
+type DeleteIDLsReq struct {
+	Ids []int64
+}
+
+type DeleteIDLsRes struct {
+	Code int32
+	Msg  string
+}
+
+type UpdateIDLReq struct {
+	Id           int64
+	RepositoryId int64
+	MainIdlPath  string
+	ServiceName  string
+}
+
+type UpdateIDLRes struct {
+	Code int32
+	Msg  string
+}
+
+type GetIDLsReq struct {
+	Page  int32
+	Limit int32
+}
+
+type GetIDLsRes struct {
+	Code int32
+	Msg  string
+	IDLs []config.IDL
+}
+
 func AddIDL(req AddIDLReq) (AddIDLRes, error) {
 	var err error
 	var res AddIDLRes
-	repoType := 1 //查数据库
+
+	//TODO：查数据库
+	repoType := 1
+
 	switch repoType {
 	case 1:
-		err = gitlab.AddIDL(req.RepositoryId, req.MainIdlPath)
+		err = gitlab.AddIDL(req.RepositoryId, req.MainIdlPath, req.ServiceName)
 	case 2:
 
 	}
@@ -48,5 +84,61 @@ func AddIDL(req AddIDLReq) (AddIDLRes, error) {
 		return res, err
 	}
 
+	return res, nil
+}
+
+func DeleteIDLs(req DeleteIDLsReq) (DeleteIDLsRes, error) {
+	var err error
+	var res DeleteIDLsRes
+	repoType := 1 //查数据库
+	switch repoType {
+	case 1:
+		err = gitlab.DeleteIDLs(req.Ids)
+	case 2:
+
+	}
+	if err != nil {
+		res.Code = http.StatusBadRequest
+		res.Msg = "Internal error"
+		return res, err
+	}
+
+	return res, nil
+}
+
+func UpdateIDL(req UpdateIDLReq) (UpdateIDLRes, error) {
+	var err error
+	var res UpdateIDLRes
+	repoType := 1 //查数据库
+	switch repoType {
+	case 1:
+		err = gitlab.UpdateIDL(req.Id, req.RepositoryId, req.MainIdlPath, req.ServiceName)
+	case 2:
+
+	}
+	if err != nil {
+		res.Code = http.StatusBadRequest
+		res.Msg = "Internal error"
+		return res, err
+	}
+
+	return res, nil
+}
+
+func GetIDLs(req GetIDLsReq) (GetIDLsRes, error) {
+	var err error
+	var res GetIDLsRes
+	repoType := 1 //查数据库
+	switch repoType {
+	case 1:
+		err = gitlab.GetIDLs(req.Limit, req.Page)
+	case 2:
+
+	}
+	if err != nil {
+		res.Code = http.StatusBadRequest
+		res.Msg = "Internal error"
+		return res, err
+	}
 	return res, nil
 }
