@@ -17,7 +17,7 @@
 package idl
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/idl/gitlab"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/idl/gitlab"
 	"net/http"
 )
 
