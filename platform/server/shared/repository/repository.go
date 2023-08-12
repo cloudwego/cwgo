@@ -29,7 +29,7 @@ import (
 
 type IRepository interface {
 	InitClient(token string) error
-	GetFile(owner, repoName, filePath, ref string) (*File, error)
+	GetFile(owner, repoName, filePid, ref string) (*File, error)
 	PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error
 }
 
@@ -130,14 +130,14 @@ func (gl *GitLabApi) InitClient(token string) error {
 	return nil
 }
 
-func (gl *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
-	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, &gitlab.GetFileOptions{Ref: &ref})
+func (gl *GitLabApi) GetFile(owner, repoName, filePid, ref string) (*File, error) {
+	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(fmt.Sprintf("%s/%s", owner, repoName), filePid, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
 
-	name := filePath
-	index := strings.LastIndex(filePath, "/")
+	name := filePid
+	index := strings.LastIndex(filePid, "/")
 	if index != -1 {
 		name = name[index+1:]
 	}

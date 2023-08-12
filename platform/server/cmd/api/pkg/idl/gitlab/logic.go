@@ -17,13 +17,11 @@
 package gitlab
 
 import (
-	"errors"
 	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 )
 
 const (
@@ -41,27 +39,11 @@ func AddIDL(repoID int64, idlPath, serviceName string) error {
 		return err
 	}
 
-	var tempPath string
-	if strings.HasPrefix(idlPath, GitlabURLPrefix) {
-		tempPath = idlPath[len(GitlabURLPrefix):]
-		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
-		if lastQuestionMarkIndex != -1 {
-			tempPath = tempPath[:lastQuestionMarkIndex]
-		}
-	} else {
-		return errors.New("idlPath format wrong,do not have prefix:\"https://github.com/\"")
+	idlPid, owner, repoName, err := parseIdlURL(idlPath)
+	if err != nil {
+		return err
 	}
-	urlParts := strings.Split(tempPath, "/")
-	if len(urlParts) < 5 {
-		return errors.New("idlPath format wrong")
-	}
-	owner := urlParts[0]
-	repoName := urlParts[1]
-	idlPid := ""
-	for i := 5; i < len(urlParts); i++ {
-		idlPid = idlPid + "/" + urlParts[i]
-	}
-	idlPid = idlPid[1:]
+
 	// Create temp dir
 	tempDir, err := ioutil.TempDir("", "temp_gitlab_cwgo")
 	if err != nil {
@@ -120,5 +102,23 @@ func UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
 
 func GetIDLs(limit, page int32) error {
 	//TODO: 数据库操作，得到idl数据
+	return nil
+}
+
+func SyncIDLs(ids []int64) error {
+	var gl repository.GitLabApi
+
+	for _, v := range ids {
+		//TODO: 数据库操作，得到idl的URL
+		idlPath := ""
+		idlPid, owner, repoName, err := parseIdlURL(idlPath)
+		file, err := gl.GetFile(owner, repoName, idlPid, MainRef)
+		if err != nil {
+			return err
+		}
+		//TODO: 数据库存储file.content
+
+	}
+
 	return nil
 }

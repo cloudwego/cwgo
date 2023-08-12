@@ -27,7 +27,6 @@ type AddIDLReq struct {
 	MainIdlPath  string
 	ServiceName  string
 }
-
 type AddIDLRes struct {
 	Code int32
 	Msg  string
@@ -36,7 +35,6 @@ type AddIDLRes struct {
 type DeleteIDLsReq struct {
 	Ids []int64
 }
-
 type DeleteIDLsRes struct {
 	Code int32
 	Msg  string
@@ -48,7 +46,6 @@ type UpdateIDLReq struct {
 	MainIdlPath  string
 	ServiceName  string
 }
-
 type UpdateIDLRes struct {
 	Code int32
 	Msg  string
@@ -58,11 +55,18 @@ type GetIDLsReq struct {
 	Page  int32
 	Limit int32
 }
-
 type GetIDLsRes struct {
 	Code int32
 	Msg  string
 	IDLs []config.IDL
+}
+
+type SyncIDLsReq struct {
+	Ids []int64
+}
+type SyncIDLsRes struct {
+	Code int32
+	Msg  string
 }
 
 func AddIDL(req AddIDLReq) (AddIDLRes, error) {
@@ -140,5 +144,25 @@ func GetIDLs(req GetIDLsReq) (GetIDLsRes, error) {
 		res.Msg = "Internal error"
 		return res, err
 	}
+
+	return res, nil
+}
+
+func SyncIDLs(req SyncIDLsReq) (SyncIDLsRes, error) {
+	var err error
+	var res SyncIDLsRes
+	repoType := 1 //查数据库
+	switch repoType {
+	case 1:
+		err = gitlab.SyncIDLs(req.Ids)
+	case 2:
+
+	}
+	if err != nil {
+		res.Code = http.StatusBadRequest
+		res.Msg = "Internal error"
+		return res, err
+	}
+
 	return res, nil
 }

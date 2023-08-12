@@ -15,3 +15,68 @@
  */
 
 package config
+
+import "gorm.io/gorm"
+
+type IIdl interface {
+	AddIDL(repoId int64, idlPath, idlHash, serviceName string) error
+	DeleteIDLs(id int64) error
+	UpdateIDL(id, repoId int64, idlPath, serviceName string) error
+	GetIDLs(page, limit int32) []IDL
+}
+
+type MysqlIDL struct {
+	db *gorm.DB
+}
+
+func (r *MysqlIDL) AddIDL(repoId int64, idlPath, idlHash, serviceName string) error {
+	idl := IDL{
+		RepositoryId: repoId,
+		MainIdlPath:  idlPath,
+		IdlHash:      idlHash,
+		ServiceName:  serviceName,
+	}
+	result := r.db.Create(&idl)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlIDL) DeleteIDLs(ids []int64) error {
+	var idl IDL
+	result := r.db.Delete(&idl, ids)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlIDL) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName string) error {
+	idl := IDL{
+		Id:           id,
+		RepositoryId: repoId,
+		MainIdlPath:  idlPath,
+		IdlHash:      idlHash,
+		ServiceName:  serviceName,
+	}
+	result := r.db.Save(&idl)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlIDL) GetIDLs(page, limit int32) ([]IDL, error) {
+	var IDLs []IDL
+	offset := (page - 1) * limit
+	result := r.db.Offset(int(offset)).Limit(int(limit)).Find(&IDLs)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return IDLs, nil
+}

@@ -22,12 +22,12 @@ import (
 
 type IRepository interface {
 	GetTokenByID(id int64) (string, error)
-	GetRepoTypeByID(id int64) (int64, error)
+	GetRepoTypeByID(id int64) (int32, error)
 
-	AddIDL(repoId int64, idlPath, idlHash, serviceName string) error
-	DeleteIDLs(id int64) error
-	UpdateIDL(id, repoId int64, idlPath, serviceName string) error
-	GetIDLs(page, limit int32) []IDL
+	AddRepository(repoURL, lastUpdateTime, lastSyncTime, token, status string, repoType int32) error
+	DeleteRepository(ids string) error
+	UpdateRepository(id, token string) error
+	GetRepositories(page, limit int32) ([]Repository, error)
 }
 
 type MysqlRepository struct {
@@ -41,7 +41,7 @@ type Repository struct {
 	LastSyncTime   string
 	Token          string
 	Status         string
-	RepoType       int64
+	RepoType       int32
 }
 
 type IDL struct {
@@ -62,7 +62,7 @@ func (r *MysqlRepository) GetTokenByID(id int64) (string, error) {
 	return repo.Token, nil
 }
 
-func (r *MysqlRepository) GetRepoTypeByID(id int64) (int64, error) {
+func (r *MysqlRepository) GetRepoTypeByID(id int64) (int32, error) {
 	var repo Repository
 	result := r.db.Model(&repo).Where("id = ?", id).First(&repo)
 	if result.Error != nil {
@@ -72,14 +72,16 @@ func (r *MysqlRepository) GetRepoTypeByID(id int64) (int64, error) {
 	return repo.RepoType, nil
 }
 
-func (r *MysqlRepository) AddIDL(repoId int64, idlPath, idlHash, serviceName string) error {
-	idl := IDL{
-		RepositoryId: repoId,
-		MainIdlPath:  idlPath,
-		IdlHash:      idlHash,
-		ServiceName:  serviceName,
+func (r *MysqlRepository) AddRepository(repoURL, lastUpdateTime, lastSyncTime, token, status string, repoType int32) error {
+	repo := Repository{
+		RepositoryUrl:  repoURL,
+		LastUpdateTime: lastSyncTime,
+		LastSyncTime:   lastSyncTime,
+		Token:          token,
+		Status:         status,
+		RepoType:       repoType,
 	}
-	result := r.db.Model(&idl).Create(&idl)
+	result := r.db.Create(&repo)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -87,9 +89,9 @@ func (r *MysqlRepository) AddIDL(repoId int64, idlPath, idlHash, serviceName str
 	return nil
 }
 
-func (r *MysqlRepository) DeleteIDLs(ids []int64) error {
-	var idl IDL
-	result := r.db.Delete(&idl, ids)
+func (r *MysqlRepository) DeleteRepository(ids string) error {
+	var repo Repository
+	result := r.db.Delete(&repo, ids)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -97,15 +99,8 @@ func (r *MysqlRepository) DeleteIDLs(ids []int64) error {
 	return nil
 }
 
-func (r *MysqlRepository) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName string) error {
-	idl := IDL{
-		Id:           id,
-		RepositoryId: repoId,
-		MainIdlPath:  idlPath,
-		IdlHash:      idlHash,
-		ServiceName:  serviceName,
-	}
-	result := r.db.Save(&idl)
+func (r *MysqlRepository) UpdateRepository(id, token string) error {
+	result := r.db.Model(&Repository{}).Where("id = ?", id).Update("token", token)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -113,13 +108,13 @@ func (r *MysqlRepository) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceN
 	return nil
 }
 
-func (r *MysqlRepository) GetIDLs(page, limit int32) ([]IDL, error) {
-	var IDLs []IDL
+func (r *MysqlRepository) GetRepositories(page, limit int32) ([]Repository, error) {
+	var repos []Repository
 	offset := (page - 1) * limit
-	result := r.db.Offset(int(offset)).Limit(int(limit)).Find(&IDLs)
+	result := r.db.Offset(int(offset)).Limit(int(limit)).Find(&repos)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return IDLs, nil
+	return repos, nil
 }

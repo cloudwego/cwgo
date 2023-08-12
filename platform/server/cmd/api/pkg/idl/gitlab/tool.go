@@ -16,7 +16,11 @@
 
 package gitlab
 
-import "io/ioutil"
+import (
+	"errors"
+	"io/ioutil"
+	"strings"
+)
 
 func processFolders(filesM map[string][]byte, sourceDir string, folders ...string) error {
 	for _, folder := range folders {
@@ -53,4 +57,28 @@ func processFolder(filesM map[string][]byte, folderPath, targetPath string) erro
 	}
 
 	return nil
+}
+
+func parseIdlURL(url string) (idlPid, owner, repoName string, err error) {
+	var tempPath string
+	if strings.HasPrefix(url, GitlabURLPrefix) {
+		tempPath = url[len(GitlabURLPrefix):]
+		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
+		if lastQuestionMarkIndex != -1 {
+			tempPath = tempPath[:lastQuestionMarkIndex]
+		}
+	} else {
+		return "", "", "", errors.New("idlPath format wrong,do not have prefix:\"https://github.com/\"")
+	}
+	urlParts := strings.Split(tempPath, "/")
+	if len(urlParts) < 5 {
+		return "", "", "", errors.New("idlPath format wrong")
+	}
+	owner = urlParts[0]
+	repoName = urlParts[1]
+	for i := 5; i < len(urlParts); i++ {
+		idlPid = idlPid + "/" + urlParts[i]
+	}
+	idlPid = idlPid[1:]
+	return idlPid, owner, repoName, nil
 }

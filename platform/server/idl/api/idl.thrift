@@ -50,10 +50,10 @@ struct GetIDLsResData{
     1: list<IDL> idls
 }
 
-struct SyncIDLByIdReq{
+struct SyncIDLsByIdReq{
     1: list<i64> ids (api.body="ids,required")
 }
-struct SyncIDLByIdRes{
+struct SyncIDLsByIdRes{
     1: i32 code
     2: string msg
 }
@@ -64,5 +64,5 @@ service IDLService {
     UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/idl/update")
     GetIDLsRes GetIDLs(1: GetIDLsReq req) (api.get="/idl/get")
 
-    SyncIDLByIdRes SyncIDL(1: SyncIDLByIdReq req) (api.post="/idl/sync")
+    SyncIDLsByIdRes SyncIDLs(1: SyncIDLsByIdReq req) (api.post="/idl/sync")
 }
