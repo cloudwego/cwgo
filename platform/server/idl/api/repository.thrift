@@ -3,10 +3,11 @@ namespace go repository
 struct Repository{
     1: string id
     2: string repository_url
-    3: string last_update_time
-    4: string last_sync_time
-    5: string token
-    6: string status
+    3: string create_time
+    4: string last_update_time
+    5: string last_sync_time
+    6: string token
+    7: string status
 }
 
 struct AddRepositoryReq{

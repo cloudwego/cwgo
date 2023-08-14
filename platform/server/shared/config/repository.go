@@ -113,11 +113,11 @@ func (r *MysqlRepository) GetRepositories(page, limit int32, sortBy string) ([]R
 
 	// Default sort field to 'update_time' if not provided
 	if sortBy == "" {
-		sortBy = "update_time"
+		sortBy = SortByUpdateTime
 	}
 
 	offset := (page - 1) * limit
-	result := r.Db.Offset(int(offset)).Limit(int(limit)).Find(&repos)
+	result := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&repos)
 	if result.Error != nil {
 		return nil, result.Error
 	}

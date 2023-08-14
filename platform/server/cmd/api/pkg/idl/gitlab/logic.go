@@ -25,10 +25,6 @@ import (
 	"os/exec"
 )
 
-const (
-	MainRef = "main"
-)
-
 func AddIDL(repoID int64, idlPath, serviceName string) error {
 	idlPid, owner, repoName, err := utils.ParseIdlURL(idlPath)
 	if err != nil {

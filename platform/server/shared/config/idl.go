@@ -76,7 +76,12 @@ func (r *MysqlIDL) GetIDLs(page, limit int32, sortBy string) ([]IDL, error) {
 	var IDLs []IDL
 	offset := (page - 1) * limit
 
-	res := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&IDLs)
+	// Default sort field to 'update_time' if not provided
+	if sortBy == "" {
+		sortBy = SortByUpdateTime
+	}
+
+	res := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Order(sortBy).Find(&IDLs)
 	if res.Error != nil {
 		return nil, res.Error
 	}
