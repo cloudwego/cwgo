@@ -31,7 +31,7 @@ type IRepository interface {
 }
 
 type MysqlRepository struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 type Repository struct {
@@ -54,7 +54,7 @@ type IDL struct {
 
 func (r *MysqlRepository) GetTokenByID(id int64) (string, error) {
 	var repo Repository
-	result := r.db.Model(&repo).Where("id = ?", id).Take(&repo)
+	result := r.Db.Model(&repo).Where("id = ?", id).Take(&repo)
 	if result.Error != nil {
 		return "", result.Error
 	}
@@ -64,7 +64,7 @@ func (r *MysqlRepository) GetTokenByID(id int64) (string, error) {
 
 func (r *MysqlRepository) GetRepoTypeByID(id int64) (int32, error) {
 	var repo Repository
-	result := r.db.Model(&repo).Where("id = ?", id).Take(&repo)
+	result := r.Db.Model(&repo).Where("id = ?", id).Take(&repo)
 	if result.Error != nil {
 		return 0, result.Error
 	}
@@ -81,7 +81,7 @@ func (r *MysqlRepository) AddRepository(repoURL, lastUpdateTime, lastSyncTime, t
 		Status:         status,
 		RepoType:       repoType,
 	}
-	result := r.db.Create(&repo)
+	result := r.Db.Create(&repo)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -91,7 +91,7 @@ func (r *MysqlRepository) AddRepository(repoURL, lastUpdateTime, lastSyncTime, t
 
 func (r *MysqlRepository) DeleteRepository(ids string) error {
 	var repo Repository
-	result := r.db.Delete(&repo, ids)
+	result := r.Db.Delete(&repo, ids)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -100,7 +100,7 @@ func (r *MysqlRepository) DeleteRepository(ids string) error {
 }
 
 func (r *MysqlRepository) UpdateRepository(id, token string) error {
-	result := r.db.Model(&Repository{}).Where("id = ?", id).Update("token", token)
+	result := r.Db.Model(&Repository{}).Where("id = ?", id).Update("token", token)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -108,10 +108,16 @@ func (r *MysqlRepository) UpdateRepository(id, token string) error {
 	return nil
 }
 
-func (r *MysqlRepository) GetRepositories(page, limit int32) ([]Repository, error) {
+func (r *MysqlRepository) GetRepositories(page, limit int32, sortBy string) ([]Repository, error) {
 	var repos []Repository
+
+	// Default sort field to 'update_time' if not provided
+	if sortBy == "" {
+		sortBy = "update_time"
+	}
+
 	offset := (page - 1) * limit
-	result := r.db.Offset(int(offset)).Limit(int(limit)).Find(&repos)
+	result := r.Db.Offset(int(offset)).Limit(int(limit)).Find(&repos)
 	if result.Error != nil {
 		return nil, result.Error
 	}

@@ -26,8 +26,10 @@ type IIdl interface {
 }
 
 type MysqlIDL struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
+
+var MysqlIdl *MysqlIDL
 
 func (r *MysqlIDL) AddIDL(repoId int64, idlPath, idlHash, serviceName string) error {
 	idl := IDL{
@@ -36,7 +38,7 @@ func (r *MysqlIDL) AddIDL(repoId int64, idlPath, idlHash, serviceName string) er
 		IdlHash:      idlHash,
 		ServiceName:  serviceName,
 	}
-	res := r.db.Create(&idl)
+	res := r.Db.Create(&idl)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -46,7 +48,7 @@ func (r *MysqlIDL) AddIDL(repoId int64, idlPath, idlHash, serviceName string) er
 
 func (r *MysqlIDL) DeleteIDLs(ids []int64) error {
 	var idl IDL
-	res := r.db.Delete(&idl, ids)
+	res := r.Db.Delete(&idl, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -62,7 +64,7 @@ func (r *MysqlIDL) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName str
 		IdlHash:      idlHash,
 		ServiceName:  serviceName,
 	}
-	res := r.db.Save(&idl)
+	res := r.Db.Save(&idl)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -70,10 +72,11 @@ func (r *MysqlIDL) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName str
 	return nil
 }
 
-func (r *MysqlIDL) GetIDLs(page, limit int32) ([]IDL, error) {
+func (r *MysqlIDL) GetIDLs(page, limit int32, sortBy string) ([]IDL, error) {
 	var IDLs []IDL
 	offset := (page - 1) * limit
-	res := r.db.Offset(int(offset)).Limit(int(limit)).Find(&IDLs)
+
+	res := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&IDLs)
 	if res.Error != nil {
 		return nil, res.Error
 	}

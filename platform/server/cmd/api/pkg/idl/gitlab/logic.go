@@ -18,7 +18,7 @@ package gitlab
 
 import (
 	"fmt"
-	"github.com/cloudwego/cwgo/platform/server/shared/repository"
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"io/ioutil"
 	"os"
@@ -30,15 +30,6 @@ const (
 )
 
 func AddIDL(repoID int64, idlPath, serviceName string) error {
-	var gl repository.GitLabApi
-	// TODO: 查数据库
-	token := ""
-
-	err := gl.InitClient(token)
-	if err != nil {
-		return err
-	}
-
 	idlPid, owner, repoName, err := utils.ParseIdlURL(idlPath)
 	if err != nil {
 		return err
@@ -85,7 +76,10 @@ func AddIDL(repoID int64, idlPath, serviceName string) error {
 		return err
 	}
 
-	// TODO: 数据库操作，添加idl记录
+	err = config.MysqlIdl.AddIDL(repoID, idlPath, idlPath, serviceName)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -106,8 +100,6 @@ func GetIDLs(limit, page int32) error {
 }
 
 func SyncIDLs(ids []int64) error {
-	var gl repository.GitLabApi
-
 	for _, v := range ids {
 		//TODO: 数据库操作，得到idl的URL
 		idlPath := ""
