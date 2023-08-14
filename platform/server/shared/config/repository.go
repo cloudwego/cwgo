@@ -16,27 +16,111 @@
 
 package config
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type IRepository interface {
-	GetTokenByID(id int64) string
+	GetTokenByID(id int64) (string, error)
+	GetRepoTypeByID(id int64) (int32, error)
+
+	AddRepository(repoURL, lastUpdateTime, lastSyncTime, token, status string, repoType int32) error
+	DeleteRepository(ids string) error
+	UpdateRepository(id, token string) error
+	GetRepositories(page, limit int32) ([]Repository, error)
 }
 
 type MysqlRepository struct {
-	db *gorm.DB
+	Db *gorm.DB
 }
 
 type Repository struct {
-	id             int64
-	repositoryUrl  string
-	lastUpdateTime string
-	lastSyncTime   string
-	token          string
-	status         string
+	Id             int64
+	RepositoryUrl  string
+	LastUpdateTime string
+	LastSyncTime   string
+	Token          string
+	Status         string
+	RepoType       int32
 }
 
-func (sql *MysqlRepository) GetTokenByID(id int64) string {
+type IDL struct {
+	Id           int64
+	RepositoryId int64
+	MainIdlPath  string
+	IdlHash      string
+	ServiceName  string
+}
+
+func (r *MysqlRepository) GetTokenByID(id int64) (string, error) {
 	var repo Repository
-	sql.db.Model(&repo).Where("id = ?", id).First(&repo)
-	return repo.token
+	result := r.Db.Model(&repo).Where("id = ?", id).Take(&repo)
+	if result.Error != nil {
+		return "", result.Error
+	}
+
+	return repo.Token, nil
+}
+
+func (r *MysqlRepository) GetRepoTypeByID(id int64) (int32, error) {
+	var repo Repository
+	result := r.Db.Model(&repo).Where("id = ?", id).Take(&repo)
+	if result.Error != nil {
+		return 0, result.Error
+	}
+
+	return repo.RepoType, nil
+}
+
+func (r *MysqlRepository) AddRepository(repoURL, lastUpdateTime, lastSyncTime, token, status string, repoType int32) error {
+	repo := Repository{
+		RepositoryUrl:  repoURL,
+		LastUpdateTime: lastSyncTime,
+		LastSyncTime:   lastSyncTime,
+		Token:          token,
+		Status:         status,
+		RepoType:       repoType,
+	}
+	result := r.Db.Create(&repo)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlRepository) DeleteRepository(ids string) error {
+	var repo Repository
+	result := r.Db.Delete(&repo, ids)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlRepository) UpdateRepository(id, token string) error {
+	result := r.Db.Model(&Repository{}).Where("id = ?", id).Update("token", token)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlRepository) GetRepositories(page, limit int32, sortBy string) ([]Repository, error) {
+	var repos []Repository
+
+	// Default sort field to 'update_time' if not provided
+	if sortBy == "" {
+		sortBy = SortByUpdateTime
+	}
+
+	offset := (page - 1) * limit
+	result := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&repos)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return repos, nil
 }

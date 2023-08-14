@@ -3,10 +3,11 @@ namespace go repository
 struct Repository{
     1: string id
     2: string repository_url
-    3: string last_update_time
-    4: string last_sync_time
-    5: string token
-    6: string status
+    3: string create_time
+    4: string last_update_time
+    5: string last_sync_time
+    6: string token
+    7: string status
 }
 
 struct AddRepositoryReq{
@@ -27,7 +28,8 @@ struct DeleteRepositoriesRes{
 }
 
 struct UpdateRepositoryReq{
-    1: string token (api.body="token")
+    1: string id
+    2: string token (api.body="token")
 }
 struct UpdateRepositoryRes{
     1: i32 code
@@ -59,7 +61,7 @@ service RepositoryService {
     AddRepositoryRes AddRepository(1: AddRepositoryReq req) (api.post="/repo")
     DeleteRepositoriesRes DeleteRepository(1: DeleteRepositoriesReq req) (api.delete="/repo")
     UpdateRepositoryRes UpdateRepository(1: UpdateRepositoryReq req) (api.patch="/repo")
-    GetRepositoriesRes GetRepository(1: GetRepositoriesReq req) (api.get="/repo")
+    GetRepositoriesRes GetRepositories(1: GetRepositoriesReq req) (api.get="/repo")
 
     SyncRepositoryByIdRes SyncRepository(1: SyncRepositoryByIdReq req) (api.post="/repo/sync")
 }

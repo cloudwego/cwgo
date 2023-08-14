@@ -17,3 +17,21 @@
  */
 
 package store
+
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+func InitDB(dsn string) error {
+	sql, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return err
+	}
+	config.MysqlIdl = &config.MysqlIDL{
+		Db: sql,
+	}
+
+	return nil
+}

@@ -15,3 +15,76 @@
  */
 
 package config
+
+import "gorm.io/gorm"
+
+type IIdl interface {
+	AddIDL(repoId int64, idlPath, idlHash, serviceName string) error
+	DeleteIDLs(id int64) error
+	UpdateIDL(id, repoId int64, idlPath, serviceName string) error
+	GetIDLs(page, limit int32) []IDL
+}
+
+type MysqlIDL struct {
+	Db *gorm.DB
+}
+
+var MysqlIdl *MysqlIDL
+
+func (r *MysqlIDL) AddIDL(repoId int64, idlPath, idlHash, serviceName string) error {
+	idl := IDL{
+		RepositoryId: repoId,
+		MainIdlPath:  idlPath,
+		IdlHash:      idlHash,
+		ServiceName:  serviceName,
+	}
+	res := r.Db.Create(&idl)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlIDL) DeleteIDLs(ids []int64) error {
+	var idl IDL
+	res := r.Db.Delete(&idl, ids)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlIDL) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName string) error {
+	idl := IDL{
+		Id:           id,
+		RepositoryId: repoId,
+		MainIdlPath:  idlPath,
+		IdlHash:      idlHash,
+		ServiceName:  serviceName,
+	}
+	res := r.Db.Save(&idl)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlIDL) GetIDLs(page, limit int32, sortBy string) ([]IDL, error) {
+	var IDLs []IDL
+	offset := (page - 1) * limit
+
+	// Default sort field to 'update_time' if not provided
+	if sortBy == "" {
+		sortBy = SortByUpdateTime
+	}
+
+	res := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Order(sortBy).Find(&IDLs)
+	if res.Error != nil {
+		return nil, res.Error
+	}
+
+	return IDLs, nil
+}

@@ -1,10 +1,14 @@
 namespace go idl
 
 struct IDL{
-    1: i64 repository_id
-    2: string main_idl_path
-    3: string idl_hash
-    4: string service_name
+    1: i64 id
+    2: i64 repository_id
+    3: string create_time
+    4: string last_update_time
+    5: string last_sync_time
+    6: string main_idl_path
+    7: string idl_hash
+    8: string service_name
 }
 
 struct AddIDLReq{
@@ -49,19 +53,19 @@ struct GetIDLsResData{
     1: list<IDL> idls
 }
 
-struct SyncIDLByIdReq{
+struct SyncIDLsByIdReq{
     1: list<i64> ids (api.body="ids,required")
 }
-struct SyncIDLByIdRes{
+struct SyncIDLsByIdRes{
     1: i32 code
     2: string msg
 }
 
 service IDLService {
-    AddIDLRes AddIDL(1: AddIDLReq req) (api.post="/idl")
-    DeleteIDLsRes DeleteIDL(1: DeleteIDLsReq req) (api.delete="/idl")
-    UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/idl")
-    GetIDLsRes GetIDL(1: GetIDLsReq req) (api.get="/idl")
+    AddIDLRes AddIDL(1: AddIDLReq req) (api.post="/idl/add")
+    DeleteIDLsRes DeleteIDL(1: DeleteIDLsReq req) (api.delete="/idl/delete")
+    UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/idl/update")
+    GetIDLsRes GetIDLs(1: GetIDLsReq req) (api.get="/idl/get")
 
-    SyncIDLByIdRes SyncIDL(1: SyncIDLByIdReq req) (api.post="/idl/sync")
+    SyncIDLsByIdRes SyncIDLs(1: SyncIDLsByIdReq req) (api.post="/idl/sync")
 }
