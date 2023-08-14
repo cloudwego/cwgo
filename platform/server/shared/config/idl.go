@@ -36,9 +36,9 @@ func (r *MysqlIDL) AddIDL(repoId int64, idlPath, idlHash, serviceName string) er
 		IdlHash:      idlHash,
 		ServiceName:  serviceName,
 	}
-	result := r.db.Create(&idl)
-	if result.Error != nil {
-		return result.Error
+	res := r.db.Create(&idl)
+	if res.Error != nil {
+		return res.Error
 	}
 
 	return nil
@@ -46,9 +46,9 @@ func (r *MysqlIDL) AddIDL(repoId int64, idlPath, idlHash, serviceName string) er
 
 func (r *MysqlIDL) DeleteIDLs(ids []int64) error {
 	var idl IDL
-	result := r.db.Delete(&idl, ids)
-	if result.Error != nil {
-		return result.Error
+	res := r.db.Delete(&idl, ids)
+	if res.Error != nil {
+		return res.Error
 	}
 
 	return nil
@@ -62,9 +62,9 @@ func (r *MysqlIDL) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName str
 		IdlHash:      idlHash,
 		ServiceName:  serviceName,
 	}
-	result := r.db.Save(&idl)
-	if result.Error != nil {
-		return result.Error
+	res := r.db.Save(&idl)
+	if res.Error != nil {
+		return res.Error
 	}
 
 	return nil
@@ -73,9 +73,9 @@ func (r *MysqlIDL) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName str
 func (r *MysqlIDL) GetIDLs(page, limit int32) ([]IDL, error) {
 	var IDLs []IDL
 	offset := (page - 1) * limit
-	result := r.db.Offset(int(offset)).Limit(int(limit)).Find(&IDLs)
-	if result.Error != nil {
-		return nil, result.Error
+	res := r.db.Offset(int(offset)).Limit(int(limit)).Find(&IDLs)
+	if res.Error != nil {
+		return nil, res.Error
 	}
 
 	return IDLs, nil

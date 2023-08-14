@@ -14,52 +14,53 @@
  * limitations under the License.
  */
 
-package gitlab
+package utils
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
-func processFolders(filesM map[string][]byte, sourceDir string, folders ...string) error {
+const GitlabURLPrefix = "https://gitlab.com/"
+
+func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ...string) error {
 	for _, folder := range folders {
-		// 递归处理文件夹
-		if err := processFolder(filesM, sourceDir+"/"+folder, folder); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func processFolder(filesM map[string][]byte, folderPath, targetPath string) error {
-	files, err := ioutil.ReadDir(folderPath)
-	if err != nil {
-		return err
-	}
-
-	for _, file := range files {
-		if file.IsDir() {
-			// process the subfolders
-			subFolder := targetPath + "/" + file.Name()
-			if err := processFolder(filesM, folderPath+"/"+file.Name(), subFolder); err != nil {
-				return err
-			}
-		} else {
-			// process the file
-			filePath := folderPath + "/" + file.Name()
-			content, err := ioutil.ReadFile(filePath)
-			filesM[targetPath+"/"+file.Name()] = content
+		err := filepath.Walk(tempDir+"/"+folder, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
+
+			if !info.IsDir() {
+				relPath, err := filepath.Rel(tempDir, path)
+				if err != nil {
+					return err
+				}
+
+				content, err := ioutil.ReadFile(path)
+				if err != nil {
+					return err
+				}
+
+				fileContentMap[relPath] = content
+			}
+
+			return nil
+		})
+
+		if err != nil {
+			fmt.Printf("Error walking path %s: %v\n", folder, err)
+			return err
 		}
 	}
 
 	return nil
 }
 
-func parseIdlURL(url string) (idlPid, owner, repoName string, err error) {
+func ParseIdlURL(url string) (idlPid, owner, repoName string, err error) {
 	var tempPath string
 	if strings.HasPrefix(url, GitlabURLPrefix) {
 		tempPath = url[len(GitlabURLPrefix):]

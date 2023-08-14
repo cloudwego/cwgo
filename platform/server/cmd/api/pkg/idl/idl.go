@@ -17,6 +17,7 @@
 package idl
 
 import (
+	"errors"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/idl/gitlab"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"net/http"
@@ -81,6 +82,8 @@ func AddIDL(req AddIDLReq) (AddIDLRes, error) {
 		err = gitlab.AddIDL(req.RepositoryId, req.MainIdlPath, req.ServiceName)
 	case 2:
 
+	default:
+		err = errors.New("repoType is wrong")
 	}
 	if err != nil {
 		res.Code = http.StatusBadRequest
@@ -100,6 +103,8 @@ func DeleteIDLs(req DeleteIDLsReq) (DeleteIDLsRes, error) {
 		err = gitlab.DeleteIDLs(req.Ids)
 	case 2:
 
+	default:
+		err = errors.New("repoType is wrong")
 	}
 	if err != nil {
 		res.Code = http.StatusBadRequest
@@ -119,6 +124,8 @@ func UpdateIDL(req UpdateIDLReq) (UpdateIDLRes, error) {
 		err = gitlab.UpdateIDL(req.Id, req.RepositoryId, req.MainIdlPath, req.ServiceName)
 	case 2:
 
+	default:
+		err = errors.New("repoType is wrong")
 	}
 	if err != nil {
 		res.Code = http.StatusBadRequest
@@ -138,6 +145,8 @@ func GetIDLs(req GetIDLsReq) (GetIDLsRes, error) {
 		err = gitlab.GetIDLs(req.Limit, req.Page)
 	case 2:
 
+	default:
+		err = errors.New("repoType is wrong")
 	}
 	if err != nil {
 		res.Code = http.StatusBadRequest
@@ -157,6 +166,8 @@ func SyncIDLs(req SyncIDLsReq) (SyncIDLsRes, error) {
 		err = gitlab.SyncIDLs(req.Ids)
 	case 2:
 
+	default:
+		err = errors.New("repoType is wrong")
 	}
 	if err != nil {
 		res.Code = http.StatusBadRequest

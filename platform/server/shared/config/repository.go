@@ -54,7 +54,7 @@ type IDL struct {
 
 func (r *MysqlRepository) GetTokenByID(id int64) (string, error) {
 	var repo Repository
-	result := r.db.Model(&repo).Where("id = ?", id).First(&repo)
+	result := r.db.Model(&repo).Where("id = ?", id).Take(&repo)
 	if result.Error != nil {
 		return "", result.Error
 	}
@@ -64,7 +64,7 @@ func (r *MysqlRepository) GetTokenByID(id int64) (string, error) {
 
 func (r *MysqlRepository) GetRepoTypeByID(id int64) (int32, error) {
 	var repo Repository
-	result := r.db.Model(&repo).Where("id = ?", id).First(&repo)
+	result := r.db.Model(&repo).Where("id = ?", id).Take(&repo)
 	if result.Error != nil {
 		return 0, result.Error
 	}
