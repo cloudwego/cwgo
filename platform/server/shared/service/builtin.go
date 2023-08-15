@@ -16,38 +16,12 @@
  *
  */
 
-package store
+package service
 
-import (
-	"errors"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-)
+import "time"
 
-var (
-	mysqlDb *gorm.DB
-)
-
-func InitMysqlDB(dsn string) error {
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-
-	mysqlDb = db
-
-	return nil
-}
-
-func GetMysqlDB(dsn ...string) (*gorm.DB, error) {
-	if dsn != nil {
-		err := InitMysqlDB(dsn[0])
-		if err != nil {
-			return nil, err
-		}
-	}
-	if mysqlDb != nil {
-		return mysqlDb, nil
-	}
-	return nil, errors.New("mysql db not initialized")
+type BuiltinService struct {
+	Id             string
+	LastUpdateTime time.Time
+	// TODO: rpc客户端
 }

@@ -16,4 +16,8 @@
  *
  */
 
-package config
+package service
+
+type IService interface {
+	// TODO: 能调用 agent 的方法...
+}

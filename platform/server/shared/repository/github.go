@@ -24,15 +24,20 @@ import (
 	"io/ioutil"
 )
 
-func (g *GitHubApi) InitClient(token string) error {
+type GitHubApi struct {
+	Client *github.Client
+}
+
+func NewClient(token string) *GitHubApi {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
 	tc := oauth2.NewClient(ctx, ts)
-	g.Client = github.NewClient(tc)
 
-	return nil
+	return &GitHubApi{
+		Client: github.NewClient(tc),
+	}
 }
 
 func (g *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {

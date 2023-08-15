@@ -16,10 +16,4 @@
  *
  */
 
-package config
-
-const (
-	SortByUpdateTime = "last_update_time"
-	SortByCreateTime = "create_time"
-	SortBySyncTime   = "last_sync_time"
-)
+package agent

@@ -16,10 +16,4 @@
  *
  */
 
-package registry
-
-type IRegistry interface {
-	CleanUp() error
-	Count() int
-	GetServiceIds() []string
-}
+package api

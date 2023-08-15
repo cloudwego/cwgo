@@ -72,7 +72,7 @@ func AddIDL(repoID int64, idlPath, serviceName string) error {
 		return err
 	}
 
-	err = config.MysqlIdl.AddIDL(repoID, idlPath, idlPath, serviceName)
+	err = config.GetManager().GetIdlManager().AddIDL(repoID, idlPath, idlPath, serviceName)
 	if err != nil {
 		return err
 	}

@@ -16,5 +16,36 @@
 
 package config
 
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/idl"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/repository"
+)
+
 type IManager interface {
+	GetIdlManager() idl.IIdlManager
+	GetRepositoryManager() repository.IRepositoryManager
+}
+
+type Manager struct {
+	IdlManager        idl.IIdlManager
+	RepositoryManager repository.IRepositoryManager
+}
+
+var manager *Manager
+
+func NewManager() *Manager {
+
+	return &Manager{}
+}
+
+func GetManager() *Manager {
+	return manager
+}
+
+func (m *Manager) GetIdlManager() idl.IIdlManager {
+	return m.IdlManager
+}
+
+func (m *Manager) GetRepositoryManager() repository.IRepositoryManager {
+	return m.RepositoryManager
 }
