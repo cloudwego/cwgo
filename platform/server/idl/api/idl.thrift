@@ -5,11 +5,11 @@ struct IDL{
     2: i64 repository_id
     3: string main_idl_path
     4: string content
-    5: string create_time
-    6: string last_update_time
-    7: string last_sync_time
-    8: string idl_hash
-    9: string service_name
+    7: string idl_hash
+    8: string service_name
+    6: string last_sync_time
+    9: string create_time
+    10: string update_time
 }
 
 struct AddIDLReq{
