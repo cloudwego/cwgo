@@ -16,7 +16,7 @@
  *
  */
 
-package idl
+package repository
 
 const (
 	SortByUpdateTime = "update_time"

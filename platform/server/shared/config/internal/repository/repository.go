@@ -19,15 +19,15 @@
 package repository
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/idl"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
 )
 
 type IRepositoryManager interface {
 	GetTokenByID(id int64) (string, error)
-	GetRepoTypeByID(id int64) (int32, error)
+	GetRepoTypeByID(id int64) (int8, error)
 
-	AddRepository(repoURL, lastUpdateTime, lastSyncTime, token, status string, repoType int32) error
+	AddRepository(repoURL, token, status string, repoType int8) error
 	DeleteRepository(ids string) error
 	UpdateRepository(id, token string) error
 	GetRepositories(page, limit int32, sortBy string) ([]Repository, error)
@@ -42,19 +42,13 @@ var _ IRepositoryManager = (*MysqlRepositoryManager)(nil)
 type Repository struct {
 	Id             int64
 	RepositoryUrl  string
-	LastUpdateTime string
-	LastSyncTime   string
 	Token          string
 	Status         string
-	RepoType       int32
-}
-
-type IDL struct {
-	Id           int64
-	RepositoryId int64
-	MainIdlPath  string
-	IdlHash      string
-	ServiceName  string
+	LastUpdateTime string
+	LastSyncTime   string
+	CreateTime     string
+	UpdateTime     string
+	RepoType       int8
 }
 
 func (r *MysqlRepositoryManager) GetTokenByID(id int64) (string, error) {
@@ -67,7 +61,7 @@ func (r *MysqlRepositoryManager) GetTokenByID(id int64) (string, error) {
 	return repo.Token, nil
 }
 
-func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int32, error) {
+func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int8, error) {
 	var repo Repository
 	result := r.Db.Model(&repo).Where("id = ?", id).Take(&repo)
 	if result.Error != nil {
@@ -77,14 +71,17 @@ func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int32, error) {
 	return repo.RepoType, nil
 }
 
-func (r *MysqlRepositoryManager) AddRepository(repoURL, lastUpdateTime, lastSyncTime, token, status string, repoType int32) error {
+func (r *MysqlRepositoryManager) AddRepository(repoURL, token, status string, repoType int8) error {
+	timeNow := utils.GetCurrentTime()
 	repo := Repository{
 		RepositoryUrl:  repoURL,
-		LastUpdateTime: lastSyncTime,
-		LastSyncTime:   lastSyncTime,
 		Token:          token,
 		Status:         status,
 		RepoType:       repoType,
+		LastUpdateTime: "0",
+		LastSyncTime:   timeNow,
+		CreateTime:     timeNow,
+		UpdateTime:     timeNow,
 	}
 	result := r.Db.Create(&repo)
 	if result.Error != nil {
@@ -105,7 +102,11 @@ func (r *MysqlRepositoryManager) DeleteRepository(ids string) error {
 }
 
 func (r *MysqlRepositoryManager) UpdateRepository(id, token string) error {
-	result := r.Db.Model(&Repository{}).Where("id = ?", id).Update("token", token)
+	timeNow := utils.GetCurrentTime()
+	result := r.Db.Model(&Repository{}).Where("id = ?", id).Updates(Repository{
+		Token:      token,
+		UpdateTime: timeNow,
+	})
 	if result.Error != nil {
 		return result.Error
 	}
@@ -118,7 +119,7 @@ func (r *MysqlRepositoryManager) GetRepositories(page, limit int32, sortBy strin
 
 	// Default sort field to 'update_time' if not provided
 	if sortBy == "" {
-		sortBy = idl.SortByUpdateTime
+		sortBy = SortByUpdateTime
 	}
 
 	offset := (page - 1) * limit

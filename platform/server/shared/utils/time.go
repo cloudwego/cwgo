@@ -16,10 +16,11 @@
  *
  */
 
-package idl
+package utils
 
-const (
-	SortByUpdateTime = "update_time"
-	SortByCreateTime = "create_time"
-	SortBySyncTime   = "last_sync_time"
-)
+import "time"
+
+func GetCurrentTime() string {
+	currentTime := time.Now()
+	return currentTime.Format("2006-01-02 15:04:05") // Format the time
+}

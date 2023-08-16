@@ -16,7 +16,7 @@
  *
  */
 
-package idl
+package template
 
 const (
 	SortByUpdateTime = "update_time"

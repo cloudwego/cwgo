@@ -19,20 +19,31 @@
 package idl
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/store"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
 )
 
 type IIdlManager interface {
-	AddIDL(repoId int64, idlPath, idlHash, serviceName string) error
+	AddIDL(repoId int64, idlPath, serviceName string) error
 	DeleteIDLs(ids []int64) error
-	UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName string) error
-	GetIDLs(page, limit int32, sortBy string) ([]repository.IDL, error)
+	UpdateIDL(id, repoId int64, idlPath, serviceName string) error
+	GetIDLs(page, limit int32, sortBy string) ([]IDL, error)
 }
 
 type MysqlIDLManager struct {
 	Db *gorm.DB
+}
+
+type IDL struct {
+	Id           int64
+	RepositoryId int64
+	MainIdlPath  string
+	Content      string
+	ServiceName  string
+	LastSyncTime string
+	CreateTime   string
+	UpdateTime   string
 }
 
 var _ IIdlManager = (*MysqlIDLManager)(nil)
@@ -48,12 +59,15 @@ func NewMysqlIDL() (*MysqlIDLManager, error) {
 	}, nil
 }
 
-func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, idlHash, serviceName string) error {
-	idl := repository.IDL{
+func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) error {
+	timeNow := utils.GetCurrentTime()
+	idl := IDL{
 		RepositoryId: repoId,
 		MainIdlPath:  idlPath,
-		IdlHash:      idlHash,
 		ServiceName:  serviceName,
+		LastSyncTime: timeNow,
+		CreateTime:   timeNow,
+		UpdateTime:   timeNow,
 	}
 	res := r.Db.Create(&idl)
 	if res.Error != nil {
@@ -64,7 +78,7 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, idlHash, serviceName str
 }
 
 func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
-	var idl repository.IDL
+	var idl IDL
 	res := r.Db.Delete(&idl, ids)
 	if res.Error != nil {
 		return res.Error
@@ -73,15 +87,15 @@ func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
 	return nil
 }
 
-func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceName string) error {
-	idl := repository.IDL{
+func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
+	timeNow := utils.GetCurrentTime()
+	res := r.Db.Where("id = ?", id).Updates(IDL{
 		Id:           id,
 		RepositoryId: repoId,
 		MainIdlPath:  idlPath,
-		IdlHash:      idlHash,
 		ServiceName:  serviceName,
-	}
-	res := r.Db.Save(&idl)
+		UpdateTime:   timeNow,
+	})
 	if res.Error != nil {
 		return res.Error
 	}
@@ -89,8 +103,8 @@ func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, idlHash, serviceN
 	return nil
 }
 
-func (r *MysqlIDLManager) GetIDLs(page, limit int32, sortBy string) ([]repository.IDL, error) {
-	var IDLs []repository.IDL
+func (r *MysqlIDLManager) GetIDLs(page, limit int32, sortBy string) ([]IDL, error) {
+	var IDLs []IDL
 	offset := (page - 1) * limit
 
 	// Default sort field to 'update_time' if not provided
@@ -98,7 +112,7 @@ func (r *MysqlIDLManager) GetIDLs(page, limit int32, sortBy string) ([]repositor
 		sortBy = SortByUpdateTime
 	}
 
-	res := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Order(sortBy).Find(&IDLs)
+	res := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&IDLs)
 	if res.Error != nil {
 		return nil, res.Error
 	}

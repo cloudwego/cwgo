@@ -72,7 +72,7 @@ func AddIDL(repoID int64, idlPath, serviceName string) error {
 		return err
 	}
 
-	err = config.GetManager().GetIdlManager().AddIDL(repoID, idlPath, idlPath, serviceName)
+	err = config.GetManager().GetIdlManager().AddIDL(repoID, idlPath, serviceName)
 	if err != nil {
 		return err
 	}
@@ -96,17 +96,17 @@ func GetIDLs(limit, page int32) error {
 }
 
 func SyncIDLs(ids []int64) error {
-	for _, v := range ids {
-		//TODO: 数据库操作，得到idl的URL
-		idlPath := ""
-		idlPid, owner, repoName, err := utils.ParseIdlURL(idlPath)
-		file, err := gl.GetFile(owner, repoName, idlPid, MainRef)
-		if err != nil {
-			return err
-		}
-		//TODO: 数据库存储file.content
-
-	}
+	//for _, v := range ids {
+	//	//TODO: 数据库操作，得到idl的URL
+	//	idlPath := ""
+	//	idlPid, owner, repoName, err := utils.ParseIdlURL(idlPath)
+	//	file, err := gl.GetFile(owner, repoName, idlPid, MainRef)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	//TODO: 数据库存储file.content
+	//
+	//}
 
 	return nil
 }
