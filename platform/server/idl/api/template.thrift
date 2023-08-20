@@ -3,7 +3,9 @@ namespace go template
 struct Template{
     1: i64 id
     2: string name
-    3: i8 type
+    3: i8 type // 1: hz, 2: kitex
+    4: string create_time
+    5: string update_time
 }
 
 struct TemplateItem{
@@ -11,11 +13,13 @@ struct TemplateItem{
     2: i64 template_id
     3: string name
     4: string content
+    5: string create_time
+    6: string update_time
 }
 
 struct AddTemplateReq{
     1: string name (api.body="name,required")
-    2: i8 type (api.body="type,required") // 1: hz, 2: kitex
+    2: i8 type (api.body="type,required")
 }
 struct AddTemplateRes{
     1: i32 code
@@ -39,22 +43,23 @@ struct UpdateTemplateRes{
     2: string msg
 }
 
-struct GetTemplateReq{
+struct GetTemplatesReq{
     1: i32 page (api.query="page",api.vd="$>=0")
     2: i32 limit (api.query="limit",api.vd="$>=0")
 }
-struct GetTemplateRes{
+struct GetTemplatesRes{
     1: i32 code
     2: string msg
-    3: GetTemplateResData data
+    3: GetTemplatesResData data
 }
-struct GetTemplateResData{
+struct GetTemplatesResData{
     1: list<Template> templates
 }
 
 struct AddTemplateItemReq{
-    1: string name (api.body="name,required")
-    2: string content (api.body="content,required")
+    1: i64 template_id
+    2: string name (api.body="name,required")
+    3: string content (api.body="content,required")
 }
 struct AddTemplateItemRes{
     1: i32 code
@@ -93,13 +98,13 @@ struct GetTemplateItemsResData{
 }
 
 service TemplateService {
-    AddTemplateReq AddTemplate(1: AddTemplateReq req) (api.post="/template")
-    DeleteTemplateReq DeleteTemplate(1: DeleteTemplateReq req) (api.delete="/template")
-    UpdateTemplateReq UpdateTemplate(1: UpdateTemplateReq req) (api.patch="/template")
-    GetTemplateReq GetTemplate(1: GetTemplateItemsReq req) (api.get="/template")
+    AddTemplateRes AddTemplate(1: AddTemplateReq req) (api.post="/template")
+    DeleteTemplateRes DeleteTemplate(1: DeleteTemplateReq req) (api.delete="/template")
+    UpdateTemplateRes UpdateTemplate(1: UpdateTemplateReq req) (api.patch="/template")
+    GetTemplatesRes GetTemplates(1: GetTemplateItemsReq req) (api.get="/template")
 
-    AddTemplateItemReq AddTemplateItem(1: AddTemplateItemReq req) (api.post="/template/item")
-    DeleteTemplateReq DeleteTemplateItem(1: DeleteTemplateItemReq req) (api.delete="/template/item")
-    UpdateTemplateItemReq UpdateTemplateItem(1: UpdateTemplateItemReq req) (api.patch="/template/item")
-    GetTemplateItemsReq GetTemplateItem(1: GetTemplateItemsReq req) (api.get="/template/item")
+    AddTemplateItemRes AddTemplateItem(1: AddTemplateItemReq req) (api.post="/template/item")
+    DeleteTemplateRes DeleteTemplateItem(1: DeleteTemplateItemReq req) (api.delete="/template/item")
+    UpdateTemplateItemRes UpdateTemplateItem(1: UpdateTemplateItemReq req) (api.patch="/template/item")
+    GetTemplateItemsRes GetTemplateItems(1: GetTemplateItemsReq req) (api.get="/template/item")
 }

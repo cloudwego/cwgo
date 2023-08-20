@@ -16,10 +16,10 @@
  *
  */
 
-package registry
+package repository
 
-type IRegistry interface {
-	CleanUp() error
-	Count() int
-	GetServiceIds() []string
-}
+const (
+	SortByUpdateTime = "update_time"
+	SortByCreateTime = "create_time"
+	SortBySyncTime   = "last_sync_time"
+)

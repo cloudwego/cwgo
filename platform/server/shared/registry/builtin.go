@@ -18,12 +18,27 @@
 
 package registry
 
+import (
+	service2 "github.com/cloudwego/cwgo/platform/server/shared/service"
+	"sync"
+	"time"
+)
+
 type BuiltinRegistry struct {
+	sync.Mutex
+	agents map[string]*service2.BuiltinService
 }
 
 var _ IRegistry = (*BuiltinRegistry)(nil)
 
-func (r *BuiltinRegistry) Register(id string) error {
+func (r *BuiltinRegistry) Register(id string, address string, port int) error {
+	r.Lock()
+	defer r.Unlock()
+	// TODO: 连接客户端
+	r.agents[id] = &service2.BuiltinService{
+		Id:             id,
+		LastUpdateTime: time.Now(),
+	}
 	return nil
 }
 
@@ -43,6 +58,6 @@ func (r *BuiltinRegistry) Count() int {
 	return 0
 }
 
-func (r *BuiltinRegistry) GetServiceIds() []string {
+func (r *BuiltinRegistry) GetServiceById(string) service2.IService {
 	return nil
 }

@@ -16,38 +16,10 @@
  *
  */
 
-package store
+package template
 
-import (
-	"errors"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+const (
+	SortByUpdateTime = "update_time"
+	SortByCreateTime = "create_time"
+	SortBySyncTime   = "last_sync_time"
 )
-
-var (
-	mysqlDb *gorm.DB
-)
-
-func InitMysqlDB(dsn string) error {
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-
-	mysqlDb = db
-
-	return nil
-}
-
-func GetMysqlDB(dsn ...string) (*gorm.DB, error) {
-	if dsn != nil {
-		err := InitMysqlDB(dsn[0])
-		if err != nil {
-			return nil, err
-		}
-	}
-	if mysqlDb != nil {
-		return mysqlDb, nil
-	}
-	return nil, errors.New("mysql db not initialized")
-}

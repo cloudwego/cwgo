@@ -16,23 +16,9 @@
 
 package repository
 
-import (
-	"github.com/google/go-github/v53/github"
-	"github.com/xanzy/go-gitlab"
-)
-
 type IRepository interface {
-	InitClient(token string) error
 	GetFile(owner, repoName, filePid, ref string) (*File, error)
 	PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error
-}
-
-type GitHubApi struct {
-	Client *github.Client
-}
-
-type GitLabApi struct {
-	Client *gitlab.Client
 }
 
 type File struct {
