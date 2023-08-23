@@ -20,6 +20,7 @@ package example
 
 import (
 	"context"
+	"fmt"
 
 	example "cwgo/example/hex/kitex_gen/hello/example"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -38,6 +39,7 @@ func HelloMethod(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(example.HelloResp)
+	resp.RespBody = fmt.Sprintf("[HERTZ] hello, %s", req.Name)
 
 	c.JSON(consts.StatusOK, resp)
 }
