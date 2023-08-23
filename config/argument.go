@@ -113,4 +113,5 @@ const (
 	Signable     = "signable"
 	IndexTag     = "index_tag"
 	TypeTag      = "type_tag"
+	HexTag       = "hex"
 )

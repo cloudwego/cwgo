@@ -66,6 +66,24 @@ func Server(c *config.ServerArgument) error {
 			}
 			os.Exit(1)
 		}
+		if c.Hex { // add http listen for kitex
+			hzArgs, err := hzArgsForHex(c)
+			if err != nil {
+				return err
+			}
+			err = app.TriggerPlugin(hzArgs)
+			if err != nil {
+				return err
+			}
+			err = generateHexFile(c)
+			if err != nil {
+				return err
+			}
+			err = addHexOptions()
+			if err != nil {
+				log.Warn("please add \"opts = append(opts,server.WithTransHandlerFactory(&mixTransHandlerFactory{nil}))\", to your kitex options")
+			}
+		}
 		replaceThriftVersion(&args)
 	case config.HTTP:
 		args := hzConfig.NewArgument()
