@@ -5,5 +5,5 @@ struct UserInfo{
     2: string name;
     3: string create_time
     4: string update_time
-    5: bool isDeleted
+    5: bool is_deleted
 }
