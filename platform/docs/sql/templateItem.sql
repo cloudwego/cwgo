@@ -4,8 +4,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for templateItem
 -- ----------------------------
-DROP TABLE IF EXISTS `templateItem`;
-CREATE TABLE `templateItem` (
+DROP TABLE IF EXISTS `template_item`;
+CREATE TABLE `template_item` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `template_id` bigint(20) NOT NULL COMMENT '模板ID',
   `name` varchar(255) NOT NULL COMMENT '名称',
