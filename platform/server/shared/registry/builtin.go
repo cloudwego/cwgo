@@ -43,6 +43,7 @@ type CleanManager struct {
 func (sw *CleanManager) add(agentService *service.BuiltinService, serviceNum int) {
 	sw.mutex.Lock()
 	defer sw.mutex.Unlock()
+
 	if sw.currentSize < serviceNum {
 		if sw.currentSize == cap(sw.agents) {
 			newAgents := make([]*service.BuiltinService, cap(sw.agents)<<1)
@@ -115,6 +116,9 @@ func (r *BuiltinRegistry) Register(serviceId string, host string, port int) erro
 }
 
 func (r *BuiltinRegistry) Unregister(id string) error {
+	r.Lock()
+	defer r.Unlock()
+
 	if _, ok := r.agents[id]; !ok {
 		return errors.New("service not found")
 	}
