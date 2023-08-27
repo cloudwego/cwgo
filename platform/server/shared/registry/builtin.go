@@ -19,45 +19,148 @@
 package registry
 
 import (
-	service2 "github.com/cloudwego/cwgo/platform/server/shared/service"
+	"errors"
+	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/service"
 	"sync"
 	"time"
 )
 
 type BuiltinRegistry struct {
 	sync.Mutex
-	agents map[string]*service2.BuiltinService
+	agents        map[string]*service.BuiltinService
+	cleanInterval time.Duration
+	cleanManager  *CleanManager
+}
+
+type CleanManager struct {
+	agents      []*service.BuiltinService
+	currentSize int
+	expireTime  time.Duration
+	mutex       sync.Mutex
+}
+
+func (sw *CleanManager) add(agentService *service.BuiltinService, serviceNum int) {
+	sw.mutex.Lock()
+	defer sw.mutex.Unlock()
+	if sw.currentSize < serviceNum {
+		if sw.currentSize == cap(sw.agents) {
+			newAgents := make([]*service.BuiltinService, cap(sw.agents)<<1)
+			copy(newAgents, sw.agents)
+			sw.agents = newAgents
+		}
+
+		sw.agents[sw.currentSize] = agentService
+		sw.currentSize++
+	} else {
+		copy(sw.agents, sw.agents[serviceNum-sw.currentSize:])
+		sw.agents[serviceNum-1] = agentService
+	}
+}
+
+func (sw *CleanManager) getExpiredServiceIds() []string {
+	sw.mutex.Lock()
+	defer sw.mutex.Unlock()
+
+	expiredServiceIds := make([]string, 0)
+	for _, agentService := range sw.agents {
+		if agentService.LastUpdateTime.Add(sw.expireTime).Before(time.Now()) {
+			expiredServiceIds = append(expiredServiceIds, agentService.Id)
+		} else {
+			break
+		}
+	}
+
+	return expiredServiceIds
 }
 
 var _ IRegistry = (*BuiltinRegistry)(nil)
 
-func (r *BuiltinRegistry) Register(id string, address string, port int) error {
+const (
+	minCleanInterval = 100 * time.Millisecond
+)
+
+func NewBuiltinRegistry() *BuiltinRegistry {
+	registry := &BuiltinRegistry{
+		Mutex:         sync.Mutex{},
+		agents:        make(map[string]*service.BuiltinService),
+		cleanInterval: 3 * time.Second,
+		cleanManager: &CleanManager{
+			agents:      make([]*service.BuiltinService, 0),
+			currentSize: 0,
+			mutex:       sync.Mutex{},
+			expireTime:  time.Minute,
+		},
+	}
+
+	go registry.CleanUp()
+
+	return registry
+}
+
+func (r *BuiltinRegistry) Register(serviceId string, host string, port int) error {
 	r.Lock()
 	defer r.Unlock()
-	// TODO: 连接客户端
-	r.agents[id] = &service2.BuiltinService{
-		Id:             id,
-		LastUpdateTime: time.Now(),
+
+	agentService, err := service.NewBuiltinService(serviceId, fmt.Sprintf("%s:%d", host, port))
+	if err != nil {
+		return err
 	}
+
+	r.agents[serviceId] = agentService
+
+	r.cleanManager.add(agentService, r.Count())
+
 	return nil
 }
 
 func (r *BuiltinRegistry) Unregister(id string) error {
+	if _, ok := r.agents[id]; !ok {
+		return errors.New("service not found")
+	}
+
+	delete(r.agents, id)
+
 	return nil
 }
 
-func (r *BuiltinRegistry) Update(id string) error {
-	return nil
+func (r *BuiltinRegistry) Update(serviceId string) error {
+	r.Lock()
+	defer r.Unlock()
+
+	if agentService, ok := r.agents[serviceId]; !ok {
+		return errors.New("service not found")
+	} else {
+		agentService.LastUpdateTime = time.Now()
+		r.cleanManager.add(agentService, r.Count())
+		return nil
+	}
 }
 
-func (r *BuiltinRegistry) CleanUp() error {
-	return nil
+func (r *BuiltinRegistry) CleanUp() {
+	for {
+		time.Sleep(r.cleanInterval)
+
+		expiredServiceIds := r.cleanManager.getExpiredServiceIds()
+
+		r.Mutex.Lock()
+		for _, serviceId := range expiredServiceIds {
+			if _, ok := r.agents[serviceId]; ok {
+				delete(r.agents, serviceId)
+			}
+		}
+		r.Mutex.Unlock()
+	}
 }
 
 func (r *BuiltinRegistry) Count() int {
-	return 0
+	return len(r.agents)
 }
 
-func (r *BuiltinRegistry) GetServiceById(string) service2.IService {
-	return nil
+func (r *BuiltinRegistry) GetServiceById(serviceId string) (service.IService, error) {
+	if agentService, ok := r.agents[serviceId]; !ok {
+		return nil, errors.New("service not found")
+	} else {
+		return agentService, nil
+	}
 }

@@ -23,7 +23,6 @@ import (
 )
 
 type IRegistry interface {
-	CleanUp() error
 	Count() int
-	GetServiceById(string) service.IService
+	GetServiceById(string) (service.IService, error)
 }

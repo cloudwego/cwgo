@@ -18,10 +18,42 @@
 
 package service
 
-import "time"
+import (
+	"context"
+	"errors"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent/agentservice"
+	"github.com/cloudwego/kitex/client"
+	"time"
+)
 
 type BuiltinService struct {
 	Id             string
 	LastUpdateTime time.Time
-	// TODO: rpc客户端
+	RpcClient      agentservice.Client
+}
+
+func NewBuiltinService(serviceId, address string) (*BuiltinService, error) {
+	rpcClient, err := agentservice.NewClient(serviceId, client.WithHostPorts(address))
+	if err != nil {
+		return nil, err
+	}
+
+	return &BuiltinService{
+		Id:             serviceId,
+		LastUpdateTime: time.Now(),
+		RpcClient:      rpcClient,
+	}, nil
+}
+
+func (s *BuiltinService) GenerateCode(ctx context.Context, idlId int64) error {
+	rpcRes, err := s.RpcClient.GenerateCode(ctx, &agent.GenerateCodeReq{IdlId: idlId})
+	if err != nil {
+		return err
+	}
+	if rpcRes.Code != 0 {
+		return errors.New(rpcRes.Msg)
+	}
+
+	return nil
 }
