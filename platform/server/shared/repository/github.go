@@ -19,7 +19,6 @@ package repository
 import (
 	"context"
 	"github.com/google/go-github/v53/github"
-	"github.com/xanzy/go-gitlab"
 	"golang.org/x/oauth2"
 	"io/ioutil"
 )
@@ -28,7 +27,7 @@ type GitHubApi struct {
 	Client *github.Client
 }
 
-func NewClient(token string) *GitHubApi {
+func NewGithubClient(token string) *GitHubApi {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
@@ -99,16 +98,6 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	if err != nil {
 		return err
 	}
-
-	return nil
-}
-
-func (gl *GitLabApi) InitClient(token string) error {
-	client, err := gitlab.NewClient(token)
-	if err != nil {
-		return err
-	}
-	gl.Client = client
 
 	return nil
 }

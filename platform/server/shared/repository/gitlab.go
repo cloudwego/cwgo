@@ -27,6 +27,17 @@ type GitLabApi struct {
 	Client *gitlab.Client
 }
 
+func NewGitlabClient(token string) (*GitLabApi, error) {
+	client, err := gitlab.NewClient(token)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GitLabApi{
+		Client: client,
+	}, nil
+}
+
 func (gl *GitLabApi) GetFile(owner, repoName, filePid, ref string) (*File, error) {
 	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(fmt.Sprintf("%s/%s", owner, repoName), filePid, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
