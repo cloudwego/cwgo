@@ -19,6 +19,8 @@ package repository
 type IRepository interface {
 	GetFile(owner, repoName, filePid, ref string) (*File, error)
 	PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error
+	GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) //Specify the compressed file format and obtain the byte of the compressed package, gitlab could not specify ref
+	GetLatestCommitHash(owner, repoName, filePid, ref string) (string, error) //Get the latest commit hash for the specified file
 }
 
 type File struct {
