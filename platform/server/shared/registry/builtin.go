@@ -168,3 +168,9 @@ func (r *BuiltinRegistry) GetServiceById(serviceId string) (service.IService, er
 		return agentService, nil
 	}
 }
+
+func (r *BuiltinRegistry) ServiceExists(serviceId string) bool {
+	_, ok := r.agents[serviceId]
+
+	return ok
+}

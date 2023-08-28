@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/apache/thrift v0.13.0
+	github.com/buraksezer/consistent v0.10.0
 	github.com/cloudwego/kitex v0.7.0
 	github.com/google/go-github/v53 v53.2.0
 	github.com/spf13/cobra v0.0.5

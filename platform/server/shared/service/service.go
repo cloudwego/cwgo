@@ -22,5 +22,4 @@ import "context"
 
 type IService interface {
 	GenerateCode(ctx context.Context, idlId int64) error
-	// TODO: 能调用 agent 的方法...
 }
