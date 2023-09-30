@@ -17,20 +17,3 @@
  */
 
 package task
-
-import "time"
-
-type Task struct {
-	Id           string
-	Type         uint32
-	ScheduleTime time.Duration
-	Data         interface{}
-}
-
-type SyncRepoData struct {
-	RepositoryId string
-}
-
-const (
-	SyncRepo = iota + 1
-)
