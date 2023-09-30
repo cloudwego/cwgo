@@ -18,9 +18,11 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/go-github/v53/github"
 	"golang.org/x/oauth2"
 	"io/ioutil"
+	"net/http"
 )
 
 type GitHubApi struct {
@@ -39,8 +41,11 @@ func NewGithubClient(token string) *GitHubApi {
 	}
 }
 
-func (g *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
-	fileContent, _, err := g.Client.Repositories.DownloadContents(context.Background(), owner, repoName, filePath, &github.RepositoryContentGetOptions{Ref: ref})
+func (g *GitHubApi) GetFile(owner, repoName, filePid, ref string) (*File, error) {
+	opts := &github.RepositoryContentGetOptions{
+		Ref: ref,
+	}
+	fileContent, _, err := g.Client.Repositories.DownloadContents(context.Background(), owner, repoName, filePid, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +57,7 @@ func (g *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error
 	}
 
 	return &File{
-		Name:    filePath,
+		Name:    filePid,
 		Content: content,
 	}, nil
 }
@@ -100,4 +105,45 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	}
 
 	return nil
+}
+
+func (g *GitHubApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
+	opts := &github.RepositoryContentGetOptions{
+		Ref: ref,
+	}
+
+	archiveLink, _, err := g.Client.Repositories.GetArchiveLink(context.Background(), owner, repoName, github.ArchiveFormat(format), opts, false)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := http.Get(archiveLink.String())
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to fetch archive: %s", resp.Status)
+	}
+
+	archiveData, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return archiveData, nil
+}
+
+func (gl *GitHubApi) GetLatestCommitHash(owner, repoName, filePid, ref string) (string, error) {
+	opts := &github.RepositoryContentGetOptions{
+		Ref: ref,
+	}
+
+	fileContent, _, _, err := gl.Client.Repositories.GetContents(context.Background(), owner, repoName, filePid, opts)
+	if err != nil {
+		return "", err
+	}
+
+	return *fileContent.SHA, nil
 }
