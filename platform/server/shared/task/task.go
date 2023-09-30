@@ -16,14 +16,21 @@
  *
  */
 
-package registry
+package task
 
-import (
-	"github.com/cloudwego/cwgo/platform/server/shared/service"
-)
+import "time"
 
-type IRegistry interface {
-	Count() int
-	GetServiceById(string) (service.IService, error)
-	ServiceExists(string) bool
+type Task struct {
+	Id           string
+	Type         uint32
+	ScheduleTime time.Duration
+	Data         interface{}
 }
+
+type SyncRepoData struct {
+	RepositoryId string
+}
+
+const (
+	SyncRepo = iota + 1
+)

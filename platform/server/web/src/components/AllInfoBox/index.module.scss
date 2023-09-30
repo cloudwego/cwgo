@@ -1,0 +1,17 @@
+.col-content {
+	border-radius: 5px;
+	height: 6vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+.all-info-box {
+	height: 8vh;
+	display: flex;
+	align-items: center;
+	border: solid 1px var(--semi-color-border);
+	border-radius: 10px;
+	background-color: var(--semi-color-bg-1);
+	justify-content: space-around;
+}

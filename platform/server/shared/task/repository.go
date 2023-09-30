@@ -16,14 +16,4 @@
  *
  */
 
-package registry
-
-import (
-	"github.com/cloudwego/cwgo/platform/server/shared/service"
-)
-
-type IRegistry interface {
-	Count() int
-	GetServiceById(string) (service.IService, error)
-	ServiceExists(string) bool
-}
+package task

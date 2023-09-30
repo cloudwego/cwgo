@@ -16,5 +16,38 @@
 
 package cron
 
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/task"
+	"github.com/go-co-op/gocron"
+	"time"
+)
+
 type ICron interface {
+	AddTask()
+	DeleteTask()
+	GetTasks()
+}
+
+type Cron struct {
+	scheduler *gocron.Scheduler
+}
+
+func NewCron() *Cron {
+	scheduler := gocron.NewScheduler(time.UTC)
+	scheduler.TagsUnique()
+
+	return &Cron{
+		scheduler: scheduler,
+	}
+}
+
+func (c *Cron) AddTask(t *task.Task) {
+	switch t.Type {
+	case task.SyncRepo:
+		c.scheduler.Every(t.ScheduleTime).Tag(t.Id).Do(func() {
+
+		})
+	default:
+
+	}
 }

@@ -16,5 +16,15 @@
 
 package dispatcher
 
+import "github.com/cloudwego/cwgo/platform/server/shared/task"
+
 type IDispatcher interface {
+	AddService(serviceId string) error
+	RemoveService(serviceId string) error
+
+	AddTask(task *task.Task) error
+	RemoveTask(taskId string) error
+
+	GetTaskByServiceId(serviceId string) []*task.Task
+	GetTotalTaskNum() int
 }

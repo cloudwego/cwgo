@@ -18,6 +18,8 @@
 
 package service
 
+import "context"
+
 type IService interface {
-	// TODO: 能调用 agent 的方法...
+	GenerateCode(ctx context.Context, idlId int64) error
 }
