@@ -19,12 +19,11 @@
 package template
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
 )
 
-type ITemplateManager interface {
+type ITemplateDaoManager interface {
 	AddTemplate(name string, _type int8) error
 	DeleteTemplate(ids []int64) error
 	UpdateTemplate(id int64, name string) error
@@ -34,10 +33,6 @@ type ITemplateManager interface {
 	DeleteTemplateItem(ids []int64) error
 	UpdateTemplateItem(id int64, name, content string) error
 	GetTemplateItems(page, limit int32, sortBy string) ([]TemplateItem, error)
-}
-
-type MysqlTemplateManager struct {
-	Db *gorm.DB
 }
 
 type Template struct {
@@ -57,17 +52,16 @@ type TemplateItem struct {
 	UpdateTime string
 }
 
-var _ ITemplateManager = (*MysqlTemplateManager)(nil)
+type MysqlTemplateManager struct {
+	db *gorm.DB
+}
 
-func NewMysqlTemplate() (*MysqlTemplateManager, error) {
-	db, err := store.GetMysqlDB()
-	if err != nil {
-		return nil, err
-	}
+var _ ITemplateDaoManager = (*MysqlTemplateManager)(nil)
 
+func NewMysqlTemplate(db *gorm.DB) *MysqlTemplateManager {
 	return &MysqlTemplateManager{
-		Db: db,
-	}, nil
+		db: db,
+	}
 }
 
 func (r *MysqlTemplateManager) AddTemplate(name string, _type int8) error {
@@ -78,7 +72,7 @@ func (r *MysqlTemplateManager) AddTemplate(name string, _type int8) error {
 		CreateTime: timeNow,
 		UpdateTime: timeNow,
 	}
-	res := r.Db.Create(&template)
+	res := r.db.Create(&template)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -88,7 +82,7 @@ func (r *MysqlTemplateManager) AddTemplate(name string, _type int8) error {
 
 func (r *MysqlTemplateManager) DeleteTemplate(ids []int64) error {
 	var template Template
-	res := r.Db.Delete(&template, ids)
+	res := r.db.Delete(&template, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -98,7 +92,7 @@ func (r *MysqlTemplateManager) DeleteTemplate(ids []int64) error {
 
 func (r *MysqlTemplateManager) UpdateTemplate(id int64, name string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.Db.Where("id = ?", id).Updates(Template{
+	res := r.db.Where("id = ?", id).Updates(Template{
 		Name:       name,
 		UpdateTime: timeNow,
 	})
@@ -118,7 +112,7 @@ func (r *MysqlTemplateManager) GetTemplates(page, limit int32, sortBy string) ([
 		sortBy = SortByUpdateTime
 	}
 
-	res := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&templates)
+	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&templates)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -135,7 +129,7 @@ func (r *MysqlTemplateManager) AddTemplateItem(templateId int64, name, content s
 		CreateTime: timeNow,
 		UpdateTime: timeNow,
 	}
-	res := r.Db.Create(&templateItem)
+	res := r.db.Create(&templateItem)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -145,7 +139,7 @@ func (r *MysqlTemplateManager) AddTemplateItem(templateId int64, name, content s
 
 func (r *MysqlTemplateManager) DeleteTemplateItem(ids []int64) error {
 	var template Template
-	res := r.Db.Delete(&template, ids)
+	res := r.db.Delete(&template, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -155,7 +149,7 @@ func (r *MysqlTemplateManager) DeleteTemplateItem(ids []int64) error {
 
 func (r *MysqlTemplateManager) UpdateTemplateItem(id int64, name, content string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.Db.Where("id = ?", id).Updates(TemplateItem{
+	res := r.db.Where("id = ?", id).Updates(TemplateItem{
 		Name:       name,
 		Content:    content,
 		UpdateTime: timeNow,
@@ -176,7 +170,7 @@ func (r *MysqlTemplateManager) GetTemplateItems(page, limit int32, sortBy string
 		sortBy = SortByUpdateTime
 	}
 
-	res := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&templateItems)
+	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&templateItems)
 	if res.Error != nil {
 		return nil, res.Error
 	}

@@ -16,22 +16,35 @@
  *
  */
 
-package agent
+package consts
 
-import "github.com/spf13/cobra"
+type ConfigType uint32
 
-func NewCommand() *cobra.Command {
-	opt := newSetupOptions()
-	cmd := &cobra.Command{
-		Use:   "agent",
-		Short: "agent service",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := run(opt); err != nil {
-				return err
-			}
-			return nil
-		},
+const (
+	ConfigTypeNumFile   ConfigType = iota + 1
+	ConfigTypeNumApollo            // TODO: to be implemented
+
+	ConfigTypeFile   = "file"
+	ConfigTypeApollo = "apollo"
+
+	ConfigTypeEnvName = "CWGO_CONFIG_TYPE"
+)
+
+var (
+	ConfigTypeMapToStr = map[ConfigType]string{
+		ConfigTypeNumFile:   ConfigTypeFile,
+		ConfigTypeNumApollo: ConfigTypeApollo,
 	}
-	opt.AddFlags(cmd)
-	return cmd
-}
+	ConfigTypeMapToNum = map[string]ConfigType{
+		ConfigTypeFile:   ConfigTypeNumFile,
+		ConfigTypeApollo: ConfigTypeNumApollo,
+	}
+)
+
+const (
+	ConfigPathEnvName = "CWGO_CONFIG_PATH"
+)
+
+const (
+	ConfigDefaultPath = "config.yaml"
+)

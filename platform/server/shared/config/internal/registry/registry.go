@@ -16,22 +16,15 @@
  *
  */
 
-package agent
+package registry
 
-import "github.com/spf13/cobra"
+import (
+	hertzregistry "github.com/cloudwego/hertz/pkg/app/server/registry"
+	kitexregistry "github.com/cloudwego/kitex/pkg/registry"
+)
 
-func NewCommand() *cobra.Command {
-	opt := newSetupOptions()
-	cmd := &cobra.Command{
-		Use:   "agent",
-		Short: "agent service",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := run(opt); err != nil {
-				return err
-			}
-			return nil
-		},
-	}
-	opt.AddFlags(cmd)
-	return cmd
+type IRegistryConfigManager interface {
+	init()
+	GetHertzRegistry() (hertzregistry.Registry, *hertzregistry.Info)
+	GetKitexRegistry() (kitexregistry.Registry, *kitexregistry.Info)
 }

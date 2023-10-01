@@ -1,0 +1,24 @@
+agent:
+  mode: release
+  port: 8089
+  readTimeout: 60s
+  writeTimeout: 60s
+
+api:
+
+registry:
+  type: consul
+  consul:
+
+store:
+  type: 'mysql'
+  mysql:
+
+  mongo:
+
+
+logger:
+  savePath: 'log'
+  encoderType: 'console'
+  encodeLevel: 'CapitalLevelEncoder'
+  encodeCaller: 'FullCallerEncoder'

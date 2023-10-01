@@ -18,5 +18,26 @@
 
 package store
 
-type IStore interface {
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"gorm.io/gorm"
+)
+
+type StoreConfigManager struct {
+	config    Config
+	storeType consts.StoreType
+}
+
+func NewStoreConfigManager(config Config) *StoreConfigManager {
+	return &StoreConfigManager{
+		config: config,
+	}
+}
+
+func (cm *StoreConfigManager) GetStoreType() consts.StoreType {
+	return cm.storeType
+}
+
+func (cm *StoreConfigManager) NewMysqlDb() (*gorm.DB, error) {
+	return initMysqlDB(cm.config.Mysql.GetDsn())
 }

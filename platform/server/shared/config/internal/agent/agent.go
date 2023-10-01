@@ -17,3 +17,15 @@
  */
 
 package agent
+
+import "github.com/cloudwego/kitex/server"
+
+type IAgentConfigManager interface {
+	GetKitexServerOptions() []server.Option
+}
+
+type Config struct {
+}
+
+type FileAgentManager struct {
+}

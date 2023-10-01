@@ -16,22 +16,30 @@
  *
  */
 
-package agent
+package logger
 
-import "github.com/spf13/cobra"
-
-func NewCommand() *cobra.Command {
-	opt := newSetupOptions()
-	cmd := &cobra.Command{
-		Use:   "agent",
-		Short: "agent service",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := run(opt); err != nil {
-				return err
-			}
-			return nil
-		},
-	}
-	opt.AddFlags(cmd)
-	return cmd
+type EncoderOptions struct {
+	EncoderType  string
+	EncodeLevel  string
+	EncodeCaller string
 }
+
+const (
+	// EncoderType
+
+	JsonEncoder    = "json"
+	ConsoleEncoder = "console"
+
+	// EncodeLevel
+
+	LowercaseLevelEncoder      = "LowercaseLevelEncoder"
+	LowercaseColorLevelEncoder = "LowercaseColorLevelEncoder"
+	CapitalLevelEncoder        = "CapitalLevelEncoder"
+	CapitalColorLevelEncoder   = "CapitalColorLevelEncoder"
+
+	// EncodeCaller
+	// log file info: short（package/file.go:line） full (file_path.go:line)
+
+	ShortCallerEncoder = "ShortCallerEncoder"
+	FullCallerEncoder  = "FullCallerEncoder"
+)

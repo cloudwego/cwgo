@@ -25,7 +25,8 @@ import (
 
 func main() {
 	cmd := &cobra.Command{
-		Use: "cwgo platform",
+		Version: "v0.1.0",
+		Use:     "cwgo platform",
 	}
 
 	cmd.AddCommand(

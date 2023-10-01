@@ -16,22 +16,11 @@
  *
  */
 
-package agent
+package logger
 
-import "github.com/spf13/cobra"
-
-func NewCommand() *cobra.Command {
-	opt := newSetupOptions()
-	cmd := &cobra.Command{
-		Use:   "agent",
-		Short: "agent service",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := run(opt); err != nil {
-				return err
-			}
-			return nil
-		},
-	}
-	opt.AddFlags(cmd)
-	return cmd
+type Config struct {
+	SavePath     string `mapstructure:"savePath"`
+	EncoderType  string `mapstructure:"encoderType"`
+	EncodeLevel  string `mapstructure:"encodeLevel"`
+	EncodeCaller string `mapstructure:"encodeCaller"`
 }

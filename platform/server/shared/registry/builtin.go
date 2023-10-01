@@ -30,17 +30,17 @@ type BuiltinRegistry struct {
 	sync.Mutex
 	agents        map[string]*service.BuiltinService
 	cleanInterval time.Duration
-	cleanManager  *CleanManager
+	manager       *Manager
 }
 
-type CleanManager struct {
+type Manager struct {
 	agents      []*service.BuiltinService
 	currentSize int
 	expireTime  time.Duration
 	mutex       sync.Mutex
 }
 
-func (sw *CleanManager) add(agentService *service.BuiltinService, serviceNum int) {
+func (sw *Manager) add(agentService *service.BuiltinService, serviceNum int) {
 	sw.mutex.Lock()
 	defer sw.mutex.Unlock()
 
@@ -59,7 +59,7 @@ func (sw *CleanManager) add(agentService *service.BuiltinService, serviceNum int
 	}
 }
 
-func (sw *CleanManager) getExpiredServiceIds() []string {
+func (sw *Manager) getExpiredServiceIds() []string {
 	sw.mutex.Lock()
 	defer sw.mutex.Unlock()
 
@@ -86,7 +86,7 @@ func NewBuiltinRegistry() *BuiltinRegistry {
 		Mutex:         sync.Mutex{},
 		agents:        make(map[string]*service.BuiltinService),
 		cleanInterval: 3 * time.Second,
-		cleanManager: &CleanManager{
+		manager: &Manager{
 			agents:      make([]*service.BuiltinService, 0),
 			currentSize: 0,
 			mutex:       sync.Mutex{},
@@ -110,7 +110,7 @@ func (r *BuiltinRegistry) Register(serviceId string, host string, port int) erro
 
 	r.agents[serviceId] = agentService
 
-	r.cleanManager.add(agentService, r.Count())
+	r.manager.add(agentService, r.Count())
 
 	return nil
 }
@@ -136,7 +136,7 @@ func (r *BuiltinRegistry) Update(serviceId string) error {
 		return errors.New("service not found")
 	} else {
 		agentService.LastUpdateTime = time.Now()
-		r.cleanManager.add(agentService, r.Count())
+		r.manager.add(agentService, r.Count())
 		return nil
 	}
 }
@@ -145,7 +145,7 @@ func (r *BuiltinRegistry) CleanUp() {
 	for {
 		time.Sleep(r.cleanInterval)
 
-		expiredServiceIds := r.cleanManager.getExpiredServiceIds()
+		expiredServiceIds := r.manager.getExpiredServiceIds()
 
 		r.Mutex.Lock()
 		for _, serviceId := range expiredServiceIds {

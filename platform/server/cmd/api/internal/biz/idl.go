@@ -19,7 +19,6 @@ package idl
 import (
 	"errors"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/idl/gitlab"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/repository"
 	"net/http"
 )
 
@@ -59,7 +58,7 @@ type GetIDLsReq struct {
 type GetIDLsRes struct {
 	Code int32
 	Msg  string
-	IDLs []repository.IDL
+	//IDLs []repository.IDL
 }
 
 type SyncIDLsReq struct {

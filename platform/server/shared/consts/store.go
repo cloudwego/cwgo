@@ -16,22 +16,20 @@
  *
  */
 
-package agent
+package consts
 
-import "github.com/spf13/cobra"
+type StoreType uint32
 
-func NewCommand() *cobra.Command {
-	opt := newSetupOptions()
-	cmd := &cobra.Command{
-		Use:   "agent",
-		Short: "agent service",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := run(opt); err != nil {
-				return err
-			}
-			return nil
-		},
+const (
+	StoreTypeMysql StoreType = iota + 1
+	StoreTypeMongo
+	StoreTypeRedis
+)
+
+var (
+	StoreTypeMap = map[string]StoreType{
+		"mysql": StoreTypeMysql,
+		"mongo": StoreTypeMongo,
+		"redis": StoreTypeRedis,
 	}
-	opt.AddFlags(cmd)
-	return cmd
-}
+)

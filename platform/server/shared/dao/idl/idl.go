@@ -19,20 +19,15 @@
 package idl
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
 )
 
-type IIdlManager interface {
+type IIdlDaoManager interface {
 	AddIDL(repoId int64, idlPath, serviceName string) error
 	DeleteIDLs(ids []int64) error
 	UpdateIDL(id, repoId int64, idlPath, serviceName string) error
 	GetIDLs(page, limit int32, sortBy string) ([]IDL, error)
-}
-
-type MysqlIDLManager struct {
-	Db *gorm.DB
 }
 
 type IDL struct {
@@ -46,17 +41,16 @@ type IDL struct {
 	UpdateTime   string
 }
 
-var _ IIdlManager = (*MysqlIDLManager)(nil)
+type MysqlIDLManager struct {
+	db *gorm.DB
+}
 
-func NewMysqlIDL() (*MysqlIDLManager, error) {
-	db, err := store.GetMysqlDB()
-	if err != nil {
-		return nil, err
-	}
+var _ IIdlDaoManager = (*MysqlIDLManager)(nil)
 
+func NewMysqlIDL(db *gorm.DB) *MysqlIDLManager {
 	return &MysqlIDLManager{
-		Db: db,
-	}, nil
+		db: db,
+	}
 }
 
 func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) error {
@@ -69,7 +63,7 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) erro
 		CreateTime:   timeNow,
 		UpdateTime:   timeNow,
 	}
-	res := r.Db.Create(&idl)
+	res := r.db.Create(&idl)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -79,7 +73,7 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) erro
 
 func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
 	var idl IDL
-	res := r.Db.Delete(&idl, ids)
+	res := r.db.Delete(&idl, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -89,7 +83,7 @@ func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
 
 func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.Db.Where("id = ?", id).Updates(IDL{
+	res := r.db.Where("id = ?", id).Updates(IDL{
 		Id:           id,
 		RepositoryId: repoId,
 		MainIdlPath:  idlPath,
@@ -112,7 +106,7 @@ func (r *MysqlIDLManager) GetIDLs(page, limit int32, sortBy string) ([]IDL, erro
 		sortBy = SortByUpdateTime
 	}
 
-	res := r.Db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&IDLs)
+	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&IDLs)
 	if res.Error != nil {
 		return nil, res.Error
 	}

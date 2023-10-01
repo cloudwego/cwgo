@@ -16,22 +16,26 @@
  *
  */
 
-package agent
+package svc
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/dao"
+	"github.com/cloudwego/thriftgo/config"
+)
 
-func NewCommand() *cobra.Command {
-	opt := newSetupOptions()
-	cmd := &cobra.Command{
-		Use:   "agent",
-		Short: "agent service",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := run(opt); err != nil {
-				return err
-			}
-			return nil
-		},
+type ServiceContext struct {
+	// TODO: add service context...
+	DaoManager *dao.Manager
+}
+
+func NewServiceContext(c config.Config) *ServiceContext {
+	// TODO: add service initialization...
+
+	return &ServiceContext{
+		//Config: c,
+		//RpcClientTokenStore: tokenstoreservice.MustNewClient(
+		//	c.RpcClients[common.ServiceIdRpcTokenStore].Name,
+		//	model.RpcClientOptions[common.ServiceIdRpcTokenStore]...,
+		//),
 	}
-	opt.AddFlags(cmd)
-	return cmd
 }
