@@ -42,6 +42,8 @@ struct UpdateRepositoryRes{
 struct GetRepositoriesReq{
     1: i32 page (api.query="page",api.vd="$>=0")
     2: i32 limit (api.query="limit",api.vd="$>=0")
+    3: i32 order (api.query="order",api.vd="$>=0")
+    4: string order_by (api.query="order_by")
 }
 struct GetRepositoriesRes{
     1: i32 code

@@ -51,3 +51,7 @@ func _getrepositoriesMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+func _addrepositoryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

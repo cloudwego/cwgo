@@ -1633,8 +1633,10 @@ func (p *UpdateRepositoryRes) String() string {
 }
 
 type GetRepositoriesReq struct {
-	Page  int32 `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
-	Limit int32 `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
+	Page    int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
+	Limit   int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
+	Order   int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
+	OrderBy string `thrift:"order_by,4" json:"order_by" query:"order_by"`
 }
 
 func NewGetRepositoriesReq() *GetRepositoriesReq {
@@ -1649,9 +1651,19 @@ func (p *GetRepositoriesReq) GetLimit() (v int32) {
 	return p.Limit
 }
 
+func (p *GetRepositoriesReq) GetOrder() (v int32) {
+	return p.Order
+}
+
+func (p *GetRepositoriesReq) GetOrderBy() (v string) {
+	return p.OrderBy
+}
+
 var fieldIDToName_GetRepositoriesReq = map[int16]string{
 	1: "page",
 	2: "limit",
+	3: "order",
+	4: "order_by",
 }
 
 func (p *GetRepositoriesReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1686,6 +1698,26 @@ func (p *GetRepositoriesReq) Read(iprot thrift.TProtocol) (err error) {
 		case 2:
 			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1741,6 +1773,24 @@ func (p *GetRepositoriesReq) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *GetRepositoriesReq) ReadField3(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.Order = v
+	}
+	return nil
+}
+
+func (p *GetRepositoriesReq) ReadField4(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.OrderBy = v
+	}
+	return nil
+}
+
 func (p *GetRepositoriesReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("GetRepositoriesReq"); err != nil {
@@ -1753,6 +1803,14 @@ func (p *GetRepositoriesReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
 			goto WriteFieldError
 		}
 
@@ -1806,6 +1864,40 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *GetRepositoriesReq) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("order", thrift.I32, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Order); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *GetRepositoriesReq) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("order_by", thrift.STRING, 4); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.OrderBy); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
 func (p *GetRepositoriesReq) String() string {
