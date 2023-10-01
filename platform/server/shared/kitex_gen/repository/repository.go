@@ -19,7 +19,7 @@ type Repository struct {
 	LastSyncTime   string `thrift:"last_sync_time,7" frugal:"7,default,string" json:"last_sync_time"`
 	CreateTime     string `thrift:"create_time,8" frugal:"8,default,string" json:"create_time"`
 	UpdateTime     string `thrift:"update_time,9" frugal:"9,default,string" json:"update_time"`
-	RepoType       int8   `thrift:"repo_type,10" frugal:"10,default,i8" json:"repo_type"`
+	RepoType       int32  `thrift:"repo_type,10" frugal:"10,default,i32" json:"repo_type"`
 }
 
 func NewRepository() *Repository {
@@ -66,7 +66,7 @@ func (p *Repository) GetUpdateTime() (v string) {
 	return p.UpdateTime
 }
 
-func (p *Repository) GetRepoType() (v int8) {
+func (p *Repository) GetRepoType() (v int32) {
 	return p.RepoType
 }
 func (p *Repository) SetId(val string) {
@@ -96,7 +96,7 @@ func (p *Repository) SetCreateTime(val string) {
 func (p *Repository) SetUpdateTime(val string) {
 	p.UpdateTime = val
 }
-func (p *Repository) SetRepoType(val int8) {
+func (p *Repository) SetRepoType(val int32) {
 	p.RepoType = val
 }
 
@@ -223,7 +223,7 @@ func (p *Repository) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 10:
-			if fieldTypeId == thrift.BYTE {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField10(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -344,7 +344,7 @@ func (p *Repository) ReadField9(iprot thrift.TProtocol) error {
 }
 
 func (p *Repository) ReadField10(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadByte(); err != nil {
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		p.RepoType = v
@@ -571,10 +571,10 @@ WriteFieldEndError:
 }
 
 func (p *Repository) writeField10(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("repo_type", thrift.BYTE, 10); err != nil {
+	if err = oprot.WriteFieldBegin("repo_type", thrift.I32, 10); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteByte(p.RepoType); err != nil {
+	if err := oprot.WriteI32(p.RepoType); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -696,7 +696,7 @@ func (p *Repository) Field9DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *Repository) Field10DeepEqual(src int8) bool {
+func (p *Repository) Field10DeepEqual(src int32) bool {
 
 	if p.RepoType != src {
 		return false

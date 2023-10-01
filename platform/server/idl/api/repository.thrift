@@ -10,7 +10,7 @@ struct Repository{
     7: string last_sync_time
     8: string create_time
     9: string update_time
-    10: i8 repo_type
+    10: i32 repo_type
 }
 
 struct AddRepositoryReq{

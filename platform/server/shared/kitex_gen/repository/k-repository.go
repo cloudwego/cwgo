@@ -172,7 +172,7 @@ func (p *Repository) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 10:
-			if fieldTypeId == thrift.BYTE {
+			if fieldTypeId == thrift.I32 {
 				l, err = p.FastReadField10(buf[offset:])
 				offset += l
 				if err != nil {
@@ -349,7 +349,7 @@ func (p *Repository) FastReadField9(buf []byte) (int, error) {
 func (p *Repository) FastReadField10(buf []byte) (int, error) {
 	offset := 0
 
-	if v, l, err := bthrift.Binary.ReadByte(buf[offset:]); err != nil {
+	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
@@ -488,8 +488,8 @@ func (p *Repository) fastWriteField9(buf []byte, binaryWriter bthrift.BinaryWrit
 
 func (p *Repository) fastWriteField10(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repo_type", thrift.BYTE, 10)
-	offset += bthrift.Binary.WriteByte(buf[offset:], p.RepoType)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repo_type", thrift.I32, 10)
+	offset += bthrift.Binary.WriteI32(buf[offset:], p.RepoType)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -578,8 +578,8 @@ func (p *Repository) field9Length() int {
 
 func (p *Repository) field10Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("repo_type", thrift.BYTE, 10)
-	l += bthrift.Binary.ByteLength(p.RepoType)
+	l += bthrift.Binary.FieldBeginLength("repo_type", thrift.I32, 10)
+	l += bthrift.Binary.I32Length(p.RepoType)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
