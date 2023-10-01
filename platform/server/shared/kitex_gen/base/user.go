@@ -5,22 +5,27 @@ package base
 import (
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
+	"strings"
 )
 
 type UserInfo struct {
-	UserID     int64  `thrift:"user_id,1" form:"user_id" json:"user_id" query:"user_id"`
-	Name       string `thrift:"name,2" form:"name" json:"name" query:"name"`
-	CreateTime string `thrift:"create_time,3" form:"create_time" json:"create_time" query:"create_time"`
-	UpdateTime string `thrift:"update_time,4" form:"update_time" json:"update_time" query:"update_time"`
-	IsDeleted  bool   `thrift:"is_deleted,5" form:"is_deleted" json:"is_deleted" query:"is_deleted"`
+	UserId     int64  `thrift:"user_id,1" frugal:"1,default,i64" json:"user_id"`
+	Name       string `thrift:"name,2" frugal:"2,default,string" json:"name"`
+	CreateTime string `thrift:"create_time,3" frugal:"3,default,string" json:"create_time"`
+	UpdateTime string `thrift:"update_time,4" frugal:"4,default,string" json:"update_time"`
+	IsDeleted  bool   `thrift:"is_deleted,5" frugal:"5,default,bool" json:"is_deleted"`
 }
 
 func NewUserInfo() *UserInfo {
 	return &UserInfo{}
 }
 
-func (p *UserInfo) GetUserID() (v int64) {
-	return p.UserID
+func (p *UserInfo) InitDefault() {
+	*p = UserInfo{}
+}
+
+func (p *UserInfo) GetUserId() (v int64) {
+	return p.UserId
 }
 
 func (p *UserInfo) GetName() (v string) {
@@ -37,6 +42,21 @@ func (p *UserInfo) GetUpdateTime() (v string) {
 
 func (p *UserInfo) GetIsDeleted() (v bool) {
 	return p.IsDeleted
+}
+func (p *UserInfo) SetUserId(val int64) {
+	p.UserId = val
+}
+func (p *UserInfo) SetName(val string) {
+	p.Name = val
+}
+func (p *UserInfo) SetCreateTime(val string) {
+	p.CreateTime = val
+}
+func (p *UserInfo) SetUpdateTime(val string) {
+	p.UpdateTime = val
+}
+func (p *UserInfo) SetIsDeleted(val bool) {
+	p.IsDeleted = val
 }
 
 var fieldIDToName_UserInfo = map[int16]string{
@@ -150,7 +170,7 @@ func (p *UserInfo) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.UserID = v
+		p.UserId = v
 	}
 	return nil
 }
@@ -240,7 +260,7 @@ func (p *UserInfo) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("user_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.UserID); err != nil {
+	if err := oprot.WriteI64(p.UserId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -326,4 +346,64 @@ func (p *UserInfo) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("UserInfo(%+v)", *p)
+}
+
+func (p *UserInfo) DeepEqual(ano *UserInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.UserId) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Name) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.UpdateTime) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.IsDeleted) {
+		return false
+	}
+	return true
+}
+
+func (p *UserInfo) Field1DeepEqual(src int64) bool {
+
+	if p.UserId != src {
+		return false
+	}
+	return true
+}
+func (p *UserInfo) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UserInfo) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.CreateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UserInfo) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.UpdateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UserInfo) Field5DeepEqual(src bool) bool {
+
+	if p.IsDeleted != src {
+		return false
+	}
+	return true
 }

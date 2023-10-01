@@ -6,29 +6,34 @@ import (
 	"context"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
+	"strings"
 )
 
 type IDL struct {
-	ID           int64  `thrift:"id,1" form:"id" json:"id" query:"id"`
-	RepositoryID int64  `thrift:"repository_id,2" form:"repository_id" json:"repository_id" query:"repository_id"`
-	MainIdlPath  string `thrift:"main_idl_path,3" form:"main_idl_path" json:"main_idl_path" query:"main_idl_path"`
-	Content      string `thrift:"content,4" form:"content" json:"content" query:"content"`
-	ServiceName  string `thrift:"service_name,5" form:"service_name" json:"service_name" query:"service_name"`
-	LastSyncTime string `thrift:"last_sync_time,6" form:"last_sync_time" json:"last_sync_time" query:"last_sync_time"`
-	CreateTime   string `thrift:"create_time,7" form:"create_time" json:"create_time" query:"create_time"`
-	UpdateTime   string `thrift:"update_time,8" form:"update_time" json:"update_time" query:"update_time"`
+	Id           int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+	RepositoryId int64  `thrift:"repository_id,2" frugal:"2,default,i64" json:"repository_id"`
+	MainIdlPath  string `thrift:"main_idl_path,3" frugal:"3,default,string" json:"main_idl_path"`
+	Content      string `thrift:"content,4" frugal:"4,default,string" json:"content"`
+	ServiceName  string `thrift:"service_name,5" frugal:"5,default,string" json:"service_name"`
+	LastSyncTime string `thrift:"last_sync_time,6" frugal:"6,default,string" json:"last_sync_time"`
+	CreateTime   string `thrift:"create_time,7" frugal:"7,default,string" json:"create_time"`
+	UpdateTime   string `thrift:"update_time,8" frugal:"8,default,string" json:"update_time"`
 }
 
 func NewIDL() *IDL {
 	return &IDL{}
 }
 
-func (p *IDL) GetID() (v int64) {
-	return p.ID
+func (p *IDL) InitDefault() {
+	*p = IDL{}
 }
 
-func (p *IDL) GetRepositoryID() (v int64) {
-	return p.RepositoryID
+func (p *IDL) GetId() (v int64) {
+	return p.Id
+}
+
+func (p *IDL) GetRepositoryId() (v int64) {
+	return p.RepositoryId
 }
 
 func (p *IDL) GetMainIdlPath() (v string) {
@@ -53,6 +58,30 @@ func (p *IDL) GetCreateTime() (v string) {
 
 func (p *IDL) GetUpdateTime() (v string) {
 	return p.UpdateTime
+}
+func (p *IDL) SetId(val int64) {
+	p.Id = val
+}
+func (p *IDL) SetRepositoryId(val int64) {
+	p.RepositoryId = val
+}
+func (p *IDL) SetMainIdlPath(val string) {
+	p.MainIdlPath = val
+}
+func (p *IDL) SetContent(val string) {
+	p.Content = val
+}
+func (p *IDL) SetServiceName(val string) {
+	p.ServiceName = val
+}
+func (p *IDL) SetLastSyncTime(val string) {
+	p.LastSyncTime = val
+}
+func (p *IDL) SetCreateTime(val string) {
+	p.CreateTime = val
+}
+func (p *IDL) SetUpdateTime(val string) {
+	p.UpdateTime = val
 }
 
 var fieldIDToName_IDL = map[int16]string{
@@ -199,7 +228,7 @@ func (p *IDL) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.ID = v
+		p.Id = v
 	}
 	return nil
 }
@@ -208,7 +237,7 @@ func (p *IDL) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.RepositoryID = v
+		p.RepositoryId = v
 	}
 	return nil
 }
@@ -328,7 +357,7 @@ func (p *IDL) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ID); err != nil {
+	if err := oprot.WriteI64(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -345,7 +374,7 @@ func (p *IDL) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("repository_id", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.RepositoryID); err != nil {
+	if err := oprot.WriteI64(p.RepositoryId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -467,18 +496,112 @@ func (p *IDL) String() string {
 	return fmt.Sprintf("IDL(%+v)", *p)
 }
 
+func (p *IDL) DeepEqual(ano *IDL) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.RepositoryId) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.MainIdlPath) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Content) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.ServiceName) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.LastSyncTime) {
+		return false
+	}
+	if !p.Field7DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field8DeepEqual(ano.UpdateTime) {
+		return false
+	}
+	return true
+}
+
+func (p *IDL) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *IDL) Field2DeepEqual(src int64) bool {
+
+	if p.RepositoryId != src {
+		return false
+	}
+	return true
+}
+func (p *IDL) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.MainIdlPath, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDL) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.Content, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDL) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.ServiceName, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDL) Field6DeepEqual(src string) bool {
+
+	if strings.Compare(p.LastSyncTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDL) Field7DeepEqual(src string) bool {
+
+	if strings.Compare(p.CreateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDL) Field8DeepEqual(src string) bool {
+
+	if strings.Compare(p.UpdateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type AddIDLReq struct {
-	RepositoryID int64  `thrift:"repository_id,1" form:"repository_id,required" json:"repository_id,required"`
-	MainIdlPath  string `thrift:"main_idl_path,2" form:"main_idl_path,required" json:"main_idl_path,required"`
-	ServiceName  string `thrift:"service_name,3" form:"service_name,required" json:"service_name,required"`
+	RepositoryId int64  `thrift:"repository_id,1" frugal:"1,default,i64" json:"repository_id"`
+	MainIdlPath  string `thrift:"main_idl_path,2" frugal:"2,default,string" json:"main_idl_path"`
+	ServiceName  string `thrift:"service_name,3" frugal:"3,default,string" json:"service_name"`
 }
 
 func NewAddIDLReq() *AddIDLReq {
 	return &AddIDLReq{}
 }
 
-func (p *AddIDLReq) GetRepositoryID() (v int64) {
-	return p.RepositoryID
+func (p *AddIDLReq) InitDefault() {
+	*p = AddIDLReq{}
+}
+
+func (p *AddIDLReq) GetRepositoryId() (v int64) {
+	return p.RepositoryId
 }
 
 func (p *AddIDLReq) GetMainIdlPath() (v string) {
@@ -487,6 +610,15 @@ func (p *AddIDLReq) GetMainIdlPath() (v string) {
 
 func (p *AddIDLReq) GetServiceName() (v string) {
 	return p.ServiceName
+}
+func (p *AddIDLReq) SetRepositoryId(val int64) {
+	p.RepositoryId = val
+}
+func (p *AddIDLReq) SetMainIdlPath(val string) {
+	p.MainIdlPath = val
+}
+func (p *AddIDLReq) SetServiceName(val string) {
+	p.ServiceName = val
 }
 
 var fieldIDToName_AddIDLReq = map[int16]string{
@@ -578,7 +710,7 @@ func (p *AddIDLReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.RepositoryID = v
+		p.RepositoryId = v
 	}
 	return nil
 }
@@ -642,7 +774,7 @@ func (p *AddIDLReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("repository_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.RepositoryID); err != nil {
+	if err := oprot.WriteI64(p.RepositoryId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -696,13 +828,57 @@ func (p *AddIDLReq) String() string {
 	return fmt.Sprintf("AddIDLReq(%+v)", *p)
 }
 
+func (p *AddIDLReq) DeepEqual(ano *AddIDLReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.RepositoryId) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.MainIdlPath) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.ServiceName) {
+		return false
+	}
+	return true
+}
+
+func (p *AddIDLReq) Field1DeepEqual(src int64) bool {
+
+	if p.RepositoryId != src {
+		return false
+	}
+	return true
+}
+func (p *AddIDLReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.MainIdlPath, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddIDLReq) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.ServiceName, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type AddIDLRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewAddIDLRes() *AddIDLRes {
 	return &AddIDLRes{}
+}
+
+func (p *AddIDLRes) InitDefault() {
+	*p = AddIDLRes{}
 }
 
 func (p *AddIDLRes) GetCode() (v int32) {
@@ -711,6 +887,12 @@ func (p *AddIDLRes) GetCode() (v int32) {
 
 func (p *AddIDLRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *AddIDLRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *AddIDLRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_AddIDLRes = map[int16]string{
@@ -879,16 +1061,53 @@ func (p *AddIDLRes) String() string {
 	return fmt.Sprintf("AddIDLRes(%+v)", *p)
 }
 
+func (p *AddIDLRes) DeepEqual(ano *AddIDLRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *AddIDLRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *AddIDLRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type DeleteIDLsReq struct {
-	Ids []int64 `thrift:"ids,1" form:"ids,required" json:"ids,required"`
+	Ids []int64 `thrift:"ids,1" frugal:"1,default,list<i64>" json:"ids"`
 }
 
 func NewDeleteIDLsReq() *DeleteIDLsReq {
 	return &DeleteIDLsReq{}
 }
 
+func (p *DeleteIDLsReq) InitDefault() {
+	*p = DeleteIDLsReq{}
+}
+
 func (p *DeleteIDLsReq) GetIds() (v []int64) {
 	return p.Ids
+}
+func (p *DeleteIDLsReq) SetIds(val []int64) {
+	p.Ids = val
 }
 
 var fieldIDToName_DeleteIDLsReq = map[int16]string{
@@ -1037,13 +1256,43 @@ func (p *DeleteIDLsReq) String() string {
 	return fmt.Sprintf("DeleteIDLsReq(%+v)", *p)
 }
 
+func (p *DeleteIDLsReq) DeepEqual(ano *DeleteIDLsReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Ids) {
+		return false
+	}
+	return true
+}
+
+func (p *DeleteIDLsReq) Field1DeepEqual(src []int64) bool {
+
+	if len(p.Ids) != len(src) {
+		return false
+	}
+	for i, v := range p.Ids {
+		_src := src[i]
+		if v != _src {
+			return false
+		}
+	}
+	return true
+}
+
 type DeleteIDLsRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewDeleteIDLsRes() *DeleteIDLsRes {
 	return &DeleteIDLsRes{}
+}
+
+func (p *DeleteIDLsRes) InitDefault() {
+	*p = DeleteIDLsRes{}
 }
 
 func (p *DeleteIDLsRes) GetCode() (v int32) {
@@ -1052,6 +1301,12 @@ func (p *DeleteIDLsRes) GetCode() (v int32) {
 
 func (p *DeleteIDLsRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *DeleteIDLsRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *DeleteIDLsRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_DeleteIDLsRes = map[int16]string{
@@ -1220,23 +1475,57 @@ func (p *DeleteIDLsRes) String() string {
 	return fmt.Sprintf("DeleteIDLsRes(%+v)", *p)
 }
 
+func (p *DeleteIDLsRes) DeepEqual(ano *DeleteIDLsRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *DeleteIDLsRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *DeleteIDLsRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type UpdateIDLReq struct {
-	ID           int64  `thrift:"id,1" form:"id,required" json:"id,required"`
-	RepositoryID int64  `thrift:"repository_id,2" form:"repository_id" json:"repository_id"`
-	MainIdlPath  string `thrift:"main_idl_path,3" form:"main_idl_path" json:"main_idl_path"`
-	ServiceName  string `thrift:"service_name,4" form:"service_name" json:"service_name"`
+	Id           int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+	RepositoryId int64  `thrift:"repository_id,2" frugal:"2,default,i64" json:"repository_id"`
+	MainIdlPath  string `thrift:"main_idl_path,3" frugal:"3,default,string" json:"main_idl_path"`
+	ServiceName  string `thrift:"service_name,4" frugal:"4,default,string" json:"service_name"`
 }
 
 func NewUpdateIDLReq() *UpdateIDLReq {
 	return &UpdateIDLReq{}
 }
 
-func (p *UpdateIDLReq) GetID() (v int64) {
-	return p.ID
+func (p *UpdateIDLReq) InitDefault() {
+	*p = UpdateIDLReq{}
 }
 
-func (p *UpdateIDLReq) GetRepositoryID() (v int64) {
-	return p.RepositoryID
+func (p *UpdateIDLReq) GetId() (v int64) {
+	return p.Id
+}
+
+func (p *UpdateIDLReq) GetRepositoryId() (v int64) {
+	return p.RepositoryId
 }
 
 func (p *UpdateIDLReq) GetMainIdlPath() (v string) {
@@ -1245,6 +1534,18 @@ func (p *UpdateIDLReq) GetMainIdlPath() (v string) {
 
 func (p *UpdateIDLReq) GetServiceName() (v string) {
 	return p.ServiceName
+}
+func (p *UpdateIDLReq) SetId(val int64) {
+	p.Id = val
+}
+func (p *UpdateIDLReq) SetRepositoryId(val int64) {
+	p.RepositoryId = val
+}
+func (p *UpdateIDLReq) SetMainIdlPath(val string) {
+	p.MainIdlPath = val
+}
+func (p *UpdateIDLReq) SetServiceName(val string) {
+	p.ServiceName = val
 }
 
 var fieldIDToName_UpdateIDLReq = map[int16]string{
@@ -1347,7 +1648,7 @@ func (p *UpdateIDLReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.ID = v
+		p.Id = v
 	}
 	return nil
 }
@@ -1356,7 +1657,7 @@ func (p *UpdateIDLReq) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.RepositoryID = v
+		p.RepositoryId = v
 	}
 	return nil
 }
@@ -1424,7 +1725,7 @@ func (p *UpdateIDLReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ID); err != nil {
+	if err := oprot.WriteI64(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1441,7 +1742,7 @@ func (p *UpdateIDLReq) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("repository_id", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.RepositoryID); err != nil {
+	if err := oprot.WriteI64(p.RepositoryId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1495,13 +1796,67 @@ func (p *UpdateIDLReq) String() string {
 	return fmt.Sprintf("UpdateIDLReq(%+v)", *p)
 }
 
+func (p *UpdateIDLReq) DeepEqual(ano *UpdateIDLReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.RepositoryId) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.MainIdlPath) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.ServiceName) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateIDLReq) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateIDLReq) Field2DeepEqual(src int64) bool {
+
+	if p.RepositoryId != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateIDLReq) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.MainIdlPath, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UpdateIDLReq) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.ServiceName, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type UpdateIDLRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewUpdateIDLRes() *UpdateIDLRes {
 	return &UpdateIDLRes{}
+}
+
+func (p *UpdateIDLRes) InitDefault() {
+	*p = UpdateIDLRes{}
 }
 
 func (p *UpdateIDLRes) GetCode() (v int32) {
@@ -1510,6 +1865,12 @@ func (p *UpdateIDLRes) GetCode() (v int32) {
 
 func (p *UpdateIDLRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *UpdateIDLRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *UpdateIDLRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_UpdateIDLRes = map[int16]string{
@@ -1678,15 +2039,49 @@ func (p *UpdateIDLRes) String() string {
 	return fmt.Sprintf("UpdateIDLRes(%+v)", *p)
 }
 
+func (p *UpdateIDLRes) DeepEqual(ano *UpdateIDLRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateIDLRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateIDLRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type GetIDLsReq struct {
-	Page    int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
-	Limit   int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
-	Order   int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
-	OrderBy string `thrift:"order_by,4" json:"order_by" query:"order_by"`
+	Page    int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
+	Limit   int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
+	Order   int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
+	OrderBy string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
 }
 
 func NewGetIDLsReq() *GetIDLsReq {
 	return &GetIDLsReq{}
+}
+
+func (p *GetIDLsReq) InitDefault() {
+	*p = GetIDLsReq{}
 }
 
 func (p *GetIDLsReq) GetPage() (v int32) {
@@ -1703,6 +2098,18 @@ func (p *GetIDLsReq) GetOrder() (v int32) {
 
 func (p *GetIDLsReq) GetOrderBy() (v string) {
 	return p.OrderBy
+}
+func (p *GetIDLsReq) SetPage(val int32) {
+	p.Page = val
+}
+func (p *GetIDLsReq) SetLimit(val int32) {
+	p.Limit = val
+}
+func (p *GetIDLsReq) SetOrder(val int32) {
+	p.Order = val
+}
+func (p *GetIDLsReq) SetOrderBy(val string) {
+	p.OrderBy = val
 }
 
 var fieldIDToName_GetIDLsReq = map[int16]string{
@@ -1953,14 +2360,68 @@ func (p *GetIDLsReq) String() string {
 	return fmt.Sprintf("GetIDLsReq(%+v)", *p)
 }
 
+func (p *GetIDLsReq) DeepEqual(ano *GetIDLsReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Page) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Limit) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Order) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.OrderBy) {
+		return false
+	}
+	return true
+}
+
+func (p *GetIDLsReq) Field1DeepEqual(src int32) bool {
+
+	if p.Page != src {
+		return false
+	}
+	return true
+}
+func (p *GetIDLsReq) Field2DeepEqual(src int32) bool {
+
+	if p.Limit != src {
+		return false
+	}
+	return true
+}
+func (p *GetIDLsReq) Field3DeepEqual(src int32) bool {
+
+	if p.Order != src {
+		return false
+	}
+	return true
+}
+func (p *GetIDLsReq) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.OrderBy, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type GetIDLsRes struct {
-	Code int32           `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string          `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
-	Data *GetIDLsResData `thrift:"data,3" form:"data" json:"data" query:"data"`
+	Code int32           `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string          `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *GetIDLsResData `thrift:"data,3" frugal:"3,default,GetIDLsResData" json:"data"`
 }
 
 func NewGetIDLsRes() *GetIDLsRes {
 	return &GetIDLsRes{}
+}
+
+func (p *GetIDLsRes) InitDefault() {
+	*p = GetIDLsRes{}
 }
 
 func (p *GetIDLsRes) GetCode() (v int32) {
@@ -1978,6 +2439,15 @@ func (p *GetIDLsRes) GetData() (v *GetIDLsResData) {
 		return GetIDLsRes_Data_DEFAULT
 	}
 	return p.Data
+}
+func (p *GetIDLsRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *GetIDLsRes) SetMsg(val string) {
+	p.Msg = val
+}
+func (p *GetIDLsRes) SetData(val *GetIDLsResData) {
+	p.Data = val
 }
 
 var fieldIDToName_GetIDLsRes = map[int16]string{
@@ -2190,16 +2660,63 @@ func (p *GetIDLsRes) String() string {
 	return fmt.Sprintf("GetIDLsRes(%+v)", *p)
 }
 
+func (p *GetIDLsRes) DeepEqual(ano *GetIDLsRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Data) {
+		return false
+	}
+	return true
+}
+
+func (p *GetIDLsRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *GetIDLsRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetIDLsRes) Field3DeepEqual(src *GetIDLsResData) bool {
+
+	if !p.Data.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type GetIDLsResData struct {
-	Idls []*IDL `thrift:"idls,1" form:"idls" json:"idls" query:"idls"`
+	Idls []*IDL `thrift:"idls,1" frugal:"1,default,list<IDL>" json:"idls"`
 }
 
 func NewGetIDLsResData() *GetIDLsResData {
 	return &GetIDLsResData{}
 }
 
+func (p *GetIDLsResData) InitDefault() {
+	*p = GetIDLsResData{}
+}
+
 func (p *GetIDLsResData) GetIdls() (v []*IDL) {
 	return p.Idls
+}
+func (p *GetIDLsResData) SetIdls(val []*IDL) {
+	p.Idls = val
 }
 
 var fieldIDToName_GetIDLsResData = map[int16]string{
@@ -2346,16 +2863,49 @@ func (p *GetIDLsResData) String() string {
 	return fmt.Sprintf("GetIDLsResData(%+v)", *p)
 }
 
+func (p *GetIDLsResData) DeepEqual(ano *GetIDLsResData) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Idls) {
+		return false
+	}
+	return true
+}
+
+func (p *GetIDLsResData) Field1DeepEqual(src []*IDL) bool {
+
+	if len(p.Idls) != len(src) {
+		return false
+	}
+	for i, v := range p.Idls {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+
 type SyncIDLsByIdReq struct {
-	Ids []int64 `thrift:"ids,1" form:"ids,required" json:"ids,required"`
+	Ids []int64 `thrift:"ids,1" frugal:"1,default,list<i64>" json:"ids"`
 }
 
 func NewSyncIDLsByIdReq() *SyncIDLsByIdReq {
 	return &SyncIDLsByIdReq{}
 }
 
+func (p *SyncIDLsByIdReq) InitDefault() {
+	*p = SyncIDLsByIdReq{}
+}
+
 func (p *SyncIDLsByIdReq) GetIds() (v []int64) {
 	return p.Ids
+}
+func (p *SyncIDLsByIdReq) SetIds(val []int64) {
+	p.Ids = val
 }
 
 var fieldIDToName_SyncIDLsByIdReq = map[int16]string{
@@ -2504,13 +3054,43 @@ func (p *SyncIDLsByIdReq) String() string {
 	return fmt.Sprintf("SyncIDLsByIdReq(%+v)", *p)
 }
 
+func (p *SyncIDLsByIdReq) DeepEqual(ano *SyncIDLsByIdReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Ids) {
+		return false
+	}
+	return true
+}
+
+func (p *SyncIDLsByIdReq) Field1DeepEqual(src []int64) bool {
+
+	if len(p.Ids) != len(src) {
+		return false
+	}
+	for i, v := range p.Ids {
+		_src := src[i]
+		if v != _src {
+			return false
+		}
+	}
+	return true
+}
+
 type SyncIDLsByIdRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewSyncIDLsByIdRes() *SyncIDLsByIdRes {
 	return &SyncIDLsByIdRes{}
+}
+
+func (p *SyncIDLsByIdRes) InitDefault() {
+	*p = SyncIDLsByIdRes{}
 }
 
 func (p *SyncIDLsByIdRes) GetCode() (v int32) {
@@ -2519,6 +3099,12 @@ func (p *SyncIDLsByIdRes) GetCode() (v int32) {
 
 func (p *SyncIDLsByIdRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *SyncIDLsByIdRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *SyncIDLsByIdRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_SyncIDLsByIdRes = map[int16]string{
@@ -2685,6 +3271,36 @@ func (p *SyncIDLsByIdRes) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("SyncIDLsByIdRes(%+v)", *p)
+}
+
+func (p *SyncIDLsByIdRes) DeepEqual(ano *SyncIDLsByIdRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *SyncIDLsByIdRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *SyncIDLsByIdRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
 }
 
 type IdlService interface {
@@ -3057,11 +3673,15 @@ func (p *idlServiceProcessorSyncIDLs) Process(ctx context.Context, seqId int32, 
 }
 
 type IdlServiceAddIDLArgs struct {
-	Req *AddIDLReq `thrift:"req,1"`
+	Req *AddIDLReq `thrift:"req,1" frugal:"1,default,AddIDLReq" json:"req"`
 }
 
 func NewIdlServiceAddIDLArgs() *IdlServiceAddIDLArgs {
 	return &IdlServiceAddIDLArgs{}
+}
+
+func (p *IdlServiceAddIDLArgs) InitDefault() {
+	*p = IdlServiceAddIDLArgs{}
 }
 
 var IdlServiceAddIDLArgs_Req_DEFAULT *AddIDLReq
@@ -3071,6 +3691,9 @@ func (p *IdlServiceAddIDLArgs) GetReq() (v *AddIDLReq) {
 		return IdlServiceAddIDLArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *IdlServiceAddIDLArgs) SetReq(val *AddIDLReq) {
+	p.Req = val
 }
 
 var fieldIDToName_IdlServiceAddIDLArgs = map[int16]string{
@@ -3201,12 +3824,36 @@ func (p *IdlServiceAddIDLArgs) String() string {
 	return fmt.Sprintf("IdlServiceAddIDLArgs(%+v)", *p)
 }
 
+func (p *IdlServiceAddIDLArgs) DeepEqual(ano *IdlServiceAddIDLArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceAddIDLArgs) Field1DeepEqual(src *AddIDLReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type IdlServiceAddIDLResult struct {
-	Success *AddIDLRes `thrift:"success,0,optional"`
+	Success *AddIDLRes `thrift:"success,0,optional" frugal:"0,optional,AddIDLRes" json:"success,omitempty"`
 }
 
 func NewIdlServiceAddIDLResult() *IdlServiceAddIDLResult {
 	return &IdlServiceAddIDLResult{}
+}
+
+func (p *IdlServiceAddIDLResult) InitDefault() {
+	*p = IdlServiceAddIDLResult{}
 }
 
 var IdlServiceAddIDLResult_Success_DEFAULT *AddIDLRes
@@ -3216,6 +3863,9 @@ func (p *IdlServiceAddIDLResult) GetSuccess() (v *AddIDLRes) {
 		return IdlServiceAddIDLResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *IdlServiceAddIDLResult) SetSuccess(x interface{}) {
+	p.Success = x.(*AddIDLRes)
 }
 
 var fieldIDToName_IdlServiceAddIDLResult = map[int16]string{
@@ -3348,12 +3998,36 @@ func (p *IdlServiceAddIDLResult) String() string {
 	return fmt.Sprintf("IdlServiceAddIDLResult(%+v)", *p)
 }
 
+func (p *IdlServiceAddIDLResult) DeepEqual(ano *IdlServiceAddIDLResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceAddIDLResult) Field0DeepEqual(src *AddIDLRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type IdlServiceDeleteIDLArgs struct {
-	Req *DeleteIDLsReq `thrift:"req,1"`
+	Req *DeleteIDLsReq `thrift:"req,1" frugal:"1,default,DeleteIDLsReq" json:"req"`
 }
 
 func NewIdlServiceDeleteIDLArgs() *IdlServiceDeleteIDLArgs {
 	return &IdlServiceDeleteIDLArgs{}
+}
+
+func (p *IdlServiceDeleteIDLArgs) InitDefault() {
+	*p = IdlServiceDeleteIDLArgs{}
 }
 
 var IdlServiceDeleteIDLArgs_Req_DEFAULT *DeleteIDLsReq
@@ -3363,6 +4037,9 @@ func (p *IdlServiceDeleteIDLArgs) GetReq() (v *DeleteIDLsReq) {
 		return IdlServiceDeleteIDLArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *IdlServiceDeleteIDLArgs) SetReq(val *DeleteIDLsReq) {
+	p.Req = val
 }
 
 var fieldIDToName_IdlServiceDeleteIDLArgs = map[int16]string{
@@ -3493,12 +4170,36 @@ func (p *IdlServiceDeleteIDLArgs) String() string {
 	return fmt.Sprintf("IdlServiceDeleteIDLArgs(%+v)", *p)
 }
 
+func (p *IdlServiceDeleteIDLArgs) DeepEqual(ano *IdlServiceDeleteIDLArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceDeleteIDLArgs) Field1DeepEqual(src *DeleteIDLsReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type IdlServiceDeleteIDLResult struct {
-	Success *DeleteIDLsRes `thrift:"success,0,optional"`
+	Success *DeleteIDLsRes `thrift:"success,0,optional" frugal:"0,optional,DeleteIDLsRes" json:"success,omitempty"`
 }
 
 func NewIdlServiceDeleteIDLResult() *IdlServiceDeleteIDLResult {
 	return &IdlServiceDeleteIDLResult{}
+}
+
+func (p *IdlServiceDeleteIDLResult) InitDefault() {
+	*p = IdlServiceDeleteIDLResult{}
 }
 
 var IdlServiceDeleteIDLResult_Success_DEFAULT *DeleteIDLsRes
@@ -3508,6 +4209,9 @@ func (p *IdlServiceDeleteIDLResult) GetSuccess() (v *DeleteIDLsRes) {
 		return IdlServiceDeleteIDLResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *IdlServiceDeleteIDLResult) SetSuccess(x interface{}) {
+	p.Success = x.(*DeleteIDLsRes)
 }
 
 var fieldIDToName_IdlServiceDeleteIDLResult = map[int16]string{
@@ -3640,12 +4344,36 @@ func (p *IdlServiceDeleteIDLResult) String() string {
 	return fmt.Sprintf("IdlServiceDeleteIDLResult(%+v)", *p)
 }
 
+func (p *IdlServiceDeleteIDLResult) DeepEqual(ano *IdlServiceDeleteIDLResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceDeleteIDLResult) Field0DeepEqual(src *DeleteIDLsRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type IdlServiceUpdateIDLArgs struct {
-	Req *UpdateIDLReq `thrift:"req,1"`
+	Req *UpdateIDLReq `thrift:"req,1" frugal:"1,default,UpdateIDLReq" json:"req"`
 }
 
 func NewIdlServiceUpdateIDLArgs() *IdlServiceUpdateIDLArgs {
 	return &IdlServiceUpdateIDLArgs{}
+}
+
+func (p *IdlServiceUpdateIDLArgs) InitDefault() {
+	*p = IdlServiceUpdateIDLArgs{}
 }
 
 var IdlServiceUpdateIDLArgs_Req_DEFAULT *UpdateIDLReq
@@ -3655,6 +4383,9 @@ func (p *IdlServiceUpdateIDLArgs) GetReq() (v *UpdateIDLReq) {
 		return IdlServiceUpdateIDLArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *IdlServiceUpdateIDLArgs) SetReq(val *UpdateIDLReq) {
+	p.Req = val
 }
 
 var fieldIDToName_IdlServiceUpdateIDLArgs = map[int16]string{
@@ -3785,12 +4516,36 @@ func (p *IdlServiceUpdateIDLArgs) String() string {
 	return fmt.Sprintf("IdlServiceUpdateIDLArgs(%+v)", *p)
 }
 
+func (p *IdlServiceUpdateIDLArgs) DeepEqual(ano *IdlServiceUpdateIDLArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceUpdateIDLArgs) Field1DeepEqual(src *UpdateIDLReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type IdlServiceUpdateIDLResult struct {
-	Success *UpdateIDLRes `thrift:"success,0,optional"`
+	Success *UpdateIDLRes `thrift:"success,0,optional" frugal:"0,optional,UpdateIDLRes" json:"success,omitempty"`
 }
 
 func NewIdlServiceUpdateIDLResult() *IdlServiceUpdateIDLResult {
 	return &IdlServiceUpdateIDLResult{}
+}
+
+func (p *IdlServiceUpdateIDLResult) InitDefault() {
+	*p = IdlServiceUpdateIDLResult{}
 }
 
 var IdlServiceUpdateIDLResult_Success_DEFAULT *UpdateIDLRes
@@ -3800,6 +4555,9 @@ func (p *IdlServiceUpdateIDLResult) GetSuccess() (v *UpdateIDLRes) {
 		return IdlServiceUpdateIDLResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *IdlServiceUpdateIDLResult) SetSuccess(x interface{}) {
+	p.Success = x.(*UpdateIDLRes)
 }
 
 var fieldIDToName_IdlServiceUpdateIDLResult = map[int16]string{
@@ -3932,12 +4690,36 @@ func (p *IdlServiceUpdateIDLResult) String() string {
 	return fmt.Sprintf("IdlServiceUpdateIDLResult(%+v)", *p)
 }
 
+func (p *IdlServiceUpdateIDLResult) DeepEqual(ano *IdlServiceUpdateIDLResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceUpdateIDLResult) Field0DeepEqual(src *UpdateIDLRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type IdlServiceGetIDLsArgs struct {
-	Req *GetIDLsReq `thrift:"req,1"`
+	Req *GetIDLsReq `thrift:"req,1" frugal:"1,default,GetIDLsReq" json:"req"`
 }
 
 func NewIdlServiceGetIDLsArgs() *IdlServiceGetIDLsArgs {
 	return &IdlServiceGetIDLsArgs{}
+}
+
+func (p *IdlServiceGetIDLsArgs) InitDefault() {
+	*p = IdlServiceGetIDLsArgs{}
 }
 
 var IdlServiceGetIDLsArgs_Req_DEFAULT *GetIDLsReq
@@ -3947,6 +4729,9 @@ func (p *IdlServiceGetIDLsArgs) GetReq() (v *GetIDLsReq) {
 		return IdlServiceGetIDLsArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *IdlServiceGetIDLsArgs) SetReq(val *GetIDLsReq) {
+	p.Req = val
 }
 
 var fieldIDToName_IdlServiceGetIDLsArgs = map[int16]string{
@@ -4077,12 +4862,36 @@ func (p *IdlServiceGetIDLsArgs) String() string {
 	return fmt.Sprintf("IdlServiceGetIDLsArgs(%+v)", *p)
 }
 
+func (p *IdlServiceGetIDLsArgs) DeepEqual(ano *IdlServiceGetIDLsArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceGetIDLsArgs) Field1DeepEqual(src *GetIDLsReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type IdlServiceGetIDLsResult struct {
-	Success *GetIDLsRes `thrift:"success,0,optional"`
+	Success *GetIDLsRes `thrift:"success,0,optional" frugal:"0,optional,GetIDLsRes" json:"success,omitempty"`
 }
 
 func NewIdlServiceGetIDLsResult() *IdlServiceGetIDLsResult {
 	return &IdlServiceGetIDLsResult{}
+}
+
+func (p *IdlServiceGetIDLsResult) InitDefault() {
+	*p = IdlServiceGetIDLsResult{}
 }
 
 var IdlServiceGetIDLsResult_Success_DEFAULT *GetIDLsRes
@@ -4092,6 +4901,9 @@ func (p *IdlServiceGetIDLsResult) GetSuccess() (v *GetIDLsRes) {
 		return IdlServiceGetIDLsResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *IdlServiceGetIDLsResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetIDLsRes)
 }
 
 var fieldIDToName_IdlServiceGetIDLsResult = map[int16]string{
@@ -4224,12 +5036,36 @@ func (p *IdlServiceGetIDLsResult) String() string {
 	return fmt.Sprintf("IdlServiceGetIDLsResult(%+v)", *p)
 }
 
+func (p *IdlServiceGetIDLsResult) DeepEqual(ano *IdlServiceGetIDLsResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceGetIDLsResult) Field0DeepEqual(src *GetIDLsRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type IdlServiceSyncIDLsArgs struct {
-	Req *SyncIDLsByIdReq `thrift:"req,1"`
+	Req *SyncIDLsByIdReq `thrift:"req,1" frugal:"1,default,SyncIDLsByIdReq" json:"req"`
 }
 
 func NewIdlServiceSyncIDLsArgs() *IdlServiceSyncIDLsArgs {
 	return &IdlServiceSyncIDLsArgs{}
+}
+
+func (p *IdlServiceSyncIDLsArgs) InitDefault() {
+	*p = IdlServiceSyncIDLsArgs{}
 }
 
 var IdlServiceSyncIDLsArgs_Req_DEFAULT *SyncIDLsByIdReq
@@ -4239,6 +5075,9 @@ func (p *IdlServiceSyncIDLsArgs) GetReq() (v *SyncIDLsByIdReq) {
 		return IdlServiceSyncIDLsArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *IdlServiceSyncIDLsArgs) SetReq(val *SyncIDLsByIdReq) {
+	p.Req = val
 }
 
 var fieldIDToName_IdlServiceSyncIDLsArgs = map[int16]string{
@@ -4369,12 +5208,36 @@ func (p *IdlServiceSyncIDLsArgs) String() string {
 	return fmt.Sprintf("IdlServiceSyncIDLsArgs(%+v)", *p)
 }
 
+func (p *IdlServiceSyncIDLsArgs) DeepEqual(ano *IdlServiceSyncIDLsArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceSyncIDLsArgs) Field1DeepEqual(src *SyncIDLsByIdReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type IdlServiceSyncIDLsResult struct {
-	Success *SyncIDLsByIdRes `thrift:"success,0,optional"`
+	Success *SyncIDLsByIdRes `thrift:"success,0,optional" frugal:"0,optional,SyncIDLsByIdRes" json:"success,omitempty"`
 }
 
 func NewIdlServiceSyncIDLsResult() *IdlServiceSyncIDLsResult {
 	return &IdlServiceSyncIDLsResult{}
+}
+
+func (p *IdlServiceSyncIDLsResult) InitDefault() {
+	*p = IdlServiceSyncIDLsResult{}
 }
 
 var IdlServiceSyncIDLsResult_Success_DEFAULT *SyncIDLsByIdRes
@@ -4384,6 +5247,9 @@ func (p *IdlServiceSyncIDLsResult) GetSuccess() (v *SyncIDLsByIdRes) {
 		return IdlServiceSyncIDLsResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *IdlServiceSyncIDLsResult) SetSuccess(x interface{}) {
+	p.Success = x.(*SyncIDLsByIdRes)
 }
 
 var fieldIDToName_IdlServiceSyncIDLsResult = map[int16]string{
@@ -4514,4 +5380,24 @@ func (p *IdlServiceSyncIDLsResult) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("IdlServiceSyncIDLsResult(%+v)", *p)
+}
+
+func (p *IdlServiceSyncIDLsResult) DeepEqual(ano *IdlServiceSyncIDLsResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *IdlServiceSyncIDLsResult) Field0DeepEqual(src *SyncIDLsByIdRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
 }

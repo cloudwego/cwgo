@@ -6,23 +6,27 @@ import (
 	"context"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
+	"strings"
 )
 
 type Template struct {
-	ID   int64  `thrift:"id,1" form:"id" json:"id" query:"id"`
-	Name string `thrift:"name,2" form:"name" json:"name" query:"name"`
-	// 1: hz, 2: kitex
-	Type       int8   `thrift:"type,3" form:"type" json:"type" query:"type"`
-	CreateTime string `thrift:"create_time,4" form:"create_time" json:"create_time" query:"create_time"`
-	UpdateTime string `thrift:"update_time,5" form:"update_time" json:"update_time" query:"update_time"`
+	Id         int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+	Name       string `thrift:"name,2" frugal:"2,default,string" json:"name"`
+	Type       int8   `thrift:"type,3" frugal:"3,default,i8" json:"type"`
+	CreateTime string `thrift:"create_time,4" frugal:"4,default,string" json:"create_time"`
+	UpdateTime string `thrift:"update_time,5" frugal:"5,default,string" json:"update_time"`
 }
 
 func NewTemplate() *Template {
 	return &Template{}
 }
 
-func (p *Template) GetID() (v int64) {
-	return p.ID
+func (p *Template) InitDefault() {
+	*p = Template{}
+}
+
+func (p *Template) GetId() (v int64) {
+	return p.Id
 }
 
 func (p *Template) GetName() (v string) {
@@ -39,6 +43,21 @@ func (p *Template) GetCreateTime() (v string) {
 
 func (p *Template) GetUpdateTime() (v string) {
 	return p.UpdateTime
+}
+func (p *Template) SetId(val int64) {
+	p.Id = val
+}
+func (p *Template) SetName(val string) {
+	p.Name = val
+}
+func (p *Template) SetType(val int8) {
+	p.Type = val
+}
+func (p *Template) SetCreateTime(val string) {
+	p.CreateTime = val
+}
+func (p *Template) SetUpdateTime(val string) {
+	p.UpdateTime = val
 }
 
 var fieldIDToName_Template = map[int16]string{
@@ -152,7 +171,7 @@ func (p *Template) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.ID = v
+		p.Id = v
 	}
 	return nil
 }
@@ -242,7 +261,7 @@ func (p *Template) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ID); err != nil {
+	if err := oprot.WriteI64(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -330,25 +349,89 @@ func (p *Template) String() string {
 	return fmt.Sprintf("Template(%+v)", *p)
 }
 
+func (p *Template) DeepEqual(ano *Template) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Name) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Type) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.UpdateTime) {
+		return false
+	}
+	return true
+}
+
+func (p *Template) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *Template) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Template) Field3DeepEqual(src int8) bool {
+
+	if p.Type != src {
+		return false
+	}
+	return true
+}
+func (p *Template) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.CreateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Template) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.UpdateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type TemplateItem struct {
-	ID         int64  `thrift:"id,1" form:"id" json:"id" query:"id"`
-	TemplateID int64  `thrift:"template_id,2" form:"template_id" json:"template_id" query:"template_id"`
-	Name       string `thrift:"name,3" form:"name" json:"name" query:"name"`
-	Content    string `thrift:"content,4" form:"content" json:"content" query:"content"`
-	CreateTime string `thrift:"create_time,5" form:"create_time" json:"create_time" query:"create_time"`
-	UpdateTime string `thrift:"update_time,6" form:"update_time" json:"update_time" query:"update_time"`
+	Id         int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+	TemplateId int64  `thrift:"template_id,2" frugal:"2,default,i64" json:"template_id"`
+	Name       string `thrift:"name,3" frugal:"3,default,string" json:"name"`
+	Content    string `thrift:"content,4" frugal:"4,default,string" json:"content"`
+	CreateTime string `thrift:"create_time,5" frugal:"5,default,string" json:"create_time"`
+	UpdateTime string `thrift:"update_time,6" frugal:"6,default,string" json:"update_time"`
 }
 
 func NewTemplateItem() *TemplateItem {
 	return &TemplateItem{}
 }
 
-func (p *TemplateItem) GetID() (v int64) {
-	return p.ID
+func (p *TemplateItem) InitDefault() {
+	*p = TemplateItem{}
 }
 
-func (p *TemplateItem) GetTemplateID() (v int64) {
-	return p.TemplateID
+func (p *TemplateItem) GetId() (v int64) {
+	return p.Id
+}
+
+func (p *TemplateItem) GetTemplateId() (v int64) {
+	return p.TemplateId
 }
 
 func (p *TemplateItem) GetName() (v string) {
@@ -365,6 +448,24 @@ func (p *TemplateItem) GetCreateTime() (v string) {
 
 func (p *TemplateItem) GetUpdateTime() (v string) {
 	return p.UpdateTime
+}
+func (p *TemplateItem) SetId(val int64) {
+	p.Id = val
+}
+func (p *TemplateItem) SetTemplateId(val int64) {
+	p.TemplateId = val
+}
+func (p *TemplateItem) SetName(val string) {
+	p.Name = val
+}
+func (p *TemplateItem) SetContent(val string) {
+	p.Content = val
+}
+func (p *TemplateItem) SetCreateTime(val string) {
+	p.CreateTime = val
+}
+func (p *TemplateItem) SetUpdateTime(val string) {
+	p.UpdateTime = val
 }
 
 var fieldIDToName_TemplateItem = map[int16]string{
@@ -489,7 +590,7 @@ func (p *TemplateItem) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.ID = v
+		p.Id = v
 	}
 	return nil
 }
@@ -498,7 +599,7 @@ func (p *TemplateItem) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.TemplateID = v
+		p.TemplateId = v
 	}
 	return nil
 }
@@ -592,7 +693,7 @@ func (p *TemplateItem) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ID); err != nil {
+	if err := oprot.WriteI64(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -609,7 +710,7 @@ func (p *TemplateItem) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("template_id", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.TemplateID); err != nil {
+	if err := oprot.WriteI64(p.TemplateId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -697,13 +798,87 @@ func (p *TemplateItem) String() string {
 	return fmt.Sprintf("TemplateItem(%+v)", *p)
 }
 
+func (p *TemplateItem) DeepEqual(ano *TemplateItem) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.TemplateId) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Name) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Content) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.UpdateTime) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateItem) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *TemplateItem) Field2DeepEqual(src int64) bool {
+
+	if p.TemplateId != src {
+		return false
+	}
+	return true
+}
+func (p *TemplateItem) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *TemplateItem) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.Content, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *TemplateItem) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.CreateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *TemplateItem) Field6DeepEqual(src string) bool {
+
+	if strings.Compare(p.UpdateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type AddTemplateReq struct {
-	Name string `thrift:"name,1" form:"name,required" json:"name,required"`
-	Type int8   `thrift:"type,2" form:"type,required" json:"type,required"`
+	Name string `thrift:"name,1" frugal:"1,default,string" json:"name"`
+	Type int8   `thrift:"type,2" frugal:"2,default,i8" json:"type"`
 }
 
 func NewAddTemplateReq() *AddTemplateReq {
 	return &AddTemplateReq{}
+}
+
+func (p *AddTemplateReq) InitDefault() {
+	*p = AddTemplateReq{}
 }
 
 func (p *AddTemplateReq) GetName() (v string) {
@@ -712,6 +887,12 @@ func (p *AddTemplateReq) GetName() (v string) {
 
 func (p *AddTemplateReq) GetType() (v int8) {
 	return p.Type
+}
+func (p *AddTemplateReq) SetName(val string) {
+	p.Name = val
+}
+func (p *AddTemplateReq) SetType(val int8) {
+	p.Type = val
 }
 
 var fieldIDToName_AddTemplateReq = map[int16]string{
@@ -880,13 +1061,47 @@ func (p *AddTemplateReq) String() string {
 	return fmt.Sprintf("AddTemplateReq(%+v)", *p)
 }
 
+func (p *AddTemplateReq) DeepEqual(ano *AddTemplateReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Name) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Type) {
+		return false
+	}
+	return true
+}
+
+func (p *AddTemplateReq) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddTemplateReq) Field2DeepEqual(src int8) bool {
+
+	if p.Type != src {
+		return false
+	}
+	return true
+}
+
 type AddTemplateRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewAddTemplateRes() *AddTemplateRes {
 	return &AddTemplateRes{}
+}
+
+func (p *AddTemplateRes) InitDefault() {
+	*p = AddTemplateRes{}
 }
 
 func (p *AddTemplateRes) GetCode() (v int32) {
@@ -895,6 +1110,12 @@ func (p *AddTemplateRes) GetCode() (v int32) {
 
 func (p *AddTemplateRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *AddTemplateRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *AddTemplateRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_AddTemplateRes = map[int16]string{
@@ -1063,16 +1284,53 @@ func (p *AddTemplateRes) String() string {
 	return fmt.Sprintf("AddTemplateRes(%+v)", *p)
 }
 
+func (p *AddTemplateRes) DeepEqual(ano *AddTemplateRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *AddTemplateRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *AddTemplateRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type DeleteTemplateReq struct {
-	Ids []int64 `thrift:"ids,1" form:"ids,required" json:"ids,required"`
+	Ids []int64 `thrift:"ids,1" frugal:"1,default,list<i64>" json:"ids"`
 }
 
 func NewDeleteTemplateReq() *DeleteTemplateReq {
 	return &DeleteTemplateReq{}
 }
 
+func (p *DeleteTemplateReq) InitDefault() {
+	*p = DeleteTemplateReq{}
+}
+
 func (p *DeleteTemplateReq) GetIds() (v []int64) {
 	return p.Ids
+}
+func (p *DeleteTemplateReq) SetIds(val []int64) {
+	p.Ids = val
 }
 
 var fieldIDToName_DeleteTemplateReq = map[int16]string{
@@ -1221,13 +1479,43 @@ func (p *DeleteTemplateReq) String() string {
 	return fmt.Sprintf("DeleteTemplateReq(%+v)", *p)
 }
 
+func (p *DeleteTemplateReq) DeepEqual(ano *DeleteTemplateReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Ids) {
+		return false
+	}
+	return true
+}
+
+func (p *DeleteTemplateReq) Field1DeepEqual(src []int64) bool {
+
+	if len(p.Ids) != len(src) {
+		return false
+	}
+	for i, v := range p.Ids {
+		_src := src[i]
+		if v != _src {
+			return false
+		}
+	}
+	return true
+}
+
 type DeleteTemplateRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewDeleteTemplateRes() *DeleteTemplateRes {
 	return &DeleteTemplateRes{}
+}
+
+func (p *DeleteTemplateRes) InitDefault() {
+	*p = DeleteTemplateRes{}
 }
 
 func (p *DeleteTemplateRes) GetCode() (v int32) {
@@ -1236,6 +1524,12 @@ func (p *DeleteTemplateRes) GetCode() (v int32) {
 
 func (p *DeleteTemplateRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *DeleteTemplateRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *DeleteTemplateRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_DeleteTemplateRes = map[int16]string{
@@ -1404,21 +1698,61 @@ func (p *DeleteTemplateRes) String() string {
 	return fmt.Sprintf("DeleteTemplateRes(%+v)", *p)
 }
 
+func (p *DeleteTemplateRes) DeepEqual(ano *DeleteTemplateRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *DeleteTemplateRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *DeleteTemplateRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type UpdateTemplateReq struct {
-	ID   int64  `thrift:"id,1" form:"id,required" json:"id,required"`
-	Name string `thrift:"name,2" form:"name,required" json:"name,required"`
+	Id   int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+	Name string `thrift:"name,2" frugal:"2,default,string" json:"name"`
 }
 
 func NewUpdateTemplateReq() *UpdateTemplateReq {
 	return &UpdateTemplateReq{}
 }
 
-func (p *UpdateTemplateReq) GetID() (v int64) {
-	return p.ID
+func (p *UpdateTemplateReq) InitDefault() {
+	*p = UpdateTemplateReq{}
+}
+
+func (p *UpdateTemplateReq) GetId() (v int64) {
+	return p.Id
 }
 
 func (p *UpdateTemplateReq) GetName() (v string) {
 	return p.Name
+}
+func (p *UpdateTemplateReq) SetId(val int64) {
+	p.Id = val
+}
+func (p *UpdateTemplateReq) SetName(val string) {
+	p.Name = val
 }
 
 var fieldIDToName_UpdateTemplateReq = map[int16]string{
@@ -1499,7 +1833,7 @@ func (p *UpdateTemplateReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.ID = v
+		p.Id = v
 	}
 	return nil
 }
@@ -1550,7 +1884,7 @@ func (p *UpdateTemplateReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ID); err != nil {
+	if err := oprot.WriteI64(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1587,13 +1921,47 @@ func (p *UpdateTemplateReq) String() string {
 	return fmt.Sprintf("UpdateTemplateReq(%+v)", *p)
 }
 
+func (p *UpdateTemplateReq) DeepEqual(ano *UpdateTemplateReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Name) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateTemplateReq) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateTemplateReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type UpdateTemplateRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewUpdateTemplateRes() *UpdateTemplateRes {
 	return &UpdateTemplateRes{}
+}
+
+func (p *UpdateTemplateRes) InitDefault() {
+	*p = UpdateTemplateRes{}
 }
 
 func (p *UpdateTemplateRes) GetCode() (v int32) {
@@ -1602,6 +1970,12 @@ func (p *UpdateTemplateRes) GetCode() (v int32) {
 
 func (p *UpdateTemplateRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *UpdateTemplateRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *UpdateTemplateRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_UpdateTemplateRes = map[int16]string{
@@ -1770,15 +2144,49 @@ func (p *UpdateTemplateRes) String() string {
 	return fmt.Sprintf("UpdateTemplateRes(%+v)", *p)
 }
 
+func (p *UpdateTemplateRes) DeepEqual(ano *UpdateTemplateRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateTemplateRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateTemplateRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type GetTemplatesReq struct {
-	Page    int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
-	Limit   int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
-	Order   int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
-	OrderBy string `thrift:"order_by,4" json:"order_by" query:"order_by"`
+	Page    int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
+	Limit   int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
+	Order   int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
+	OrderBy string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
 }
 
 func NewGetTemplatesReq() *GetTemplatesReq {
 	return &GetTemplatesReq{}
+}
+
+func (p *GetTemplatesReq) InitDefault() {
+	*p = GetTemplatesReq{}
 }
 
 func (p *GetTemplatesReq) GetPage() (v int32) {
@@ -1795,6 +2203,18 @@ func (p *GetTemplatesReq) GetOrder() (v int32) {
 
 func (p *GetTemplatesReq) GetOrderBy() (v string) {
 	return p.OrderBy
+}
+func (p *GetTemplatesReq) SetPage(val int32) {
+	p.Page = val
+}
+func (p *GetTemplatesReq) SetLimit(val int32) {
+	p.Limit = val
+}
+func (p *GetTemplatesReq) SetOrder(val int32) {
+	p.Order = val
+}
+func (p *GetTemplatesReq) SetOrderBy(val string) {
+	p.OrderBy = val
 }
 
 var fieldIDToName_GetTemplatesReq = map[int16]string{
@@ -2045,14 +2465,68 @@ func (p *GetTemplatesReq) String() string {
 	return fmt.Sprintf("GetTemplatesReq(%+v)", *p)
 }
 
+func (p *GetTemplatesReq) DeepEqual(ano *GetTemplatesReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Page) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Limit) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Order) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.OrderBy) {
+		return false
+	}
+	return true
+}
+
+func (p *GetTemplatesReq) Field1DeepEqual(src int32) bool {
+
+	if p.Page != src {
+		return false
+	}
+	return true
+}
+func (p *GetTemplatesReq) Field2DeepEqual(src int32) bool {
+
+	if p.Limit != src {
+		return false
+	}
+	return true
+}
+func (p *GetTemplatesReq) Field3DeepEqual(src int32) bool {
+
+	if p.Order != src {
+		return false
+	}
+	return true
+}
+func (p *GetTemplatesReq) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.OrderBy, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type GetTemplatesRes struct {
-	Code int32                `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string               `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
-	Data *GetTemplatesResData `thrift:"data,3" form:"data" json:"data" query:"data"`
+	Code int32                `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string               `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *GetTemplatesResData `thrift:"data,3" frugal:"3,default,GetTemplatesResData" json:"data"`
 }
 
 func NewGetTemplatesRes() *GetTemplatesRes {
 	return &GetTemplatesRes{}
+}
+
+func (p *GetTemplatesRes) InitDefault() {
+	*p = GetTemplatesRes{}
 }
 
 func (p *GetTemplatesRes) GetCode() (v int32) {
@@ -2070,6 +2544,15 @@ func (p *GetTemplatesRes) GetData() (v *GetTemplatesResData) {
 		return GetTemplatesRes_Data_DEFAULT
 	}
 	return p.Data
+}
+func (p *GetTemplatesRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *GetTemplatesRes) SetMsg(val string) {
+	p.Msg = val
+}
+func (p *GetTemplatesRes) SetData(val *GetTemplatesResData) {
+	p.Data = val
 }
 
 var fieldIDToName_GetTemplatesRes = map[int16]string{
@@ -2282,16 +2765,63 @@ func (p *GetTemplatesRes) String() string {
 	return fmt.Sprintf("GetTemplatesRes(%+v)", *p)
 }
 
+func (p *GetTemplatesRes) DeepEqual(ano *GetTemplatesRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Data) {
+		return false
+	}
+	return true
+}
+
+func (p *GetTemplatesRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *GetTemplatesRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetTemplatesRes) Field3DeepEqual(src *GetTemplatesResData) bool {
+
+	if !p.Data.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type GetTemplatesResData struct {
-	Templates []*Template `thrift:"templates,1" form:"templates" json:"templates" query:"templates"`
+	Templates []*Template `thrift:"templates,1" frugal:"1,default,list<Template>" json:"templates"`
 }
 
 func NewGetTemplatesResData() *GetTemplatesResData {
 	return &GetTemplatesResData{}
 }
 
+func (p *GetTemplatesResData) InitDefault() {
+	*p = GetTemplatesResData{}
+}
+
 func (p *GetTemplatesResData) GetTemplates() (v []*Template) {
 	return p.Templates
+}
+func (p *GetTemplatesResData) SetTemplates(val []*Template) {
+	p.Templates = val
 }
 
 var fieldIDToName_GetTemplatesResData = map[int16]string{
@@ -2438,18 +2968,48 @@ func (p *GetTemplatesResData) String() string {
 	return fmt.Sprintf("GetTemplatesResData(%+v)", *p)
 }
 
+func (p *GetTemplatesResData) DeepEqual(ano *GetTemplatesResData) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Templates) {
+		return false
+	}
+	return true
+}
+
+func (p *GetTemplatesResData) Field1DeepEqual(src []*Template) bool {
+
+	if len(p.Templates) != len(src) {
+		return false
+	}
+	for i, v := range p.Templates {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+
 type AddTemplateItemReq struct {
-	TemplateID int64  `thrift:"template_id,1" form:"template_id" json:"template_id" query:"template_id"`
-	Name       string `thrift:"name,2" form:"name,required" json:"name,required"`
-	Content    string `thrift:"content,3" form:"content,required" json:"content,required"`
+	TemplateId int64  `thrift:"template_id,1" frugal:"1,default,i64" json:"template_id"`
+	Name       string `thrift:"name,2" frugal:"2,default,string" json:"name"`
+	Content    string `thrift:"content,3" frugal:"3,default,string" json:"content"`
 }
 
 func NewAddTemplateItemReq() *AddTemplateItemReq {
 	return &AddTemplateItemReq{}
 }
 
-func (p *AddTemplateItemReq) GetTemplateID() (v int64) {
-	return p.TemplateID
+func (p *AddTemplateItemReq) InitDefault() {
+	*p = AddTemplateItemReq{}
+}
+
+func (p *AddTemplateItemReq) GetTemplateId() (v int64) {
+	return p.TemplateId
 }
 
 func (p *AddTemplateItemReq) GetName() (v string) {
@@ -2458,6 +3018,15 @@ func (p *AddTemplateItemReq) GetName() (v string) {
 
 func (p *AddTemplateItemReq) GetContent() (v string) {
 	return p.Content
+}
+func (p *AddTemplateItemReq) SetTemplateId(val int64) {
+	p.TemplateId = val
+}
+func (p *AddTemplateItemReq) SetName(val string) {
+	p.Name = val
+}
+func (p *AddTemplateItemReq) SetContent(val string) {
+	p.Content = val
 }
 
 var fieldIDToName_AddTemplateItemReq = map[int16]string{
@@ -2549,7 +3118,7 @@ func (p *AddTemplateItemReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.TemplateID = v
+		p.TemplateId = v
 	}
 	return nil
 }
@@ -2613,7 +3182,7 @@ func (p *AddTemplateItemReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("template_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.TemplateID); err != nil {
+	if err := oprot.WriteI64(p.TemplateId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2667,13 +3236,57 @@ func (p *AddTemplateItemReq) String() string {
 	return fmt.Sprintf("AddTemplateItemReq(%+v)", *p)
 }
 
+func (p *AddTemplateItemReq) DeepEqual(ano *AddTemplateItemReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.TemplateId) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Name) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Content) {
+		return false
+	}
+	return true
+}
+
+func (p *AddTemplateItemReq) Field1DeepEqual(src int64) bool {
+
+	if p.TemplateId != src {
+		return false
+	}
+	return true
+}
+func (p *AddTemplateItemReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddTemplateItemReq) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.Content, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type AddTemplateItemRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewAddTemplateItemRes() *AddTemplateItemRes {
 	return &AddTemplateItemRes{}
+}
+
+func (p *AddTemplateItemRes) InitDefault() {
+	*p = AddTemplateItemRes{}
 }
 
 func (p *AddTemplateItemRes) GetCode() (v int32) {
@@ -2682,6 +3295,12 @@ func (p *AddTemplateItemRes) GetCode() (v int32) {
 
 func (p *AddTemplateItemRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *AddTemplateItemRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *AddTemplateItemRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_AddTemplateItemRes = map[int16]string{
@@ -2850,16 +3469,53 @@ func (p *AddTemplateItemRes) String() string {
 	return fmt.Sprintf("AddTemplateItemRes(%+v)", *p)
 }
 
+func (p *AddTemplateItemRes) DeepEqual(ano *AddTemplateItemRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *AddTemplateItemRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *AddTemplateItemRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type DeleteTemplateItemReq struct {
-	Ids []int64 `thrift:"ids,1" form:"ids,required" json:"ids,required"`
+	Ids []int64 `thrift:"ids,1" frugal:"1,default,list<i64>" json:"ids"`
 }
 
 func NewDeleteTemplateItemReq() *DeleteTemplateItemReq {
 	return &DeleteTemplateItemReq{}
 }
 
+func (p *DeleteTemplateItemReq) InitDefault() {
+	*p = DeleteTemplateItemReq{}
+}
+
 func (p *DeleteTemplateItemReq) GetIds() (v []int64) {
 	return p.Ids
+}
+func (p *DeleteTemplateItemReq) SetIds(val []int64) {
+	p.Ids = val
 }
 
 var fieldIDToName_DeleteTemplateItemReq = map[int16]string{
@@ -3008,13 +3664,43 @@ func (p *DeleteTemplateItemReq) String() string {
 	return fmt.Sprintf("DeleteTemplateItemReq(%+v)", *p)
 }
 
+func (p *DeleteTemplateItemReq) DeepEqual(ano *DeleteTemplateItemReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Ids) {
+		return false
+	}
+	return true
+}
+
+func (p *DeleteTemplateItemReq) Field1DeepEqual(src []int64) bool {
+
+	if len(p.Ids) != len(src) {
+		return false
+	}
+	for i, v := range p.Ids {
+		_src := src[i]
+		if v != _src {
+			return false
+		}
+	}
+	return true
+}
+
 type DeleteTemplateItemRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewDeleteTemplateItemRes() *DeleteTemplateItemRes {
 	return &DeleteTemplateItemRes{}
+}
+
+func (p *DeleteTemplateItemRes) InitDefault() {
+	*p = DeleteTemplateItemRes{}
 }
 
 func (p *DeleteTemplateItemRes) GetCode() (v int32) {
@@ -3023,6 +3709,12 @@ func (p *DeleteTemplateItemRes) GetCode() (v int32) {
 
 func (p *DeleteTemplateItemRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *DeleteTemplateItemRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *DeleteTemplateItemRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_DeleteTemplateItemRes = map[int16]string{
@@ -3191,18 +3883,52 @@ func (p *DeleteTemplateItemRes) String() string {
 	return fmt.Sprintf("DeleteTemplateItemRes(%+v)", *p)
 }
 
+func (p *DeleteTemplateItemRes) DeepEqual(ano *DeleteTemplateItemRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *DeleteTemplateItemRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *DeleteTemplateItemRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type UpdateTemplateItemReq struct {
-	ID      int64  `thrift:"id,1" form:"id,required" json:"id,required"`
-	Name    string `thrift:"name,2" form:"name" json:"name"`
-	Content string `thrift:"content,3" form:"content" json:"content"`
+	Id      int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+	Name    string `thrift:"name,2" frugal:"2,default,string" json:"name"`
+	Content string `thrift:"content,3" frugal:"3,default,string" json:"content"`
 }
 
 func NewUpdateTemplateItemReq() *UpdateTemplateItemReq {
 	return &UpdateTemplateItemReq{}
 }
 
-func (p *UpdateTemplateItemReq) GetID() (v int64) {
-	return p.ID
+func (p *UpdateTemplateItemReq) InitDefault() {
+	*p = UpdateTemplateItemReq{}
+}
+
+func (p *UpdateTemplateItemReq) GetId() (v int64) {
+	return p.Id
 }
 
 func (p *UpdateTemplateItemReq) GetName() (v string) {
@@ -3211,6 +3937,15 @@ func (p *UpdateTemplateItemReq) GetName() (v string) {
 
 func (p *UpdateTemplateItemReq) GetContent() (v string) {
 	return p.Content
+}
+func (p *UpdateTemplateItemReq) SetId(val int64) {
+	p.Id = val
+}
+func (p *UpdateTemplateItemReq) SetName(val string) {
+	p.Name = val
+}
+func (p *UpdateTemplateItemReq) SetContent(val string) {
+	p.Content = val
 }
 
 var fieldIDToName_UpdateTemplateItemReq = map[int16]string{
@@ -3302,7 +4037,7 @@ func (p *UpdateTemplateItemReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.ID = v
+		p.Id = v
 	}
 	return nil
 }
@@ -3366,7 +4101,7 @@ func (p *UpdateTemplateItemReq) writeField1(oprot thrift.TProtocol) (err error) 
 	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ID); err != nil {
+	if err := oprot.WriteI64(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3420,13 +4155,57 @@ func (p *UpdateTemplateItemReq) String() string {
 	return fmt.Sprintf("UpdateTemplateItemReq(%+v)", *p)
 }
 
+func (p *UpdateTemplateItemReq) DeepEqual(ano *UpdateTemplateItemReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Name) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Content) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateTemplateItemReq) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateTemplateItemReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UpdateTemplateItemReq) Field3DeepEqual(src string) bool {
+
+	if strings.Compare(p.Content, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type UpdateTemplateItemRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewUpdateTemplateItemRes() *UpdateTemplateItemRes {
 	return &UpdateTemplateItemRes{}
+}
+
+func (p *UpdateTemplateItemRes) InitDefault() {
+	*p = UpdateTemplateItemRes{}
 }
 
 func (p *UpdateTemplateItemRes) GetCode() (v int32) {
@@ -3435,6 +4214,12 @@ func (p *UpdateTemplateItemRes) GetCode() (v int32) {
 
 func (p *UpdateTemplateItemRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *UpdateTemplateItemRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *UpdateTemplateItemRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_UpdateTemplateItemRes = map[int16]string{
@@ -3603,15 +4388,49 @@ func (p *UpdateTemplateItemRes) String() string {
 	return fmt.Sprintf("UpdateTemplateItemRes(%+v)", *p)
 }
 
+func (p *UpdateTemplateItemRes) DeepEqual(ano *UpdateTemplateItemRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateTemplateItemRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateTemplateItemRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type GetTemplateItemsReq struct {
-	Page    int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
-	Limit   int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
-	Order   int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
-	OrderBy string `thrift:"order_by,4" json:"order_by" query:"order_by"`
+	Page    int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
+	Limit   int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
+	Order   int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
+	OrderBy string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
 }
 
 func NewGetTemplateItemsReq() *GetTemplateItemsReq {
 	return &GetTemplateItemsReq{}
+}
+
+func (p *GetTemplateItemsReq) InitDefault() {
+	*p = GetTemplateItemsReq{}
 }
 
 func (p *GetTemplateItemsReq) GetPage() (v int32) {
@@ -3628,6 +4447,18 @@ func (p *GetTemplateItemsReq) GetOrder() (v int32) {
 
 func (p *GetTemplateItemsReq) GetOrderBy() (v string) {
 	return p.OrderBy
+}
+func (p *GetTemplateItemsReq) SetPage(val int32) {
+	p.Page = val
+}
+func (p *GetTemplateItemsReq) SetLimit(val int32) {
+	p.Limit = val
+}
+func (p *GetTemplateItemsReq) SetOrder(val int32) {
+	p.Order = val
+}
+func (p *GetTemplateItemsReq) SetOrderBy(val string) {
+	p.OrderBy = val
 }
 
 var fieldIDToName_GetTemplateItemsReq = map[int16]string{
@@ -3878,14 +4709,68 @@ func (p *GetTemplateItemsReq) String() string {
 	return fmt.Sprintf("GetTemplateItemsReq(%+v)", *p)
 }
 
+func (p *GetTemplateItemsReq) DeepEqual(ano *GetTemplateItemsReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Page) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Limit) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Order) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.OrderBy) {
+		return false
+	}
+	return true
+}
+
+func (p *GetTemplateItemsReq) Field1DeepEqual(src int32) bool {
+
+	if p.Page != src {
+		return false
+	}
+	return true
+}
+func (p *GetTemplateItemsReq) Field2DeepEqual(src int32) bool {
+
+	if p.Limit != src {
+		return false
+	}
+	return true
+}
+func (p *GetTemplateItemsReq) Field3DeepEqual(src int32) bool {
+
+	if p.Order != src {
+		return false
+	}
+	return true
+}
+func (p *GetTemplateItemsReq) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.OrderBy, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type GetTemplateItemsRes struct {
-	Code int32                    `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string                   `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
-	Data *GetTemplateItemsResData `thrift:"data,3" form:"data" json:"data" query:"data"`
+	Code int32                    `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string                   `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *GetTemplateItemsResData `thrift:"data,3" frugal:"3,default,GetTemplateItemsResData" json:"data"`
 }
 
 func NewGetTemplateItemsRes() *GetTemplateItemsRes {
 	return &GetTemplateItemsRes{}
+}
+
+func (p *GetTemplateItemsRes) InitDefault() {
+	*p = GetTemplateItemsRes{}
 }
 
 func (p *GetTemplateItemsRes) GetCode() (v int32) {
@@ -3903,6 +4788,15 @@ func (p *GetTemplateItemsRes) GetData() (v *GetTemplateItemsResData) {
 		return GetTemplateItemsRes_Data_DEFAULT
 	}
 	return p.Data
+}
+func (p *GetTemplateItemsRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *GetTemplateItemsRes) SetMsg(val string) {
+	p.Msg = val
+}
+func (p *GetTemplateItemsRes) SetData(val *GetTemplateItemsResData) {
+	p.Data = val
 }
 
 var fieldIDToName_GetTemplateItemsRes = map[int16]string{
@@ -4115,16 +5009,63 @@ func (p *GetTemplateItemsRes) String() string {
 	return fmt.Sprintf("GetTemplateItemsRes(%+v)", *p)
 }
 
+func (p *GetTemplateItemsRes) DeepEqual(ano *GetTemplateItemsRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Data) {
+		return false
+	}
+	return true
+}
+
+func (p *GetTemplateItemsRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *GetTemplateItemsRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetTemplateItemsRes) Field3DeepEqual(src *GetTemplateItemsResData) bool {
+
+	if !p.Data.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type GetTemplateItemsResData struct {
-	TemplateItems []*TemplateItem `thrift:"template_items,1" form:"template_items" json:"template_items" query:"template_items"`
+	TemplateItems []*TemplateItem `thrift:"template_items,1" frugal:"1,default,list<TemplateItem>" json:"template_items"`
 }
 
 func NewGetTemplateItemsResData() *GetTemplateItemsResData {
 	return &GetTemplateItemsResData{}
 }
 
+func (p *GetTemplateItemsResData) InitDefault() {
+	*p = GetTemplateItemsResData{}
+}
+
 func (p *GetTemplateItemsResData) GetTemplateItems() (v []*TemplateItem) {
 	return p.TemplateItems
+}
+func (p *GetTemplateItemsResData) SetTemplateItems(val []*TemplateItem) {
+	p.TemplateItems = val
 }
 
 var fieldIDToName_GetTemplateItemsResData = map[int16]string{
@@ -4269,6 +5210,32 @@ func (p *GetTemplateItemsResData) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("GetTemplateItemsResData(%+v)", *p)
+}
+
+func (p *GetTemplateItemsResData) DeepEqual(ano *GetTemplateItemsResData) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.TemplateItems) {
+		return false
+	}
+	return true
+}
+
+func (p *GetTemplateItemsResData) Field1DeepEqual(src []*TemplateItem) bool {
+
+	if len(p.TemplateItems) != len(src) {
+		return false
+	}
+	for i, v := range p.TemplateItems {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
 }
 
 type TemplateService interface {
@@ -4821,11 +5788,15 @@ func (p *templateServiceProcessorGetTemplateItems) Process(ctx context.Context, 
 }
 
 type TemplateServiceAddTemplateArgs struct {
-	Req *AddTemplateReq `thrift:"req,1"`
+	Req *AddTemplateReq `thrift:"req,1" frugal:"1,default,AddTemplateReq" json:"req"`
 }
 
 func NewTemplateServiceAddTemplateArgs() *TemplateServiceAddTemplateArgs {
 	return &TemplateServiceAddTemplateArgs{}
+}
+
+func (p *TemplateServiceAddTemplateArgs) InitDefault() {
+	*p = TemplateServiceAddTemplateArgs{}
 }
 
 var TemplateServiceAddTemplateArgs_Req_DEFAULT *AddTemplateReq
@@ -4835,6 +5806,9 @@ func (p *TemplateServiceAddTemplateArgs) GetReq() (v *AddTemplateReq) {
 		return TemplateServiceAddTemplateArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *TemplateServiceAddTemplateArgs) SetReq(val *AddTemplateReq) {
+	p.Req = val
 }
 
 var fieldIDToName_TemplateServiceAddTemplateArgs = map[int16]string{
@@ -4965,12 +5939,36 @@ func (p *TemplateServiceAddTemplateArgs) String() string {
 	return fmt.Sprintf("TemplateServiceAddTemplateArgs(%+v)", *p)
 }
 
+func (p *TemplateServiceAddTemplateArgs) DeepEqual(ano *TemplateServiceAddTemplateArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceAddTemplateArgs) Field1DeepEqual(src *AddTemplateReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceAddTemplateResult struct {
-	Success *AddTemplateRes `thrift:"success,0,optional"`
+	Success *AddTemplateRes `thrift:"success,0,optional" frugal:"0,optional,AddTemplateRes" json:"success,omitempty"`
 }
 
 func NewTemplateServiceAddTemplateResult() *TemplateServiceAddTemplateResult {
 	return &TemplateServiceAddTemplateResult{}
+}
+
+func (p *TemplateServiceAddTemplateResult) InitDefault() {
+	*p = TemplateServiceAddTemplateResult{}
 }
 
 var TemplateServiceAddTemplateResult_Success_DEFAULT *AddTemplateRes
@@ -4980,6 +5978,9 @@ func (p *TemplateServiceAddTemplateResult) GetSuccess() (v *AddTemplateRes) {
 		return TemplateServiceAddTemplateResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *TemplateServiceAddTemplateResult) SetSuccess(x interface{}) {
+	p.Success = x.(*AddTemplateRes)
 }
 
 var fieldIDToName_TemplateServiceAddTemplateResult = map[int16]string{
@@ -5112,12 +6113,36 @@ func (p *TemplateServiceAddTemplateResult) String() string {
 	return fmt.Sprintf("TemplateServiceAddTemplateResult(%+v)", *p)
 }
 
+func (p *TemplateServiceAddTemplateResult) DeepEqual(ano *TemplateServiceAddTemplateResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceAddTemplateResult) Field0DeepEqual(src *AddTemplateRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceDeleteTemplateArgs struct {
-	Req *DeleteTemplateReq `thrift:"req,1"`
+	Req *DeleteTemplateReq `thrift:"req,1" frugal:"1,default,DeleteTemplateReq" json:"req"`
 }
 
 func NewTemplateServiceDeleteTemplateArgs() *TemplateServiceDeleteTemplateArgs {
 	return &TemplateServiceDeleteTemplateArgs{}
+}
+
+func (p *TemplateServiceDeleteTemplateArgs) InitDefault() {
+	*p = TemplateServiceDeleteTemplateArgs{}
 }
 
 var TemplateServiceDeleteTemplateArgs_Req_DEFAULT *DeleteTemplateReq
@@ -5127,6 +6152,9 @@ func (p *TemplateServiceDeleteTemplateArgs) GetReq() (v *DeleteTemplateReq) {
 		return TemplateServiceDeleteTemplateArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *TemplateServiceDeleteTemplateArgs) SetReq(val *DeleteTemplateReq) {
+	p.Req = val
 }
 
 var fieldIDToName_TemplateServiceDeleteTemplateArgs = map[int16]string{
@@ -5257,12 +6285,36 @@ func (p *TemplateServiceDeleteTemplateArgs) String() string {
 	return fmt.Sprintf("TemplateServiceDeleteTemplateArgs(%+v)", *p)
 }
 
+func (p *TemplateServiceDeleteTemplateArgs) DeepEqual(ano *TemplateServiceDeleteTemplateArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceDeleteTemplateArgs) Field1DeepEqual(src *DeleteTemplateReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceDeleteTemplateResult struct {
-	Success *DeleteTemplateRes `thrift:"success,0,optional"`
+	Success *DeleteTemplateRes `thrift:"success,0,optional" frugal:"0,optional,DeleteTemplateRes" json:"success,omitempty"`
 }
 
 func NewTemplateServiceDeleteTemplateResult() *TemplateServiceDeleteTemplateResult {
 	return &TemplateServiceDeleteTemplateResult{}
+}
+
+func (p *TemplateServiceDeleteTemplateResult) InitDefault() {
+	*p = TemplateServiceDeleteTemplateResult{}
 }
 
 var TemplateServiceDeleteTemplateResult_Success_DEFAULT *DeleteTemplateRes
@@ -5272,6 +6324,9 @@ func (p *TemplateServiceDeleteTemplateResult) GetSuccess() (v *DeleteTemplateRes
 		return TemplateServiceDeleteTemplateResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *TemplateServiceDeleteTemplateResult) SetSuccess(x interface{}) {
+	p.Success = x.(*DeleteTemplateRes)
 }
 
 var fieldIDToName_TemplateServiceDeleteTemplateResult = map[int16]string{
@@ -5404,12 +6459,36 @@ func (p *TemplateServiceDeleteTemplateResult) String() string {
 	return fmt.Sprintf("TemplateServiceDeleteTemplateResult(%+v)", *p)
 }
 
+func (p *TemplateServiceDeleteTemplateResult) DeepEqual(ano *TemplateServiceDeleteTemplateResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceDeleteTemplateResult) Field0DeepEqual(src *DeleteTemplateRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceUpdateTemplateArgs struct {
-	Req *UpdateTemplateReq `thrift:"req,1"`
+	Req *UpdateTemplateReq `thrift:"req,1" frugal:"1,default,UpdateTemplateReq" json:"req"`
 }
 
 func NewTemplateServiceUpdateTemplateArgs() *TemplateServiceUpdateTemplateArgs {
 	return &TemplateServiceUpdateTemplateArgs{}
+}
+
+func (p *TemplateServiceUpdateTemplateArgs) InitDefault() {
+	*p = TemplateServiceUpdateTemplateArgs{}
 }
 
 var TemplateServiceUpdateTemplateArgs_Req_DEFAULT *UpdateTemplateReq
@@ -5419,6 +6498,9 @@ func (p *TemplateServiceUpdateTemplateArgs) GetReq() (v *UpdateTemplateReq) {
 		return TemplateServiceUpdateTemplateArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *TemplateServiceUpdateTemplateArgs) SetReq(val *UpdateTemplateReq) {
+	p.Req = val
 }
 
 var fieldIDToName_TemplateServiceUpdateTemplateArgs = map[int16]string{
@@ -5549,12 +6631,36 @@ func (p *TemplateServiceUpdateTemplateArgs) String() string {
 	return fmt.Sprintf("TemplateServiceUpdateTemplateArgs(%+v)", *p)
 }
 
+func (p *TemplateServiceUpdateTemplateArgs) DeepEqual(ano *TemplateServiceUpdateTemplateArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceUpdateTemplateArgs) Field1DeepEqual(src *UpdateTemplateReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceUpdateTemplateResult struct {
-	Success *UpdateTemplateRes `thrift:"success,0,optional"`
+	Success *UpdateTemplateRes `thrift:"success,0,optional" frugal:"0,optional,UpdateTemplateRes" json:"success,omitempty"`
 }
 
 func NewTemplateServiceUpdateTemplateResult() *TemplateServiceUpdateTemplateResult {
 	return &TemplateServiceUpdateTemplateResult{}
+}
+
+func (p *TemplateServiceUpdateTemplateResult) InitDefault() {
+	*p = TemplateServiceUpdateTemplateResult{}
 }
 
 var TemplateServiceUpdateTemplateResult_Success_DEFAULT *UpdateTemplateRes
@@ -5564,6 +6670,9 @@ func (p *TemplateServiceUpdateTemplateResult) GetSuccess() (v *UpdateTemplateRes
 		return TemplateServiceUpdateTemplateResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *TemplateServiceUpdateTemplateResult) SetSuccess(x interface{}) {
+	p.Success = x.(*UpdateTemplateRes)
 }
 
 var fieldIDToName_TemplateServiceUpdateTemplateResult = map[int16]string{
@@ -5696,12 +6805,36 @@ func (p *TemplateServiceUpdateTemplateResult) String() string {
 	return fmt.Sprintf("TemplateServiceUpdateTemplateResult(%+v)", *p)
 }
 
+func (p *TemplateServiceUpdateTemplateResult) DeepEqual(ano *TemplateServiceUpdateTemplateResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceUpdateTemplateResult) Field0DeepEqual(src *UpdateTemplateRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceGetTemplatesArgs struct {
-	Req *GetTemplateItemsReq `thrift:"req,1"`
+	Req *GetTemplateItemsReq `thrift:"req,1" frugal:"1,default,GetTemplateItemsReq" json:"req"`
 }
 
 func NewTemplateServiceGetTemplatesArgs() *TemplateServiceGetTemplatesArgs {
 	return &TemplateServiceGetTemplatesArgs{}
+}
+
+func (p *TemplateServiceGetTemplatesArgs) InitDefault() {
+	*p = TemplateServiceGetTemplatesArgs{}
 }
 
 var TemplateServiceGetTemplatesArgs_Req_DEFAULT *GetTemplateItemsReq
@@ -5711,6 +6844,9 @@ func (p *TemplateServiceGetTemplatesArgs) GetReq() (v *GetTemplateItemsReq) {
 		return TemplateServiceGetTemplatesArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *TemplateServiceGetTemplatesArgs) SetReq(val *GetTemplateItemsReq) {
+	p.Req = val
 }
 
 var fieldIDToName_TemplateServiceGetTemplatesArgs = map[int16]string{
@@ -5841,12 +6977,36 @@ func (p *TemplateServiceGetTemplatesArgs) String() string {
 	return fmt.Sprintf("TemplateServiceGetTemplatesArgs(%+v)", *p)
 }
 
+func (p *TemplateServiceGetTemplatesArgs) DeepEqual(ano *TemplateServiceGetTemplatesArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceGetTemplatesArgs) Field1DeepEqual(src *GetTemplateItemsReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceGetTemplatesResult struct {
-	Success *GetTemplatesRes `thrift:"success,0,optional"`
+	Success *GetTemplatesRes `thrift:"success,0,optional" frugal:"0,optional,GetTemplatesRes" json:"success,omitempty"`
 }
 
 func NewTemplateServiceGetTemplatesResult() *TemplateServiceGetTemplatesResult {
 	return &TemplateServiceGetTemplatesResult{}
+}
+
+func (p *TemplateServiceGetTemplatesResult) InitDefault() {
+	*p = TemplateServiceGetTemplatesResult{}
 }
 
 var TemplateServiceGetTemplatesResult_Success_DEFAULT *GetTemplatesRes
@@ -5856,6 +7016,9 @@ func (p *TemplateServiceGetTemplatesResult) GetSuccess() (v *GetTemplatesRes) {
 		return TemplateServiceGetTemplatesResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *TemplateServiceGetTemplatesResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetTemplatesRes)
 }
 
 var fieldIDToName_TemplateServiceGetTemplatesResult = map[int16]string{
@@ -5988,12 +7151,36 @@ func (p *TemplateServiceGetTemplatesResult) String() string {
 	return fmt.Sprintf("TemplateServiceGetTemplatesResult(%+v)", *p)
 }
 
+func (p *TemplateServiceGetTemplatesResult) DeepEqual(ano *TemplateServiceGetTemplatesResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceGetTemplatesResult) Field0DeepEqual(src *GetTemplatesRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceAddTemplateItemArgs struct {
-	Req *AddTemplateItemReq `thrift:"req,1"`
+	Req *AddTemplateItemReq `thrift:"req,1" frugal:"1,default,AddTemplateItemReq" json:"req"`
 }
 
 func NewTemplateServiceAddTemplateItemArgs() *TemplateServiceAddTemplateItemArgs {
 	return &TemplateServiceAddTemplateItemArgs{}
+}
+
+func (p *TemplateServiceAddTemplateItemArgs) InitDefault() {
+	*p = TemplateServiceAddTemplateItemArgs{}
 }
 
 var TemplateServiceAddTemplateItemArgs_Req_DEFAULT *AddTemplateItemReq
@@ -6003,6 +7190,9 @@ func (p *TemplateServiceAddTemplateItemArgs) GetReq() (v *AddTemplateItemReq) {
 		return TemplateServiceAddTemplateItemArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *TemplateServiceAddTemplateItemArgs) SetReq(val *AddTemplateItemReq) {
+	p.Req = val
 }
 
 var fieldIDToName_TemplateServiceAddTemplateItemArgs = map[int16]string{
@@ -6133,12 +7323,36 @@ func (p *TemplateServiceAddTemplateItemArgs) String() string {
 	return fmt.Sprintf("TemplateServiceAddTemplateItemArgs(%+v)", *p)
 }
 
+func (p *TemplateServiceAddTemplateItemArgs) DeepEqual(ano *TemplateServiceAddTemplateItemArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceAddTemplateItemArgs) Field1DeepEqual(src *AddTemplateItemReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceAddTemplateItemResult struct {
-	Success *AddTemplateItemRes `thrift:"success,0,optional"`
+	Success *AddTemplateItemRes `thrift:"success,0,optional" frugal:"0,optional,AddTemplateItemRes" json:"success,omitempty"`
 }
 
 func NewTemplateServiceAddTemplateItemResult() *TemplateServiceAddTemplateItemResult {
 	return &TemplateServiceAddTemplateItemResult{}
+}
+
+func (p *TemplateServiceAddTemplateItemResult) InitDefault() {
+	*p = TemplateServiceAddTemplateItemResult{}
 }
 
 var TemplateServiceAddTemplateItemResult_Success_DEFAULT *AddTemplateItemRes
@@ -6148,6 +7362,9 @@ func (p *TemplateServiceAddTemplateItemResult) GetSuccess() (v *AddTemplateItemR
 		return TemplateServiceAddTemplateItemResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *TemplateServiceAddTemplateItemResult) SetSuccess(x interface{}) {
+	p.Success = x.(*AddTemplateItemRes)
 }
 
 var fieldIDToName_TemplateServiceAddTemplateItemResult = map[int16]string{
@@ -6280,12 +7497,36 @@ func (p *TemplateServiceAddTemplateItemResult) String() string {
 	return fmt.Sprintf("TemplateServiceAddTemplateItemResult(%+v)", *p)
 }
 
+func (p *TemplateServiceAddTemplateItemResult) DeepEqual(ano *TemplateServiceAddTemplateItemResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceAddTemplateItemResult) Field0DeepEqual(src *AddTemplateItemRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceDeleteTemplateItemArgs struct {
-	Req *DeleteTemplateItemReq `thrift:"req,1"`
+	Req *DeleteTemplateItemReq `thrift:"req,1" frugal:"1,default,DeleteTemplateItemReq" json:"req"`
 }
 
 func NewTemplateServiceDeleteTemplateItemArgs() *TemplateServiceDeleteTemplateItemArgs {
 	return &TemplateServiceDeleteTemplateItemArgs{}
+}
+
+func (p *TemplateServiceDeleteTemplateItemArgs) InitDefault() {
+	*p = TemplateServiceDeleteTemplateItemArgs{}
 }
 
 var TemplateServiceDeleteTemplateItemArgs_Req_DEFAULT *DeleteTemplateItemReq
@@ -6295,6 +7536,9 @@ func (p *TemplateServiceDeleteTemplateItemArgs) GetReq() (v *DeleteTemplateItemR
 		return TemplateServiceDeleteTemplateItemArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *TemplateServiceDeleteTemplateItemArgs) SetReq(val *DeleteTemplateItemReq) {
+	p.Req = val
 }
 
 var fieldIDToName_TemplateServiceDeleteTemplateItemArgs = map[int16]string{
@@ -6425,12 +7669,36 @@ func (p *TemplateServiceDeleteTemplateItemArgs) String() string {
 	return fmt.Sprintf("TemplateServiceDeleteTemplateItemArgs(%+v)", *p)
 }
 
+func (p *TemplateServiceDeleteTemplateItemArgs) DeepEqual(ano *TemplateServiceDeleteTemplateItemArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceDeleteTemplateItemArgs) Field1DeepEqual(src *DeleteTemplateItemReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceDeleteTemplateItemResult struct {
-	Success *DeleteTemplateRes `thrift:"success,0,optional"`
+	Success *DeleteTemplateRes `thrift:"success,0,optional" frugal:"0,optional,DeleteTemplateRes" json:"success,omitempty"`
 }
 
 func NewTemplateServiceDeleteTemplateItemResult() *TemplateServiceDeleteTemplateItemResult {
 	return &TemplateServiceDeleteTemplateItemResult{}
+}
+
+func (p *TemplateServiceDeleteTemplateItemResult) InitDefault() {
+	*p = TemplateServiceDeleteTemplateItemResult{}
 }
 
 var TemplateServiceDeleteTemplateItemResult_Success_DEFAULT *DeleteTemplateRes
@@ -6440,6 +7708,9 @@ func (p *TemplateServiceDeleteTemplateItemResult) GetSuccess() (v *DeleteTemplat
 		return TemplateServiceDeleteTemplateItemResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *TemplateServiceDeleteTemplateItemResult) SetSuccess(x interface{}) {
+	p.Success = x.(*DeleteTemplateRes)
 }
 
 var fieldIDToName_TemplateServiceDeleteTemplateItemResult = map[int16]string{
@@ -6572,12 +7843,36 @@ func (p *TemplateServiceDeleteTemplateItemResult) String() string {
 	return fmt.Sprintf("TemplateServiceDeleteTemplateItemResult(%+v)", *p)
 }
 
+func (p *TemplateServiceDeleteTemplateItemResult) DeepEqual(ano *TemplateServiceDeleteTemplateItemResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceDeleteTemplateItemResult) Field0DeepEqual(src *DeleteTemplateRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceUpdateTemplateItemArgs struct {
-	Req *UpdateTemplateItemReq `thrift:"req,1"`
+	Req *UpdateTemplateItemReq `thrift:"req,1" frugal:"1,default,UpdateTemplateItemReq" json:"req"`
 }
 
 func NewTemplateServiceUpdateTemplateItemArgs() *TemplateServiceUpdateTemplateItemArgs {
 	return &TemplateServiceUpdateTemplateItemArgs{}
+}
+
+func (p *TemplateServiceUpdateTemplateItemArgs) InitDefault() {
+	*p = TemplateServiceUpdateTemplateItemArgs{}
 }
 
 var TemplateServiceUpdateTemplateItemArgs_Req_DEFAULT *UpdateTemplateItemReq
@@ -6587,6 +7882,9 @@ func (p *TemplateServiceUpdateTemplateItemArgs) GetReq() (v *UpdateTemplateItemR
 		return TemplateServiceUpdateTemplateItemArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *TemplateServiceUpdateTemplateItemArgs) SetReq(val *UpdateTemplateItemReq) {
+	p.Req = val
 }
 
 var fieldIDToName_TemplateServiceUpdateTemplateItemArgs = map[int16]string{
@@ -6717,12 +8015,36 @@ func (p *TemplateServiceUpdateTemplateItemArgs) String() string {
 	return fmt.Sprintf("TemplateServiceUpdateTemplateItemArgs(%+v)", *p)
 }
 
+func (p *TemplateServiceUpdateTemplateItemArgs) DeepEqual(ano *TemplateServiceUpdateTemplateItemArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceUpdateTemplateItemArgs) Field1DeepEqual(src *UpdateTemplateItemReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceUpdateTemplateItemResult struct {
-	Success *UpdateTemplateItemRes `thrift:"success,0,optional"`
+	Success *UpdateTemplateItemRes `thrift:"success,0,optional" frugal:"0,optional,UpdateTemplateItemRes" json:"success,omitempty"`
 }
 
 func NewTemplateServiceUpdateTemplateItemResult() *TemplateServiceUpdateTemplateItemResult {
 	return &TemplateServiceUpdateTemplateItemResult{}
+}
+
+func (p *TemplateServiceUpdateTemplateItemResult) InitDefault() {
+	*p = TemplateServiceUpdateTemplateItemResult{}
 }
 
 var TemplateServiceUpdateTemplateItemResult_Success_DEFAULT *UpdateTemplateItemRes
@@ -6732,6 +8054,9 @@ func (p *TemplateServiceUpdateTemplateItemResult) GetSuccess() (v *UpdateTemplat
 		return TemplateServiceUpdateTemplateItemResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *TemplateServiceUpdateTemplateItemResult) SetSuccess(x interface{}) {
+	p.Success = x.(*UpdateTemplateItemRes)
 }
 
 var fieldIDToName_TemplateServiceUpdateTemplateItemResult = map[int16]string{
@@ -6864,12 +8189,36 @@ func (p *TemplateServiceUpdateTemplateItemResult) String() string {
 	return fmt.Sprintf("TemplateServiceUpdateTemplateItemResult(%+v)", *p)
 }
 
+func (p *TemplateServiceUpdateTemplateItemResult) DeepEqual(ano *TemplateServiceUpdateTemplateItemResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceUpdateTemplateItemResult) Field0DeepEqual(src *UpdateTemplateItemRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceGetTemplateItemsArgs struct {
-	Req *GetTemplatesReq `thrift:"req,1"`
+	Req *GetTemplatesReq `thrift:"req,1" frugal:"1,default,GetTemplatesReq" json:"req"`
 }
 
 func NewTemplateServiceGetTemplateItemsArgs() *TemplateServiceGetTemplateItemsArgs {
 	return &TemplateServiceGetTemplateItemsArgs{}
+}
+
+func (p *TemplateServiceGetTemplateItemsArgs) InitDefault() {
+	*p = TemplateServiceGetTemplateItemsArgs{}
 }
 
 var TemplateServiceGetTemplateItemsArgs_Req_DEFAULT *GetTemplatesReq
@@ -6879,6 +8228,9 @@ func (p *TemplateServiceGetTemplateItemsArgs) GetReq() (v *GetTemplatesReq) {
 		return TemplateServiceGetTemplateItemsArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *TemplateServiceGetTemplateItemsArgs) SetReq(val *GetTemplatesReq) {
+	p.Req = val
 }
 
 var fieldIDToName_TemplateServiceGetTemplateItemsArgs = map[int16]string{
@@ -7009,12 +8361,36 @@ func (p *TemplateServiceGetTemplateItemsArgs) String() string {
 	return fmt.Sprintf("TemplateServiceGetTemplateItemsArgs(%+v)", *p)
 }
 
+func (p *TemplateServiceGetTemplateItemsArgs) DeepEqual(ano *TemplateServiceGetTemplateItemsArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceGetTemplateItemsArgs) Field1DeepEqual(src *GetTemplatesReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type TemplateServiceGetTemplateItemsResult struct {
-	Success *GetTemplateItemsRes `thrift:"success,0,optional"`
+	Success *GetTemplateItemsRes `thrift:"success,0,optional" frugal:"0,optional,GetTemplateItemsRes" json:"success,omitempty"`
 }
 
 func NewTemplateServiceGetTemplateItemsResult() *TemplateServiceGetTemplateItemsResult {
 	return &TemplateServiceGetTemplateItemsResult{}
+}
+
+func (p *TemplateServiceGetTemplateItemsResult) InitDefault() {
+	*p = TemplateServiceGetTemplateItemsResult{}
 }
 
 var TemplateServiceGetTemplateItemsResult_Success_DEFAULT *GetTemplateItemsRes
@@ -7024,6 +8400,9 @@ func (p *TemplateServiceGetTemplateItemsResult) GetSuccess() (v *GetTemplateItem
 		return TemplateServiceGetTemplateItemsResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *TemplateServiceGetTemplateItemsResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetTemplateItemsRes)
 }
 
 var fieldIDToName_TemplateServiceGetTemplateItemsResult = map[int16]string{
@@ -7154,4 +8533,24 @@ func (p *TemplateServiceGetTemplateItemsResult) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("TemplateServiceGetTemplateItemsResult(%+v)", *p)
+}
+
+func (p *TemplateServiceGetTemplateItemsResult) DeepEqual(ano *TemplateServiceGetTemplateItemsResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *TemplateServiceGetTemplateItemsResult) Field0DeepEqual(src *GetTemplateItemsRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
 }

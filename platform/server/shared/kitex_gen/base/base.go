@@ -6,15 +6,20 @@ import (
 	"context"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
+	"strings"
 )
 
 type RegisterReq struct {
-	Username string `thrift:"username,1" form:"username,required" json:"username"`
-	Password string `thrift:"password,2" form:"password,required" json:"password"`
+	Username string `thrift:"username,1" frugal:"1,default,string" json:"username"`
+	Password string `thrift:"password,2" frugal:"2,default,string" json:"password"`
 }
 
 func NewRegisterReq() *RegisterReq {
 	return &RegisterReq{}
+}
+
+func (p *RegisterReq) InitDefault() {
+	*p = RegisterReq{}
 }
 
 func (p *RegisterReq) GetUsername() (v string) {
@@ -23,6 +28,12 @@ func (p *RegisterReq) GetUsername() (v string) {
 
 func (p *RegisterReq) GetPassword() (v string) {
 	return p.Password
+}
+func (p *RegisterReq) SetUsername(val string) {
+	p.Username = val
+}
+func (p *RegisterReq) SetPassword(val string) {
+	p.Password = val
 }
 
 var fieldIDToName_RegisterReq = map[int16]string{
@@ -191,13 +202,47 @@ func (p *RegisterReq) String() string {
 	return fmt.Sprintf("RegisterReq(%+v)", *p)
 }
 
+func (p *RegisterReq) DeepEqual(ano *RegisterReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Username) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Password) {
+		return false
+	}
+	return true
+}
+
+func (p *RegisterReq) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Username, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *RegisterReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Password, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type RegisterRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewRegisterRes() *RegisterRes {
 	return &RegisterRes{}
+}
+
+func (p *RegisterRes) InitDefault() {
+	*p = RegisterRes{}
 }
 
 func (p *RegisterRes) GetCode() (v int32) {
@@ -206,6 +251,12 @@ func (p *RegisterRes) GetCode() (v int32) {
 
 func (p *RegisterRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *RegisterRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *RegisterRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_RegisterRes = map[int16]string{
@@ -374,13 +425,47 @@ func (p *RegisterRes) String() string {
 	return fmt.Sprintf("RegisterRes(%+v)", *p)
 }
 
+func (p *RegisterRes) DeepEqual(ano *RegisterRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *RegisterRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *RegisterRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type LoginReq struct {
-	Username string `thrift:"username,1" form:"username,required" json:"username"`
-	Password string `thrift:"password,2" form:"password,required" json:"password"`
+	Username string `thrift:"username,1" frugal:"1,default,string" json:"username"`
+	Password string `thrift:"password,2" frugal:"2,default,string" json:"password"`
 }
 
 func NewLoginReq() *LoginReq {
 	return &LoginReq{}
+}
+
+func (p *LoginReq) InitDefault() {
+	*p = LoginReq{}
 }
 
 func (p *LoginReq) GetUsername() (v string) {
@@ -389,6 +474,12 @@ func (p *LoginReq) GetUsername() (v string) {
 
 func (p *LoginReq) GetPassword() (v string) {
 	return p.Password
+}
+func (p *LoginReq) SetUsername(val string) {
+	p.Username = val
+}
+func (p *LoginReq) SetPassword(val string) {
+	p.Password = val
 }
 
 var fieldIDToName_LoginReq = map[int16]string{
@@ -557,14 +648,48 @@ func (p *LoginReq) String() string {
 	return fmt.Sprintf("LoginReq(%+v)", *p)
 }
 
+func (p *LoginReq) DeepEqual(ano *LoginReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Username) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Password) {
+		return false
+	}
+	return true
+}
+
+func (p *LoginReq) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Username, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *LoginReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Password, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type LoginRes struct {
-	Code int32         `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string        `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
-	Data *LoginResData `thrift:"data,3" form:"data" json:"data" query:"data"`
+	Code int32         `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string        `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *LoginResData `thrift:"data,3" frugal:"3,default,LoginResData" json:"data"`
 }
 
 func NewLoginRes() *LoginRes {
 	return &LoginRes{}
+}
+
+func (p *LoginRes) InitDefault() {
+	*p = LoginRes{}
 }
 
 func (p *LoginRes) GetCode() (v int32) {
@@ -582,6 +707,15 @@ func (p *LoginRes) GetData() (v *LoginResData) {
 		return LoginRes_Data_DEFAULT
 	}
 	return p.Data
+}
+func (p *LoginRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *LoginRes) SetMsg(val string) {
+	p.Msg = val
+}
+func (p *LoginRes) SetData(val *LoginResData) {
+	p.Data = val
 }
 
 var fieldIDToName_LoginRes = map[int16]string{
@@ -794,12 +928,56 @@ func (p *LoginRes) String() string {
 	return fmt.Sprintf("LoginRes(%+v)", *p)
 }
 
+func (p *LoginRes) DeepEqual(ano *LoginRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Data) {
+		return false
+	}
+	return true
+}
+
+func (p *LoginRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *LoginRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *LoginRes) Field3DeepEqual(src *LoginResData) bool {
+
+	if !p.Data.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type LoginResData struct {
-	UserInfo *UserInfo `thrift:"user_info,1" form:"user_info" json:"user_info" query:"user_info"`
+	UserInfo *UserInfo `thrift:"user_info,1" frugal:"1,default,UserInfo" json:"user_info"`
 }
 
 func NewLoginResData() *LoginResData {
 	return &LoginResData{}
+}
+
+func (p *LoginResData) InitDefault() {
+	*p = LoginResData{}
 }
 
 var LoginResData_UserInfo_DEFAULT *UserInfo
@@ -809,6 +987,9 @@ func (p *LoginResData) GetUserInfo() (v *UserInfo) {
 		return LoginResData_UserInfo_DEFAULT
 	}
 	return p.UserInfo
+}
+func (p *LoginResData) SetUserInfo(val *UserInfo) {
+	p.UserInfo = val
 }
 
 var fieldIDToName_LoginResData = map[int16]string{
@@ -939,82 +1120,102 @@ func (p *LoginResData) String() string {
 	return fmt.Sprintf("LoginResData(%+v)", *p)
 }
 
-type ApiService interface {
+func (p *LoginResData) DeepEqual(ano *LoginResData) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.UserInfo) {
+		return false
+	}
+	return true
+}
+
+func (p *LoginResData) Field1DeepEqual(src *UserInfo) bool {
+
+	if !p.UserInfo.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type BaseService interface {
 	Register(ctx context.Context, req *RegisterReq) (r *RegisterRes, err error)
 
 	Login(ctx context.Context, req *LoginReq) (r *LoginRes, err error)
 }
 
-type ApiServiceClient struct {
+type BaseServiceClient struct {
 	c thrift.TClient
 }
 
-func NewApiServiceClientFactory(t thrift.TTransport, f thrift.TProtocolFactory) *ApiServiceClient {
-	return &ApiServiceClient{
+func NewBaseServiceClientFactory(t thrift.TTransport, f thrift.TProtocolFactory) *BaseServiceClient {
+	return &BaseServiceClient{
 		c: thrift.NewTStandardClient(f.GetProtocol(t), f.GetProtocol(t)),
 	}
 }
 
-func NewApiServiceClientProtocol(t thrift.TTransport, iprot thrift.TProtocol, oprot thrift.TProtocol) *ApiServiceClient {
-	return &ApiServiceClient{
+func NewBaseServiceClientProtocol(t thrift.TTransport, iprot thrift.TProtocol, oprot thrift.TProtocol) *BaseServiceClient {
+	return &BaseServiceClient{
 		c: thrift.NewTStandardClient(iprot, oprot),
 	}
 }
 
-func NewApiServiceClient(c thrift.TClient) *ApiServiceClient {
-	return &ApiServiceClient{
+func NewBaseServiceClient(c thrift.TClient) *BaseServiceClient {
+	return &BaseServiceClient{
 		c: c,
 	}
 }
 
-func (p *ApiServiceClient) Client_() thrift.TClient {
+func (p *BaseServiceClient) Client_() thrift.TClient {
 	return p.c
 }
 
-func (p *ApiServiceClient) Register(ctx context.Context, req *RegisterReq) (r *RegisterRes, err error) {
-	var _args ApiServiceRegisterArgs
+func (p *BaseServiceClient) Register(ctx context.Context, req *RegisterReq) (r *RegisterRes, err error) {
+	var _args BaseServiceRegisterArgs
 	_args.Req = req
-	var _result ApiServiceRegisterResult
+	var _result BaseServiceRegisterResult
 	if err = p.Client_().Call(ctx, "Register", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *ApiServiceClient) Login(ctx context.Context, req *LoginReq) (r *LoginRes, err error) {
-	var _args ApiServiceLoginArgs
+func (p *BaseServiceClient) Login(ctx context.Context, req *LoginReq) (r *LoginRes, err error) {
+	var _args BaseServiceLoginArgs
 	_args.Req = req
-	var _result ApiServiceLoginResult
+	var _result BaseServiceLoginResult
 	if err = p.Client_().Call(ctx, "Login", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
 }
 
-type ApiServiceProcessor struct {
+type BaseServiceProcessor struct {
 	processorMap map[string]thrift.TProcessorFunction
-	handler      ApiService
+	handler      BaseService
 }
 
-func (p *ApiServiceProcessor) AddToProcessorMap(key string, processor thrift.TProcessorFunction) {
+func (p *BaseServiceProcessor) AddToProcessorMap(key string, processor thrift.TProcessorFunction) {
 	p.processorMap[key] = processor
 }
 
-func (p *ApiServiceProcessor) GetProcessorFunction(key string) (processor thrift.TProcessorFunction, ok bool) {
+func (p *BaseServiceProcessor) GetProcessorFunction(key string) (processor thrift.TProcessorFunction, ok bool) {
 	processor, ok = p.processorMap[key]
 	return processor, ok
 }
 
-func (p *ApiServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFunction {
+func (p *BaseServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFunction {
 	return p.processorMap
 }
 
-func NewApiServiceProcessor(handler ApiService) *ApiServiceProcessor {
-	self := &ApiServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
-	self.AddToProcessorMap("Register", &apiServiceProcessorRegister{handler: handler})
-	self.AddToProcessorMap("Login", &apiServiceProcessorLogin{handler: handler})
+func NewBaseServiceProcessor(handler BaseService) *BaseServiceProcessor {
+	self := &BaseServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
+	self.AddToProcessorMap("Register", &baseServiceProcessorRegister{handler: handler})
+	self.AddToProcessorMap("Login", &baseServiceProcessorLogin{handler: handler})
 	return self
 }
-func (p *ApiServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+func (p *BaseServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
 	name, _, seqId, err := iprot.ReadMessageBegin()
 	if err != nil {
 		return false, err
@@ -1032,12 +1233,12 @@ func (p *ApiServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.T
 	return false, x
 }
 
-type apiServiceProcessorRegister struct {
-	handler ApiService
+type baseServiceProcessorRegister struct {
+	handler BaseService
 }
 
-func (p *apiServiceProcessorRegister) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-	args := ApiServiceRegisterArgs{}
+func (p *baseServiceProcessorRegister) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := BaseServiceRegisterArgs{}
 	if err = args.Read(iprot); err != nil {
 		iprot.ReadMessageEnd()
 		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
@@ -1050,7 +1251,7 @@ func (p *apiServiceProcessorRegister) Process(ctx context.Context, seqId int32, 
 
 	iprot.ReadMessageEnd()
 	var err2 error
-	result := ApiServiceRegisterResult{}
+	result := BaseServiceRegisterResult{}
 	var retval *RegisterRes
 	if retval, err2 = p.handler.Register(ctx, args.Req); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing Register: "+err2.Error())
@@ -1080,12 +1281,12 @@ func (p *apiServiceProcessorRegister) Process(ctx context.Context, seqId int32, 
 	return true, err
 }
 
-type apiServiceProcessorLogin struct {
-	handler ApiService
+type baseServiceProcessorLogin struct {
+	handler BaseService
 }
 
-func (p *apiServiceProcessorLogin) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-	args := ApiServiceLoginArgs{}
+func (p *baseServiceProcessorLogin) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := BaseServiceLoginArgs{}
 	if err = args.Read(iprot); err != nil {
 		iprot.ReadMessageEnd()
 		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
@@ -1098,7 +1299,7 @@ func (p *apiServiceProcessorLogin) Process(ctx context.Context, seqId int32, ipr
 
 	iprot.ReadMessageEnd()
 	var err2 error
-	result := ApiServiceLoginResult{}
+	result := BaseServiceLoginResult{}
 	var retval *LoginRes
 	if retval, err2 = p.handler.Login(ctx, args.Req); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing Login: "+err2.Error())
@@ -1128,32 +1329,39 @@ func (p *apiServiceProcessorLogin) Process(ctx context.Context, seqId int32, ipr
 	return true, err
 }
 
-type ApiServiceRegisterArgs struct {
-	Req *RegisterReq `thrift:"req,1"`
+type BaseServiceRegisterArgs struct {
+	Req *RegisterReq `thrift:"req,1" frugal:"1,default,RegisterReq" json:"req"`
 }
 
-func NewApiServiceRegisterArgs() *ApiServiceRegisterArgs {
-	return &ApiServiceRegisterArgs{}
+func NewBaseServiceRegisterArgs() *BaseServiceRegisterArgs {
+	return &BaseServiceRegisterArgs{}
 }
 
-var ApiServiceRegisterArgs_Req_DEFAULT *RegisterReq
+func (p *BaseServiceRegisterArgs) InitDefault() {
+	*p = BaseServiceRegisterArgs{}
+}
 
-func (p *ApiServiceRegisterArgs) GetReq() (v *RegisterReq) {
+var BaseServiceRegisterArgs_Req_DEFAULT *RegisterReq
+
+func (p *BaseServiceRegisterArgs) GetReq() (v *RegisterReq) {
 	if !p.IsSetReq() {
-		return ApiServiceRegisterArgs_Req_DEFAULT
+		return BaseServiceRegisterArgs_Req_DEFAULT
 	}
 	return p.Req
 }
+func (p *BaseServiceRegisterArgs) SetReq(val *RegisterReq) {
+	p.Req = val
+}
 
-var fieldIDToName_ApiServiceRegisterArgs = map[int16]string{
+var fieldIDToName_BaseServiceRegisterArgs = map[int16]string{
 	1: "req",
 }
 
-func (p *ApiServiceRegisterArgs) IsSetReq() bool {
+func (p *BaseServiceRegisterArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *ApiServiceRegisterArgs) Read(iprot thrift.TProtocol) (err error) {
+func (p *BaseServiceRegisterArgs) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1202,7 +1410,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ApiServiceRegisterArgs[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_BaseServiceRegisterArgs[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1212,7 +1420,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *ApiServiceRegisterArgs) ReadField1(iprot thrift.TProtocol) error {
+func (p *BaseServiceRegisterArgs) ReadField1(iprot thrift.TProtocol) error {
 	p.Req = NewRegisterReq()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
@@ -1220,7 +1428,7 @@ func (p *ApiServiceRegisterArgs) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *ApiServiceRegisterArgs) Write(oprot thrift.TProtocol) (err error) {
+func (p *BaseServiceRegisterArgs) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("Register_args"); err != nil {
 		goto WriteStructBeginError
@@ -1249,7 +1457,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *ApiServiceRegisterArgs) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *BaseServiceRegisterArgs) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1266,39 +1474,66 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *ApiServiceRegisterArgs) String() string {
+func (p *BaseServiceRegisterArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("ApiServiceRegisterArgs(%+v)", *p)
+	return fmt.Sprintf("BaseServiceRegisterArgs(%+v)", *p)
 }
 
-type ApiServiceRegisterResult struct {
-	Success *RegisterRes `thrift:"success,0,optional"`
+func (p *BaseServiceRegisterArgs) DeepEqual(ano *BaseServiceRegisterArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
 }
 
-func NewApiServiceRegisterResult() *ApiServiceRegisterResult {
-	return &ApiServiceRegisterResult{}
+func (p *BaseServiceRegisterArgs) Field1DeepEqual(src *RegisterReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
 }
 
-var ApiServiceRegisterResult_Success_DEFAULT *RegisterRes
+type BaseServiceRegisterResult struct {
+	Success *RegisterRes `thrift:"success,0,optional" frugal:"0,optional,RegisterRes" json:"success,omitempty"`
+}
 
-func (p *ApiServiceRegisterResult) GetSuccess() (v *RegisterRes) {
+func NewBaseServiceRegisterResult() *BaseServiceRegisterResult {
+	return &BaseServiceRegisterResult{}
+}
+
+func (p *BaseServiceRegisterResult) InitDefault() {
+	*p = BaseServiceRegisterResult{}
+}
+
+var BaseServiceRegisterResult_Success_DEFAULT *RegisterRes
+
+func (p *BaseServiceRegisterResult) GetSuccess() (v *RegisterRes) {
 	if !p.IsSetSuccess() {
-		return ApiServiceRegisterResult_Success_DEFAULT
+		return BaseServiceRegisterResult_Success_DEFAULT
 	}
 	return p.Success
 }
+func (p *BaseServiceRegisterResult) SetSuccess(x interface{}) {
+	p.Success = x.(*RegisterRes)
+}
 
-var fieldIDToName_ApiServiceRegisterResult = map[int16]string{
+var fieldIDToName_BaseServiceRegisterResult = map[int16]string{
 	0: "success",
 }
 
-func (p *ApiServiceRegisterResult) IsSetSuccess() bool {
+func (p *BaseServiceRegisterResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *ApiServiceRegisterResult) Read(iprot thrift.TProtocol) (err error) {
+func (p *BaseServiceRegisterResult) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1347,7 +1582,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ApiServiceRegisterResult[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_BaseServiceRegisterResult[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1357,7 +1592,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *ApiServiceRegisterResult) ReadField0(iprot thrift.TProtocol) error {
+func (p *BaseServiceRegisterResult) ReadField0(iprot thrift.TProtocol) error {
 	p.Success = NewRegisterRes()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
@@ -1365,7 +1600,7 @@ func (p *ApiServiceRegisterResult) ReadField0(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *ApiServiceRegisterResult) Write(oprot thrift.TProtocol) (err error) {
+func (p *BaseServiceRegisterResult) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("Register_result"); err != nil {
 		goto WriteStructBeginError
@@ -1394,7 +1629,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *ApiServiceRegisterResult) writeField0(oprot thrift.TProtocol) (err error) {
+func (p *BaseServiceRegisterResult) writeField0(oprot thrift.TProtocol) (err error) {
 	if p.IsSetSuccess() {
 		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
 			goto WriteFieldBeginError
@@ -1413,39 +1648,66 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
 }
 
-func (p *ApiServiceRegisterResult) String() string {
+func (p *BaseServiceRegisterResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("ApiServiceRegisterResult(%+v)", *p)
+	return fmt.Sprintf("BaseServiceRegisterResult(%+v)", *p)
 }
 
-type ApiServiceLoginArgs struct {
-	Req *LoginReq `thrift:"req,1"`
+func (p *BaseServiceRegisterResult) DeepEqual(ano *BaseServiceRegisterResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
 }
 
-func NewApiServiceLoginArgs() *ApiServiceLoginArgs {
-	return &ApiServiceLoginArgs{}
+func (p *BaseServiceRegisterResult) Field0DeepEqual(src *RegisterRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
 }
 
-var ApiServiceLoginArgs_Req_DEFAULT *LoginReq
+type BaseServiceLoginArgs struct {
+	Req *LoginReq `thrift:"req,1" frugal:"1,default,LoginReq" json:"req"`
+}
 
-func (p *ApiServiceLoginArgs) GetReq() (v *LoginReq) {
+func NewBaseServiceLoginArgs() *BaseServiceLoginArgs {
+	return &BaseServiceLoginArgs{}
+}
+
+func (p *BaseServiceLoginArgs) InitDefault() {
+	*p = BaseServiceLoginArgs{}
+}
+
+var BaseServiceLoginArgs_Req_DEFAULT *LoginReq
+
+func (p *BaseServiceLoginArgs) GetReq() (v *LoginReq) {
 	if !p.IsSetReq() {
-		return ApiServiceLoginArgs_Req_DEFAULT
+		return BaseServiceLoginArgs_Req_DEFAULT
 	}
 	return p.Req
 }
+func (p *BaseServiceLoginArgs) SetReq(val *LoginReq) {
+	p.Req = val
+}
 
-var fieldIDToName_ApiServiceLoginArgs = map[int16]string{
+var fieldIDToName_BaseServiceLoginArgs = map[int16]string{
 	1: "req",
 }
 
-func (p *ApiServiceLoginArgs) IsSetReq() bool {
+func (p *BaseServiceLoginArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *ApiServiceLoginArgs) Read(iprot thrift.TProtocol) (err error) {
+func (p *BaseServiceLoginArgs) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1494,7 +1756,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ApiServiceLoginArgs[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_BaseServiceLoginArgs[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1504,7 +1766,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *ApiServiceLoginArgs) ReadField1(iprot thrift.TProtocol) error {
+func (p *BaseServiceLoginArgs) ReadField1(iprot thrift.TProtocol) error {
 	p.Req = NewLoginReq()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
@@ -1512,7 +1774,7 @@ func (p *ApiServiceLoginArgs) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *ApiServiceLoginArgs) Write(oprot thrift.TProtocol) (err error) {
+func (p *BaseServiceLoginArgs) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("Login_args"); err != nil {
 		goto WriteStructBeginError
@@ -1541,7 +1803,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *ApiServiceLoginArgs) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *BaseServiceLoginArgs) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1558,39 +1820,66 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *ApiServiceLoginArgs) String() string {
+func (p *BaseServiceLoginArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("ApiServiceLoginArgs(%+v)", *p)
+	return fmt.Sprintf("BaseServiceLoginArgs(%+v)", *p)
 }
 
-type ApiServiceLoginResult struct {
-	Success *LoginRes `thrift:"success,0,optional"`
+func (p *BaseServiceLoginArgs) DeepEqual(ano *BaseServiceLoginArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
 }
 
-func NewApiServiceLoginResult() *ApiServiceLoginResult {
-	return &ApiServiceLoginResult{}
+func (p *BaseServiceLoginArgs) Field1DeepEqual(src *LoginReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
 }
 
-var ApiServiceLoginResult_Success_DEFAULT *LoginRes
+type BaseServiceLoginResult struct {
+	Success *LoginRes `thrift:"success,0,optional" frugal:"0,optional,LoginRes" json:"success,omitempty"`
+}
 
-func (p *ApiServiceLoginResult) GetSuccess() (v *LoginRes) {
+func NewBaseServiceLoginResult() *BaseServiceLoginResult {
+	return &BaseServiceLoginResult{}
+}
+
+func (p *BaseServiceLoginResult) InitDefault() {
+	*p = BaseServiceLoginResult{}
+}
+
+var BaseServiceLoginResult_Success_DEFAULT *LoginRes
+
+func (p *BaseServiceLoginResult) GetSuccess() (v *LoginRes) {
 	if !p.IsSetSuccess() {
-		return ApiServiceLoginResult_Success_DEFAULT
+		return BaseServiceLoginResult_Success_DEFAULT
 	}
 	return p.Success
 }
+func (p *BaseServiceLoginResult) SetSuccess(x interface{}) {
+	p.Success = x.(*LoginRes)
+}
 
-var fieldIDToName_ApiServiceLoginResult = map[int16]string{
+var fieldIDToName_BaseServiceLoginResult = map[int16]string{
 	0: "success",
 }
 
-func (p *ApiServiceLoginResult) IsSetSuccess() bool {
+func (p *BaseServiceLoginResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *ApiServiceLoginResult) Read(iprot thrift.TProtocol) (err error) {
+func (p *BaseServiceLoginResult) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1639,7 +1928,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ApiServiceLoginResult[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_BaseServiceLoginResult[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1649,7 +1938,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *ApiServiceLoginResult) ReadField0(iprot thrift.TProtocol) error {
+func (p *BaseServiceLoginResult) ReadField0(iprot thrift.TProtocol) error {
 	p.Success = NewLoginRes()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
@@ -1657,7 +1946,7 @@ func (p *ApiServiceLoginResult) ReadField0(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *ApiServiceLoginResult) Write(oprot thrift.TProtocol) (err error) {
+func (p *BaseServiceLoginResult) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("Login_result"); err != nil {
 		goto WriteStructBeginError
@@ -1686,7 +1975,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *ApiServiceLoginResult) writeField0(oprot thrift.TProtocol) (err error) {
+func (p *BaseServiceLoginResult) writeField0(oprot thrift.TProtocol) (err error) {
 	if p.IsSetSuccess() {
 		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
 			goto WriteFieldBeginError
@@ -1705,9 +1994,29 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
 }
 
-func (p *ApiServiceLoginResult) String() string {
+func (p *BaseServiceLoginResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("ApiServiceLoginResult(%+v)", *p)
+	return fmt.Sprintf("BaseServiceLoginResult(%+v)", *p)
+}
+
+func (p *BaseServiceLoginResult) DeepEqual(ano *BaseServiceLoginResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *BaseServiceLoginResult) Field0DeepEqual(src *LoginRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
 }

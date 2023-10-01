@@ -20,8 +20,8 @@ package idl
 
 import (
 	"context"
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
 )
 
 const (

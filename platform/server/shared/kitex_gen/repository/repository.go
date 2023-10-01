@@ -6,31 +6,36 @@ import (
 	"context"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
+	"strings"
 )
 
 type Repository struct {
-	ID             string `thrift:"id,1" form:"id" json:"id" query:"id"`
-	RepositoryURL  string `thrift:"repository_url,2" form:"repository_url" json:"repository_url" query:"repository_url"`
-	Type           int32  `thrift:"type,3" form:"type" json:"type" query:"type"`
-	Token          string `thrift:"token,4" form:"token" json:"token" query:"token"`
-	Status         string `thrift:"status,5" form:"status" json:"status" query:"status"`
-	LastUpdateTime string `thrift:"last_update_time,6" form:"last_update_time" json:"last_update_time" query:"last_update_time"`
-	LastSyncTime   string `thrift:"last_sync_time,7" form:"last_sync_time" json:"last_sync_time" query:"last_sync_time"`
-	CreateTime     string `thrift:"create_time,8" form:"create_time" json:"create_time" query:"create_time"`
-	UpdateTime     string `thrift:"update_time,9" form:"update_time" json:"update_time" query:"update_time"`
-	RepoType       int8   `thrift:"repo_type,10" form:"repo_type" json:"repo_type" query:"repo_type"`
+	Id             string `thrift:"id,1" frugal:"1,default,string" json:"id"`
+	RepositoryUrl  string `thrift:"repository_url,2" frugal:"2,default,string" json:"repository_url"`
+	Type           int32  `thrift:"type,3" frugal:"3,default,i32" json:"type"`
+	Token          string `thrift:"token,4" frugal:"4,default,string" json:"token"`
+	Status         string `thrift:"status,5" frugal:"5,default,string" json:"status"`
+	LastUpdateTime string `thrift:"last_update_time,6" frugal:"6,default,string" json:"last_update_time"`
+	LastSyncTime   string `thrift:"last_sync_time,7" frugal:"7,default,string" json:"last_sync_time"`
+	CreateTime     string `thrift:"create_time,8" frugal:"8,default,string" json:"create_time"`
+	UpdateTime     string `thrift:"update_time,9" frugal:"9,default,string" json:"update_time"`
+	RepoType       int8   `thrift:"repo_type,10" frugal:"10,default,i8" json:"repo_type"`
 }
 
 func NewRepository() *Repository {
 	return &Repository{}
 }
 
-func (p *Repository) GetID() (v string) {
-	return p.ID
+func (p *Repository) InitDefault() {
+	*p = Repository{}
 }
 
-func (p *Repository) GetRepositoryURL() (v string) {
-	return p.RepositoryURL
+func (p *Repository) GetId() (v string) {
+	return p.Id
+}
+
+func (p *Repository) GetRepositoryUrl() (v string) {
+	return p.RepositoryUrl
 }
 
 func (p *Repository) GetType() (v int32) {
@@ -63,6 +68,36 @@ func (p *Repository) GetUpdateTime() (v string) {
 
 func (p *Repository) GetRepoType() (v int8) {
 	return p.RepoType
+}
+func (p *Repository) SetId(val string) {
+	p.Id = val
+}
+func (p *Repository) SetRepositoryUrl(val string) {
+	p.RepositoryUrl = val
+}
+func (p *Repository) SetType(val int32) {
+	p.Type = val
+}
+func (p *Repository) SetToken(val string) {
+	p.Token = val
+}
+func (p *Repository) SetStatus(val string) {
+	p.Status = val
+}
+func (p *Repository) SetLastUpdateTime(val string) {
+	p.LastUpdateTime = val
+}
+func (p *Repository) SetLastSyncTime(val string) {
+	p.LastSyncTime = val
+}
+func (p *Repository) SetCreateTime(val string) {
+	p.CreateTime = val
+}
+func (p *Repository) SetUpdateTime(val string) {
+	p.UpdateTime = val
+}
+func (p *Repository) SetRepoType(val int8) {
+	p.RepoType = val
 }
 
 var fieldIDToName_Repository = map[int16]string{
@@ -231,7 +266,7 @@ func (p *Repository) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.ID = v
+		p.Id = v
 	}
 	return nil
 }
@@ -240,7 +275,7 @@ func (p *Repository) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.RepositoryURL = v
+		p.RepositoryUrl = v
 	}
 	return nil
 }
@@ -386,7 +421,7 @@ func (p *Repository) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("id", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.ID); err != nil {
+	if err := oprot.WriteString(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -403,7 +438,7 @@ func (p *Repository) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("repository_url", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.RepositoryURL); err != nil {
+	if err := oprot.WriteString(p.RepositoryUrl); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -559,21 +594,141 @@ func (p *Repository) String() string {
 	return fmt.Sprintf("Repository(%+v)", *p)
 }
 
+func (p *Repository) DeepEqual(ano *Repository) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.RepositoryUrl) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Type) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Token) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.Status) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.LastUpdateTime) {
+		return false
+	}
+	if !p.Field7DeepEqual(ano.LastSyncTime) {
+		return false
+	}
+	if !p.Field8DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field9DeepEqual(ano.UpdateTime) {
+		return false
+	}
+	if !p.Field10DeepEqual(ano.RepoType) {
+		return false
+	}
+	return true
+}
+
+func (p *Repository) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Id, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.RepositoryUrl, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field3DeepEqual(src int32) bool {
+
+	if p.Type != src {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.Token, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.Status, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field6DeepEqual(src string) bool {
+
+	if strings.Compare(p.LastUpdateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field7DeepEqual(src string) bool {
+
+	if strings.Compare(p.LastSyncTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field8DeepEqual(src string) bool {
+
+	if strings.Compare(p.CreateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field9DeepEqual(src string) bool {
+
+	if strings.Compare(p.UpdateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field10DeepEqual(src int8) bool {
+
+	if p.RepoType != src {
+		return false
+	}
+	return true
+}
+
 type AddRepositoryReq struct {
-	RepositoryURL string `thrift:"repository_url,1" form:"repository_url,required" json:"repository_url,required"`
-	Token         string `thrift:"token,2" form:"token" json:"token"`
+	RepositoryUrl string `thrift:"repository_url,1" frugal:"1,default,string" json:"repository_url"`
+	Token         string `thrift:"token,2" frugal:"2,default,string" json:"token"`
 }
 
 func NewAddRepositoryReq() *AddRepositoryReq {
 	return &AddRepositoryReq{}
 }
 
-func (p *AddRepositoryReq) GetRepositoryURL() (v string) {
-	return p.RepositoryURL
+func (p *AddRepositoryReq) InitDefault() {
+	*p = AddRepositoryReq{}
+}
+
+func (p *AddRepositoryReq) GetRepositoryUrl() (v string) {
+	return p.RepositoryUrl
 }
 
 func (p *AddRepositoryReq) GetToken() (v string) {
 	return p.Token
+}
+func (p *AddRepositoryReq) SetRepositoryUrl(val string) {
+	p.RepositoryUrl = val
+}
+func (p *AddRepositoryReq) SetToken(val string) {
+	p.Token = val
 }
 
 var fieldIDToName_AddRepositoryReq = map[int16]string{
@@ -654,7 +809,7 @@ func (p *AddRepositoryReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.RepositoryURL = v
+		p.RepositoryUrl = v
 	}
 	return nil
 }
@@ -705,7 +860,7 @@ func (p *AddRepositoryReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("repository_url", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.RepositoryURL); err != nil {
+	if err := oprot.WriteString(p.RepositoryUrl); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -742,13 +897,47 @@ func (p *AddRepositoryReq) String() string {
 	return fmt.Sprintf("AddRepositoryReq(%+v)", *p)
 }
 
+func (p *AddRepositoryReq) DeepEqual(ano *AddRepositoryReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.RepositoryUrl) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Token) {
+		return false
+	}
+	return true
+}
+
+func (p *AddRepositoryReq) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.RepositoryUrl, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddRepositoryReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Token, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type AddRepositoryRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewAddRepositoryRes() *AddRepositoryRes {
 	return &AddRepositoryRes{}
+}
+
+func (p *AddRepositoryRes) InitDefault() {
+	*p = AddRepositoryRes{}
 }
 
 func (p *AddRepositoryRes) GetCode() (v int32) {
@@ -757,6 +946,12 @@ func (p *AddRepositoryRes) GetCode() (v int32) {
 
 func (p *AddRepositoryRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *AddRepositoryRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *AddRepositoryRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_AddRepositoryRes = map[int16]string{
@@ -925,16 +1120,53 @@ func (p *AddRepositoryRes) String() string {
 	return fmt.Sprintf("AddRepositoryRes(%+v)", *p)
 }
 
+func (p *AddRepositoryRes) DeepEqual(ano *AddRepositoryRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *AddRepositoryRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *AddRepositoryRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type DeleteRepositoriesReq struct {
-	Ids []string `thrift:"ids,1" form:"ids,required" json:"ids,required"`
+	Ids []string `thrift:"ids,1" frugal:"1,default,list<string>" json:"ids"`
 }
 
 func NewDeleteRepositoriesReq() *DeleteRepositoriesReq {
 	return &DeleteRepositoriesReq{}
 }
 
+func (p *DeleteRepositoriesReq) InitDefault() {
+	*p = DeleteRepositoriesReq{}
+}
+
 func (p *DeleteRepositoriesReq) GetIds() (v []string) {
 	return p.Ids
+}
+func (p *DeleteRepositoriesReq) SetIds(val []string) {
+	p.Ids = val
 }
 
 var fieldIDToName_DeleteRepositoriesReq = map[int16]string{
@@ -1083,13 +1315,43 @@ func (p *DeleteRepositoriesReq) String() string {
 	return fmt.Sprintf("DeleteRepositoriesReq(%+v)", *p)
 }
 
+func (p *DeleteRepositoriesReq) DeepEqual(ano *DeleteRepositoriesReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Ids) {
+		return false
+	}
+	return true
+}
+
+func (p *DeleteRepositoriesReq) Field1DeepEqual(src []string) bool {
+
+	if len(p.Ids) != len(src) {
+		return false
+	}
+	for i, v := range p.Ids {
+		_src := src[i]
+		if strings.Compare(v, _src) != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 type DeleteRepositoriesRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewDeleteRepositoriesRes() *DeleteRepositoriesRes {
 	return &DeleteRepositoriesRes{}
+}
+
+func (p *DeleteRepositoriesRes) InitDefault() {
+	*p = DeleteRepositoriesRes{}
 }
 
 func (p *DeleteRepositoriesRes) GetCode() (v int32) {
@@ -1098,6 +1360,12 @@ func (p *DeleteRepositoriesRes) GetCode() (v int32) {
 
 func (p *DeleteRepositoriesRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *DeleteRepositoriesRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *DeleteRepositoriesRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_DeleteRepositoriesRes = map[int16]string{
@@ -1266,21 +1534,61 @@ func (p *DeleteRepositoriesRes) String() string {
 	return fmt.Sprintf("DeleteRepositoriesRes(%+v)", *p)
 }
 
+func (p *DeleteRepositoriesRes) DeepEqual(ano *DeleteRepositoriesRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *DeleteRepositoriesRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *DeleteRepositoriesRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type UpdateRepositoryReq struct {
-	ID    string `thrift:"id,1" form:"id" json:"id" query:"id"`
-	Token string `thrift:"token,2" form:"token" json:"token"`
+	Id    string `thrift:"id,1" frugal:"1,default,string" json:"id"`
+	Token string `thrift:"token,2" frugal:"2,default,string" json:"token"`
 }
 
 func NewUpdateRepositoryReq() *UpdateRepositoryReq {
 	return &UpdateRepositoryReq{}
 }
 
-func (p *UpdateRepositoryReq) GetID() (v string) {
-	return p.ID
+func (p *UpdateRepositoryReq) InitDefault() {
+	*p = UpdateRepositoryReq{}
+}
+
+func (p *UpdateRepositoryReq) GetId() (v string) {
+	return p.Id
 }
 
 func (p *UpdateRepositoryReq) GetToken() (v string) {
 	return p.Token
+}
+func (p *UpdateRepositoryReq) SetId(val string) {
+	p.Id = val
+}
+func (p *UpdateRepositoryReq) SetToken(val string) {
+	p.Token = val
 }
 
 var fieldIDToName_UpdateRepositoryReq = map[int16]string{
@@ -1361,7 +1669,7 @@ func (p *UpdateRepositoryReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.ID = v
+		p.Id = v
 	}
 	return nil
 }
@@ -1412,7 +1720,7 @@ func (p *UpdateRepositoryReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("id", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.ID); err != nil {
+	if err := oprot.WriteString(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1449,13 +1757,47 @@ func (p *UpdateRepositoryReq) String() string {
 	return fmt.Sprintf("UpdateRepositoryReq(%+v)", *p)
 }
 
+func (p *UpdateRepositoryReq) DeepEqual(ano *UpdateRepositoryReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Token) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateRepositoryReq) Field1DeepEqual(src string) bool {
+
+	if strings.Compare(p.Id, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UpdateRepositoryReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Token, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type UpdateRepositoryRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewUpdateRepositoryRes() *UpdateRepositoryRes {
 	return &UpdateRepositoryRes{}
+}
+
+func (p *UpdateRepositoryRes) InitDefault() {
+	*p = UpdateRepositoryRes{}
 }
 
 func (p *UpdateRepositoryRes) GetCode() (v int32) {
@@ -1464,6 +1806,12 @@ func (p *UpdateRepositoryRes) GetCode() (v int32) {
 
 func (p *UpdateRepositoryRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *UpdateRepositoryRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *UpdateRepositoryRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_UpdateRepositoryRes = map[int16]string{
@@ -1632,15 +1980,49 @@ func (p *UpdateRepositoryRes) String() string {
 	return fmt.Sprintf("UpdateRepositoryRes(%+v)", *p)
 }
 
+func (p *UpdateRepositoryRes) DeepEqual(ano *UpdateRepositoryRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *UpdateRepositoryRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateRepositoryRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type GetRepositoriesReq struct {
-	Page    int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
-	Limit   int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
-	Order   int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
-	OrderBy string `thrift:"order_by,4" json:"order_by" query:"order_by"`
+	Page    int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
+	Limit   int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
+	Order   int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
+	OrderBy string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
 }
 
 func NewGetRepositoriesReq() *GetRepositoriesReq {
 	return &GetRepositoriesReq{}
+}
+
+func (p *GetRepositoriesReq) InitDefault() {
+	*p = GetRepositoriesReq{}
 }
 
 func (p *GetRepositoriesReq) GetPage() (v int32) {
@@ -1657,6 +2039,18 @@ func (p *GetRepositoriesReq) GetOrder() (v int32) {
 
 func (p *GetRepositoriesReq) GetOrderBy() (v string) {
 	return p.OrderBy
+}
+func (p *GetRepositoriesReq) SetPage(val int32) {
+	p.Page = val
+}
+func (p *GetRepositoriesReq) SetLimit(val int32) {
+	p.Limit = val
+}
+func (p *GetRepositoriesReq) SetOrder(val int32) {
+	p.Order = val
+}
+func (p *GetRepositoriesReq) SetOrderBy(val string) {
+	p.OrderBy = val
 }
 
 var fieldIDToName_GetRepositoriesReq = map[int16]string{
@@ -1907,14 +2301,68 @@ func (p *GetRepositoriesReq) String() string {
 	return fmt.Sprintf("GetRepositoriesReq(%+v)", *p)
 }
 
+func (p *GetRepositoriesReq) DeepEqual(ano *GetRepositoriesReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Page) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Limit) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Order) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.OrderBy) {
+		return false
+	}
+	return true
+}
+
+func (p *GetRepositoriesReq) Field1DeepEqual(src int32) bool {
+
+	if p.Page != src {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesReq) Field2DeepEqual(src int32) bool {
+
+	if p.Limit != src {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesReq) Field3DeepEqual(src int32) bool {
+
+	if p.Order != src {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesReq) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.OrderBy, src) != 0 {
+		return false
+	}
+	return true
+}
+
 type GetRepositoriesRes struct {
-	Code int32                   `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string                  `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
-	Data *GetRepositoriesResData `thrift:"data,3" form:"data" json:"data" query:"data"`
+	Code int32                   `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string                  `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *GetRepositoriesResData `thrift:"data,3" frugal:"3,default,GetRepositoriesResData" json:"data"`
 }
 
 func NewGetRepositoriesRes() *GetRepositoriesRes {
 	return &GetRepositoriesRes{}
+}
+
+func (p *GetRepositoriesRes) InitDefault() {
+	*p = GetRepositoriesRes{}
 }
 
 func (p *GetRepositoriesRes) GetCode() (v int32) {
@@ -1932,6 +2380,15 @@ func (p *GetRepositoriesRes) GetData() (v *GetRepositoriesResData) {
 		return GetRepositoriesRes_Data_DEFAULT
 	}
 	return p.Data
+}
+func (p *GetRepositoriesRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *GetRepositoriesRes) SetMsg(val string) {
+	p.Msg = val
+}
+func (p *GetRepositoriesRes) SetData(val *GetRepositoriesResData) {
+	p.Data = val
 }
 
 var fieldIDToName_GetRepositoriesRes = map[int16]string{
@@ -2144,16 +2601,63 @@ func (p *GetRepositoriesRes) String() string {
 	return fmt.Sprintf("GetRepositoriesRes(%+v)", *p)
 }
 
+func (p *GetRepositoriesRes) DeepEqual(ano *GetRepositoriesRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Data) {
+		return false
+	}
+	return true
+}
+
+func (p *GetRepositoriesRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesRes) Field3DeepEqual(src *GetRepositoriesResData) bool {
+
+	if !p.Data.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type GetRepositoriesResData struct {
-	Repositories []*Repository `thrift:"repositories,1" form:"repositories" json:"repositories" query:"repositories"`
+	Repositories []*Repository `thrift:"repositories,1" frugal:"1,default,list<Repository>" json:"repositories"`
 }
 
 func NewGetRepositoriesResData() *GetRepositoriesResData {
 	return &GetRepositoriesResData{}
 }
 
+func (p *GetRepositoriesResData) InitDefault() {
+	*p = GetRepositoriesResData{}
+}
+
 func (p *GetRepositoriesResData) GetRepositories() (v []*Repository) {
 	return p.Repositories
+}
+func (p *GetRepositoriesResData) SetRepositories(val []*Repository) {
+	p.Repositories = val
 }
 
 var fieldIDToName_GetRepositoriesResData = map[int16]string{
@@ -2300,16 +2804,49 @@ func (p *GetRepositoriesResData) String() string {
 	return fmt.Sprintf("GetRepositoriesResData(%+v)", *p)
 }
 
+func (p *GetRepositoriesResData) DeepEqual(ano *GetRepositoriesResData) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Repositories) {
+		return false
+	}
+	return true
+}
+
+func (p *GetRepositoriesResData) Field1DeepEqual(src []*Repository) bool {
+
+	if len(p.Repositories) != len(src) {
+		return false
+	}
+	for i, v := range p.Repositories {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+
 type SyncRepositoryByIdReq struct {
-	Ids []int64 `thrift:"ids,1" form:"ids,required" json:"ids,required"`
+	Ids []int64 `thrift:"ids,1" frugal:"1,default,list<i64>" json:"ids"`
 }
 
 func NewSyncRepositoryByIdReq() *SyncRepositoryByIdReq {
 	return &SyncRepositoryByIdReq{}
 }
 
+func (p *SyncRepositoryByIdReq) InitDefault() {
+	*p = SyncRepositoryByIdReq{}
+}
+
 func (p *SyncRepositoryByIdReq) GetIds() (v []int64) {
 	return p.Ids
+}
+func (p *SyncRepositoryByIdReq) SetIds(val []int64) {
+	p.Ids = val
 }
 
 var fieldIDToName_SyncRepositoryByIdReq = map[int16]string{
@@ -2458,13 +2995,43 @@ func (p *SyncRepositoryByIdReq) String() string {
 	return fmt.Sprintf("SyncRepositoryByIdReq(%+v)", *p)
 }
 
+func (p *SyncRepositoryByIdReq) DeepEqual(ano *SyncRepositoryByIdReq) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Ids) {
+		return false
+	}
+	return true
+}
+
+func (p *SyncRepositoryByIdReq) Field1DeepEqual(src []int64) bool {
+
+	if len(p.Ids) != len(src) {
+		return false
+	}
+	for i, v := range p.Ids {
+		_src := src[i]
+		if v != _src {
+			return false
+		}
+	}
+	return true
+}
+
 type SyncRepositoryByIdRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
 func NewSyncRepositoryByIdRes() *SyncRepositoryByIdRes {
 	return &SyncRepositoryByIdRes{}
+}
+
+func (p *SyncRepositoryByIdRes) InitDefault() {
+	*p = SyncRepositoryByIdRes{}
 }
 
 func (p *SyncRepositoryByIdRes) GetCode() (v int32) {
@@ -2473,6 +3040,12 @@ func (p *SyncRepositoryByIdRes) GetCode() (v int32) {
 
 func (p *SyncRepositoryByIdRes) GetMsg() (v string) {
 	return p.Msg
+}
+func (p *SyncRepositoryByIdRes) SetCode(val int32) {
+	p.Code = val
+}
+func (p *SyncRepositoryByIdRes) SetMsg(val string) {
+	p.Msg = val
 }
 
 var fieldIDToName_SyncRepositoryByIdRes = map[int16]string{
@@ -2639,6 +3212,36 @@ func (p *SyncRepositoryByIdRes) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("SyncRepositoryByIdRes(%+v)", *p)
+}
+
+func (p *SyncRepositoryByIdRes) DeepEqual(ano *SyncRepositoryByIdRes) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Code) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Msg) {
+		return false
+	}
+	return true
+}
+
+func (p *SyncRepositoryByIdRes) Field1DeepEqual(src int32) bool {
+
+	if p.Code != src {
+		return false
+	}
+	return true
+}
+func (p *SyncRepositoryByIdRes) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
 }
 
 type RepositoryService interface {
@@ -3011,11 +3614,15 @@ func (p *repositoryServiceProcessorSyncRepository) Process(ctx context.Context, 
 }
 
 type RepositoryServiceAddRepositoryArgs struct {
-	Req *AddRepositoryReq `thrift:"req,1"`
+	Req *AddRepositoryReq `thrift:"req,1" frugal:"1,default,AddRepositoryReq" json:"req"`
 }
 
 func NewRepositoryServiceAddRepositoryArgs() *RepositoryServiceAddRepositoryArgs {
 	return &RepositoryServiceAddRepositoryArgs{}
+}
+
+func (p *RepositoryServiceAddRepositoryArgs) InitDefault() {
+	*p = RepositoryServiceAddRepositoryArgs{}
 }
 
 var RepositoryServiceAddRepositoryArgs_Req_DEFAULT *AddRepositoryReq
@@ -3025,6 +3632,9 @@ func (p *RepositoryServiceAddRepositoryArgs) GetReq() (v *AddRepositoryReq) {
 		return RepositoryServiceAddRepositoryArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *RepositoryServiceAddRepositoryArgs) SetReq(val *AddRepositoryReq) {
+	p.Req = val
 }
 
 var fieldIDToName_RepositoryServiceAddRepositoryArgs = map[int16]string{
@@ -3155,12 +3765,36 @@ func (p *RepositoryServiceAddRepositoryArgs) String() string {
 	return fmt.Sprintf("RepositoryServiceAddRepositoryArgs(%+v)", *p)
 }
 
+func (p *RepositoryServiceAddRepositoryArgs) DeepEqual(ano *RepositoryServiceAddRepositoryArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceAddRepositoryArgs) Field1DeepEqual(src *AddRepositoryReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type RepositoryServiceAddRepositoryResult struct {
-	Success *AddRepositoryRes `thrift:"success,0,optional"`
+	Success *AddRepositoryRes `thrift:"success,0,optional" frugal:"0,optional,AddRepositoryRes" json:"success,omitempty"`
 }
 
 func NewRepositoryServiceAddRepositoryResult() *RepositoryServiceAddRepositoryResult {
 	return &RepositoryServiceAddRepositoryResult{}
+}
+
+func (p *RepositoryServiceAddRepositoryResult) InitDefault() {
+	*p = RepositoryServiceAddRepositoryResult{}
 }
 
 var RepositoryServiceAddRepositoryResult_Success_DEFAULT *AddRepositoryRes
@@ -3170,6 +3804,9 @@ func (p *RepositoryServiceAddRepositoryResult) GetSuccess() (v *AddRepositoryRes
 		return RepositoryServiceAddRepositoryResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *RepositoryServiceAddRepositoryResult) SetSuccess(x interface{}) {
+	p.Success = x.(*AddRepositoryRes)
 }
 
 var fieldIDToName_RepositoryServiceAddRepositoryResult = map[int16]string{
@@ -3302,12 +3939,36 @@ func (p *RepositoryServiceAddRepositoryResult) String() string {
 	return fmt.Sprintf("RepositoryServiceAddRepositoryResult(%+v)", *p)
 }
 
+func (p *RepositoryServiceAddRepositoryResult) DeepEqual(ano *RepositoryServiceAddRepositoryResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceAddRepositoryResult) Field0DeepEqual(src *AddRepositoryRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type RepositoryServiceDeleteRepositoryArgs struct {
-	Req *DeleteRepositoriesReq `thrift:"req,1"`
+	Req *DeleteRepositoriesReq `thrift:"req,1" frugal:"1,default,DeleteRepositoriesReq" json:"req"`
 }
 
 func NewRepositoryServiceDeleteRepositoryArgs() *RepositoryServiceDeleteRepositoryArgs {
 	return &RepositoryServiceDeleteRepositoryArgs{}
+}
+
+func (p *RepositoryServiceDeleteRepositoryArgs) InitDefault() {
+	*p = RepositoryServiceDeleteRepositoryArgs{}
 }
 
 var RepositoryServiceDeleteRepositoryArgs_Req_DEFAULT *DeleteRepositoriesReq
@@ -3317,6 +3978,9 @@ func (p *RepositoryServiceDeleteRepositoryArgs) GetReq() (v *DeleteRepositoriesR
 		return RepositoryServiceDeleteRepositoryArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *RepositoryServiceDeleteRepositoryArgs) SetReq(val *DeleteRepositoriesReq) {
+	p.Req = val
 }
 
 var fieldIDToName_RepositoryServiceDeleteRepositoryArgs = map[int16]string{
@@ -3447,12 +4111,36 @@ func (p *RepositoryServiceDeleteRepositoryArgs) String() string {
 	return fmt.Sprintf("RepositoryServiceDeleteRepositoryArgs(%+v)", *p)
 }
 
+func (p *RepositoryServiceDeleteRepositoryArgs) DeepEqual(ano *RepositoryServiceDeleteRepositoryArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceDeleteRepositoryArgs) Field1DeepEqual(src *DeleteRepositoriesReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type RepositoryServiceDeleteRepositoryResult struct {
-	Success *DeleteRepositoriesRes `thrift:"success,0,optional"`
+	Success *DeleteRepositoriesRes `thrift:"success,0,optional" frugal:"0,optional,DeleteRepositoriesRes" json:"success,omitempty"`
 }
 
 func NewRepositoryServiceDeleteRepositoryResult() *RepositoryServiceDeleteRepositoryResult {
 	return &RepositoryServiceDeleteRepositoryResult{}
+}
+
+func (p *RepositoryServiceDeleteRepositoryResult) InitDefault() {
+	*p = RepositoryServiceDeleteRepositoryResult{}
 }
 
 var RepositoryServiceDeleteRepositoryResult_Success_DEFAULT *DeleteRepositoriesRes
@@ -3462,6 +4150,9 @@ func (p *RepositoryServiceDeleteRepositoryResult) GetSuccess() (v *DeleteReposit
 		return RepositoryServiceDeleteRepositoryResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *RepositoryServiceDeleteRepositoryResult) SetSuccess(x interface{}) {
+	p.Success = x.(*DeleteRepositoriesRes)
 }
 
 var fieldIDToName_RepositoryServiceDeleteRepositoryResult = map[int16]string{
@@ -3594,12 +4285,36 @@ func (p *RepositoryServiceDeleteRepositoryResult) String() string {
 	return fmt.Sprintf("RepositoryServiceDeleteRepositoryResult(%+v)", *p)
 }
 
+func (p *RepositoryServiceDeleteRepositoryResult) DeepEqual(ano *RepositoryServiceDeleteRepositoryResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceDeleteRepositoryResult) Field0DeepEqual(src *DeleteRepositoriesRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type RepositoryServiceUpdateRepositoryArgs struct {
-	Req *UpdateRepositoryReq `thrift:"req,1"`
+	Req *UpdateRepositoryReq `thrift:"req,1" frugal:"1,default,UpdateRepositoryReq" json:"req"`
 }
 
 func NewRepositoryServiceUpdateRepositoryArgs() *RepositoryServiceUpdateRepositoryArgs {
 	return &RepositoryServiceUpdateRepositoryArgs{}
+}
+
+func (p *RepositoryServiceUpdateRepositoryArgs) InitDefault() {
+	*p = RepositoryServiceUpdateRepositoryArgs{}
 }
 
 var RepositoryServiceUpdateRepositoryArgs_Req_DEFAULT *UpdateRepositoryReq
@@ -3609,6 +4324,9 @@ func (p *RepositoryServiceUpdateRepositoryArgs) GetReq() (v *UpdateRepositoryReq
 		return RepositoryServiceUpdateRepositoryArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *RepositoryServiceUpdateRepositoryArgs) SetReq(val *UpdateRepositoryReq) {
+	p.Req = val
 }
 
 var fieldIDToName_RepositoryServiceUpdateRepositoryArgs = map[int16]string{
@@ -3739,12 +4457,36 @@ func (p *RepositoryServiceUpdateRepositoryArgs) String() string {
 	return fmt.Sprintf("RepositoryServiceUpdateRepositoryArgs(%+v)", *p)
 }
 
+func (p *RepositoryServiceUpdateRepositoryArgs) DeepEqual(ano *RepositoryServiceUpdateRepositoryArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceUpdateRepositoryArgs) Field1DeepEqual(src *UpdateRepositoryReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type RepositoryServiceUpdateRepositoryResult struct {
-	Success *UpdateRepositoryRes `thrift:"success,0,optional"`
+	Success *UpdateRepositoryRes `thrift:"success,0,optional" frugal:"0,optional,UpdateRepositoryRes" json:"success,omitempty"`
 }
 
 func NewRepositoryServiceUpdateRepositoryResult() *RepositoryServiceUpdateRepositoryResult {
 	return &RepositoryServiceUpdateRepositoryResult{}
+}
+
+func (p *RepositoryServiceUpdateRepositoryResult) InitDefault() {
+	*p = RepositoryServiceUpdateRepositoryResult{}
 }
 
 var RepositoryServiceUpdateRepositoryResult_Success_DEFAULT *UpdateRepositoryRes
@@ -3754,6 +4496,9 @@ func (p *RepositoryServiceUpdateRepositoryResult) GetSuccess() (v *UpdateReposit
 		return RepositoryServiceUpdateRepositoryResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *RepositoryServiceUpdateRepositoryResult) SetSuccess(x interface{}) {
+	p.Success = x.(*UpdateRepositoryRes)
 }
 
 var fieldIDToName_RepositoryServiceUpdateRepositoryResult = map[int16]string{
@@ -3886,12 +4631,36 @@ func (p *RepositoryServiceUpdateRepositoryResult) String() string {
 	return fmt.Sprintf("RepositoryServiceUpdateRepositoryResult(%+v)", *p)
 }
 
+func (p *RepositoryServiceUpdateRepositoryResult) DeepEqual(ano *RepositoryServiceUpdateRepositoryResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceUpdateRepositoryResult) Field0DeepEqual(src *UpdateRepositoryRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type RepositoryServiceGetRepositoriesArgs struct {
-	Req *GetRepositoriesReq `thrift:"req,1"`
+	Req *GetRepositoriesReq `thrift:"req,1" frugal:"1,default,GetRepositoriesReq" json:"req"`
 }
 
 func NewRepositoryServiceGetRepositoriesArgs() *RepositoryServiceGetRepositoriesArgs {
 	return &RepositoryServiceGetRepositoriesArgs{}
+}
+
+func (p *RepositoryServiceGetRepositoriesArgs) InitDefault() {
+	*p = RepositoryServiceGetRepositoriesArgs{}
 }
 
 var RepositoryServiceGetRepositoriesArgs_Req_DEFAULT *GetRepositoriesReq
@@ -3901,6 +4670,9 @@ func (p *RepositoryServiceGetRepositoriesArgs) GetReq() (v *GetRepositoriesReq) 
 		return RepositoryServiceGetRepositoriesArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *RepositoryServiceGetRepositoriesArgs) SetReq(val *GetRepositoriesReq) {
+	p.Req = val
 }
 
 var fieldIDToName_RepositoryServiceGetRepositoriesArgs = map[int16]string{
@@ -4031,12 +4803,36 @@ func (p *RepositoryServiceGetRepositoriesArgs) String() string {
 	return fmt.Sprintf("RepositoryServiceGetRepositoriesArgs(%+v)", *p)
 }
 
+func (p *RepositoryServiceGetRepositoriesArgs) DeepEqual(ano *RepositoryServiceGetRepositoriesArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceGetRepositoriesArgs) Field1DeepEqual(src *GetRepositoriesReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type RepositoryServiceGetRepositoriesResult struct {
-	Success *GetRepositoriesRes `thrift:"success,0,optional"`
+	Success *GetRepositoriesRes `thrift:"success,0,optional" frugal:"0,optional,GetRepositoriesRes" json:"success,omitempty"`
 }
 
 func NewRepositoryServiceGetRepositoriesResult() *RepositoryServiceGetRepositoriesResult {
 	return &RepositoryServiceGetRepositoriesResult{}
+}
+
+func (p *RepositoryServiceGetRepositoriesResult) InitDefault() {
+	*p = RepositoryServiceGetRepositoriesResult{}
 }
 
 var RepositoryServiceGetRepositoriesResult_Success_DEFAULT *GetRepositoriesRes
@@ -4046,6 +4842,9 @@ func (p *RepositoryServiceGetRepositoriesResult) GetSuccess() (v *GetRepositorie
 		return RepositoryServiceGetRepositoriesResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *RepositoryServiceGetRepositoriesResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetRepositoriesRes)
 }
 
 var fieldIDToName_RepositoryServiceGetRepositoriesResult = map[int16]string{
@@ -4178,12 +4977,36 @@ func (p *RepositoryServiceGetRepositoriesResult) String() string {
 	return fmt.Sprintf("RepositoryServiceGetRepositoriesResult(%+v)", *p)
 }
 
+func (p *RepositoryServiceGetRepositoriesResult) DeepEqual(ano *RepositoryServiceGetRepositoriesResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceGetRepositoriesResult) Field0DeepEqual(src *GetRepositoriesRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type RepositoryServiceSyncRepositoryArgs struct {
-	Req *SyncRepositoryByIdReq `thrift:"req,1"`
+	Req *SyncRepositoryByIdReq `thrift:"req,1" frugal:"1,default,SyncRepositoryByIdReq" json:"req"`
 }
 
 func NewRepositoryServiceSyncRepositoryArgs() *RepositoryServiceSyncRepositoryArgs {
 	return &RepositoryServiceSyncRepositoryArgs{}
+}
+
+func (p *RepositoryServiceSyncRepositoryArgs) InitDefault() {
+	*p = RepositoryServiceSyncRepositoryArgs{}
 }
 
 var RepositoryServiceSyncRepositoryArgs_Req_DEFAULT *SyncRepositoryByIdReq
@@ -4193,6 +5016,9 @@ func (p *RepositoryServiceSyncRepositoryArgs) GetReq() (v *SyncRepositoryByIdReq
 		return RepositoryServiceSyncRepositoryArgs_Req_DEFAULT
 	}
 	return p.Req
+}
+func (p *RepositoryServiceSyncRepositoryArgs) SetReq(val *SyncRepositoryByIdReq) {
+	p.Req = val
 }
 
 var fieldIDToName_RepositoryServiceSyncRepositoryArgs = map[int16]string{
@@ -4323,12 +5149,36 @@ func (p *RepositoryServiceSyncRepositoryArgs) String() string {
 	return fmt.Sprintf("RepositoryServiceSyncRepositoryArgs(%+v)", *p)
 }
 
+func (p *RepositoryServiceSyncRepositoryArgs) DeepEqual(ano *RepositoryServiceSyncRepositoryArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceSyncRepositoryArgs) Field1DeepEqual(src *SyncRepositoryByIdReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type RepositoryServiceSyncRepositoryResult struct {
-	Success *SyncRepositoryByIdRes `thrift:"success,0,optional"`
+	Success *SyncRepositoryByIdRes `thrift:"success,0,optional" frugal:"0,optional,SyncRepositoryByIdRes" json:"success,omitempty"`
 }
 
 func NewRepositoryServiceSyncRepositoryResult() *RepositoryServiceSyncRepositoryResult {
 	return &RepositoryServiceSyncRepositoryResult{}
+}
+
+func (p *RepositoryServiceSyncRepositoryResult) InitDefault() {
+	*p = RepositoryServiceSyncRepositoryResult{}
 }
 
 var RepositoryServiceSyncRepositoryResult_Success_DEFAULT *SyncRepositoryByIdRes
@@ -4338,6 +5188,9 @@ func (p *RepositoryServiceSyncRepositoryResult) GetSuccess() (v *SyncRepositoryB
 		return RepositoryServiceSyncRepositoryResult_Success_DEFAULT
 	}
 	return p.Success
+}
+func (p *RepositoryServiceSyncRepositoryResult) SetSuccess(x interface{}) {
+	p.Success = x.(*SyncRepositoryByIdRes)
 }
 
 var fieldIDToName_RepositoryServiceSyncRepositoryResult = map[int16]string{
@@ -4468,4 +5321,24 @@ func (p *RepositoryServiceSyncRepositoryResult) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("RepositoryServiceSyncRepositoryResult(%+v)", *p)
+}
+
+func (p *RepositoryServiceSyncRepositoryResult) DeepEqual(ano *RepositoryServiceSyncRepositoryResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *RepositoryServiceSyncRepositoryResult) Field0DeepEqual(src *SyncRepositoryByIdRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
 }

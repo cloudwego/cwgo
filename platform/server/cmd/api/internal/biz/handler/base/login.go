@@ -21,7 +21,7 @@ package base
 import (
 	"context"
 	baselogic "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/logic/base"
-	basemodel "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/base"
+	basemodel github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/model/response"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"

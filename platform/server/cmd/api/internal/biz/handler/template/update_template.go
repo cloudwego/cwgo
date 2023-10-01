@@ -21,9 +21,9 @@ package template
 import (
 	"context"
 	templatelogic "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/logic/template"
-	templatemodel "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/model/response"
+	templatemodel "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertzconsts "github.com/cloudwego/hertz/pkg/protocol/consts"
