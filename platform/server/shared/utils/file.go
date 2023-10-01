@@ -69,7 +69,7 @@ func ParseIdlURL(url string) (idlPid, owner, repoName string, err error) {
 			tempPath = tempPath[:lastQuestionMarkIndex]
 		}
 	} else {
-		return "", "", "", errors.New("idlPath format wrong,do not have prefix:\"https://github.com/\"")
+		return "", "", "", errors.New("idlPath format wrong,do not have prefix:\"https://gitlab.com/\"")
 	}
 	urlParts := strings.Split(tempPath, "/")
 	if len(urlParts) < 5 {

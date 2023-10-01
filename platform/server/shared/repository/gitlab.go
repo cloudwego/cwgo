@@ -39,7 +39,8 @@ func NewGitlabClient(token string) (*GitLabApi, error) {
 }
 
 func (gl *GitLabApi) GetFile(owner, repoName, filePid, ref string) (*File, error) {
-	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(fmt.Sprintf("%s/%s", owner, repoName), filePid, &gitlab.GetFileOptions{Ref: &ref})
+	pid := fmt.Sprintf("%s/%s", owner, repoName)
+	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(pid, filePid, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +51,7 @@ func (gl *GitLabApi) GetFile(owner, repoName, filePid, ref string) (*File, error
 		name = name[index+1:]
 	}
 
-	// 对base64编码的文件内容进行解码
+	// Decoding the content of base64 encoded files
 	decodedContent, err := base64.StdEncoding.DecodeString(fileContent.Content)
 	if err != nil {
 		return nil, err
@@ -79,4 +80,27 @@ func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoN
 	}
 
 	return nil
+}
+
+func (gl *GitLabApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
+	pid := fmt.Sprintf("%s/%s", owner, repoName)
+	archiveOptions := &gitlab.ArchiveOptions{
+		Format: &format, // Choose the archive format
+	}
+
+	fileData, _, err := gl.Client.Repositories.Archive(pid, archiveOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	return fileData, nil
+}
+
+func (gl *GitLabApi) GetLatestCommitHash(owner, repoName, filePid, ref string) (string, error) {
+	pid := fmt.Sprintf("%s/%s", owner, repoName)
+	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(pid, filePid, &gitlab.GetFileOptions{Ref: &ref})
+	if err != nil {
+		return "", err
+	}
+	return fileContent.LastCommitID, nil
 }
