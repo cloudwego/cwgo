@@ -12,7 +12,7 @@ import (
 type Template struct {
 	Id         int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
 	Name       string `thrift:"name,2" frugal:"2,default,string" json:"name"`
-	Type       int8   `thrift:"type,3" frugal:"3,default,i8" json:"type"`
+	Type       int32  `thrift:"type,3" frugal:"3,default,i32" json:"type"`
 	CreateTime string `thrift:"create_time,4" frugal:"4,default,string" json:"create_time"`
 	UpdateTime string `thrift:"update_time,5" frugal:"5,default,string" json:"update_time"`
 }
@@ -33,7 +33,7 @@ func (p *Template) GetName() (v string) {
 	return p.Name
 }
 
-func (p *Template) GetType() (v int8) {
+func (p *Template) GetType() (v int32) {
 	return p.Type
 }
 
@@ -50,7 +50,7 @@ func (p *Template) SetId(val int64) {
 func (p *Template) SetName(val string) {
 	p.Name = val
 }
-func (p *Template) SetType(val int8) {
+func (p *Template) SetType(val int32) {
 	p.Type = val
 }
 func (p *Template) SetCreateTime(val string) {
@@ -108,7 +108,7 @@ func (p *Template) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 3:
-			if fieldTypeId == thrift.BYTE {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -186,7 +186,7 @@ func (p *Template) ReadField2(iprot thrift.TProtocol) error {
 }
 
 func (p *Template) ReadField3(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadByte(); err != nil {
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		p.Type = v
@@ -292,10 +292,10 @@ WriteFieldEndError:
 }
 
 func (p *Template) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("type", thrift.BYTE, 3); err != nil {
+	if err = oprot.WriteFieldBegin("type", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteByte(p.Type); err != nil {
+	if err := oprot.WriteI32(p.Type); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -387,7 +387,7 @@ func (p *Template) Field2DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *Template) Field3DeepEqual(src int8) bool {
+func (p *Template) Field3DeepEqual(src int32) bool {
 
 	if p.Type != src {
 		return false
@@ -870,7 +870,7 @@ func (p *TemplateItem) Field6DeepEqual(src string) bool {
 
 type AddTemplateReq struct {
 	Name string `thrift:"name,1" frugal:"1,default,string" json:"name"`
-	Type int8   `thrift:"type,2" frugal:"2,default,i8" json:"type"`
+	Type int32  `thrift:"type,2" frugal:"2,default,i32" json:"type"`
 }
 
 func NewAddTemplateReq() *AddTemplateReq {
@@ -885,13 +885,13 @@ func (p *AddTemplateReq) GetName() (v string) {
 	return p.Name
 }
 
-func (p *AddTemplateReq) GetType() (v int8) {
+func (p *AddTemplateReq) GetType() (v int32) {
 	return p.Type
 }
 func (p *AddTemplateReq) SetName(val string) {
 	p.Name = val
 }
-func (p *AddTemplateReq) SetType(val int8) {
+func (p *AddTemplateReq) SetType(val int32) {
 	p.Type = val
 }
 
@@ -930,7 +930,7 @@ func (p *AddTemplateReq) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.BYTE {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -979,7 +979,7 @@ func (p *AddTemplateReq) ReadField1(iprot thrift.TProtocol) error {
 }
 
 func (p *AddTemplateReq) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadByte(); err != nil {
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		p.Type = v
@@ -1038,10 +1038,10 @@ WriteFieldEndError:
 }
 
 func (p *AddTemplateReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("type", thrift.BYTE, 2); err != nil {
+	if err = oprot.WriteFieldBegin("type", thrift.I32, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteByte(p.Type); err != nil {
+	if err := oprot.WriteI32(p.Type); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1083,7 +1083,7 @@ func (p *AddTemplateReq) Field1DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *AddTemplateReq) Field2DeepEqual(src int8) bool {
+func (p *AddTemplateReq) Field2DeepEqual(src int32) bool {
 
 	if p.Type != src {
 		return false

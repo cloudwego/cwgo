@@ -74,7 +74,7 @@ func (p *Template) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 3:
-			if fieldTypeId == thrift.BYTE {
+			if fieldTypeId == thrift.I32 {
 				l, err = p.FastReadField3(buf[offset:])
 				offset += l
 				if err != nil {
@@ -181,7 +181,7 @@ func (p *Template) FastReadField2(buf []byte) (int, error) {
 func (p *Template) FastReadField3(buf []byte) (int, error) {
 	offset := 0
 
-	if v, l, err := bthrift.Binary.ReadByte(buf[offset:]); err != nil {
+	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
@@ -275,8 +275,8 @@ func (p *Template) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter
 
 func (p *Template) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "type", thrift.BYTE, 3)
-	offset += bthrift.Binary.WriteByte(buf[offset:], p.Type)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "type", thrift.I32, 3)
+	offset += bthrift.Binary.WriteI32(buf[offset:], p.Type)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -320,8 +320,8 @@ func (p *Template) field2Length() int {
 
 func (p *Template) field3Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("type", thrift.BYTE, 3)
-	l += bthrift.Binary.ByteLength(p.Type)
+	l += bthrift.Binary.FieldBeginLength("type", thrift.I32, 3)
+	l += bthrift.Binary.I32Length(p.Type)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -752,7 +752,7 @@ func (p *AddTemplateReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.BYTE {
+			if fieldTypeId == thrift.I32 {
 				l, err = p.FastReadField2(buf[offset:])
 				offset += l
 				if err != nil {
@@ -817,7 +817,7 @@ func (p *AddTemplateReq) FastReadField1(buf []byte) (int, error) {
 func (p *AddTemplateReq) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
-	if v, l, err := bthrift.Binary.ReadByte(buf[offset:]); err != nil {
+	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
@@ -868,8 +868,8 @@ func (p *AddTemplateReq) fastWriteField1(buf []byte, binaryWriter bthrift.Binary
 
 func (p *AddTemplateReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "type", thrift.BYTE, 2)
-	offset += bthrift.Binary.WriteByte(buf[offset:], p.Type)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "type", thrift.I32, 2)
+	offset += bthrift.Binary.WriteI32(buf[offset:], p.Type)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -886,8 +886,8 @@ func (p *AddTemplateReq) field1Length() int {
 
 func (p *AddTemplateReq) field2Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("type", thrift.BYTE, 2)
-	l += bthrift.Binary.ByteLength(p.Type)
+	l += bthrift.Binary.FieldBeginLength("type", thrift.I32, 2)
+	l += bthrift.Binary.I32Length(p.Type)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l

@@ -3,7 +3,7 @@ namespace go template
 struct Template{
     1: i64 id
     2: string name
-    3: i8 type // 1: hz, 2: kitex
+    3: i32 type // 1: hz, 2: kitex
     4: string create_time
     5: string update_time
 }
@@ -19,7 +19,7 @@ struct TemplateItem{
 
 struct AddTemplateReq{
     1: string name (api.body="name,required")
-    2: i8 type (api.body="type,required")
+    2: i32 type (api.body="type,required")
 }
 struct AddTemplateRes{
     1: i32 code
