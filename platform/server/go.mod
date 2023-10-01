@@ -11,6 +11,8 @@ require (
 	github.com/go-co-op/gocron v1.32.1
 	github.com/google/go-github/v53 v53.2.0
 	github.com/hashicorp/consul/api v1.25.1
+	github.com/hertz-contrib/registry/consul v0.0.0-20230926162026-cab5b29e61c5
+	github.com/kitex-contrib/registry-consul v0.0.0-20230406075225-7d341f036654
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.3.2
 	github.com/xanzy/go-gitlab v0.90.0

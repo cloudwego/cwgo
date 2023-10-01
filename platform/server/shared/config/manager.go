@@ -100,7 +100,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 func GetManager() *Manager {
 	if manager == nil {
-		panic("Config manager.go not initialized")
+		panic("config manager not initialized")
 	}
 
 	return manager

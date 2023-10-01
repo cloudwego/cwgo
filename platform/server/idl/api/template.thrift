@@ -106,5 +106,5 @@ service TemplateService {
     AddTemplateItemRes AddTemplateItem(1: AddTemplateItemReq req) (api.post="/template/item")
     DeleteTemplateRes DeleteTemplateItem(1: DeleteTemplateItemReq req) (api.delete="/template/item")
     UpdateTemplateItemRes UpdateTemplateItem(1: UpdateTemplateItemReq req) (api.patch="/template/item")
-    GetTemplateItemsRes GetTemplateItems(1: GetTemplateItemsReq req) (api.get="/template/item")
+    GetTemplateItemsRes GetTemplateItems(1: GetTemplatesReq req) (api.get="/template/item")
 }

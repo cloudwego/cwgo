@@ -9,6 +9,8 @@ api:
 registry:
   type: consul
   consul:
+    address: ''
+    token: ''
 
 store:
   type: 'mysql'

@@ -24,7 +24,7 @@ struct LoginResData{
     1: user.UserInfo user_info;
 }
 
-service ApiService {
+service BaseService {
 
     RegisterRes Register(1: RegisterReq req) (api.post="/register")
     LoginRes Login(1: LoginReq req) (api.post="/login");

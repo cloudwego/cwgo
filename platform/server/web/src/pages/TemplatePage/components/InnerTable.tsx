@@ -28,62 +28,7 @@ export default function InnerTable() {
 		content: (
 			<div>
 				<CodeMirror
-					value={`
-path: main.go
-update_behavior:
-type: cover
-body: |-
-/*
-* Copyright (c) 2023 lanshan team. All rights reserved.
-*/
-
-package main
-
-import (
-"fmt"
-apollo "wecqupt/app/common/config"
-"wecqupt/app/common/config/model"
-"{{.ImportPath}}/{{ToLower .ServiceName}}"
-"wecqupt/app/common/logger"
-"{{.Module}}/internal/config"
-"{{.Module}}/internal/svc"
-"wecqupt/utils"
-
-"go.uber.org/zap"
-)
-
-var c config.Config
-
-func main() {
-// 初始化配置管理器
-err := apollo.InitClient(config.ServiceName)
-if err != nil {
-    panic(fmt.Sprintf("initialize Apollo Client failed, err: %v", err))
-}
-
-namespace, serviceSingleName := utils.GetServiceDetails(config.ServiceName)
-
-err = apollo.Common().UnmarshalServiceConfig(namespace, serviceSingleName, &c)
-
-// 初始化服务
-c.SetUp()
-
-// 初始化服务上下文
-svcCtx := svc.NewServiceContext(c)
-
-// 启动服务
-svr := {{ToLower .ServiceName}}.NewServer(
-    &{{.ServiceName}}Impl{
-        svcCtx: svcCtx,
-    },
-    model.KitexServerOptions...,
-)
-
-err = svr.Run()
-if err != nil {
-    logger.Logger.Error("kitex server run failed.", zap.Error(err))
-}
-}`}
+					value={`comment`}
 					height="500px"
 					theme={okaidia}
 					// extensions={[yaml()]}
@@ -100,13 +45,13 @@ if err != nil {
 				setTimeout(
 					Math.random() > 0.5
 						? () => {
-								Toast.success("添加成功！");
-								resolve(true);
-						  }
+							Toast.success("添加成功！");
+							resolve(true);
+						}
 						: () => {
-								Toast.error("Oops errors!");
-								reject(false);
-						  },
+							Toast.error("Oops errors!");
+							reject(false);
+						},
 					1000
 				);
 			}).catch(() => console.log("Oops errors!"));

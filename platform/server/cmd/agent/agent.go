@@ -37,7 +37,7 @@ func run(opts *setupOptions) error {
 		configType consts.ConfigType
 	)
 	var ok bool
-	// priority: command line > env > config > default
+	// priority: command line > env > default
 	if opts.ServerMode != "" {
 		serverMode, ok = consts.ServerModeMapToNum[opts.ServerMode]
 		if !ok {

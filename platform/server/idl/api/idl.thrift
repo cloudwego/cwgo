@@ -61,7 +61,7 @@ struct SyncIDLsByIdRes{
     2: string msg
 }
 
-service IDLService {
+service IdlService {
     AddIDLRes AddIDL(1: AddIDLReq req) (api.post="/idl")
     DeleteIDLsRes DeleteIDL(1: DeleteIDLsReq req) (api.delete="/idl")
     UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/idl")
