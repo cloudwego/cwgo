@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
 const (
@@ -41,10 +42,25 @@ func NewGetIDLsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetIDLsLo
 }
 
 func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
-	// TODO: to be filled...
+	if !utils.ValidOrder(req.Order) || !utils.ValidOrderBy(req.OrderBy) {
+		return &idl.GetIDLsRes{
+			Code: 400,
+			Msg:  "err: invalid field",
+			Data: nil,
+		}
+	}
+	idls, err := l.svcCtx.DaoManager.Idl.GetIDLs(req.Page, req.Limit, req.Order, req.OrderBy)
+	if err != nil {
+		return &idl.GetIDLsRes{
+			Code: 400,
+			Msg:  err.Error(),
+			Data: nil,
+		}
+	}
 
 	return &idl.GetIDLsRes{
 		Code: 0,
 		Msg:  successMsgGetIDLs,
+		Data: &idl.GetIDLsResData{Idls: idls},
 	}
 }

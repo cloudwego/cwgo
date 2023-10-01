@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
 const (
@@ -41,7 +42,19 @@ func NewAddTemplateItemLogic(ctx context.Context, svcCtx *svc.ServiceContext) *A
 }
 
 func (l *AddTemplateItemLogic) AddTemplateItem(req *template.AddTemplateItemReq) (res *template.AddTemplateItemRes) {
-	// TODO: to be filled...
+	if !utils.ValidStrings(req.Name, req.Content) {
+		return &template.AddTemplateItemRes{
+			Code: 400,
+			Msg:  "err: The input field contains an empty string",
+		}
+	}
+	err := l.svcCtx.DaoManager.Template.AddTemplateItem(req.TemplateId, req.Name, req.Content)
+	if err != nil {
+		return &template.AddTemplateItemRes{
+			Code: 400,
+			Msg:  err.Error(),
+		}
+	}
 
 	return &template.AddTemplateItemRes{
 		Code: 0,

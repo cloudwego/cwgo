@@ -17,3 +17,5 @@
  */
 
 package consts
+
+const ()

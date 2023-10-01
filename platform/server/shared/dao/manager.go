@@ -29,8 +29,8 @@ import (
 
 type Manager struct {
 	Idl        idl.IIdlDaoManager
-	repository repository.IRepositoryDaoManager
-	template   template.ITemplateDaoManager
+	Repository repository.IRepositoryDaoManager
+	Template   template.ITemplateDaoManager
 }
 
 func NewDaoManager() (*Manager, error) {
@@ -47,8 +47,8 @@ func NewDaoManager() (*Manager, error) {
 
 		return &Manager{
 			Idl:        idlDaoManager,
-			repository: repositoryDaoManager,
-			template:   templateDaoManager,
+			Repository: repositoryDaoManager,
+			Template:   templateDaoManager,
 		}, nil
 
 	case consts.StoreTypeMongo:

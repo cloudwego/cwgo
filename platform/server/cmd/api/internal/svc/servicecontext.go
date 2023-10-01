@@ -21,12 +21,14 @@ package svc
 import (
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"go.uber.org/zap"
 )
 
 type ServiceContext struct {
 	//RpcClientAgentService agentservice.Client
-	DaoManager *dao.Manager
+	DaoManager  *dao.Manager
+	RepoManager *repository.Manager
 }
 
 var Svc *ServiceContext
@@ -36,8 +38,13 @@ func InitServiceContext() {
 	if err != nil {
 		logger.Logger.Fatal("initialize dao manager failed", zap.Error(err))
 	}
+	repoManager, err := repository.NewRepoManager()
+	if err != nil {
+		logger.Logger.Fatal("initialize repository manager failed")
+	}
 
 	Svc = &ServiceContext{
-		DaoManager: daoManager,
+		DaoManager:  daoManager,
+		RepoManager: repoManager,
 	}
 }

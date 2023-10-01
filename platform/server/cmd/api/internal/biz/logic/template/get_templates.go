@@ -41,10 +41,18 @@ func NewGetTemplatesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetT
 }
 
 func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *template.GetTemplatesRes) {
-	// TODO: to be filled...
+	templates, err := l.svcCtx.DaoManager.Template.GetTemplates(req.Page, req.Limit, req.Order, req.OrderBy)
+	if err != nil {
+		return &template.GetTemplatesRes{
+			Code: 400,
+			Msg:  err.Error(),
+			Data: nil,
+		}
+	}
 
 	return &template.GetTemplatesRes{
 		Code: 0,
 		Msg:  successMsgGetTemplates,
+		Data: &template.GetTemplatesResData{Templates: templates},
 	}
 }

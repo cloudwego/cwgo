@@ -41,10 +41,18 @@ func NewGetRepositoriesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 }
 
 func (l *GetRepositoriesLogic) GetRepositories(req *repository.GetRepositoriesReq) (res *repository.GetRepositoriesRes) {
-	// TODO: to be filled...
+	repos, err := l.svcCtx.DaoManager.Repository.GetRepositories(req.Page, req.Limit, req.Order, req.OrderBy)
+	if err != nil {
+		return &repository.GetRepositoriesRes{
+			Code: 400,
+			Msg:  err.Error(),
+			Data: nil,
+		}
+	}
 
 	return &repository.GetRepositoriesRes{
 		Code: 0,
 		Msg:  successMsgGetRepositories,
+		Data: &repository.GetRepositoriesResData{Repositories: repos},
 	}
 }

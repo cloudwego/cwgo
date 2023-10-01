@@ -19,37 +19,22 @@
 package template
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
 )
 
 type ITemplateDaoManager interface {
-	AddTemplate(name string, _type int8) error
+	AddTemplate(name string, _type int32) error
 	DeleteTemplate(ids []int64) error
 	UpdateTemplate(id int64, name string) error
-	GetTemplates(page, limit int32, sortBy string) ([]Template, error)
+	GetTemplates(page, limit, order int32, orderBy string) ([]*template.Template, error)
 
 	AddTemplateItem(templateId int64, name, content string) error
 	DeleteTemplateItem(ids []int64) error
 	UpdateTemplateItem(id int64, name, content string) error
-	GetTemplateItems(page, limit int32, sortBy string) ([]TemplateItem, error)
-}
-
-type Template struct {
-	Id         int64
-	Name       string
-	Type       int8
-	CreateTime string
-	UpdateTime string
-}
-
-type TemplateItem struct {
-	Id         int64
-	TemplateId int64
-	Name       string
-	Content    string
-	CreateTime string
-	UpdateTime string
+	GetTemplateItems(page, limit, order int32, orderBy string) ([]*template.TemplateItem, error)
 }
 
 type MysqlTemplateManager struct {
@@ -64,9 +49,9 @@ func NewMysqlTemplate(db *gorm.DB) *MysqlTemplateManager {
 	}
 }
 
-func (r *MysqlTemplateManager) AddTemplate(name string, _type int8) error {
+func (r *MysqlTemplateManager) AddTemplate(name string, _type int32) error {
 	timeNow := utils.GetCurrentTime()
-	template := Template{
+	template := template.Template{
 		Name:       name,
 		Type:       _type,
 		CreateTime: timeNow,
@@ -81,7 +66,7 @@ func (r *MysqlTemplateManager) AddTemplate(name string, _type int8) error {
 }
 
 func (r *MysqlTemplateManager) DeleteTemplate(ids []int64) error {
-	var template Template
+	var template template.Template
 	res := r.db.Delete(&template, ids)
 	if res.Error != nil {
 		return res.Error
@@ -92,7 +77,7 @@ func (r *MysqlTemplateManager) DeleteTemplate(ids []int64) error {
 
 func (r *MysqlTemplateManager) UpdateTemplate(id int64, name string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Where("id = ?", id).Updates(Template{
+	res := r.db.Where("id = ?", id).Updates(template.Template{
 		Name:       name,
 		UpdateTime: timeNow,
 	})
@@ -103,16 +88,25 @@ func (r *MysqlTemplateManager) UpdateTemplate(id int64, name string) error {
 	return nil
 }
 
-func (r *MysqlTemplateManager) GetTemplates(page, limit int32, sortBy string) ([]Template, error) {
-	var templates []Template
+func (r *MysqlTemplateManager) GetTemplates(page, limit, order int32, orderBy string) ([]*template.Template, error) {
+	var templates []*template.Template
 	offset := (page - 1) * limit
 
 	// Default sort field to 'update_time' if not provided
-	if sortBy == "" {
-		sortBy = SortByUpdateTime
+	if orderBy == "" {
+		orderBy = consts.OrderByUpdateTime
 	}
 
-	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&templates)
+	switch order {
+	case consts.OrderNumInc:
+		orderBy = orderBy + " " + consts.Inc
+	case consts.OrderNumDec:
+		orderBy = orderBy + " " + consts.Dec
+	default:
+		orderBy = orderBy + " " + consts.Inc
+	}
+
+	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&templates)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -122,7 +116,7 @@ func (r *MysqlTemplateManager) GetTemplates(page, limit int32, sortBy string) ([
 
 func (r *MysqlTemplateManager) AddTemplateItem(templateId int64, name, content string) error {
 	timeNow := utils.GetCurrentTime()
-	templateItem := TemplateItem{
+	templateItem := template.TemplateItem{
 		TemplateId: templateId,
 		Name:       name,
 		Content:    content,
@@ -138,7 +132,7 @@ func (r *MysqlTemplateManager) AddTemplateItem(templateId int64, name, content s
 }
 
 func (r *MysqlTemplateManager) DeleteTemplateItem(ids []int64) error {
-	var template Template
+	var template template.TemplateItem
 	res := r.db.Delete(&template, ids)
 	if res.Error != nil {
 		return res.Error
@@ -149,7 +143,7 @@ func (r *MysqlTemplateManager) DeleteTemplateItem(ids []int64) error {
 
 func (r *MysqlTemplateManager) UpdateTemplateItem(id int64, name, content string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Where("id = ?", id).Updates(TemplateItem{
+	res := r.db.Where("id = ?", id).Updates(template.TemplateItem{
 		Name:       name,
 		Content:    content,
 		UpdateTime: timeNow,
@@ -161,16 +155,25 @@ func (r *MysqlTemplateManager) UpdateTemplateItem(id int64, name, content string
 	return nil
 }
 
-func (r *MysqlTemplateManager) GetTemplateItems(page, limit int32, sortBy string) ([]TemplateItem, error) {
-	var templateItems []TemplateItem
+func (r *MysqlTemplateManager) GetTemplateItems(page, limit, order int32, orderBy string) ([]*template.TemplateItem, error) {
+	var templateItems []*template.TemplateItem
 	offset := (page - 1) * limit
 
 	// Default sort field to 'update_time' if not provided
-	if sortBy == "" {
-		sortBy = SortByUpdateTime
+	if orderBy == "" {
+		orderBy = consts.OrderByUpdateTime
 	}
 
-	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&templateItems)
+	switch order {
+	case consts.OrderNumInc:
+		orderBy = orderBy + " " + consts.Inc
+	case consts.OrderNumDec:
+		orderBy = orderBy + " " + consts.Dec
+	default:
+		orderBy = orderBy + " " + consts.Inc
+	}
+
+	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&templateItems)
 	if res.Error != nil {
 		return nil, res.Error
 	}

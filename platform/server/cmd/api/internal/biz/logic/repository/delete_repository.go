@@ -41,7 +41,13 @@ func NewDeleteRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *DeleteRepositoryLogic) DeleteRepository(req *repository.DeleteRepositoriesReq) (res *repository.DeleteRepositoriesRes) {
-	// TODO: to be filled...
+	err := l.svcCtx.DaoManager.Repository.DeleteRepository(req.Ids)
+	if err != nil {
+		return &repository.DeleteRepositoriesRes{
+			Code: 400,
+			Msg:  err.Error(),
+		}
+	}
 
 	return &repository.DeleteRepositoriesRes{
 		Code: 0,

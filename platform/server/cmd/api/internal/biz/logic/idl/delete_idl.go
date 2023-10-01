@@ -41,7 +41,13 @@ func NewDeleteIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DeleteI
 }
 
 func (l *DeleteIDLLogic) DeleteIDL(req *idl.DeleteIDLsReq) (res *idl.DeleteIDLsRes) {
-	// TODO: to be filled...
+	err := l.svcCtx.DaoManager.Idl.DeleteIDLs(req.Ids)
+	if err != nil {
+		return &idl.DeleteIDLsRes{
+			Code: 400,
+			Msg:  err.Error(),
+		}
+	}
 
 	return &idl.DeleteIDLsRes{
 		Code: 0,

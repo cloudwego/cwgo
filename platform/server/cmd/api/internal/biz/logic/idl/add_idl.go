@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
 const (
@@ -41,7 +42,20 @@ func NewAddIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLLogi
 }
 
 func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
-	// TODO: to be filled...
+	if !utils.ValidStrings(req.MainIdlPath, req.ServiceName) {
+		return &idl.AddIDLRes{
+			Code: 400,
+			Msg:  "err: The input field contains an empty string",
+		}
+	}
+
+	err := l.svcCtx.DaoManager.Idl.AddIDL(req.RepositoryId, req.MainIdlPath, req.ServiceName)
+	if err != nil {
+		return &idl.AddIDLRes{
+			Code: 400,
+			Msg:  err.Error(),
+		}
+	}
 
 	return &idl.AddIDLRes{
 		Code: 0,

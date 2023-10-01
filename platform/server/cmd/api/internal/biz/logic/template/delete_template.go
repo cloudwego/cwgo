@@ -41,7 +41,13 @@ func NewDeleteTemplateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *De
 }
 
 func (l *DeleteTemplateLogic) DeleteTemplate(req *template.DeleteTemplateReq) (res *template.DeleteTemplateRes) {
-	// TODO: to be filled...
+	err := l.svcCtx.DaoManager.Template.DeleteTemplate(req.Ids)
+	if err != nil {
+		return &template.DeleteTemplateRes{
+			Code: 400,
+			Msg:  err.Error(),
+		}
+	}
 
 	return &template.DeleteTemplateRes{
 		Code: 0,

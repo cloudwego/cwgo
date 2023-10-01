@@ -41,10 +41,18 @@ func NewGetTemplateItemsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *GetTemplateItemsLogic) GetTemplateItems(req *template.GetTemplateItemsReq) (res *template.GetTemplateItemsRes) {
-	// TODO: to be filled...
+	items, err := l.svcCtx.DaoManager.Template.GetTemplateItems(req.Page, req.Limit, req.Order, req.OrderBy)
+	if err != nil {
+		return &template.GetTemplateItemsRes{
+			Code: 400,
+			Msg:  err.Error(),
+			Data: nil,
+		}
+	}
 
 	return &template.GetTemplateItemsRes{
 		Code: 0,
 		Msg:  successMsgGetTemplateItems,
+		Data: &template.GetTemplateItemsResData{TemplateItems: items},
 	}
 }

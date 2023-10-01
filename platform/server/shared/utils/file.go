@@ -60,7 +60,7 @@ func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ..
 	return nil
 }
 
-func ParseIdlURL(url string) (idlPid, owner, repoName string, err error) {
+func ParseGitlabIdlURL(url string) (idlPid, owner, repoName string, err error) {
 	var tempPath string
 	if strings.HasPrefix(url, GitlabURLPrefix) {
 		tempPath = url[len(GitlabURLPrefix):]

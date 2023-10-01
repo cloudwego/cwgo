@@ -19,6 +19,8 @@
 package idl
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
 )
@@ -27,18 +29,9 @@ type IIdlDaoManager interface {
 	AddIDL(repoId int64, idlPath, serviceName string) error
 	DeleteIDLs(ids []int64) error
 	UpdateIDL(id, repoId int64, idlPath, serviceName string) error
-	GetIDLs(page, limit int32, sortBy string) ([]IDL, error)
-}
-
-type IDL struct {
-	Id           int64
-	RepositoryId int64
-	MainIdlPath  string
-	Content      string
-	ServiceName  string
-	LastSyncTime string
-	CreateTime   string
-	UpdateTime   string
+	GetIDL(id int64) (idl.IDL, error)
+	GetIDLs(page, limit, order int32, orderBy string) ([]*idl.IDL, error)
+	SyncIDLContent(id int64, content string) error
 }
 
 type MysqlIDLManager struct {
@@ -55,7 +48,7 @@ func NewMysqlIDL(db *gorm.DB) *MysqlIDLManager {
 
 func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) error {
 	timeNow := utils.GetCurrentTime()
-	idl := IDL{
+	idl := idl.IDL{
 		RepositoryId: repoId,
 		MainIdlPath:  idlPath,
 		ServiceName:  serviceName,
@@ -72,7 +65,7 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) erro
 }
 
 func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
-	var idl IDL
+	var idl idl.IDL
 	res := r.db.Delete(&idl, ids)
 	if res.Error != nil {
 		return res.Error
@@ -83,7 +76,7 @@ func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
 
 func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Where("id = ?", id).Updates(IDL{
+	res := r.db.Where("id = ?", id).Updates(idl.IDL{
 		Id:           id,
 		RepositoryId: repoId,
 		MainIdlPath:  idlPath,
@@ -97,19 +90,52 @@ func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName strin
 	return nil
 }
 
-func (r *MysqlIDLManager) GetIDLs(page, limit int32, sortBy string) ([]IDL, error) {
-	var IDLs []IDL
+func (r *MysqlIDLManager) GetIDL(id int64) (idl.IDL, error) {
+	var idl idl.IDL
+	res := r.db.Where("id = ?", id).First(&idl)
+	if res.Error != nil {
+		return idl, res.Error
+	}
+
+	return idl, nil
+}
+
+func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*idl.IDL, error) {
+	var IDLs []*idl.IDL
 	offset := (page - 1) * limit
 
 	// Default sort field to 'update_time' if not provided
-	if sortBy == "" {
-		sortBy = SortByUpdateTime
+	if orderBy == "" {
+		orderBy = consts.OrderByUpdateTime
 	}
 
-	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&IDLs)
+	switch order {
+	case consts.OrderNumInc:
+		orderBy = orderBy + " " + consts.Inc
+	case consts.OrderNumDec:
+		orderBy = orderBy + " " + consts.Dec
+	default:
+		orderBy = orderBy + " " + consts.Inc
+	}
+
+	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&IDLs)
 	if res.Error != nil {
 		return nil, res.Error
 	}
 
 	return IDLs, nil
+}
+
+func (r *MysqlIDLManager) SyncIDLContent(id int64, content string) error {
+	timeNow := utils.GetCurrentTime()
+	res := r.db.Where("id = ?", id).Updates(idl.IDL{
+		Content:      content,
+		LastSyncTime: timeNow,
+		UpdateTime:   timeNow,
+	})
+	if res.Error != nil {
+		return res.Error
+	}
+
+	return nil
 }

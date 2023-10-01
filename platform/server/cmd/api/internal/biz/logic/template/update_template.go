@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
 const (
@@ -41,7 +42,20 @@ func NewUpdateTemplateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Up
 }
 
 func (l *UpdateTemplateLogic) UpdateTemplate(req *template.UpdateTemplateReq) (res *template.UpdateTemplateRes) {
-	// TODO: to be filled...
+	if !utils.ValidStrings(req.Name) {
+		return &template.UpdateTemplateRes{
+			Code: 400,
+			Msg:  "err: The input field contains an empty string",
+		}
+	}
+
+	err := l.svcCtx.DaoManager.Template.UpdateTemplate(req.Id, req.Name)
+	if err != nil {
+		return &template.UpdateTemplateRes{
+			Code: 400,
+			Msg:  err.Error(),
+		}
+	}
 
 	return &template.UpdateTemplateRes{
 		Code: 0,

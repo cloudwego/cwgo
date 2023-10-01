@@ -20,25 +20,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v53/github"
-	"golang.org/x/oauth2"
 	"io/ioutil"
 	"net/http"
 )
 
 type GitHubApi struct {
 	Client *github.Client
-}
-
-func NewGithubClient(token string) *GitHubApi {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
-	return &GitHubApi{
-		Client: github.NewClient(tc),
-	}
 }
 
 func (g *GitHubApi) GetFile(owner, repoName, filePid, ref string) (*File, error) {

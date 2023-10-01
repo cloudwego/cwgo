@@ -20,16 +20,23 @@ package svc
 
 import (
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/thriftgo/config"
 )
 
 type ServiceContext struct {
 	// TODO: add service context...
-	DaoManager *dao.Manager
+	DaoManager  *dao.Manager
+	RepoManager *repository.Manager
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	// TODO: add service initialization...
+	repoManager, err := repository.NewRepoManager()
+	if err != nil {
+		logger.Logger.Fatal("service initialize repository manager failed")
+	}
 
 	return &ServiceContext{
 		//Config: c,
@@ -37,5 +44,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		//	c.RpcClients[common.ServiceIdRpcTokenStore].Name,
 		//	model.RpcClientOptions[common.ServiceIdRpcTokenStore]...,
 		//),
+		RepoManager: repoManager,
 	}
 }

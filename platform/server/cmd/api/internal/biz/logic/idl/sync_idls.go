@@ -21,7 +21,9 @@ package idl
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
 const (
@@ -41,7 +43,40 @@ func NewSyncIDLsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SyncIDLs
 }
 
 func (l *SyncIDLsLogic) SyncIDLs(req *idl.SyncIDLsByIdReq) (res *idl.SyncIDLsByIdRes) {
-	// TODO: to be filled...
+	for _, v := range req.Ids {
+		Idl, err := l.svcCtx.DaoManager.Idl.GetIDL(v)
+		if err != nil {
+			return &idl.SyncIDLsByIdRes{
+				Code: 400,
+				Msg:  err.Error(),
+			}
+		}
+
+		repoType, err := l.svcCtx.DaoManager.Repository.GetRepoTypeByID(Idl.RepositoryId)
+		if err != nil {
+			return &idl.SyncIDLsByIdRes{
+				Code: 400,
+				Msg:  err.Error(),
+			}
+		}
+
+		switch repoType {
+		case consts.GitLab:
+			ref := consts.MainRef
+			owner, repoName, idlPid, err := utils.ParseGitlabIdlURL(Idl.MainIdlPath)
+			if err != nil {
+				return &idl.SyncIDLsByIdRes{
+					Code: 400,
+					Msg:  err.Error(),
+				}
+			}
+			file, err := l.svcCtx.RepoManager.Gitlab.GetFile(owner, repoName, idlPid, ref)
+			err = l.svcCtx.DaoManager.Idl.SyncIDLContent(Idl.Id, string(file.Content))
+			if err != nil {
+				return nil
+			}
+		}
+	}
 
 	return &idl.SyncIDLsByIdRes{
 		Code: 0,

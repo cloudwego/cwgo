@@ -19,30 +19,21 @@
 package repository
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
 )
 
 type IRepositoryDaoManager interface {
 	GetTokenByID(id int64) (string, error)
-	GetRepoTypeByID(id int64) (int8, error)
+	GetRepoTypeByID(id int64) (int32, error)
+	GetRepository(id int64) (*repository.Repository, error)
 
-	AddRepository(repoURL, token, status string, repoType int8) error
-	DeleteRepository(ids string) error
+	AddRepository(repoURL, token, status string, repoType int32) error
+	DeleteRepository(ids []string) error
 	UpdateRepository(id, token string) error
-	GetRepositories(page, limit int32, sortBy string) ([]Repository, error)
-}
-
-type Repository struct {
-	Id             int64
-	RepositoryUrl  string
-	Token          string
-	Status         string
-	LastUpdateTime string
-	LastSyncTime   string
-	CreateTime     string
-	UpdateTime     string
-	RepoType       int8
+	GetRepositories(page, limit, order int32, orderBy string) ([]*repository.Repository, error)
 }
 
 type MysqlRepositoryManager struct {
@@ -58,7 +49,7 @@ func NewMysqlRepository(db *gorm.DB) *MysqlRepositoryManager {
 }
 
 func (r *MysqlRepositoryManager) GetTokenByID(id int64) (string, error) {
-	var repo Repository
+	var repo repository.Repository
 	result := r.db.Model(&repo).Where("id = ?", id).Take(&repo)
 	if result.Error != nil {
 		return "", result.Error
@@ -67,8 +58,8 @@ func (r *MysqlRepositoryManager) GetTokenByID(id int64) (string, error) {
 	return repo.Token, nil
 }
 
-func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int8, error) {
-	var repo Repository
+func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int32, error) {
+	var repo repository.Repository
 	result := r.db.Model(&repo).Where("id = ?", id).Take(&repo)
 	if result.Error != nil {
 		return 0, result.Error
@@ -77,9 +68,20 @@ func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int8, error) {
 	return repo.RepoType, nil
 }
 
-func (r *MysqlRepositoryManager) AddRepository(repoURL, token, status string, repoType int8) error {
+func (r *MysqlRepositoryManager) GetRepository(id int64) (*repository.Repository, error) {
+	var repo *repository.Repository
+
+	result := r.db.Where("id = ?", id).Find(&repo)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return repo, nil
+}
+
+func (r *MysqlRepositoryManager) AddRepository(repoURL, token, status string, repoType int32) error {
 	timeNow := utils.GetCurrentTime()
-	repo := Repository{
+	repo := repository.Repository{
 		RepositoryUrl:  repoURL,
 		Token:          token,
 		Status:         status,
@@ -97,8 +99,8 @@ func (r *MysqlRepositoryManager) AddRepository(repoURL, token, status string, re
 	return nil
 }
 
-func (r *MysqlRepositoryManager) DeleteRepository(ids string) error {
-	var repo Repository
+func (r *MysqlRepositoryManager) DeleteRepository(ids []string) error {
+	var repo repository.Repository
 	result := r.db.Delete(&repo, ids)
 	if result.Error != nil {
 		return result.Error
@@ -109,7 +111,7 @@ func (r *MysqlRepositoryManager) DeleteRepository(ids string) error {
 
 func (r *MysqlRepositoryManager) UpdateRepository(id, token string) error {
 	timeNow := utils.GetCurrentTime()
-	result := r.db.Model(&Repository{}).Where("id = ?", id).Updates(Repository{
+	result := r.db.Model(&repository.Repository{}).Where("id = ?", id).Updates(repository.Repository{
 		Token:      token,
 		UpdateTime: timeNow,
 	})
@@ -120,16 +122,25 @@ func (r *MysqlRepositoryManager) UpdateRepository(id, token string) error {
 	return nil
 }
 
-func (r *MysqlRepositoryManager) GetRepositories(page, limit int32, sortBy string) ([]Repository, error) {
-	var repos []Repository
+func (r *MysqlRepositoryManager) GetRepositories(page, limit, order int32, orderBy string) ([]*repository.Repository, error) {
+	var repos []*repository.Repository
 
 	// Default sort field to 'update_time' if not provided
-	if sortBy == "" {
-		sortBy = SortByUpdateTime
+	if orderBy == "" {
+		orderBy = consts.OrderByUpdateTime
+	}
+
+	switch order {
+	case consts.OrderNumInc:
+		orderBy = orderBy + " " + consts.Inc
+	case consts.OrderNumDec:
+		orderBy = orderBy + " " + consts.Dec
+	default:
+		orderBy = orderBy + " " + consts.Inc
 	}
 
 	offset := (page - 1) * limit
-	result := r.db.Offset(int(offset)).Limit(int(limit)).Order(sortBy).Find(&repos)
+	result := r.db.Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&repos)
 	if result.Error != nil {
 		return nil, result.Error
 	}
