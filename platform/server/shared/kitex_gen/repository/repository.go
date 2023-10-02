@@ -10,7 +10,7 @@ import (
 )
 
 type Repository struct {
-	Id             string `thrift:"id,1" frugal:"1,default,string" json:"id"`
+	Id             int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
 	RepositoryUrl  string `thrift:"repository_url,2" frugal:"2,default,string" json:"repository_url"`
 	Type           int32  `thrift:"type,3" frugal:"3,default,i32" json:"type"`
 	Token          string `thrift:"token,4" frugal:"4,default,string" json:"token"`
@@ -30,7 +30,7 @@ func (p *Repository) InitDefault() {
 	*p = Repository{}
 }
 
-func (p *Repository) GetId() (v string) {
+func (p *Repository) GetId() (v int64) {
 	return p.Id
 }
 
@@ -69,7 +69,7 @@ func (p *Repository) GetUpdateTime() (v string) {
 func (p *Repository) GetRepoType() (v int32) {
 	return p.RepoType
 }
-func (p *Repository) SetId(val string) {
+func (p *Repository) SetId(val int64) {
 	p.Id = val
 }
 func (p *Repository) SetRepositoryUrl(val string) {
@@ -133,7 +133,7 @@ func (p *Repository) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -263,7 +263,7 @@ ReadStructEndError:
 }
 
 func (p *Repository) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
 		p.Id = v
@@ -418,10 +418,10 @@ WriteStructEndError:
 }
 
 func (p *Repository) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("id", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Id); err != nil {
+	if err := oprot.WriteI64(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -633,9 +633,9 @@ func (p *Repository) DeepEqual(ano *Repository) bool {
 	return true
 }
 
-func (p *Repository) Field1DeepEqual(src string) bool {
+func (p *Repository) Field1DeepEqual(src int64) bool {
 
-	if strings.Compare(p.Id, src) != 0 {
+	if p.Id != src {
 		return false
 	}
 	return true

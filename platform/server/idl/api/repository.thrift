@@ -1,7 +1,7 @@
 namespace go repository
 
 struct Repository{
-    1: string id
+    1: i64 id
     2: string repository_url
     3: i32 type
     4: string token
