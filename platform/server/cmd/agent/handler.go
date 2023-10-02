@@ -37,3 +37,24 @@ func (s *AgentServiceImpl) GenerateCode(ctx context.Context, req *agent.Generate
 
 	return resp, err
 }
+
+// SyncRepositoryById implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq) (resp *agent.SyncRepositoryByIdRes, err error) {
+	resp, err = service.NewSyncRepositoryByIdService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// UpdateRepositoryStatus implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq) (resp *agent.UpdateRepositoryStatusRes, err error) {
+	resp, err = service.NewUpdateRepositoryStatusService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// SyncIDLsById implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq) (resp *agent.SyncIDLsByIdRes, err error) {
+	resp, err = service.NewSyncIDLsByIdService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
