@@ -8,6 +8,24 @@ struct GenerateCodeRes{
     2: string msg
 }
 
+struct SyncRepositoryByIdReq{
+    1: list<i64> ids
+}
+struct SyncRepositoryByIdRes{
+    1: i32 code
+    2: string msg
+}
+
+struct UpdateRepositoryStatusReq{
+    1: string status
+}
+struct UpdateRepositoryStatusRes{
+    1: i32 code
+    2: string msg
+}
+
 service AgentService {
-    GenerateCodeRes GenerateCode(1: GenerateCodeReq req) (api.post="/")
+    GenerateCodeRes GenerateCode(1: GenerateCodeReq req)
+    SyncRepositoryByIdRes SyncRepositoryById(1: SyncRepositoryByIdReq req)
+    UpdateRepositoryStatusRes UpdateRepositoryStatus(1: UpdateRepositoryStatusReq req)
 }

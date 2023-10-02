@@ -4,8 +4,7 @@ package agentservice
 
 import (
 	"context"
-
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
 )
@@ -13,6 +12,8 @@ import (
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
 	GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error)
+	SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error)
+	UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -47,4 +48,14 @@ type kAgentServiceClient struct {
 func (p *kAgentServiceClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GenerateCode(ctx, req)
+}
+
+func (p *kAgentServiceClient) SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.SyncRepositoryById(ctx, req)
+}
+
+func (p *kAgentServiceClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateRepositoryStatus(ctx, req)
 }

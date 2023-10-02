@@ -4,8 +4,7 @@ package agentservice
 
 import (
 	"context"
-
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
 )
@@ -20,7 +19,9 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "AgentService"
 	handlerType := (*agent.AgentService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"GenerateCode": kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
+		"GenerateCode":           kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
+		"SyncRepositoryById":     kitex.NewMethodInfo(syncRepositoryByIdHandler, newAgentServiceSyncRepositoryByIdArgs, newAgentServiceSyncRepositoryByIdResult, false),
+		"UpdateRepositoryStatus": kitex.NewMethodInfo(updateRepositoryStatusHandler, newAgentServiceUpdateRepositoryStatusArgs, newAgentServiceUpdateRepositoryStatusResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "agent",
@@ -54,6 +55,42 @@ func newAgentServiceGenerateCodeResult() interface{} {
 	return agent.NewAgentServiceGenerateCodeResult()
 }
 
+func syncRepositoryByIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceSyncRepositoryByIdArgs)
+	realResult := result.(*agent.AgentServiceSyncRepositoryByIdResult)
+	success, err := handler.(agent.AgentService).SyncRepositoryById(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceSyncRepositoryByIdArgs() interface{} {
+	return agent.NewAgentServiceSyncRepositoryByIdArgs()
+}
+
+func newAgentServiceSyncRepositoryByIdResult() interface{} {
+	return agent.NewAgentServiceSyncRepositoryByIdResult()
+}
+
+func updateRepositoryStatusHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceUpdateRepositoryStatusArgs)
+	realResult := result.(*agent.AgentServiceUpdateRepositoryStatusResult)
+	success, err := handler.(agent.AgentService).UpdateRepositoryStatus(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceUpdateRepositoryStatusArgs() interface{} {
+	return agent.NewAgentServiceUpdateRepositoryStatusArgs()
+}
+
+func newAgentServiceUpdateRepositoryStatusResult() interface{} {
+	return agent.NewAgentServiceUpdateRepositoryStatusResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -69,6 +106,26 @@ func (p *kClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq) 
 	_args.Req = req
 	var _result agent.AgentServiceGenerateCodeResult
 	if err = p.c.Call(ctx, "GenerateCode", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq) (r *agent.SyncRepositoryByIdRes, err error) {
+	var _args agent.AgentServiceSyncRepositoryByIdArgs
+	_args.Req = req
+	var _result agent.AgentServiceSyncRepositoryByIdResult
+	if err = p.c.Call(ctx, "SyncRepositoryById", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq) (r *agent.UpdateRepositoryStatusRes, err error) {
+	var _args agent.AgentServiceUpdateRepositoryStatusArgs
+	_args.Req = req
+	var _result agent.AgentServiceUpdateRepositoryStatusResult
+	if err = p.c.Call(ctx, "UpdateRepositoryStatus", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
