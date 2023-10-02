@@ -17,7 +17,8 @@ struct SyncRepositoryByIdRes{
 }
 
 struct UpdateRepositoryStatusReq{
-    1: string status
+    1: i64 id
+    2: string status
 }
 struct UpdateRepositoryStatusRes{
     1: i32 code

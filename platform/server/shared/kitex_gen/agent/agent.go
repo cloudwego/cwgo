@@ -811,7 +811,8 @@ func (p *SyncRepositoryByIdRes) Field2DeepEqual(src string) bool {
 }
 
 type UpdateRepositoryStatusReq struct {
-	Status string `thrift:"status,1" frugal:"1,default,string" json:"status"`
+	Id     int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+	Status string `thrift:"status,2" frugal:"2,default,string" json:"status"`
 }
 
 func NewUpdateRepositoryStatusReq() *UpdateRepositoryStatusReq {
@@ -822,15 +823,23 @@ func (p *UpdateRepositoryStatusReq) InitDefault() {
 	*p = UpdateRepositoryStatusReq{}
 }
 
+func (p *UpdateRepositoryStatusReq) GetId() (v int64) {
+	return p.Id
+}
+
 func (p *UpdateRepositoryStatusReq) GetStatus() (v string) {
 	return p.Status
+}
+func (p *UpdateRepositoryStatusReq) SetId(val int64) {
+	p.Id = val
 }
 func (p *UpdateRepositoryStatusReq) SetStatus(val string) {
 	p.Status = val
 }
 
 var fieldIDToName_UpdateRepositoryStatusReq = map[int16]string{
-	1: "status",
+	1: "id",
+	2: "status",
 }
 
 func (p *UpdateRepositoryStatusReq) Read(iprot thrift.TProtocol) (err error) {
@@ -853,8 +862,18 @@ func (p *UpdateRepositoryStatusReq) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -893,6 +912,15 @@ ReadStructEndError:
 }
 
 func (p *UpdateRepositoryStatusReq) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.Id = v
+	}
+	return nil
+}
+
+func (p *UpdateRepositoryStatusReq) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -909,6 +937,10 @@ func (p *UpdateRepositoryStatusReq) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -931,10 +963,10 @@ WriteStructEndError:
 }
 
 func (p *UpdateRepositoryStatusReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Status); err != nil {
+	if err := oprot.WriteI64(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -945,6 +977,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *UpdateRepositoryStatusReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("status", thrift.STRING, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Status); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *UpdateRepositoryStatusReq) String() string {
@@ -960,13 +1009,23 @@ func (p *UpdateRepositoryStatusReq) DeepEqual(ano *UpdateRepositoryStatusReq) bo
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.Status) {
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Status) {
 		return false
 	}
 	return true
 }
 
-func (p *UpdateRepositoryStatusReq) Field1DeepEqual(src string) bool {
+func (p *UpdateRepositoryStatusReq) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateRepositoryStatusReq) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.Status, src) != 0 {
 		return false
