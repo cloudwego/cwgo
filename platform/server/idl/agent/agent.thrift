@@ -24,8 +24,17 @@ struct UpdateRepositoryStatusRes{
     2: string msg
 }
 
+struct SyncIDLsByIdReq{
+    1: list<i64> ids (api.body="ids,required")
+}
+struct SyncIDLsByIdRes{
+    1: i32 code
+    2: string msg
+}
+
 service AgentService {
     GenerateCodeRes GenerateCode(1: GenerateCodeReq req)
     SyncRepositoryByIdRes SyncRepositoryById(1: SyncRepositoryByIdReq req)
     UpdateRepositoryStatusRes UpdateRepositoryStatus(1: UpdateRepositoryStatusReq req)
+    SyncIDLsByIdRes SyncIDLsById(1: SyncIDLsByIdReq req)
 }

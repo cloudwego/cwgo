@@ -22,6 +22,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"GenerateCode":           kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
 		"SyncRepositoryById":     kitex.NewMethodInfo(syncRepositoryByIdHandler, newAgentServiceSyncRepositoryByIdArgs, newAgentServiceSyncRepositoryByIdResult, false),
 		"UpdateRepositoryStatus": kitex.NewMethodInfo(updateRepositoryStatusHandler, newAgentServiceUpdateRepositoryStatusArgs, newAgentServiceUpdateRepositoryStatusResult, false),
+		"SyncIDLsById":           kitex.NewMethodInfo(syncIDLsByIdHandler, newAgentServiceSyncIDLsByIdArgs, newAgentServiceSyncIDLsByIdResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "agent",
@@ -91,6 +92,24 @@ func newAgentServiceUpdateRepositoryStatusResult() interface{} {
 	return agent.NewAgentServiceUpdateRepositoryStatusResult()
 }
 
+func syncIDLsByIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceSyncIDLsByIdArgs)
+	realResult := result.(*agent.AgentServiceSyncIDLsByIdResult)
+	success, err := handler.(agent.AgentService).SyncIDLsById(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceSyncIDLsByIdArgs() interface{} {
+	return agent.NewAgentServiceSyncIDLsByIdArgs()
+}
+
+func newAgentServiceSyncIDLsByIdResult() interface{} {
+	return agent.NewAgentServiceSyncIDLsByIdResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -126,6 +145,16 @@ func (p *kClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateR
 	_args.Req = req
 	var _result agent.AgentServiceUpdateRepositoryStatusResult
 	if err = p.c.Call(ctx, "UpdateRepositoryStatus", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq) (r *agent.SyncIDLsByIdRes, err error) {
+	var _args agent.AgentServiceSyncIDLsByIdArgs
+	_args.Req = req
+	var _result agent.AgentServiceSyncIDLsByIdResult
+	if err = p.c.Call(ctx, "SyncIDLsById", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
