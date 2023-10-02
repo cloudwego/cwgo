@@ -1375,6 +1375,20 @@ func (p *UpdateRepositoryReq) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -1438,6 +1452,20 @@ func (p *UpdateRepositoryReq) FastReadField2(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *UpdateRepositoryReq) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.Status = v
+
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *UpdateRepositoryReq) FastWrite(buf []byte) int {
 	return 0
@@ -1449,6 +1477,7 @@ func (p *UpdateRepositoryReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.B
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
+		offset += p.fastWriteField3(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -1461,6 +1490,7 @@ func (p *UpdateRepositoryReq) BLength() int {
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
+		l += p.field3Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -1485,6 +1515,15 @@ func (p *UpdateRepositoryReq) fastWriteField2(buf []byte, binaryWriter bthrift.B
 	return offset
 }
 
+func (p *UpdateRepositoryReq) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "status", thrift.STRING, 3)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Status)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
 func (p *UpdateRepositoryReq) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("id", thrift.STRING, 1)
@@ -1498,6 +1537,15 @@ func (p *UpdateRepositoryReq) field2Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("token", thrift.STRING, 2)
 	l += bthrift.Binary.StringLengthNocopy(p.Token)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *UpdateRepositoryReq) field3Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("status", thrift.STRING, 3)
+	l += bthrift.Binary.StringLengthNocopy(p.Status)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l

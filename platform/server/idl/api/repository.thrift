@@ -34,6 +34,7 @@ struct DeleteRepositoriesRes{
 struct UpdateRepositoryReq{
     1: string id
     2: string token (api.body="token")
+    3: string status (api.body="status")
 }
 struct UpdateRepositoryRes{
     1: i32 code
