@@ -20,6 +20,7 @@ package registry
 
 import (
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	kitexregistry "github.com/cloudwego/kitex/pkg/registry"
@@ -52,6 +53,7 @@ func (c ConsulRegistryConfig) GetConsulApiConfig() *consulapi.Config {
 }
 
 type ConsulRegistryConfigManager struct {
+	RegistryType    consts.RegistryType
 	consulApiConfig *consulapi.Config
 	consulClient    *consulapi.Client
 	consulResolver  discovery.Resolver
@@ -85,10 +87,15 @@ func NewConsulRegistryConfigManager(config ConsulRegistryConfig) (*ConsulRegistr
 	}
 
 	return &ConsulRegistryConfigManager{
+		RegistryType:    consts.RegistryTypeNumConsul,
 		consulApiConfig: consulApiConfig,
 		consulClient:    consulClient,
 		consulResolver:  consulResolver,
 	}, nil
+}
+
+func (cm *ConsulRegistryConfigManager) GetRegistryType() consts.RegistryType {
+	return cm.RegistryType
 }
 
 func (cm *ConsulRegistryConfigManager) GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info) {
@@ -126,7 +133,7 @@ func (cm *ConsulRegistryConfigManager) GetKitexRegistry(serviceName, serviceId, 
 		}),
 	)
 	if err != nil {
-		panic(fmt.Sprintf("initialize consul registry failed, err: %v", err))
+		panic(fmt.Sprintf("initialize consul BuiltinRegistry failed, err: %v", err))
 	}
 
 	registryInfo := &kitexregistry.Info{

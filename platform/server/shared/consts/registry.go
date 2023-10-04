@@ -18,7 +18,19 @@
 
 package consts
 
+type RegistryType uint32
+
 const (
+	RegistryTypeNumBuiltin RegistryType = iota + 1
+	RegistryTypeNumConsul
+
 	RegistryTypeBuiltin = "builtin"
 	RegistryTypeConsul  = "consul"
+)
+
+var (
+	RegistryTypeMapToNum = map[string]RegistryType{
+		RegistryTypeBuiltin: RegistryTypeNumBuiltin,
+		RegistryTypeConsul:  RegistryTypeNumConsul,
+	}
 )

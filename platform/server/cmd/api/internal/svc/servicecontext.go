@@ -19,15 +19,18 @@
 package svc
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"go.uber.org/zap"
 )
 
 type ServiceContext struct {
-	DaoManager  *dao.Manager
-	RepoManager *repository.Manager
+	DaoManager      *dao.Manager
+	RepoManager     *repository.Manager
+	BuiltinRegistry *registry.BuiltinRegistry
 }
 
 var Svc *ServiceContext
@@ -43,7 +46,8 @@ func InitServiceContext() {
 	}
 
 	Svc = &ServiceContext{
-		DaoManager:  daoManager,
-		RepoManager: repoManager,
+		DaoManager:      daoManager,
+		RepoManager:     repoManager,
+		BuiltinRegistry: config.GetManager().ApiConfigManager.BuiltinRegistry,
 	}
 }

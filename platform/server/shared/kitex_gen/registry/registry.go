@@ -396,30 +396,30 @@ func (p *RegisterRes) Field2DeepEqual(src string) bool {
 	return true
 }
 
-type UnregisterReq struct {
+type DeregisterReq struct {
 	ServiceId string `thrift:"service_id,1" frugal:"1,default,string" json:"service_id"`
 }
 
-func NewUnregisterReq() *UnregisterReq {
-	return &UnregisterReq{}
+func NewDeregisterReq() *DeregisterReq {
+	return &DeregisterReq{}
 }
 
-func (p *UnregisterReq) InitDefault() {
-	*p = UnregisterReq{}
+func (p *DeregisterReq) InitDefault() {
+	*p = DeregisterReq{}
 }
 
-func (p *UnregisterReq) GetServiceId() (v string) {
+func (p *DeregisterReq) GetServiceId() (v string) {
 	return p.ServiceId
 }
-func (p *UnregisterReq) SetServiceId(val string) {
+func (p *DeregisterReq) SetServiceId(val string) {
 	p.ServiceId = val
 }
 
-var fieldIDToName_UnregisterReq = map[int16]string{
+var fieldIDToName_DeregisterReq = map[int16]string{
 	1: "service_id",
 }
 
-func (p *UnregisterReq) Read(iprot thrift.TProtocol) (err error) {
+func (p *DeregisterReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -468,7 +468,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UnregisterReq[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_DeregisterReq[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -478,7 +478,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UnregisterReq) ReadField1(iprot thrift.TProtocol) error {
+func (p *DeregisterReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -487,9 +487,9 @@ func (p *UnregisterReq) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UnregisterReq) Write(oprot thrift.TProtocol) (err error) {
+func (p *DeregisterReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("UnregisterReq"); err != nil {
+	if err = oprot.WriteStructBegin("DeregisterReq"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -516,7 +516,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *UnregisterReq) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *DeregisterReq) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("service_id", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -533,14 +533,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *UnregisterReq) String() string {
+func (p *DeregisterReq) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UnregisterReq(%+v)", *p)
+	return fmt.Sprintf("DeregisterReq(%+v)", *p)
 }
 
-func (p *UnregisterReq) DeepEqual(ano *UnregisterReq) bool {
+func (p *DeregisterReq) DeepEqual(ano *DeregisterReq) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -552,7 +552,7 @@ func (p *UnregisterReq) DeepEqual(ano *UnregisterReq) bool {
 	return true
 }
 
-func (p *UnregisterReq) Field1DeepEqual(src string) bool {
+func (p *DeregisterReq) Field1DeepEqual(src string) bool {
 
 	if strings.Compare(p.ServiceId, src) != 0 {
 		return false
@@ -560,39 +560,39 @@ func (p *UnregisterReq) Field1DeepEqual(src string) bool {
 	return true
 }
 
-type UnRegisterRes struct {
+type DeRegisterRes struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewUnRegisterRes() *UnRegisterRes {
-	return &UnRegisterRes{}
+func NewDeRegisterRes() *DeRegisterRes {
+	return &DeRegisterRes{}
 }
 
-func (p *UnRegisterRes) InitDefault() {
-	*p = UnRegisterRes{}
+func (p *DeRegisterRes) InitDefault() {
+	*p = DeRegisterRes{}
 }
 
-func (p *UnRegisterRes) GetCode() (v int32) {
+func (p *DeRegisterRes) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *UnRegisterRes) GetMsg() (v string) {
+func (p *DeRegisterRes) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *UnRegisterRes) SetCode(val int32) {
+func (p *DeRegisterRes) SetCode(val int32) {
 	p.Code = val
 }
-func (p *UnRegisterRes) SetMsg(val string) {
+func (p *DeRegisterRes) SetMsg(val string) {
 	p.Msg = val
 }
 
-var fieldIDToName_UnRegisterRes = map[int16]string{
+var fieldIDToName_DeRegisterRes = map[int16]string{
 	1: "code",
 	2: "msg",
 }
 
-func (p *UnRegisterRes) Read(iprot thrift.TProtocol) (err error) {
+func (p *DeRegisterRes) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -651,7 +651,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UnRegisterRes[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_DeRegisterRes[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -661,7 +661,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UnRegisterRes) ReadField1(iprot thrift.TProtocol) error {
+func (p *DeRegisterRes) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -670,7 +670,7 @@ func (p *UnRegisterRes) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UnRegisterRes) ReadField2(iprot thrift.TProtocol) error {
+func (p *DeRegisterRes) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -679,9 +679,9 @@ func (p *UnRegisterRes) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UnRegisterRes) Write(oprot thrift.TProtocol) (err error) {
+func (p *DeRegisterRes) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("UnRegisterRes"); err != nil {
+	if err = oprot.WriteStructBegin("DeRegisterRes"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -712,7 +712,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *UnRegisterRes) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *DeRegisterRes) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("code", thrift.I32, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -729,7 +729,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *UnRegisterRes) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *DeRegisterRes) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("msg", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -746,14 +746,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *UnRegisterRes) String() string {
+func (p *DeRegisterRes) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UnRegisterRes(%+v)", *p)
+	return fmt.Sprintf("DeRegisterRes(%+v)", *p)
 }
 
-func (p *UnRegisterRes) DeepEqual(ano *UnRegisterRes) bool {
+func (p *DeRegisterRes) DeepEqual(ano *DeRegisterRes) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -768,14 +768,14 @@ func (p *UnRegisterRes) DeepEqual(ano *UnRegisterRes) bool {
 	return true
 }
 
-func (p *UnRegisterRes) Field1DeepEqual(src int32) bool {
+func (p *DeRegisterRes) Field1DeepEqual(src int32) bool {
 
 	if p.Code != src {
 		return false
 	}
 	return true
 }
-func (p *UnRegisterRes) Field2DeepEqual(src string) bool {
+func (p *DeRegisterRes) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.Msg, src) != 0 {
 		return false
@@ -1173,7 +1173,7 @@ func (p *UpdateRes) Field2DeepEqual(src string) bool {
 type RegistryService interface {
 	Register(ctx context.Context, req *RegisterReq) (r *RegisterRes, err error)
 
-	Unregister(ctx context.Context, req *UnregisterReq) (r *UnRegisterRes, err error)
+	Deregister(ctx context.Context, req *DeregisterReq) (r *DeRegisterRes, err error)
 
 	Update(ctx context.Context, req *UpdateReq) (r *UpdateRes, err error)
 }
@@ -1213,11 +1213,11 @@ func (p *RegistryServiceClient) Register(ctx context.Context, req *RegisterReq) 
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *RegistryServiceClient) Unregister(ctx context.Context, req *UnregisterReq) (r *UnRegisterRes, err error) {
-	var _args RegistryServiceUnregisterArgs
+func (p *RegistryServiceClient) Deregister(ctx context.Context, req *DeregisterReq) (r *DeRegisterRes, err error) {
+	var _args RegistryServiceDeregisterArgs
 	_args.Req = req
-	var _result RegistryServiceUnregisterResult
-	if err = p.Client_().Call(ctx, "Unregister", &_args, &_result); err != nil {
+	var _result RegistryServiceDeregisterResult
+	if err = p.Client_().Call(ctx, "Deregister", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -1253,7 +1253,7 @@ func (p *RegistryServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFu
 func NewRegistryServiceProcessor(handler RegistryService) *RegistryServiceProcessor {
 	self := &RegistryServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
 	self.AddToProcessorMap("Register", &registryServiceProcessorRegister{handler: handler})
-	self.AddToProcessorMap("Unregister", &registryServiceProcessorUnregister{handler: handler})
+	self.AddToProcessorMap("Deregister", &registryServiceProcessorDeregister{handler: handler})
 	self.AddToProcessorMap("Update", &registryServiceProcessorUpdate{handler: handler})
 	return self
 }
@@ -1323,16 +1323,16 @@ func (p *registryServiceProcessorRegister) Process(ctx context.Context, seqId in
 	return true, err
 }
 
-type registryServiceProcessorUnregister struct {
+type registryServiceProcessorDeregister struct {
 	handler RegistryService
 }
 
-func (p *registryServiceProcessorUnregister) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-	args := RegistryServiceUnregisterArgs{}
+func (p *registryServiceProcessorDeregister) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := RegistryServiceDeregisterArgs{}
 	if err = args.Read(iprot); err != nil {
 		iprot.ReadMessageEnd()
 		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
-		oprot.WriteMessageBegin("Unregister", thrift.EXCEPTION, seqId)
+		oprot.WriteMessageBegin("Deregister", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
 		oprot.WriteMessageEnd()
 		oprot.Flush(ctx)
@@ -1341,11 +1341,11 @@ func (p *registryServiceProcessorUnregister) Process(ctx context.Context, seqId 
 
 	iprot.ReadMessageEnd()
 	var err2 error
-	result := RegistryServiceUnregisterResult{}
-	var retval *UnRegisterRes
-	if retval, err2 = p.handler.Unregister(ctx, args.Req); err2 != nil {
-		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing Unregister: "+err2.Error())
-		oprot.WriteMessageBegin("Unregister", thrift.EXCEPTION, seqId)
+	result := RegistryServiceDeregisterResult{}
+	var retval *DeRegisterRes
+	if retval, err2 = p.handler.Deregister(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing Deregister: "+err2.Error())
+		oprot.WriteMessageBegin("Deregister", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
 		oprot.WriteMessageEnd()
 		oprot.Flush(ctx)
@@ -1353,7 +1353,7 @@ func (p *registryServiceProcessorUnregister) Process(ctx context.Context, seqId 
 	} else {
 		result.Success = retval
 	}
-	if err2 = oprot.WriteMessageBegin("Unregister", thrift.REPLY, seqId); err2 != nil {
+	if err2 = oprot.WriteMessageBegin("Deregister", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -1765,39 +1765,39 @@ func (p *RegistryServiceRegisterResult) Field0DeepEqual(src *RegisterRes) bool {
 	return true
 }
 
-type RegistryServiceUnregisterArgs struct {
-	Req *UnregisterReq `thrift:"req,1" frugal:"1,default,UnregisterReq" json:"req"`
+type RegistryServiceDeregisterArgs struct {
+	Req *DeregisterReq `thrift:"req,1" frugal:"1,default,DeregisterReq" json:"req"`
 }
 
-func NewRegistryServiceUnregisterArgs() *RegistryServiceUnregisterArgs {
-	return &RegistryServiceUnregisterArgs{}
+func NewRegistryServiceDeregisterArgs() *RegistryServiceDeregisterArgs {
+	return &RegistryServiceDeregisterArgs{}
 }
 
-func (p *RegistryServiceUnregisterArgs) InitDefault() {
-	*p = RegistryServiceUnregisterArgs{}
+func (p *RegistryServiceDeregisterArgs) InitDefault() {
+	*p = RegistryServiceDeregisterArgs{}
 }
 
-var RegistryServiceUnregisterArgs_Req_DEFAULT *UnregisterReq
+var RegistryServiceDeregisterArgs_Req_DEFAULT *DeregisterReq
 
-func (p *RegistryServiceUnregisterArgs) GetReq() (v *UnregisterReq) {
+func (p *RegistryServiceDeregisterArgs) GetReq() (v *DeregisterReq) {
 	if !p.IsSetReq() {
-		return RegistryServiceUnregisterArgs_Req_DEFAULT
+		return RegistryServiceDeregisterArgs_Req_DEFAULT
 	}
 	return p.Req
 }
-func (p *RegistryServiceUnregisterArgs) SetReq(val *UnregisterReq) {
+func (p *RegistryServiceDeregisterArgs) SetReq(val *DeregisterReq) {
 	p.Req = val
 }
 
-var fieldIDToName_RegistryServiceUnregisterArgs = map[int16]string{
+var fieldIDToName_RegistryServiceDeregisterArgs = map[int16]string{
 	1: "req",
 }
 
-func (p *RegistryServiceUnregisterArgs) IsSetReq() bool {
+func (p *RegistryServiceDeregisterArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *RegistryServiceUnregisterArgs) Read(iprot thrift.TProtocol) (err error) {
+func (p *RegistryServiceDeregisterArgs) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1846,7 +1846,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegistryServiceUnregisterArgs[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegistryServiceDeregisterArgs[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1856,17 +1856,17 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *RegistryServiceUnregisterArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.Req = NewUnregisterReq()
+func (p *RegistryServiceDeregisterArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewDeregisterReq()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *RegistryServiceUnregisterArgs) Write(oprot thrift.TProtocol) (err error) {
+func (p *RegistryServiceDeregisterArgs) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("Unregister_args"); err != nil {
+	if err = oprot.WriteStructBegin("Deregister_args"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1893,7 +1893,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *RegistryServiceUnregisterArgs) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *RegistryServiceDeregisterArgs) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1910,14 +1910,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *RegistryServiceUnregisterArgs) String() string {
+func (p *RegistryServiceDeregisterArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("RegistryServiceUnregisterArgs(%+v)", *p)
+	return fmt.Sprintf("RegistryServiceDeregisterArgs(%+v)", *p)
 }
 
-func (p *RegistryServiceUnregisterArgs) DeepEqual(ano *RegistryServiceUnregisterArgs) bool {
+func (p *RegistryServiceDeregisterArgs) DeepEqual(ano *RegistryServiceDeregisterArgs) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1929,7 +1929,7 @@ func (p *RegistryServiceUnregisterArgs) DeepEqual(ano *RegistryServiceUnregister
 	return true
 }
 
-func (p *RegistryServiceUnregisterArgs) Field1DeepEqual(src *UnregisterReq) bool {
+func (p *RegistryServiceDeregisterArgs) Field1DeepEqual(src *DeregisterReq) bool {
 
 	if !p.Req.DeepEqual(src) {
 		return false
@@ -1937,39 +1937,39 @@ func (p *RegistryServiceUnregisterArgs) Field1DeepEqual(src *UnregisterReq) bool
 	return true
 }
 
-type RegistryServiceUnregisterResult struct {
-	Success *UnRegisterRes `thrift:"success,0,optional" frugal:"0,optional,UnRegisterRes" json:"success,omitempty"`
+type RegistryServiceDeregisterResult struct {
+	Success *DeRegisterRes `thrift:"success,0,optional" frugal:"0,optional,DeRegisterRes" json:"success,omitempty"`
 }
 
-func NewRegistryServiceUnregisterResult() *RegistryServiceUnregisterResult {
-	return &RegistryServiceUnregisterResult{}
+func NewRegistryServiceDeregisterResult() *RegistryServiceDeregisterResult {
+	return &RegistryServiceDeregisterResult{}
 }
 
-func (p *RegistryServiceUnregisterResult) InitDefault() {
-	*p = RegistryServiceUnregisterResult{}
+func (p *RegistryServiceDeregisterResult) InitDefault() {
+	*p = RegistryServiceDeregisterResult{}
 }
 
-var RegistryServiceUnregisterResult_Success_DEFAULT *UnRegisterRes
+var RegistryServiceDeregisterResult_Success_DEFAULT *DeRegisterRes
 
-func (p *RegistryServiceUnregisterResult) GetSuccess() (v *UnRegisterRes) {
+func (p *RegistryServiceDeregisterResult) GetSuccess() (v *DeRegisterRes) {
 	if !p.IsSetSuccess() {
-		return RegistryServiceUnregisterResult_Success_DEFAULT
+		return RegistryServiceDeregisterResult_Success_DEFAULT
 	}
 	return p.Success
 }
-func (p *RegistryServiceUnregisterResult) SetSuccess(x interface{}) {
-	p.Success = x.(*UnRegisterRes)
+func (p *RegistryServiceDeregisterResult) SetSuccess(x interface{}) {
+	p.Success = x.(*DeRegisterRes)
 }
 
-var fieldIDToName_RegistryServiceUnregisterResult = map[int16]string{
+var fieldIDToName_RegistryServiceDeregisterResult = map[int16]string{
 	0: "success",
 }
 
-func (p *RegistryServiceUnregisterResult) IsSetSuccess() bool {
+func (p *RegistryServiceDeregisterResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *RegistryServiceUnregisterResult) Read(iprot thrift.TProtocol) (err error) {
+func (p *RegistryServiceDeregisterResult) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -2018,7 +2018,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegistryServiceUnregisterResult[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegistryServiceDeregisterResult[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -2028,17 +2028,17 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *RegistryServiceUnregisterResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewUnRegisterRes()
+func (p *RegistryServiceDeregisterResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewDeRegisterRes()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *RegistryServiceUnregisterResult) Write(oprot thrift.TProtocol) (err error) {
+func (p *RegistryServiceDeregisterResult) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("Unregister_result"); err != nil {
+	if err = oprot.WriteStructBegin("Deregister_result"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -2065,7 +2065,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *RegistryServiceUnregisterResult) writeField0(oprot thrift.TProtocol) (err error) {
+func (p *RegistryServiceDeregisterResult) writeField0(oprot thrift.TProtocol) (err error) {
 	if p.IsSetSuccess() {
 		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
 			goto WriteFieldBeginError
@@ -2084,14 +2084,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
 }
 
-func (p *RegistryServiceUnregisterResult) String() string {
+func (p *RegistryServiceDeregisterResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("RegistryServiceUnregisterResult(%+v)", *p)
+	return fmt.Sprintf("RegistryServiceDeregisterResult(%+v)", *p)
 }
 
-func (p *RegistryServiceUnregisterResult) DeepEqual(ano *RegistryServiceUnregisterResult) bool {
+func (p *RegistryServiceDeregisterResult) DeepEqual(ano *RegistryServiceDeregisterResult) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -2103,7 +2103,7 @@ func (p *RegistryServiceUnregisterResult) DeepEqual(ano *RegistryServiceUnregist
 	return true
 }
 
-func (p *RegistryServiceUnregisterResult) Field0DeepEqual(src *UnRegisterRes) bool {
+func (p *RegistryServiceDeregisterResult) Field0DeepEqual(src *DeRegisterRes) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false

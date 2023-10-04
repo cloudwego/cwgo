@@ -22,29 +22,39 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	registry "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgUnregister = "" // TODO: to be filled...
+	successMsgDeregister = "" // TODO: to be filled...
 )
 
-type UnregisterLogic struct {
+type DeregisterLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewUnregisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UnregisterLogic {
-	return &UnregisterLogic{
+func NewDeregisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DeregisterLogic {
+	return &DeregisterLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *UnregisterLogic) Unregister(req *registry.UnregisterReq) (res *registry.UnRegisterRes) {
-	// TODO: to be filled...
+func (l *DeregisterLogic) Deregister(req *registry.DeregisterReq) (res *registry.DeRegisterRes) {
+	err := l.svcCtx.BuiltinRegistry.Deregister(req.ServiceId)
+	if err != nil {
+		logger.Logger.Error("deregister service failed", zap.Error(err))
+		return &registry.DeRegisterRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal err",
+		}
+	}
 
-	return &registry.UnRegisterRes{
+	return &registry.DeRegisterRes{
 		Code: 0,
-		Msg:  successMsgUnregister,
+		Msg:  successMsgDeregister,
 	}
 }

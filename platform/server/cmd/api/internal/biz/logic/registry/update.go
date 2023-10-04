@@ -22,6 +22,9 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	registry "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
@@ -41,7 +44,14 @@ func NewUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateLogi
 }
 
 func (l *UpdateLogic) Update(req *registry.UpdateReq) (res *registry.UpdateRes) {
-	// TODO: to be filled...
+	err := l.svcCtx.BuiltinRegistry.Update(req.ServiceId)
+	if err != nil {
+		logger.Logger.Error("update service failed", zap.Error(err))
+		return &registry.UpdateRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal err",
+		}
+	}
 
 	return &registry.UpdateRes{
 		Code: 0,

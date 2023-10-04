@@ -48,7 +48,12 @@ func (sw *Manager) add(agentService *service.Service, serviceNum int) {
 
 	if sw.currentSize < serviceNum {
 		if sw.currentSize == cap(sw.agents) {
-			newAgents := make([]*service.Service, cap(sw.agents)<<1)
+			var newAgents []*service.Service
+			if cap(sw.agents) == 0 {
+				newAgents = make([]*service.Service, 16)
+			} else {
+				newAgents = make([]*service.Service, cap(sw.agents)<<1)
+			}
 			copy(newAgents, sw.agents)
 			sw.agents = newAgents
 		}
@@ -246,7 +251,7 @@ type BuiltinKitexRegistryClient struct {
 }
 
 func NewBuiltinKitexRegistryClient(addr string) (*BuiltinKitexRegistryClient, error) {
-	httpRes, err := http.Get(fmt.Sprintf("http://%s/ping", addr))
+	httpRes, err := http.Get(fmt.Sprintf("http://%s/api/ping", addr))
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +286,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 		return errors.New("service_id not found")
 	}
 
-	httpRes, err := http.Get(fmt.Sprintf("http://%s/register?service_id=%s", rc.addr, serviceId))
+	httpRes, err := http.Get(fmt.Sprintf("http://%s/api/registry/register?service_id=%s", rc.addr, serviceId))
 	if err != nil {
 		return err
 	}
@@ -336,7 +341,7 @@ func (rc *BuiltinKitexRegistryClient) Deregister(info *kitexregistry.Info) error
 
 	rc.stopChan <- struct{}{}
 
-	httpRes, err := http.Get(fmt.Sprintf("http://%s/unregister?service_id=%s", rc.addr, serviceId))
+	httpRes, err := http.Get(fmt.Sprintf("http://%s/api/registry/deregister?service_id=%s", rc.addr, serviceId))
 	if err != nil {
 		return err
 	}
@@ -363,7 +368,7 @@ func (rc *BuiltinKitexRegistryClient) Deregister(info *kitexregistry.Info) error
 
 func (rc *BuiltinKitexRegistryClient) Update(serviceId string) error {
 
-	httpRes, err := http.Get(fmt.Sprintf("http://%s/update?service_id=%s", rc.addr, serviceId))
+	httpRes, err := http.Get(fmt.Sprintf("http://%s/api/registry/update?service_id=%s", rc.addr, serviceId))
 	if err != nil {
 		return err
 	}

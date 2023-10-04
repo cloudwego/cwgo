@@ -12,7 +12,7 @@ import (
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
 	Register(ctx context.Context, req *registry.RegisterReq, callOptions ...callopt.Option) (r *registry.RegisterRes, err error)
-	Unregister(ctx context.Context, req *registry.UnregisterReq, callOptions ...callopt.Option) (r *registry.UnRegisterRes, err error)
+	Deregister(ctx context.Context, req *registry.DeregisterReq, callOptions ...callopt.Option) (r *registry.DeRegisterRes, err error)
 	Update(ctx context.Context, req *registry.UpdateReq, callOptions ...callopt.Option) (r *registry.UpdateRes, err error)
 }
 
@@ -50,9 +50,9 @@ func (p *kRegistryServiceClient) Register(ctx context.Context, req *registry.Reg
 	return p.kClient.Register(ctx, req)
 }
 
-func (p *kRegistryServiceClient) Unregister(ctx context.Context, req *registry.UnregisterReq, callOptions ...callopt.Option) (r *registry.UnRegisterRes, err error) {
+func (p *kRegistryServiceClient) Deregister(ctx context.Context, req *registry.DeregisterReq, callOptions ...callopt.Option) (r *registry.DeRegisterRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.Unregister(ctx, req)
+	return p.kClient.Deregister(ctx, req)
 }
 
 func (p *kRegistryServiceClient) Update(ctx context.Context, req *registry.UpdateReq, callOptions ...callopt.Option) (r *registry.UpdateRes, err error) {

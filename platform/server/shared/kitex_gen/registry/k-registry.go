@@ -331,7 +331,7 @@ func (p *RegisterRes) field2Length() int {
 	return l
 }
 
-func (p *UnregisterReq) FastRead(buf []byte) (int, error) {
+func (p *DeregisterReq) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -393,7 +393,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UnregisterReq[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_DeregisterReq[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -402,7 +402,7 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UnregisterReq) FastReadField1(buf []byte) (int, error) {
+func (p *DeregisterReq) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -417,13 +417,13 @@ func (p *UnregisterReq) FastReadField1(buf []byte) (int, error) {
 }
 
 // for compatibility
-func (p *UnregisterReq) FastWrite(buf []byte) int {
+func (p *DeregisterReq) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *UnregisterReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *DeregisterReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UnregisterReq")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "DeregisterReq")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 	}
@@ -432,9 +432,9 @@ func (p *UnregisterReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryW
 	return offset
 }
 
-func (p *UnregisterReq) BLength() int {
+func (p *DeregisterReq) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("UnregisterReq")
+	l += bthrift.Binary.StructBeginLength("DeregisterReq")
 	if p != nil {
 		l += p.field1Length()
 	}
@@ -443,7 +443,7 @@ func (p *UnregisterReq) BLength() int {
 	return l
 }
 
-func (p *UnregisterReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *DeregisterReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "service_id", thrift.STRING, 1)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.ServiceId)
@@ -452,7 +452,7 @@ func (p *UnregisterReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryW
 	return offset
 }
 
-func (p *UnregisterReq) field1Length() int {
+func (p *DeregisterReq) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("service_id", thrift.STRING, 1)
 	l += bthrift.Binary.StringLengthNocopy(p.ServiceId)
@@ -461,7 +461,7 @@ func (p *UnregisterReq) field1Length() int {
 	return l
 }
 
-func (p *UnRegisterRes) FastRead(buf []byte) (int, error) {
+func (p *DeRegisterRes) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -537,7 +537,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UnRegisterRes[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_DeRegisterRes[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -546,7 +546,7 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UnRegisterRes) FastReadField1(buf []byte) (int, error) {
+func (p *DeRegisterRes) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
@@ -560,7 +560,7 @@ func (p *UnRegisterRes) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *UnRegisterRes) FastReadField2(buf []byte) (int, error) {
+func (p *DeRegisterRes) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -575,13 +575,13 @@ func (p *UnRegisterRes) FastReadField2(buf []byte) (int, error) {
 }
 
 // for compatibility
-func (p *UnRegisterRes) FastWrite(buf []byte) int {
+func (p *DeRegisterRes) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *UnRegisterRes) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *DeRegisterRes) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UnRegisterRes")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "DeRegisterRes")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
@@ -591,9 +591,9 @@ func (p *UnRegisterRes) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryW
 	return offset
 }
 
-func (p *UnRegisterRes) BLength() int {
+func (p *DeRegisterRes) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("UnRegisterRes")
+	l += bthrift.Binary.StructBeginLength("DeRegisterRes")
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
@@ -603,7 +603,7 @@ func (p *UnRegisterRes) BLength() int {
 	return l
 }
 
-func (p *UnRegisterRes) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *DeRegisterRes) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "code", thrift.I32, 1)
 	offset += bthrift.Binary.WriteI32(buf[offset:], p.Code)
@@ -612,7 +612,7 @@ func (p *UnRegisterRes) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryW
 	return offset
 }
 
-func (p *UnRegisterRes) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *DeRegisterRes) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "msg", thrift.STRING, 2)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Msg)
@@ -621,7 +621,7 @@ func (p *UnRegisterRes) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryW
 	return offset
 }
 
-func (p *UnRegisterRes) field1Length() int {
+func (p *DeRegisterRes) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("code", thrift.I32, 1)
 	l += bthrift.Binary.I32Length(p.Code)
@@ -630,7 +630,7 @@ func (p *UnRegisterRes) field1Length() int {
 	return l
 }
 
-func (p *UnRegisterRes) field2Length() int {
+func (p *DeRegisterRes) field2Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("msg", thrift.STRING, 2)
 	l += bthrift.Binary.StringLengthNocopy(p.Msg)
@@ -1205,7 +1205,7 @@ func (p *RegistryServiceRegisterResult) field0Length() int {
 	return l
 }
 
-func (p *RegistryServiceUnregisterArgs) FastRead(buf []byte) (int, error) {
+func (p *RegistryServiceDeregisterArgs) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -1267,7 +1267,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegistryServiceUnregisterArgs[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegistryServiceDeregisterArgs[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -1276,10 +1276,10 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *RegistryServiceUnregisterArgs) FastReadField1(buf []byte) (int, error) {
+func (p *RegistryServiceDeregisterArgs) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	tmp := NewUnregisterReq()
+	tmp := NewDeregisterReq()
 	if l, err := tmp.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -1290,13 +1290,13 @@ func (p *RegistryServiceUnregisterArgs) FastReadField1(buf []byte) (int, error) 
 }
 
 // for compatibility
-func (p *RegistryServiceUnregisterArgs) FastWrite(buf []byte) int {
+func (p *RegistryServiceDeregisterArgs) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *RegistryServiceUnregisterArgs) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *RegistryServiceDeregisterArgs) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "Unregister_args")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "Deregister_args")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 	}
@@ -1305,9 +1305,9 @@ func (p *RegistryServiceUnregisterArgs) FastWriteNocopy(buf []byte, binaryWriter
 	return offset
 }
 
-func (p *RegistryServiceUnregisterArgs) BLength() int {
+func (p *RegistryServiceDeregisterArgs) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("Unregister_args")
+	l += bthrift.Binary.StructBeginLength("Deregister_args")
 	if p != nil {
 		l += p.field1Length()
 	}
@@ -1316,7 +1316,7 @@ func (p *RegistryServiceUnregisterArgs) BLength() int {
 	return l
 }
 
-func (p *RegistryServiceUnregisterArgs) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *RegistryServiceDeregisterArgs) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "req", thrift.STRUCT, 1)
 	offset += p.Req.FastWriteNocopy(buf[offset:], binaryWriter)
@@ -1324,7 +1324,7 @@ func (p *RegistryServiceUnregisterArgs) fastWriteField1(buf []byte, binaryWriter
 	return offset
 }
 
-func (p *RegistryServiceUnregisterArgs) field1Length() int {
+func (p *RegistryServiceDeregisterArgs) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("req", thrift.STRUCT, 1)
 	l += p.Req.BLength()
@@ -1332,7 +1332,7 @@ func (p *RegistryServiceUnregisterArgs) field1Length() int {
 	return l
 }
 
-func (p *RegistryServiceUnregisterResult) FastRead(buf []byte) (int, error) {
+func (p *RegistryServiceDeregisterResult) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -1394,7 +1394,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegistryServiceUnregisterResult[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RegistryServiceDeregisterResult[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -1403,10 +1403,10 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *RegistryServiceUnregisterResult) FastReadField0(buf []byte) (int, error) {
+func (p *RegistryServiceDeregisterResult) FastReadField0(buf []byte) (int, error) {
 	offset := 0
 
-	tmp := NewUnRegisterRes()
+	tmp := NewDeRegisterRes()
 	if l, err := tmp.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -1417,13 +1417,13 @@ func (p *RegistryServiceUnregisterResult) FastReadField0(buf []byte) (int, error
 }
 
 // for compatibility
-func (p *RegistryServiceUnregisterResult) FastWrite(buf []byte) int {
+func (p *RegistryServiceDeregisterResult) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *RegistryServiceUnregisterResult) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *RegistryServiceDeregisterResult) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "Unregister_result")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "Deregister_result")
 	if p != nil {
 		offset += p.fastWriteField0(buf[offset:], binaryWriter)
 	}
@@ -1432,9 +1432,9 @@ func (p *RegistryServiceUnregisterResult) FastWriteNocopy(buf []byte, binaryWrit
 	return offset
 }
 
-func (p *RegistryServiceUnregisterResult) BLength() int {
+func (p *RegistryServiceDeregisterResult) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("Unregister_result")
+	l += bthrift.Binary.StructBeginLength("Deregister_result")
 	if p != nil {
 		l += p.field0Length()
 	}
@@ -1443,7 +1443,7 @@ func (p *RegistryServiceUnregisterResult) BLength() int {
 	return l
 }
 
-func (p *RegistryServiceUnregisterResult) fastWriteField0(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *RegistryServiceDeregisterResult) fastWriteField0(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	if p.IsSetSuccess() {
 		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "success", thrift.STRUCT, 0)
@@ -1453,7 +1453,7 @@ func (p *RegistryServiceUnregisterResult) fastWriteField0(buf []byte, binaryWrit
 	return offset
 }
 
-func (p *RegistryServiceUnregisterResult) field0Length() int {
+func (p *RegistryServiceDeregisterResult) field0Length() int {
 	l := 0
 	if p.IsSetSuccess() {
 		l += bthrift.Binary.FieldBeginLength("success", thrift.STRUCT, 0)
@@ -1729,11 +1729,11 @@ func (p *RegistryServiceRegisterResult) GetResult() interface{} {
 	return p.Success
 }
 
-func (p *RegistryServiceUnregisterArgs) GetFirstArgument() interface{} {
+func (p *RegistryServiceDeregisterArgs) GetFirstArgument() interface{} {
 	return p.Req
 }
 
-func (p *RegistryServiceUnregisterResult) GetResult() interface{} {
+func (p *RegistryServiceDeregisterResult) GetResult() interface{} {
 	return p.Success
 }
 

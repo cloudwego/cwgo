@@ -20,6 +20,7 @@ package registry
 
 import (
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
@@ -31,21 +32,27 @@ type BuiltinRegistryConfig struct {
 }
 
 type BuiltinRegistryConfigManager struct {
-	Config   BuiltinRegistryConfig
-	registry *registry.BuiltinRegistry
+	Config       BuiltinRegistryConfig
+	RegistryType consts.RegistryType
+	Registry     *registry.BuiltinRegistry
 }
 
 func NewBuiltinRegistryConfigManager(config BuiltinRegistryConfig, r *registry.BuiltinRegistry) (*BuiltinRegistryConfigManager, error) {
 	return &BuiltinRegistryConfigManager{
-		Config:   config,
-		registry: r,
+		Config:       config,
+		RegistryType: consts.RegistryTypeNumBuiltin,
+		Registry:     r,
 	}, nil
 }
 
+func (cm *BuiltinRegistryConfigManager) GetRegistryType() consts.RegistryType {
+	return cm.RegistryType
+}
+
 func (cm *BuiltinRegistryConfigManager) GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info) {
-	registryClient, err := registry.NewBuiltinKitexRegistryClient(addr)
+	registryClient, err := registry.NewBuiltinKitexRegistryClient(cm.Config.Address)
 	if err != nil {
-		panic(fmt.Sprintf("initialize builtin registry client failed, err: %v", err))
+		panic(fmt.Sprintf("initialize builtin BuiltinRegistry client failed, err: %v", err))
 	}
 
 	registryInfo := &kitexregistry.Info{
@@ -60,9 +67,9 @@ func (cm *BuiltinRegistryConfigManager) GetKitexRegistry(serviceName, serviceId,
 }
 
 func (cm *BuiltinRegistryConfigManager) GetDiscoveryResolver() discovery.Resolver {
-	resolver, err := registry.NewBuiltinRegistryResolver(cm.registry)
+	resolver, err := registry.NewBuiltinRegistryResolver(cm.Registry)
 	if err != nil {
-		panic(fmt.Sprintf("initialize builtin registry resolver failed, err: %v", err))
+		panic(fmt.Sprintf("initialize builtin BuiltinRegistry resolver failed, err: %v", err))
 	}
 
 	return resolver

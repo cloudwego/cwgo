@@ -20,7 +20,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	handlerType := (*registry.RegistryService)(nil)
 	methods := map[string]kitex.MethodInfo{
 		"Register":   kitex.NewMethodInfo(registerHandler, newRegistryServiceRegisterArgs, newRegistryServiceRegisterResult, false),
-		"Unregister": kitex.NewMethodInfo(unregisterHandler, newRegistryServiceUnregisterArgs, newRegistryServiceUnregisterResult, false),
+		"Deregister": kitex.NewMethodInfo(deregisterHandler, newRegistryServiceDeregisterArgs, newRegistryServiceDeregisterResult, false),
 		"Update":     kitex.NewMethodInfo(updateHandler, newRegistryServiceUpdateArgs, newRegistryServiceUpdateResult, false),
 	}
 	extra := map[string]interface{}{
@@ -55,22 +55,22 @@ func newRegistryServiceRegisterResult() interface{} {
 	return registry.NewRegistryServiceRegisterResult()
 }
 
-func unregisterHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*registry.RegistryServiceUnregisterArgs)
-	realResult := result.(*registry.RegistryServiceUnregisterResult)
-	success, err := handler.(registry.RegistryService).Unregister(ctx, realArg.Req)
+func deregisterHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*registry.RegistryServiceDeregisterArgs)
+	realResult := result.(*registry.RegistryServiceDeregisterResult)
+	success, err := handler.(registry.RegistryService).Deregister(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newRegistryServiceUnregisterArgs() interface{} {
-	return registry.NewRegistryServiceUnregisterArgs()
+func newRegistryServiceDeregisterArgs() interface{} {
+	return registry.NewRegistryServiceDeregisterArgs()
 }
 
-func newRegistryServiceUnregisterResult() interface{} {
-	return registry.NewRegistryServiceUnregisterResult()
+func newRegistryServiceDeregisterResult() interface{} {
+	return registry.NewRegistryServiceDeregisterResult()
 }
 
 func updateHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -111,11 +111,11 @@ func (p *kClient) Register(ctx context.Context, req *registry.RegisterReq) (r *r
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) Unregister(ctx context.Context, req *registry.UnregisterReq) (r *registry.UnRegisterRes, err error) {
-	var _args registry.RegistryServiceUnregisterArgs
+func (p *kClient) Deregister(ctx context.Context, req *registry.DeregisterReq) (r *registry.DeRegisterRes, err error) {
+	var _args registry.RegistryServiceDeregisterArgs
 	_args.Req = req
-	var _result registry.RegistryServiceUnregisterResult
-	if err = p.c.Call(ctx, "Unregister", &_args, &_result); err != nil {
+	var _result registry.RegistryServiceDeregisterResult
+	if err = p.c.Call(ctx, "Deregister", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

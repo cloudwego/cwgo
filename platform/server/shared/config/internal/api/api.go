@@ -23,6 +23,7 @@ import (
 	"github.com/bytedance/gopkg/util/gopool"
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	http2config "github.com/hertz-contrib/http2/config"
 	http2factory "github.com/hertz-contrib/http2/factory"
@@ -33,6 +34,7 @@ import (
 type ConfigManager struct {
 	config                Config
 	RegistryConfigManager registryconfig.IRegistryConfigManager
+	BuiltinRegistry       *registry.BuiltinRegistry
 	Server                *server.Hertz
 	ServiceId             string
 	ServiceName           string
@@ -40,11 +42,13 @@ type ConfigManager struct {
 
 func NewConfigManager(config Config, registryConfig registryconfig.Config, serviceId string) *ConfigManager {
 	var registryConfigManager registryconfig.IRegistryConfigManager
+	var r *registry.BuiltinRegistry
 	var err error
 
 	switch registryConfig.Type {
 	case consts.RegistryTypeBuiltin:
-		registryConfigManager = nil
+		r = registry.NewBuiltinRegistry()
+		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin, r)
 
 	case consts.RegistryTypeConsul:
 		registryConfigManager, err = registryconfig.NewConsulRegistryConfigManager(registryConfig.Consul)
@@ -64,7 +68,7 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, servi
 		server.WithMaxRequestBodySize(1<<20*4), // 4M
 		server.WithHandleMethodNotAllowed(true),
 		server.WithExitWaitTime(5*time.Second),
-		server.WithBasePath("/api/v4"),
+		server.WithBasePath("/api"),
 		server.WithMaxKeepBodySize(1<<20*4),
 		server.WithKeepAlive(true),
 		server.WithH2C(true),
@@ -88,6 +92,7 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, servi
 		config:                config,
 		Server:                hertzServer,
 		RegistryConfigManager: registryConfigManager,
+		BuiltinRegistry:       r,
 		ServiceId:             serviceId,
 		ServiceName:           fmt.Sprintf("%s-%s-%s", "cwgo", consts.ServerTypeAgent, serviceId),
 	}

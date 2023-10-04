@@ -46,3 +46,7 @@ func _updateMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+func _deregisterMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

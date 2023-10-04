@@ -36,8 +36,8 @@ func Register(r *server.Hertz) {
 	root := r.Group("/", rootMw()...)
 	{
 		_registry := root.Group("/registry", _registryMw()...)
+		_registry.GET("/dnregister", append(_deregisterMw(), registry.Deregister)...)
 		_registry.GET("/register", append(_registerMw(), registry.Register)...)
-		_registry.GET("/unregister", append(_unregisterMw(), registry.Unregister)...)
 		_registry.GET("/update", append(_updateMw(), registry.Update)...)
 	}
 }

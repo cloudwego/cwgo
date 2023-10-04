@@ -27,6 +27,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent/agentservice"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"go.uber.org/zap"
 	"os"
 )
@@ -105,6 +106,11 @@ func run(opts *setupOptions) error {
 		return err
 	}
 
+	repoManager, err := repository.NewRepoManager(daoManager)
+	if err != nil {
+		logger.Logger.Fatal("service initialize repository manager failed", zap.Error(err))
+	}
+
 	ctx := context.Background()
 
 	// get server options
@@ -115,7 +121,8 @@ func run(opts *setupOptions) error {
 		&AgentServiceImpl{
 			ctx: ctx,
 			svcCtx: &svc.ServiceContext{
-				DaoManager: daoManager,
+				DaoManager:  daoManager,
+				RepoManager: repoManager,
 			},
 		},
 		kitexServerOptions...,

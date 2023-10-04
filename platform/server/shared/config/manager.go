@@ -42,6 +42,7 @@ type Config struct {
 	Logger   logger.Config   `mapstructure:"logger"`
 	Registry registry.Config `mapstructure:"registry"`
 	Store    store.Config    `mapstructure:"store"`
+	Api      api.Config      `mapstructure:"api"`
 	Agent    agent.Config    `mapstructure:"agent"`
 }
 
@@ -92,13 +93,25 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 		return err
 	}
 
-	manager = &Manager{
-		ServerType:         serverType,
-		ServerMode:         serverMode,
-		ServiceId:          serviceId,
-		Config:             config,
-		StoreConfigManager: store.NewStoreConfigManager(config.Store),
-		AgentConfigManager: agent.NewConfigManager(config.Agent, config.Registry, serviceId),
+	switch serverType {
+	case consts.ServerTypeNumApi:
+		manager = &Manager{
+			ServerType:         serverType,
+			ServerMode:         serverMode,
+			ServiceId:          serviceId,
+			Config:             config,
+			StoreConfigManager: store.NewStoreConfigManager(config.Store),
+			ApiConfigManager:   api.NewConfigManager(config.Api, config.Registry, serviceId),
+		}
+	case consts.ServerTypeNumAgent:
+		manager = &Manager{
+			ServerType:         serverType,
+			ServerMode:         serverMode,
+			ServiceId:          serviceId,
+			Config:             config,
+			StoreConfigManager: store.NewStoreConfigManager(config.Store),
+			AgentConfigManager: agent.NewConfigManager(config.Agent, config.Registry, serviceId),
+		}
 	}
 
 	return nil
