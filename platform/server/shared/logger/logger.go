@@ -34,12 +34,14 @@ func InitLogger() {
 	// create log save dir
 	loggerConfig := config.GetManager().Config.Logger
 
-	var savePath string
-	if loggerConfig.SavePath == "" {
+	savePath := loggerConfig.SavePath
+	if savePath == "" {
 		savePath = fmt.Sprintf("%s-%s/log",
 			consts.ServerTypeMapToStr[config.GetManager().ServerType],
 			config.GetManager().ServiceId,
 		)
+	} else {
+
 	}
 
 	err := utils.IsNotExistMkDir(savePath)

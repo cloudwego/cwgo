@@ -19,6 +19,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
@@ -29,10 +30,12 @@ type IRepositoryDaoManager interface {
 	GetTokenByID(id int64) (string, error)
 	GetRepoTypeByID(id int64) (int32, error)
 	GetRepository(id int64) (*repository.Repository, error)
+	ChangeRepositoryStatus(id int64, status string) error
+	GetAllRepositories() ([]*repository.Repository, error)
 
 	AddRepository(repoURL, token, status string, repoType int32) error
 	DeleteRepository(ids []string) error
-	UpdateRepository(id, token string) error
+	UpdateRepository(id, token, status string) error
 	GetRepositories(page, limit, order int32, orderBy string) ([]*repository.Repository, error)
 }
 
@@ -50,7 +53,7 @@ func NewMysqlRepository(db *gorm.DB) *MysqlRepositoryManager {
 
 func (r *MysqlRepositoryManager) GetTokenByID(id int64) (string, error) {
 	var repo repository.Repository
-	result := r.db.Model(&repo).Where("id = ?", id).Take(&repo)
+	result := r.db.Table(consts.TableNameRepository).Model(&repo).Where("id = ?", id).Take(&repo)
 	if result.Error != nil {
 		return "", result.Error
 	}
@@ -60,7 +63,7 @@ func (r *MysqlRepositoryManager) GetTokenByID(id int64) (string, error) {
 
 func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int32, error) {
 	var repo repository.Repository
-	result := r.db.Model(&repo).Where("id = ?", id).Take(&repo)
+	result := r.db.Table(consts.TableNameRepository).Model(&repo).Where("id = ?", id).Take(&repo)
 	if result.Error != nil {
 		return 0, result.Error
 	}
@@ -71,12 +74,38 @@ func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int32, error) {
 func (r *MysqlRepositoryManager) GetRepository(id int64) (*repository.Repository, error) {
 	var repo *repository.Repository
 
-	result := r.db.Where("id = ?", id).Find(&repo)
+	result := r.db.Table(consts.TableNameRepository).Where("id = ?", id).Find(&repo)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
 	return repo, nil
+}
+
+func (r *MysqlRepositoryManager) ChangeRepositoryStatus(id int64, status string) error {
+	if !utils.ValidStatus(status) {
+		return errors.New("invalid status")
+	}
+	timeNow := utils.GetCurrentTime()
+	result := r.db.Table(consts.TableNameRepository).Model(&repository.Repository{}).Where("id = ?", id).Updates(repository.Repository{
+		Status:     status,
+		UpdateTime: timeNow,
+	})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func (r *MysqlRepositoryManager) GetAllRepositories() ([]*repository.Repository, error) {
+	var repos []*repository.Repository
+	result := r.db.Table(consts.TableNameRepository).Find(&repos)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return repos, nil
 }
 
 func (r *MysqlRepositoryManager) AddRepository(repoURL, token, status string, repoType int32) error {
@@ -91,7 +120,7 @@ func (r *MysqlRepositoryManager) AddRepository(repoURL, token, status string, re
 		CreateTime:     timeNow,
 		UpdateTime:     timeNow,
 	}
-	result := r.db.Create(&repo)
+	result := r.db.Table(consts.TableNameRepository).Create(&repo)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -101,7 +130,7 @@ func (r *MysqlRepositoryManager) AddRepository(repoURL, token, status string, re
 
 func (r *MysqlRepositoryManager) DeleteRepository(ids []string) error {
 	var repo repository.Repository
-	result := r.db.Delete(&repo, ids)
+	result := r.db.Table(consts.TableNameRepository).Delete(&repo, ids)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -109,11 +138,15 @@ func (r *MysqlRepositoryManager) DeleteRepository(ids []string) error {
 	return nil
 }
 
-func (r *MysqlRepositoryManager) UpdateRepository(id, token string) error {
+func (r *MysqlRepositoryManager) UpdateRepository(id, token, status string) error {
+	if !utils.ValidStatus(status) {
+		return errors.New("invalid status")
+	}
 	timeNow := utils.GetCurrentTime()
-	result := r.db.Model(&repository.Repository{}).Where("id = ?", id).Updates(repository.Repository{
+	result := r.db.Table(consts.TableNameRepository).Model(&repository.Repository{}).Where("id = ?", id).Updates(repository.Repository{
 		Token:      token,
 		UpdateTime: timeNow,
+		Status:     status,
 	})
 	if result.Error != nil {
 		return result.Error
@@ -140,7 +173,7 @@ func (r *MysqlRepositoryManager) GetRepositories(page, limit, order int32, order
 	}
 
 	offset := (page - 1) * limit
-	result := r.db.Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&repos)
+	result := r.db.Table(consts.TableNameRepository).Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&repos)
 	if result.Error != nil {
 		return nil, result.Error
 	}

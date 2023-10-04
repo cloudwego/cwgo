@@ -26,7 +26,6 @@ import (
 )
 
 type ServiceContext struct {
-	//RpcClientAgentService agentservice.Client
 	DaoManager  *dao.Manager
 	RepoManager *repository.Manager
 }
@@ -38,7 +37,7 @@ func InitServiceContext() {
 	if err != nil {
 		logger.Logger.Fatal("initialize dao manager failed", zap.Error(err))
 	}
-	repoManager, err := repository.NewRepoManager()
+	repoManager, err := repository.NewRepoManager(daoManager)
 	if err != nil {
 		logger.Logger.Fatal("initialize repository manager failed")
 	}

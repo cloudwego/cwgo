@@ -21,7 +21,10 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/repository"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
 type UpdateRepositoryStatusService struct {
@@ -37,7 +40,39 @@ func NewUpdateRepositoryStatusService(ctx context.Context, svcCtx *svc.ServiceCo
 
 // Run create note info
 func (s *UpdateRepositoryStatusService) Run(req *agent.UpdateRepositoryStatusReq) (resp *agent.UpdateRepositoryStatusRes, err error) {
-	// Finish your business logic.
+	utils.ValidStatus(req.Status)
+	repo, err := s.svcCtx.DaoManager.Repository.GetRepository(req.Id)
+	if err != nil {
+		resp.Code = 400
+		resp.Msg = err.Error()
+		return resp, err
+	}
 
-	return
+	switch repo.Type {
+	case consts.GitLab:
+		s.svcCtx.RepoManager.MuGitlab.Lock()
+		defer s.svcCtx.RepoManager.MuGitlab.Unlock()
+		if req.Status == consts.Active {
+			s.svcCtx.RepoManager.GitLab.Client[req.Id], err = repository.NewGitlabClient(repo.Token)
+			if err != nil {
+				resp.Code = 400
+				resp.Msg = err.Error()
+				return resp, err
+			}
+		} else if req.Status == consts.DisActive {
+			delete(s.svcCtx.RepoManager.GitLab.Client, req.Id)
+		}
+	case consts.Github:
+		s.svcCtx.RepoManager.MuGitHub.Lock()
+		defer s.svcCtx.RepoManager.MuGitHub.Unlock()
+		if req.Status == consts.Active {
+			s.svcCtx.RepoManager.GitHub.Client[req.Id] = repository.NewGithubClient(repo.Token)
+		} else if req.Status == consts.DisActive {
+			delete(s.svcCtx.RepoManager.GitHub.Client, req.Id)
+		}
+	}
+	resp.Code = 0
+	resp.Msg = "update status success"
+
+	return resp, nil
 }

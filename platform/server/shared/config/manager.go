@@ -18,6 +18,8 @@ package config
 
 import (
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/api"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/store"
@@ -32,12 +34,15 @@ type Manager struct {
 	ServiceId          string
 	Config             Config
 	StoreConfigManager *store.StoreConfigManager
+	ApiConfigManager   *api.ConfigManager
+	AgentConfigManager *agent.ConfigManager
 }
 
 type Config struct {
 	Logger   logger.Config   `mapstructure:"logger"`
 	Registry registry.Config `mapstructure:"registry"`
 	Store    store.Config    `mapstructure:"store"`
+	Agent    agent.Config    `mapstructure:"agent"`
 }
 
 var manager *Manager
@@ -61,14 +66,14 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 		configPath = fmt.Sprintf("config-%s.yaml", consts.ServerModeMapToStr[serverMode])
 
-		fmt.Printf("get Config path: %s", configPath)
+		fmt.Printf("get config path: %s\n", configPath)
 
 		v := viper.New()
 		v.SetConfigType("yaml")
 		v.SetConfigFile(configPath)
 		err := v.ReadInConfig()
 		if err != nil {
-			panic(fmt.Sprintf("get Config file failed, err: %v", err))
+			panic(fmt.Sprintf("get config file failed, err: %v", err))
 		}
 
 		if err := v.Unmarshal(&config); err != nil {
@@ -92,7 +97,8 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 		ServerMode:         serverMode,
 		ServiceId:          serviceId,
 		Config:             config,
-		StoreConfigManager: nil,
+		StoreConfigManager: store.NewStoreConfigManager(config.Store),
+		AgentConfigManager: agent.NewConfigManager(config.Agent, config.Registry, serviceId),
 	}
 
 	return nil

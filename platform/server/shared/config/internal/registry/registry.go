@@ -19,13 +19,11 @@
 package registry
 
 import (
-	hertzregistry "github.com/cloudwego/hertz/pkg/app/server/registry"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	kitexregistry "github.com/cloudwego/kitex/pkg/registry"
 )
 
 type IRegistryConfigManager interface {
-	GetHertzRegistry(serviceId int, serviceName string, Host string, port int) (hertzregistry.Registry, *hertzregistry.Info)
-	GetKitexRegistry(serviceId int, serviceName string, addr string) (kitexregistry.Registry, *kitexregistry.Info)
+	GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info)
 	GetDiscoveryResolver() discovery.Resolver
 }

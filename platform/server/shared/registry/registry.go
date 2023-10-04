@@ -24,6 +24,6 @@ import (
 
 type IRegistry interface {
 	Count() int
-	GetServiceById(string) (service.IService, error)
+	GetServiceById(string) (*service.Service, error)
 	ServiceExists(string) bool
 }

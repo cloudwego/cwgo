@@ -13,8 +13,9 @@ type Template struct {
 	Id         int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
 	Name       string `thrift:"name,2" frugal:"2,default,string" json:"name"`
 	Type       int32  `thrift:"type,3" frugal:"3,default,i32" json:"type"`
-	CreateTime string `thrift:"create_time,4" frugal:"4,default,string" json:"create_time"`
-	UpdateTime string `thrift:"update_time,5" frugal:"5,default,string" json:"update_time"`
+	IsDeleted  bool   `thrift:"is_deleted,4" frugal:"4,default,bool" json:"is_deleted"`
+	CreateTime string `thrift:"create_time,5" frugal:"5,default,string" json:"create_time"`
+	UpdateTime string `thrift:"update_time,6" frugal:"6,default,string" json:"update_time"`
 }
 
 func NewTemplate() *Template {
@@ -37,6 +38,10 @@ func (p *Template) GetType() (v int32) {
 	return p.Type
 }
 
+func (p *Template) GetIsDeleted() (v bool) {
+	return p.IsDeleted
+}
+
 func (p *Template) GetCreateTime() (v string) {
 	return p.CreateTime
 }
@@ -53,6 +58,9 @@ func (p *Template) SetName(val string) {
 func (p *Template) SetType(val int32) {
 	p.Type = val
 }
+func (p *Template) SetIsDeleted(val bool) {
+	p.IsDeleted = val
+}
 func (p *Template) SetCreateTime(val string) {
 	p.CreateTime = val
 }
@@ -64,8 +72,9 @@ var fieldIDToName_Template = map[int16]string{
 	1: "id",
 	2: "name",
 	3: "type",
-	4: "create_time",
-	5: "update_time",
+	4: "is_deleted",
+	5: "create_time",
+	6: "update_time",
 }
 
 func (p *Template) Read(iprot thrift.TProtocol) (err error) {
@@ -118,7 +127,7 @@ func (p *Template) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 4:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.BOOL {
 				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -130,6 +139,16 @@ func (p *Template) Read(iprot thrift.TProtocol) (err error) {
 		case 5:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField5(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 6:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField6(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -195,6 +214,15 @@ func (p *Template) ReadField3(iprot thrift.TProtocol) error {
 }
 
 func (p *Template) ReadField4(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadBool(); err != nil {
+		return err
+	} else {
+		p.IsDeleted = v
+	}
+	return nil
+}
+
+func (p *Template) ReadField5(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -203,7 +231,7 @@ func (p *Template) ReadField4(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *Template) ReadField5(iprot thrift.TProtocol) error {
+func (p *Template) ReadField6(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -236,6 +264,10 @@ func (p *Template) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField5(oprot); err != nil {
 			fieldId = 5
+			goto WriteFieldError
+		}
+		if err = p.writeField6(oprot); err != nil {
+			fieldId = 6
 			goto WriteFieldError
 		}
 
@@ -309,10 +341,10 @@ WriteFieldEndError:
 }
 
 func (p *Template) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 4); err != nil {
+	if err = oprot.WriteFieldBegin("is_deleted", thrift.BOOL, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.CreateTime); err != nil {
+	if err := oprot.WriteBool(p.IsDeleted); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -326,10 +358,10 @@ WriteFieldEndError:
 }
 
 func (p *Template) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 5); err != nil {
+	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.UpdateTime); err != nil {
+	if err := oprot.WriteString(p.CreateTime); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -340,6 +372,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
+func (p *Template) writeField6(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 6); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.UpdateTime); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
 }
 
 func (p *Template) String() string {
@@ -364,10 +413,13 @@ func (p *Template) DeepEqual(ano *Template) bool {
 	if !p.Field3DeepEqual(ano.Type) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.CreateTime) {
+	if !p.Field4DeepEqual(ano.IsDeleted) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.UpdateTime) {
+	if !p.Field5DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.UpdateTime) {
 		return false
 	}
 	return true
@@ -394,14 +446,21 @@ func (p *Template) Field3DeepEqual(src int32) bool {
 	}
 	return true
 }
-func (p *Template) Field4DeepEqual(src string) bool {
+func (p *Template) Field4DeepEqual(src bool) bool {
+
+	if p.IsDeleted != src {
+		return false
+	}
+	return true
+}
+func (p *Template) Field5DeepEqual(src string) bool {
 
 	if strings.Compare(p.CreateTime, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *Template) Field5DeepEqual(src string) bool {
+func (p *Template) Field6DeepEqual(src string) bool {
 
 	if strings.Compare(p.UpdateTime, src) != 0 {
 		return false
@@ -414,8 +473,9 @@ type TemplateItem struct {
 	TemplateId int64  `thrift:"template_id,2" frugal:"2,default,i64" json:"template_id"`
 	Name       string `thrift:"name,3" frugal:"3,default,string" json:"name"`
 	Content    string `thrift:"content,4" frugal:"4,default,string" json:"content"`
-	CreateTime string `thrift:"create_time,5" frugal:"5,default,string" json:"create_time"`
-	UpdateTime string `thrift:"update_time,6" frugal:"6,default,string" json:"update_time"`
+	IsDeleted  bool   `thrift:"is_deleted,5" frugal:"5,default,bool" json:"is_deleted"`
+	CreateTime string `thrift:"create_time,6" frugal:"6,default,string" json:"create_time"`
+	UpdateTime string `thrift:"update_time,7" frugal:"7,default,string" json:"update_time"`
 }
 
 func NewTemplateItem() *TemplateItem {
@@ -442,6 +502,10 @@ func (p *TemplateItem) GetContent() (v string) {
 	return p.Content
 }
 
+func (p *TemplateItem) GetIsDeleted() (v bool) {
+	return p.IsDeleted
+}
+
 func (p *TemplateItem) GetCreateTime() (v string) {
 	return p.CreateTime
 }
@@ -461,6 +525,9 @@ func (p *TemplateItem) SetName(val string) {
 func (p *TemplateItem) SetContent(val string) {
 	p.Content = val
 }
+func (p *TemplateItem) SetIsDeleted(val bool) {
+	p.IsDeleted = val
+}
 func (p *TemplateItem) SetCreateTime(val string) {
 	p.CreateTime = val
 }
@@ -473,8 +540,9 @@ var fieldIDToName_TemplateItem = map[int16]string{
 	2: "template_id",
 	3: "name",
 	4: "content",
-	5: "create_time",
-	6: "update_time",
+	5: "is_deleted",
+	6: "create_time",
+	7: "update_time",
 }
 
 func (p *TemplateItem) Read(iprot thrift.TProtocol) (err error) {
@@ -537,7 +605,7 @@ func (p *TemplateItem) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 5:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.BOOL {
 				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -549,6 +617,16 @@ func (p *TemplateItem) Read(iprot thrift.TProtocol) (err error) {
 		case 6:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField6(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 7:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField7(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -623,6 +701,15 @@ func (p *TemplateItem) ReadField4(iprot thrift.TProtocol) error {
 }
 
 func (p *TemplateItem) ReadField5(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadBool(); err != nil {
+		return err
+	} else {
+		p.IsDeleted = v
+	}
+	return nil
+}
+
+func (p *TemplateItem) ReadField6(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -631,7 +718,7 @@ func (p *TemplateItem) ReadField5(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *TemplateItem) ReadField6(iprot thrift.TProtocol) error {
+func (p *TemplateItem) ReadField7(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -668,6 +755,10 @@ func (p *TemplateItem) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField6(oprot); err != nil {
 			fieldId = 6
+			goto WriteFieldError
+		}
+		if err = p.writeField7(oprot); err != nil {
+			fieldId = 7
 			goto WriteFieldError
 		}
 
@@ -758,10 +849,10 @@ WriteFieldEndError:
 }
 
 func (p *TemplateItem) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 5); err != nil {
+	if err = oprot.WriteFieldBegin("is_deleted", thrift.BOOL, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.CreateTime); err != nil {
+	if err := oprot.WriteBool(p.IsDeleted); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -775,10 +866,10 @@ WriteFieldEndError:
 }
 
 func (p *TemplateItem) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 6); err != nil {
+	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 6); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.UpdateTime); err != nil {
+	if err := oprot.WriteString(p.CreateTime); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -789,6 +880,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
+}
+
+func (p *TemplateItem) writeField7(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 7); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.UpdateTime); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 7 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
 }
 
 func (p *TemplateItem) String() string {
@@ -816,10 +924,13 @@ func (p *TemplateItem) DeepEqual(ano *TemplateItem) bool {
 	if !p.Field4DeepEqual(ano.Content) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.CreateTime) {
+	if !p.Field5DeepEqual(ano.IsDeleted) {
 		return false
 	}
-	if !p.Field6DeepEqual(ano.UpdateTime) {
+	if !p.Field6DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field7DeepEqual(ano.UpdateTime) {
 		return false
 	}
 	return true
@@ -853,14 +964,21 @@ func (p *TemplateItem) Field4DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *TemplateItem) Field5DeepEqual(src string) bool {
+func (p *TemplateItem) Field5DeepEqual(src bool) bool {
+
+	if p.IsDeleted != src {
+		return false
+	}
+	return true
+}
+func (p *TemplateItem) Field6DeepEqual(src string) bool {
 
 	if strings.Compare(p.CreateTime, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *TemplateItem) Field6DeepEqual(src string) bool {
+func (p *TemplateItem) Field7DeepEqual(src string) bool {
 
 	if strings.Compare(p.UpdateTime, src) != 0 {
 		return false

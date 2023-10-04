@@ -22,10 +22,14 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
-const GitlabURLPrefix = "https://gitlab.com/"
+const (
+	GitlabURLPrefix = "https://gitlab.com/"
+	GithubURLPrefix = "https://github.com/"
+)
 
 func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ...string) error {
 	for _, folder := range folders {
@@ -69,18 +73,39 @@ func ParseGitlabIdlURL(url string) (idlPid, owner, repoName string, err error) {
 			tempPath = tempPath[:lastQuestionMarkIndex]
 		}
 	} else {
-		return "", "", "", errors.New("idlPath format wrong,do not have prefix:\"https://gitlab.com/\"")
+		return "", "", "", errors.New("idlPath format wrong,do not have prefix: " + GitlabURLPrefix)
 	}
-	urlParts := strings.Split(tempPath, "/")
-	if len(urlParts) < 5 {
-		return "", "", "", errors.New("idlPath format wrong")
+	regex := regexp.MustCompile(`([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`)
+	matches := regex.FindStringSubmatch(tempPath)
+	if len(matches) != 5 {
+		return "", "", "", errors.New("idlPath format wrong,cannot parse gitlab URL")
 	}
-	owner = urlParts[0]
-	repoName = urlParts[1]
-	for i := 5; i < len(urlParts); i++ {
-		idlPid = idlPid + "/" + urlParts[i]
+	owner = matches[1]
+	repoName = matches[2]
+	idlPid = matches[4]
+
+	return idlPid, owner, repoName, nil
+}
+
+func ParseGithubIdlURL(url string) (idlPid, owner, repoName string, err error) {
+	var tempPath string
+	if strings.HasPrefix(url, GithubURLPrefix) {
+		tempPath = url[len(GithubURLPrefix):]
+		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
+		if lastQuestionMarkIndex != -1 {
+			tempPath = tempPath[:lastQuestionMarkIndex]
+		}
+	} else {
+		return "", "", "", errors.New("idlPath format wrong,do not have prefix: " + GithubURLPrefix)
 	}
-	idlPid = idlPid[1:]
+	regex := regexp.MustCompile(`([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`)
+	matches := regex.FindStringSubmatch(tempPath)
+	if len(matches) != 5 {
+		return "", "", "", errors.New("idlPath format wrong,cannot parse github URL")
+	}
+	owner = matches[1]
+	repoName = matches[2]
+	idlPid = matches[4]
 	return idlPid, owner, repoName, nil
 }
 

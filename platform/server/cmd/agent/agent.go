@@ -107,7 +107,10 @@ func run(opts *setupOptions) error {
 
 	ctx := context.Background()
 
-	// init service context
+	// get server options
+	kitexServerOptions := config.GetManager().AgentConfigManager.GetKitexServerOptions()
+
+	// start service
 	svr := agentservice.NewServer(
 		&AgentServiceImpl{
 			ctx: ctx,
@@ -115,6 +118,7 @@ func run(opts *setupOptions) error {
 				DaoManager: daoManager,
 			},
 		},
+		kitexServerOptions...,
 	)
 
 	err = svr.Run()

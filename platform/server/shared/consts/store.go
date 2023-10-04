@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	StoreTypeMap = map[string]StoreType{
+	StoreTypeMapToNum = map[string]StoreType{
 		"mysql": StoreTypeMysql,
 		"mongo": StoreTypeMongo,
 		"redis": StoreTypeRedis,

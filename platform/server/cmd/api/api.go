@@ -20,6 +20,7 @@ package api
 
 import (
 	"errors"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
@@ -94,7 +95,12 @@ func run(opts *setupOptions) error {
 	// init logger
 	logger.InitLogger()
 
-	//ctx := context.Background()
+	// init service context
+	svc.InitServiceContext()
+
+	// start api service
+	register(config.GetManager().ApiConfigManager.Server)
+	config.GetManager().ApiConfigManager.Server.Spin()
 
 	return nil
 }

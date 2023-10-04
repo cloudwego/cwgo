@@ -32,7 +32,7 @@ func main() {
 	cmd.AddCommand(
 		api.NewCommand(),
 		agent.NewCommand(),
-		NewHelpCommand(),
+		//NewHelpCommand(),
 	)
 
 	if err := cmd.Execute(); err != nil {

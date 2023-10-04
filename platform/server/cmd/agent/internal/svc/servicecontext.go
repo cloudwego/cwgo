@@ -23,6 +23,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/thriftgo/config"
+	"go.uber.org/zap"
 )
 
 type ServiceContext struct {
@@ -32,10 +33,12 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	// TODO: add service initialization...
-	repoManager, err := repository.NewRepoManager()
+	// TODO: 初始化DaoManager并传入repoManager
+	var daoManager *dao.Manager
+
+	repoManager, err := repository.NewRepoManager(daoManager)
 	if err != nil {
-		logger.Logger.Fatal("service initialize repository manager failed")
+		logger.Logger.Fatal("service initialize repository manager failed", zap.Error(err))
 	}
 
 	return &ServiceContext{

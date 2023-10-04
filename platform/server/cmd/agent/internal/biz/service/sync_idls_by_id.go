@@ -21,7 +21,9 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
 type SyncIDLsByIdService struct {
@@ -37,7 +39,42 @@ func NewSyncIDLsByIdService(ctx context.Context, svcCtx *svc.ServiceContext) *Sy
 
 // Run create note info
 func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncIDLsByIdRes, err error) {
-	// Finish your business logic.
+	for _, v := range req.Ids {
+		Idl, err := s.svcCtx.DaoManager.Idl.GetIDL(v)
+		if err != nil {
+			resp.Code = 400
+			resp.Msg = err.Error()
+			return resp, err
+		}
 
-	return
+		repo, err := s.svcCtx.DaoManager.Repository.GetRepository(Idl.RepositoryId)
+		if err != nil {
+			resp.Code = 400
+			resp.Msg = err.Error()
+			return resp, err
+		}
+
+		switch repo.Type {
+		case consts.GitLab:
+			ref := consts.MainRef
+			owner, repoName, idlPath, err := utils.ParseGitlabIdlURL(Idl.MainIdlPath)
+			if err != nil {
+				resp.Code = 400
+				resp.Msg = err.Error()
+				return resp, err
+			}
+			file, err := s.svcCtx.RepoManager.GitLab.GetFile(repo.Id, owner, repoName, idlPath, ref)
+			err = s.svcCtx.DaoManager.Idl.SyncIDLContent(Idl.Id, string(file.Content))
+			if err != nil {
+				resp.Code = 400
+				resp.Msg = err.Error()
+				return resp, err
+			}
+		}
+	}
+
+	resp.Code = 0
+	resp.Msg = "sync IDLs success"
+
+	return resp, nil
 }

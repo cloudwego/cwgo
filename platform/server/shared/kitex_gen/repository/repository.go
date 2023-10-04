@@ -17,9 +17,10 @@ type Repository struct {
 	Status         string `thrift:"status,5" frugal:"5,default,string" json:"status"`
 	LastUpdateTime string `thrift:"last_update_time,6" frugal:"6,default,string" json:"last_update_time"`
 	LastSyncTime   string `thrift:"last_sync_time,7" frugal:"7,default,string" json:"last_sync_time"`
-	CreateTime     string `thrift:"create_time,8" frugal:"8,default,string" json:"create_time"`
-	UpdateTime     string `thrift:"update_time,9" frugal:"9,default,string" json:"update_time"`
-	RepoType       int32  `thrift:"repo_type,10" frugal:"10,default,i32" json:"repo_type"`
+	IsDeleted      bool   `thrift:"is_deleted,8" frugal:"8,default,bool" json:"is_deleted"`
+	CreateTime     string `thrift:"create_time,9" frugal:"9,default,string" json:"create_time"`
+	UpdateTime     string `thrift:"update_time,10" frugal:"10,default,string" json:"update_time"`
+	RepoType       int32  `thrift:"repo_type,11" frugal:"11,default,i32" json:"repo_type"`
 }
 
 func NewRepository() *Repository {
@@ -58,6 +59,10 @@ func (p *Repository) GetLastSyncTime() (v string) {
 	return p.LastSyncTime
 }
 
+func (p *Repository) GetIsDeleted() (v bool) {
+	return p.IsDeleted
+}
+
 func (p *Repository) GetCreateTime() (v string) {
 	return p.CreateTime
 }
@@ -90,6 +95,9 @@ func (p *Repository) SetLastUpdateTime(val string) {
 func (p *Repository) SetLastSyncTime(val string) {
 	p.LastSyncTime = val
 }
+func (p *Repository) SetIsDeleted(val bool) {
+	p.IsDeleted = val
+}
 func (p *Repository) SetCreateTime(val string) {
 	p.CreateTime = val
 }
@@ -108,9 +116,10 @@ var fieldIDToName_Repository = map[int16]string{
 	5:  "status",
 	6:  "last_update_time",
 	7:  "last_sync_time",
-	8:  "create_time",
-	9:  "update_time",
-	10: "repo_type",
+	8:  "is_deleted",
+	9:  "create_time",
+	10: "update_time",
+	11: "repo_type",
 }
 
 func (p *Repository) Read(iprot thrift.TProtocol) (err error) {
@@ -203,7 +212,7 @@ func (p *Repository) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 8:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.BOOL {
 				if err = p.ReadField8(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -223,8 +232,18 @@ func (p *Repository) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 10:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField10(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 11:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField11(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -326,10 +345,10 @@ func (p *Repository) ReadField7(iprot thrift.TProtocol) error {
 }
 
 func (p *Repository) ReadField8(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	if v, err := iprot.ReadBool(); err != nil {
 		return err
 	} else {
-		p.CreateTime = v
+		p.IsDeleted = v
 	}
 	return nil
 }
@@ -338,12 +357,21 @@ func (p *Repository) ReadField9(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.UpdateTime = v
+		p.CreateTime = v
 	}
 	return nil
 }
 
 func (p *Repository) ReadField10(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.UpdateTime = v
+	}
+	return nil
+}
+
+func (p *Repository) ReadField11(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -396,6 +424,10 @@ func (p *Repository) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField10(oprot); err != nil {
 			fieldId = 10
+			goto WriteFieldError
+		}
+		if err = p.writeField11(oprot); err != nil {
+			fieldId = 11
 			goto WriteFieldError
 		}
 
@@ -537,10 +569,10 @@ WriteFieldEndError:
 }
 
 func (p *Repository) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 8); err != nil {
+	if err = oprot.WriteFieldBegin("is_deleted", thrift.BOOL, 8); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.CreateTime); err != nil {
+	if err := oprot.WriteBool(p.IsDeleted); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -554,10 +586,10 @@ WriteFieldEndError:
 }
 
 func (p *Repository) writeField9(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 9); err != nil {
+	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 9); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.UpdateTime); err != nil {
+	if err := oprot.WriteString(p.CreateTime); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -571,10 +603,10 @@ WriteFieldEndError:
 }
 
 func (p *Repository) writeField10(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("repo_type", thrift.I32, 10); err != nil {
+	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 10); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.RepoType); err != nil {
+	if err := oprot.WriteString(p.UpdateTime); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -585,6 +617,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 10 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 10 end error: ", p), err)
+}
+
+func (p *Repository) writeField11(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("repo_type", thrift.I32, 11); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.RepoType); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 11 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 11 end error: ", p), err)
 }
 
 func (p *Repository) String() string {
@@ -621,13 +670,16 @@ func (p *Repository) DeepEqual(ano *Repository) bool {
 	if !p.Field7DeepEqual(ano.LastSyncTime) {
 		return false
 	}
-	if !p.Field8DeepEqual(ano.CreateTime) {
+	if !p.Field8DeepEqual(ano.IsDeleted) {
 		return false
 	}
-	if !p.Field9DeepEqual(ano.UpdateTime) {
+	if !p.Field9DeepEqual(ano.CreateTime) {
 		return false
 	}
-	if !p.Field10DeepEqual(ano.RepoType) {
+	if !p.Field10DeepEqual(ano.UpdateTime) {
+		return false
+	}
+	if !p.Field11DeepEqual(ano.RepoType) {
 		return false
 	}
 	return true
@@ -682,21 +734,28 @@ func (p *Repository) Field7DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *Repository) Field8DeepEqual(src string) bool {
+func (p *Repository) Field8DeepEqual(src bool) bool {
 
-	if strings.Compare(p.CreateTime, src) != 0 {
+	if p.IsDeleted != src {
 		return false
 	}
 	return true
 }
 func (p *Repository) Field9DeepEqual(src string) bool {
 
+	if strings.Compare(p.CreateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Repository) Field10DeepEqual(src string) bool {
+
 	if strings.Compare(p.UpdateTime, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *Repository) Field10DeepEqual(src int32) bool {
+func (p *Repository) Field11DeepEqual(src int32) bool {
 
 	if p.RepoType != src {
 		return false

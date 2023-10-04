@@ -7,8 +7,9 @@ struct IDL{
     4: string content
     5: string service_name
     6: string last_sync_time
-    7: string create_time
-    8: string update_time
+    7: bool is_deleted
+    8: string create_time
+    9: string update_time
 }
 
 struct AddIDLReq{

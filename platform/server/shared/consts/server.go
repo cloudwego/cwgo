@@ -21,6 +21,10 @@ package consts
 type ServerType uint32
 
 const (
+	ProjectName = "cwgo"
+)
+
+const (
 	ServerTypeNumApi ServerType = iota + 1
 	ServerTypeNumAgent
 

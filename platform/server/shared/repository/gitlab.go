@@ -24,18 +24,18 @@ import (
 )
 
 type GitLabApi struct {
-	Client *gitlab.Client
+	Client map[int64]*gitlab.Client
 }
 
-func (gl *GitLabApi) GetFile(owner, repoName, filePid, ref string) (*File, error) {
+func (gl *GitLabApi) GetFile(repoId int64, owner, repoName, filePath, ref string) (*File, error) {
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
-	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(pid, filePid, &gitlab.GetFileOptions{Ref: &ref})
+	fileContent, _, err := gl.Client[repoId].RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
 
-	name := filePid
-	index := strings.LastIndex(filePid, "/")
+	name := filePath
+	index := strings.LastIndex(filePath, "/")
 	if index != -1 {
 		name = name[index+1:]
 	}
@@ -52,7 +52,7 @@ func (gl *GitLabApi) GetFile(owner, repoName, filePid, ref string) (*File, error
 	}, nil
 }
 
-func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
+func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, repoId int64, owner, repoName, branch, commitMessage string) error {
 	// Implement PushFilesToRepository for GitLab
 	for filePath, content := range files {
 		contentStr := string(content)
@@ -62,7 +62,7 @@ func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoN
 			Content:       &contentStr,
 		}
 
-		_, _, err := gl.Client.RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
+		_, _, err := gl.Client[repoId].RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
 		if err != nil {
 			return err
 		}
@@ -71,13 +71,13 @@ func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoN
 	return nil
 }
 
-func (gl *GitLabApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
+func (gl *GitLabApi) GetRepositoryArchive(repoId int64, owner, repoName, format, ref string) ([]byte, error) {
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
 	archiveOptions := &gitlab.ArchiveOptions{
 		Format: &format, // Choose the archive format
 	}
 
-	fileData, _, err := gl.Client.Repositories.Archive(pid, archiveOptions)
+	fileData, _, err := gl.Client[repoId].Repositories.Archive(pid, archiveOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -85,9 +85,9 @@ func (gl *GitLabApi) GetRepositoryArchive(owner, repoName, format, ref string) (
 	return fileData, nil
 }
 
-func (gl *GitLabApi) GetLatestCommitHash(owner, repoName, filePid, ref string) (string, error) {
+func (gl *GitLabApi) GetLatestCommitHash(repoId int64, owner, repoName, filePath, ref string) (string, error) {
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
-	fileContent, _, err := gl.Client.RepositoryFiles.GetFile(pid, filePid, &gitlab.GetFileOptions{Ref: &ref})
+	fileContent, _, err := gl.Client[repoId].RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return "", err
 	}

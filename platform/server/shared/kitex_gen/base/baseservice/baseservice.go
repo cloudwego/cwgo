@@ -4,6 +4,7 @@ package baseservice
 
 import (
 	"context"
+
 	base "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base"
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
@@ -19,6 +20,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "BaseService"
 	handlerType := (*base.BaseService)(nil)
 	methods := map[string]kitex.MethodInfo{
+		"Ping":     kitex.NewMethodInfo(pingHandler, newBaseServicePingArgs, newBaseServicePingResult, false),
 		"Register": kitex.NewMethodInfo(registerHandler, newBaseServiceRegisterArgs, newBaseServiceRegisterResult, false),
 		"Login":    kitex.NewMethodInfo(loginHandler, newBaseServiceLoginArgs, newBaseServiceLoginResult, false),
 	}
@@ -34,6 +36,24 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		Extra:           extra,
 	}
 	return svcInfo
+}
+
+func pingHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*base.BaseServicePingArgs)
+	realResult := result.(*base.BaseServicePingResult)
+	success, err := handler.(base.BaseService).Ping(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newBaseServicePingArgs() interface{} {
+	return base.NewBaseServicePingArgs()
+}
+
+func newBaseServicePingResult() interface{} {
+	return base.NewBaseServicePingResult()
 }
 
 func registerHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -80,6 +100,16 @@ func newServiceClient(c client.Client) *kClient {
 	return &kClient{
 		c: c,
 	}
+}
+
+func (p *kClient) Ping(ctx context.Context, req *base.PingReq) (r *base.PingRes, err error) {
+	var _args base.BaseServicePingArgs
+	_args.Req = req
+	var _result base.BaseServicePingResult
+	if err = p.c.Call(ctx, "Ping", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
 }
 
 func (p *kClient) Register(ctx context.Context, req *base.RegisterReq) (r *base.RegisterRes, err error) {

@@ -42,20 +42,21 @@ func NewUpdateRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *UpdateRepositoryLogic) UpdateRepository(req *repository.UpdateRepositoryReq) (res *repository.UpdateRepositoryRes) {
-	if !utils.ValidStrings(req.Id, req.Token) {
+	if !utils.ValidStrings(req.Id, req.Token, req.Status) {
 		return &repository.UpdateRepositoryRes{
 			Code: 400,
 			Msg:  "err: The input field contains an empty string",
 		}
 	}
 
-	err := l.svcCtx.DaoManager.Repository.UpdateRepository(req.Id, req.Token)
+	err := l.svcCtx.DaoManager.Repository.UpdateRepository(req.Id, req.Token, req.Status)
 	if err != nil {
 		return &repository.UpdateRepositoryRes{
 			Code: 400,
 			Msg:  err.Error(),
 		}
 	}
+	//TODO: 给agent发送status变更
 
 	return &repository.UpdateRepositoryRes{
 		Code: 0,

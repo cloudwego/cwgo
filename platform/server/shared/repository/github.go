@@ -25,14 +25,14 @@ import (
 )
 
 type GitHubApi struct {
-	Client *github.Client
+	Client map[int64]*github.Client
 }
 
-func (g *GitHubApi) GetFile(owner, repoName, filePid, ref string) (*File, error) {
+func (g *GitHubApi) GetFile(repoId int64, owner, repoName, filePath, ref string) (*File, error) {
 	opts := &github.RepositoryContentGetOptions{
 		Ref: ref,
 	}
-	fileContent, _, err := g.Client.Repositories.DownloadContents(context.Background(), owner, repoName, filePid, opts)
+	fileContent, _, err := g.Client[repoId].Repositories.DownloadContents(context.Background(), owner, repoName, filePath, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -44,14 +44,14 @@ func (g *GitHubApi) GetFile(owner, repoName, filePid, ref string) (*File, error)
 	}
 
 	return &File{
-		Name:    filePid,
+		Name:    filePath,
 		Content: content,
 	}, nil
 }
 
-func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
+func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, repoId int64, owner, repoName, branch, commitMessage string) error {
 	// Get a reference to the default branch
-	ref, _, err := g.Client.Git.GetRef(context.Background(), owner, repoName, "refs/heads/"+branch)
+	ref, _, err := g.Client[repoId].Git.GetRef(context.Background(), owner, repoName, "refs/heads/"+branch)
 	if err != nil {
 		return err
 	}
@@ -65,13 +65,13 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 			Mode:    github.String("100644"),
 		})
 	}
-	newTree, _, err := g.Client.Git.CreateTree(context.Background(), owner, repoName, *ref.Object.SHA, treeEntries)
+	newTree, _, err := g.Client[repoId].Git.CreateTree(context.Background(), owner, repoName, *ref.Object.SHA, treeEntries)
 	if err != nil {
 		return err
 	}
 
 	// Create a new commit object, using the new tree as its foundation
-	newCommit, _, err := g.Client.Git.CreateCommit(context.Background(), owner, repoName, &github.Commit{
+	newCommit, _, err := g.Client[repoId].Git.CreateCommit(context.Background(), owner, repoName, &github.Commit{
 		Message: github.String(commitMessage),
 		Tree:    newTree,
 	})
@@ -80,7 +80,7 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	}
 
 	// Update branch references to point to new submissions
-	_, _, err = g.Client.Git.UpdateRef(context.Background(), owner, repoName, &github.Reference{
+	_, _, err = g.Client[repoId].Git.UpdateRef(context.Background(), owner, repoName, &github.Reference{
 		Ref: github.String("refs/heads/" + branch),
 		Object: &github.GitObject{
 			SHA:  newCommit.SHA,
@@ -94,12 +94,12 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	return nil
 }
 
-func (g *GitHubApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
+func (g *GitHubApi) GetRepositoryArchive(repoId int64, owner, repoName, format, ref string) ([]byte, error) {
 	opts := &github.RepositoryContentGetOptions{
 		Ref: ref,
 	}
 
-	archiveLink, _, err := g.Client.Repositories.GetArchiveLink(context.Background(), owner, repoName, github.ArchiveFormat(format), opts, false)
+	archiveLink, _, err := g.Client[repoId].Repositories.GetArchiveLink(context.Background(), owner, repoName, github.ArchiveFormat(format), opts, false)
 	if err != nil {
 		return nil, err
 	}
@@ -122,12 +122,12 @@ func (g *GitHubApi) GetRepositoryArchive(owner, repoName, format, ref string) ([
 	return archiveData, nil
 }
 
-func (gl *GitHubApi) GetLatestCommitHash(owner, repoName, filePid, ref string) (string, error) {
+func (g *GitHubApi) GetLatestCommitHash(repoId int64, owner, repoName, filePath, ref string) (string, error) {
 	opts := &github.RepositoryContentGetOptions{
 		Ref: ref,
 	}
 
-	fileContent, _, _, err := gl.Client.Repositories.GetContents(context.Background(), owner, repoName, filePid, opts)
+	fileContent, _, _, err := g.Client[repoId].Repositories.GetContents(context.Background(), owner, repoName, filePath, opts)
 	if err != nil {
 		return "", err
 	}

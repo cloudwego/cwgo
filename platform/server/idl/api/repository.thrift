@@ -8,9 +8,10 @@ struct Repository{
     5: string status
     6: string last_update_time
     7: string last_sync_time
-    8: string create_time
-    9: string update_time
-    10: i32 repo_type
+    8: bool is_deleted
+    9: string create_time
+    10: string update_time
+    11: i32 repo_type
 }
 
 struct AddRepositoryReq{

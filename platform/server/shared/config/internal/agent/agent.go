@@ -20,45 +20,43 @@ package agent
 
 import (
 	"fmt"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
+	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/transmeta"
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
-	"go.uber.org/zap"
 	"net"
 )
 
 type ConfigManager struct {
 	config                Config
-	RegistryConfigManager registry.IRegistryConfigManager
+	RegistryConfigManager registryconfig.IRegistryConfigManager
 	ServiceId             string
 	ServiceName           string
 }
 
-func NewConfigManager(config Config, registryConfig registry.Config) *ConfigManager {
-	var registryConfigManager registry.IRegistryConfigManager
+func NewConfigManager(config Config, registryConfig registryconfig.Config, serviceId string) *ConfigManager {
+	var registryConfigManager registryconfig.IRegistryConfigManager
 	var err error
 
 	switch registryConfig.Type {
 	case consts.RegistryTypeBuiltin:
-		registryConfigManager = nil
+		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin, nil)
+		if err != nil {
+			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
+		}
 
 	case consts.RegistryTypeConsul:
-		registryConfigManager, err = registry.NewConsulRegistryConfigManager(registryConfig.Consul)
+		registryConfigManager, err = registryconfig.NewConsulRegistryConfigManager(registryConfig.Consul)
 		if err != nil {
-			logger.Logger.Fatal("initialize registry failed", zap.Error(err))
+			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
 		}
 
 	default:
 
 	}
-
-	serviceId, _ := utils.NewServiceId()
 
 	return &ConfigManager{
 		config:                config,
@@ -71,23 +69,19 @@ func NewConfigManager(config Config, registryConfig registry.Config) *ConfigMana
 func (cm *ConfigManager) GetKitexServerOptions() []server.Option {
 	var KitexServerOptions []server.Option
 	if addr, err := net.ResolveTCPAddr("tcp", cm.config.Addr); err != nil {
-		logger.Logger.Fatal("resolve tcp addr failed.", zap.Error(err), zap.String("addr", cm.config.Addr))
+		panic(fmt.Sprintf("resolve tcp addr failed, err: %v, addr: %s", err, cm.config.Addr))
 	} else {
 		KitexServerOptions = append(KitexServerOptions, server.WithServiceAddr(addr))
 	}
 
-	if cm.RegistryConfigManager != nil {
-		kitexRegistry, kitexRegistryInfo := cm.RegistryConfigManager.GetKitexRegistry(
-			cm.ServiceId,
-			cm.ServiceName,
-			cm.config.Addr,
-		)
+	kitexRegistry, kitexRegistryInfo := cm.RegistryConfigManager.GetKitexRegistry(
+		cm.ServiceName,
+		cm.ServiceId,
+		cm.config.Addr,
+	)
 
-		KitexServerOptions = append(KitexServerOptions, server.WithRegistry(kitexRegistry))
-		KitexServerOptions = append(KitexServerOptions, server.WithRegistryInfo(kitexRegistryInfo))
-	} else {
-
-	}
+	KitexServerOptions = append(KitexServerOptions, server.WithRegistry(kitexRegistry))
+	KitexServerOptions = append(KitexServerOptions, server.WithRegistryInfo(kitexRegistryInfo))
 
 	KitexServerOptions = append(KitexServerOptions, server.WithLimit(&limit.Option{MaxConnections: 2000, MaxQPS: 500}))
 

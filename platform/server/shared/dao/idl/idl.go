@@ -56,7 +56,7 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) erro
 		CreateTime:   timeNow,
 		UpdateTime:   timeNow,
 	}
-	res := r.db.Create(&idl)
+	res := r.db.Table(consts.TableNameIDL).Create(&idl)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -66,7 +66,7 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) erro
 
 func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
 	var idl idl.IDL
-	res := r.db.Delete(&idl, ids)
+	res := r.db.Table(consts.TableNameIDL).Delete(&idl, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -76,7 +76,7 @@ func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
 
 func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Where("id = ?", id).Updates(idl.IDL{
+	res := r.db.Table(consts.TableNameIDL).Where("id = ?", id).Updates(idl.IDL{
 		Id:           id,
 		RepositoryId: repoId,
 		MainIdlPath:  idlPath,
@@ -92,7 +92,7 @@ func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName strin
 
 func (r *MysqlIDLManager) GetIDL(id int64) (idl.IDL, error) {
 	var idl idl.IDL
-	res := r.db.Where("id = ?", id).First(&idl)
+	res := r.db.Table(consts.TableNameIDL).Where("id = ?", id).First(&idl)
 	if res.Error != nil {
 		return idl, res.Error
 	}
@@ -118,7 +118,7 @@ func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*
 		orderBy = orderBy + " " + consts.Inc
 	}
 
-	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&IDLs)
+	res := r.db.Table(consts.TableNameIDL).Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&IDLs)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -128,7 +128,7 @@ func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*
 
 func (r *MysqlIDLManager) SyncIDLContent(id int64, content string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Where("id = ?", id).Updates(idl.IDL{
+	res := r.db.Table(consts.TableNameIDL).Where("id = ?", id).Updates(idl.IDL{
 		Content:      content,
 		LastSyncTime: timeNow,
 		UpdateTime:   timeNow,

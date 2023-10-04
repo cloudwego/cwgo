@@ -2,6 +2,13 @@ namespace go base
 
 include "../base/user.thrift"
 
+struct PingReq{
+}
+struct PingRes{
+    1: i32 code
+    2: string msg
+}
+
 struct RegisterReq{
     1: string username (api.form="username,required")
     2: string password (api.form="password,required")
@@ -25,6 +32,7 @@ struct LoginResData{
 }
 
 service BaseService {
+    PingRes Ping(1: PingReq req)(api.get="/ping")
 
     RegisterRes Register(1: RegisterReq req) (api.post="/register")
     LoginRes Login(1: LoginReq req) (api.post="/login");

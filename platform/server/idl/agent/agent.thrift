@@ -26,7 +26,7 @@ struct UpdateRepositoryStatusRes{
 }
 
 struct SyncIDLsByIdReq{
-    1: list<i64> ids (api.body="ids,required")
+    1: list<i64> ids
 }
 struct SyncIDLsByIdRes{
     1: i32 code

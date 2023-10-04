@@ -29,8 +29,10 @@ type StoreConfigManager struct {
 }
 
 func NewStoreConfigManager(config Config) *StoreConfigManager {
+
 	return &StoreConfigManager{
-		config: config,
+		config:    config,
+		storeType: consts.StoreTypeMapToNum[config.Type],
 	}
 }
 

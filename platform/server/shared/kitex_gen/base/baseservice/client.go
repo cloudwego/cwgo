@@ -4,6 +4,7 @@ package baseservice
 
 import (
 	"context"
+
 	base "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
@@ -11,6 +12,7 @@ import (
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
+	Ping(ctx context.Context, req *base.PingReq, callOptions ...callopt.Option) (r *base.PingRes, err error)
 	Register(ctx context.Context, req *base.RegisterReq, callOptions ...callopt.Option) (r *base.RegisterRes, err error)
 	Login(ctx context.Context, req *base.LoginReq, callOptions ...callopt.Option) (r *base.LoginRes, err error)
 }
@@ -42,6 +44,11 @@ func MustNewClient(destService string, opts ...client.Option) Client {
 
 type kBaseServiceClient struct {
 	*kClient
+}
+
+func (p *kBaseServiceClient) Ping(ctx context.Context, req *base.PingReq, callOptions ...callopt.Option) (r *base.PingRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.Ping(ctx, req)
 }
 
 func (p *kBaseServiceClient) Register(ctx context.Context, req *base.RegisterReq, callOptions ...callopt.Option) (r *base.RegisterRes, err error) {

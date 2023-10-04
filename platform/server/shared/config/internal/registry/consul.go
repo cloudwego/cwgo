@@ -20,18 +20,12 @@ package registry
 
 import (
 	"fmt"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
-	hertzregistry "github.com/cloudwego/hertz/pkg/app/server/registry"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	kitexregistry "github.com/cloudwego/kitex/pkg/registry"
 	consulapi "github.com/hashicorp/consul/api"
 	"github.com/hashicorp/go-cleanhttp"
-	hertzconsul "github.com/hertz-contrib/registry/consul"
 	kitexconsul "github.com/kitex-contrib/registry-consul"
-	"go.uber.org/zap"
-	"net"
-	"strconv"
 )
 
 type ConsulRegistryConfig struct {
@@ -97,54 +91,7 @@ func NewConsulRegistryConfigManager(config ConsulRegistryConfig) (*ConsulRegistr
 	}, nil
 }
 
-func (cm *ConsulRegistryConfigManager) GetHertzRegistry(serviceId int, serviceName string, Host string, port int) (hertzregistry.Registry, *hertzregistry.Info) {
-	registry := hertzconsul.NewConsulRegister(
-		cm.consulClient,
-		hertzconsul.WithCheck(&consulapi.AgentServiceCheck{
-			CheckID:                        "",
-			Name:                           "",
-			Args:                           nil,
-			DockerContainerID:              "",
-			Shell:                          "",
-			Interval:                       "7s",
-			Timeout:                        "5s",
-			TTL:                            "",
-			HTTP:                           "",
-			Header:                         nil,
-			Method:                         "",
-			Body:                           "",
-			TCP:                            "",
-			UDP:                            "",
-			Status:                         "",
-			Notes:                          "",
-			TLSServerName:                  "",
-			TLSSkipVerify:                  false,
-			GRPC:                           "",
-			GRPCUseTLS:                     false,
-			H2PING:                         "",
-			H2PingUseTLS:                   false,
-			AliasNode:                      "",
-			AliasService:                   "",
-			SuccessBeforePassing:           0,
-			FailuresBeforeWarning:          0,
-			FailuresBeforeCritical:         0,
-			DeregisterCriticalServiceAfter: "15s",
-		}),
-	)
-
-	registryInfo := &hertzregistry.Info{
-		ServiceName: serviceName,
-		Addr:        utils.NewNetAddr("tcp", net.JoinHostPort(Host, strconv.Itoa(port))),
-		Weight:      hertzregistry.DefaultWeight,
-		Tags: map[string]string{
-			"service_id": strconv.Itoa(serviceId),
-		},
-	}
-
-	return registry, registryInfo
-}
-
-func (cm *ConsulRegistryConfigManager) GetKitexRegistry(serviceId int, serviceName string, addr string) (kitexregistry.Registry, *kitexregistry.Info) {
+func (cm *ConsulRegistryConfigManager) GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info) {
 	registry, err := kitexconsul.NewConsulRegisterWithConfig(
 		cm.consulApiConfig,
 		kitexconsul.WithCheck(&consulapi.AgentServiceCheck{
@@ -179,16 +126,20 @@ func (cm *ConsulRegistryConfigManager) GetKitexRegistry(serviceId int, serviceNa
 		}),
 	)
 	if err != nil {
-		logger.Logger.Fatal("initialize consul registry failed.", zap.Error(err))
+		panic(fmt.Sprintf("initialize consul registry failed, err: %v", err))
 	}
 
 	registryInfo := &kitexregistry.Info{
 		ServiceName: serviceName,
 		Addr:        utils.NewNetAddr("tcp", addr),
 		Tags: map[string]string{
-			"service_id": strconv.Itoa(serviceId),
+			"service_id": serviceId,
 		},
 	}
 
 	return registry, registryInfo
+}
+
+func (cm *ConsulRegistryConfigManager) GetDiscoveryResolver() discovery.Resolver {
+	return cm.consulResolver
 }

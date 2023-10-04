@@ -57,7 +57,7 @@ func (r *MysqlTemplateManager) AddTemplate(name string, _type int32) error {
 		CreateTime: timeNow,
 		UpdateTime: timeNow,
 	}
-	res := r.db.Create(&template)
+	res := r.db.Table(consts.TableNameTemplate).Create(&template)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -67,7 +67,7 @@ func (r *MysqlTemplateManager) AddTemplate(name string, _type int32) error {
 
 func (r *MysqlTemplateManager) DeleteTemplate(ids []int64) error {
 	var template template.Template
-	res := r.db.Delete(&template, ids)
+	res := r.db.Table(consts.TableNameTemplate).Delete(&template, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -77,7 +77,7 @@ func (r *MysqlTemplateManager) DeleteTemplate(ids []int64) error {
 
 func (r *MysqlTemplateManager) UpdateTemplate(id int64, name string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Where("id = ?", id).Updates(template.Template{
+	res := r.db.Table(consts.TableNameTemplate).Where("id = ?", id).Updates(template.Template{
 		Name:       name,
 		UpdateTime: timeNow,
 	})
@@ -106,7 +106,7 @@ func (r *MysqlTemplateManager) GetTemplates(page, limit, order int32, orderBy st
 		orderBy = orderBy + " " + consts.Inc
 	}
 
-	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&templates)
+	res := r.db.Table(consts.TableNameTemplate).Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&templates)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -123,7 +123,7 @@ func (r *MysqlTemplateManager) AddTemplateItem(templateId int64, name, content s
 		CreateTime: timeNow,
 		UpdateTime: timeNow,
 	}
-	res := r.db.Create(&templateItem)
+	res := r.db.Table(consts.TableNameTemplateItem).Create(&templateItem)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -133,7 +133,7 @@ func (r *MysqlTemplateManager) AddTemplateItem(templateId int64, name, content s
 
 func (r *MysqlTemplateManager) DeleteTemplateItem(ids []int64) error {
 	var template template.TemplateItem
-	res := r.db.Delete(&template, ids)
+	res := r.db.Table(consts.TableNameTemplateItem).Delete(&template, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -143,7 +143,7 @@ func (r *MysqlTemplateManager) DeleteTemplateItem(ids []int64) error {
 
 func (r *MysqlTemplateManager) UpdateTemplateItem(id int64, name, content string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Where("id = ?", id).Updates(template.TemplateItem{
+	res := r.db.Table(consts.TableNameTemplateItem).Where("id = ?", id).Updates(template.TemplateItem{
 		Name:       name,
 		Content:    content,
 		UpdateTime: timeNow,
@@ -173,7 +173,7 @@ func (r *MysqlTemplateManager) GetTemplateItems(page, limit, order int32, orderB
 		orderBy = orderBy + " " + consts.Inc
 	}
 
-	res := r.db.Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&templateItems)
+	res := r.db.Table(consts.TableNameTemplateItem).Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&templateItems)
 	if res.Error != nil {
 		return nil, res.Error
 	}
