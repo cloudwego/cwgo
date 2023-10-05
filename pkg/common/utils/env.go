@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package consts
+package utils
 
-import "runtime"
-
-const Protobuf = "protobuf"
-
-// SysType is the running program's operating system type
-const SysType = runtime.GOOS
-
-const WindowsOS = "windows"
-
-const (
-	Slash     = "/"
-	BackSlash = "\\"
+import (
+	"github.com/cloudwego/cwgo/pkg/consts"
 )
+
+// IsWindows determines whether the current operating system is Windows
+func IsWindows() bool {
+	return consts.SysType == consts.WindowsOS
+}
