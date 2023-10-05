@@ -98,8 +98,8 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, servi
 func (cm *ConfigManager) NewManager() *manager.Manager {
 	var updateInterval time.Duration
 	var err error
-	if cm.config.Dispatcher.UpdateInterval != "" {
-		updateInterval, err = time.ParseDuration(cm.config.Dispatcher.UpdateInterval)
+	if cm.config.UpdateInterval != "" {
+		updateInterval, err = time.ParseDuration(cm.config.UpdateInterval)
 		if err != nil {
 			panic(fmt.Errorf("invalid update interval, err: %v", err))
 		}

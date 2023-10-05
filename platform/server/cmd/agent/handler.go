@@ -58,3 +58,10 @@ func (s *AgentServiceImpl) SyncIDLsById(ctx context.Context, req *agent.SyncIDLs
 
 	return resp, err
 }
+
+// UpdateTasks implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq) (resp *agent.UpdateTasksRes, err error) {
+	resp, err = service.NewUpdateTasksService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}

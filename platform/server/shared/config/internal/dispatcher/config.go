@@ -19,6 +19,5 @@
 package dispatcher
 
 type Config struct {
-	Type           string `mapstructure:"type"`
-	UpdateInterval string `mapstructure:"updateInterval"`
+	Type string `mapstructure:"type"`
 }

@@ -19,11 +19,20 @@
 package manager
 
 import (
+	"context"
+	"github.com/bytedance/sonic"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent/agentservice"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/service"
+	"github.com/cloudwego/kitex/client"
 	"go.uber.org/zap"
+	"sync"
 	"time"
 )
 
@@ -40,6 +49,8 @@ const (
 )
 
 func NewManager(dispatcher dispatcher.IDispatcher, registry registry.IRegistry, updateInterval time.Duration) *Manager {
+	// TODO: init dispatcher tasks
+
 	return &Manager{
 		agents:         make([]*service.Service, 0),
 		updateInterval: updateInterval,
@@ -98,6 +109,48 @@ func (m *Manager) StartUpdate() {
 		}
 
 		m.agents = services
+
+		if len(addServiceIds) != 0 || len(delServicesIds) != 0 {
+			// service changed, update cron
+			var wg sync.WaitGroup
+			for _, svr := range m.agents {
+				wg.Add(1)
+				go func(serviceId string) {
+					defer wg.Done()
+
+					c, err := agentservice.NewClient(
+						consts.ProjectName+"-"+consts.ServerTypeAgent,
+						client.WithResolver(config.GetManager().ApiConfigManager.RegistryConfigManager.GetDiscoveryResolver()),
+						client.WithTag("service_id", serviceId),
+					)
+					if err != nil {
+						logger.Logger.Error("connect to agent failed", zap.Error(err), zap.String("service_id", serviceId))
+					}
+
+					tasks := m.dispatcher.GetTaskByServiceId(serviceId)
+
+					tasksModels := make([]*base.Task, len(tasks))
+					for i, t := range tasks {
+						data, _ := sonic.MarshalString(t.Data)
+						tasksModels[i] = &base.Task{
+							Id:           t.Id,
+							Type:         t.Type,
+							ScheduleTime: t.ScheduleTime.String(),
+							Data:         data,
+						}
+					}
+
+					res, err := c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasksModels})
+					if err != nil {
+						logger.Logger.Error("call rpc client failed", zap.Error(err), zap.String("service_id", serviceId))
+					}
+					if res.Code != 0 {
+						logger.Logger.Error("update tasks failed", zap.String("err", res.Msg))
+					}
+				}(svr.Id)
+			}
+			wg.Wait()
+		}
 	}
 }
 

@@ -21,12 +21,13 @@ package api
 import "github.com/cloudwego/cwgo/platform/server/shared/config/internal/dispatcher"
 
 type Config struct {
-	Host       string                `mapstructure:"host"`
-	Port       int                   `mapstructure:"port"`
-	Tracing    TracerConf            `mapstructure:"tracing"`
-	MetricsUrl string                `mapstructure:"metricsUrl"`
-	RpcClients map[int]RpcClientConf `mapstructure:"rpcClients"`
-	Dispatcher dispatcher.Config     `mapstructure:"dispatcher"`
+	Host           string                `mapstructure:"host"`
+	Port           int                   `mapstructure:"port"`
+	Tracing        TracerConf            `mapstructure:"tracing"`
+	MetricsUrl     string                `mapstructure:"metricsUrl"`
+	RpcClients     map[int]RpcClientConf `mapstructure:"rpcClients"`
+	Dispatcher     dispatcher.Config     `mapstructure:"dispatcher"`
+	UpdateInterval string                `mapstructure:"updateInterval"`
 }
 
 type TracerConf struct {

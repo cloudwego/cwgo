@@ -28,11 +28,12 @@ type Task struct {
 }
 
 type SyncRepoData struct {
-	RepositoryId string
+	RepositoryId string `json:"repository_id"`
 }
 
 type Type uint32
 
 const (
-	SyncRepo Type = iota + 1
+	SyncIdl Type = iota + 1
+	SyncRepo
 )

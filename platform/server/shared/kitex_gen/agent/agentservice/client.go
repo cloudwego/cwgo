@@ -15,6 +15,7 @@ type Client interface {
 	SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error)
 	UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error)
 	SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq, callOptions ...callopt.Option) (r *agent.SyncIDLsByIdRes, err error)
+	UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -64,4 +65,9 @@ func (p *kAgentServiceClient) UpdateRepositoryStatus(ctx context.Context, req *a
 func (p *kAgentServiceClient) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq, callOptions ...callopt.Option) (r *agent.SyncIDLsByIdRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.SyncIDLsById(ctx, req)
+}
+
+func (p *kAgentServiceClient) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateTasks(ctx, req)
 }

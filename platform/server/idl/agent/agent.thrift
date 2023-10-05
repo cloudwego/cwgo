@@ -1,5 +1,7 @@
 namespace go agent
 
+include "../base/model.thrift"
+
 struct GenerateCodeReq{
     1: i64 idl_id
 }
@@ -33,9 +35,19 @@ struct SyncIDLsByIdRes{
     2: string msg
 }
 
+struct UpdateTasksReq{
+    1: list<model.Task> tasks
+}
+struct UpdateTasksRes{
+    1: i32 code
+    2: string msg
+}
+
 service AgentService {
     GenerateCodeRes GenerateCode(1: GenerateCodeReq req)
     SyncRepositoryByIdRes SyncRepositoryById(1: SyncRepositoryByIdReq req)
     UpdateRepositoryStatusRes UpdateRepositoryStatus(1: UpdateRepositoryStatusReq req)
     SyncIDLsByIdRes SyncIDLsById(1: SyncIDLsByIdReq req)
+
+    UpdateTasksRes UpdateTasks(1: UpdateTasksReq req)
 }

@@ -23,6 +23,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"SyncRepositoryById":     kitex.NewMethodInfo(syncRepositoryByIdHandler, newAgentServiceSyncRepositoryByIdArgs, newAgentServiceSyncRepositoryByIdResult, false),
 		"UpdateRepositoryStatus": kitex.NewMethodInfo(updateRepositoryStatusHandler, newAgentServiceUpdateRepositoryStatusArgs, newAgentServiceUpdateRepositoryStatusResult, false),
 		"SyncIDLsById":           kitex.NewMethodInfo(syncIDLsByIdHandler, newAgentServiceSyncIDLsByIdArgs, newAgentServiceSyncIDLsByIdResult, false),
+		"UpdateTasks":            kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "agent",
@@ -110,6 +111,24 @@ func newAgentServiceSyncIDLsByIdResult() interface{} {
 	return agent.NewAgentServiceSyncIDLsByIdResult()
 }
 
+func updateTasksHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceUpdateTasksArgs)
+	realResult := result.(*agent.AgentServiceUpdateTasksResult)
+	success, err := handler.(agent.AgentService).UpdateTasks(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceUpdateTasksArgs() interface{} {
+	return agent.NewAgentServiceUpdateTasksArgs()
+}
+
+func newAgentServiceUpdateTasksResult() interface{} {
+	return agent.NewAgentServiceUpdateTasksResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -155,6 +174,16 @@ func (p *kClient) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq) 
 	_args.Req = req
 	var _result agent.AgentServiceSyncIDLsByIdResult
 	if err = p.c.Call(ctx, "SyncIDLsById", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq) (r *agent.UpdateTasksRes, err error) {
+	var _args agent.AgentServiceUpdateTasksArgs
+	_args.Req = req
+	var _result agent.AgentServiceUpdateTasksResult
+	if err = p.c.Call(ctx, "UpdateTasks", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
