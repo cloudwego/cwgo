@@ -24,6 +24,8 @@ import (
 	"strings"
 
 	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/hertz/cmd/hz/util"
 )
 
@@ -71,19 +73,31 @@ func check(sa *config.ServerArgument) error {
 
 	// Generate the project under gopath, use the relative path as the package name
 	if strings.HasPrefix(sa.Cwd, sa.GoSrc) {
-		if gopkg, err := filepath.Rel(sa.GoSrc, sa.Cwd); err != nil {
+		if goPkg, err := filepath.Rel(sa.GoSrc, sa.Cwd); err != nil {
 			return fmt.Errorf("get relative path to GOPATH/src failed: %s", err)
 		} else {
-			sa.GoPkg = gopkg
+			sa.GoPkg = goPkg
 		}
+
 		if sa.GoMod == "" {
-			sa.GoMod = sa.GoPkg
+			if utils.IsWindows() {
+				sa.GoMod = strings.ReplaceAll(sa.GoPkg, consts.BackSlash, consts.Slash)
+			} else {
+				sa.GoMod = sa.GoPkg
+			}
 		}
-		if sa.GoMod != "" && sa.GoMod != sa.GoPkg {
-			return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", sa.GoMod, sa.GoPkg)
-		}
-		if sa.GoMod == "" {
-			sa.GoMod = sa.GoPkg
+
+		if sa.GoMod != "" {
+			if utils.IsWindows() {
+				goPkgSlash := strings.ReplaceAll(sa.GoPkg, consts.BackSlash, consts.Slash)
+				if goPkgSlash != sa.GoMod {
+					return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", sa.GoMod, goPkgSlash)
+				}
+			} else {
+				if sa.GoMod != sa.GoPkg {
+					return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", sa.GoMod, sa.GoPkg)
+				}
+			}
 		}
 	}
 	return nil
