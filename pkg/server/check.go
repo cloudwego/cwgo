@@ -73,10 +73,10 @@ func check(sa *config.ServerArgument) error {
 
 	// Generate the project under gopath, use the relative path as the package name
 	if strings.HasPrefix(sa.Cwd, sa.GoSrc) {
-		if gopkg, err := filepath.Rel(sa.GoSrc, sa.Cwd); err != nil {
+		if goPkg, err := filepath.Rel(sa.GoSrc, sa.Cwd); err != nil {
 			return fmt.Errorf("get relative path to GOPATH/src failed: %s", err)
 		} else {
-			sa.GoPkg = gopkg
+			sa.GoPkg = goPkg
 		}
 
 		if sa.GoMod == "" {
@@ -98,10 +98,6 @@ func check(sa *config.ServerArgument) error {
 					return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", sa.GoMod, sa.GoPkg)
 				}
 			}
-		}
-
-		if sa.GoMod == "" {
-			sa.GoMod = sa.GoPkg
 		}
 	}
 	return nil
