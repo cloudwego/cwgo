@@ -17,3 +17,27 @@
  */
 
 package generator
+
+import (
+	"os/exec"
+)
+
+type CwgoGenerator struct {
+}
+
+func NewCwgoGenerator() *CwgoGenerator {
+	return &CwgoGenerator{}
+}
+
+func (g *CwgoGenerator) Generate(idlPath, serviceName, generatePath string) error {
+	cwgoCmd := exec.Command("cwgo", "client",
+		"--idl", idlPath,
+		"--type", "rpc",
+		"--service", serviceName,
+		"--module", serviceName,
+	)
+
+	cwgoCmd.Dir = generatePath
+
+	return cwgoCmd.Run()
+}

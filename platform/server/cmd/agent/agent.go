@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/generator"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
@@ -123,6 +124,7 @@ func run(opts *setupOptions) error {
 			svcCtx: &svc.ServiceContext{
 				DaoManager:  daoManager,
 				RepoManager: repoManager,
+				Generator:   generator.NewCwgoGenerator(),
 			},
 		},
 		kitexServerOptions...,

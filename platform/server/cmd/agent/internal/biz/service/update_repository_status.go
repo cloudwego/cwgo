@@ -23,7 +23,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
-	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
@@ -48,29 +47,17 @@ func (s *UpdateRepositoryStatusService) Run(req *agent.UpdateRepositoryStatusReq
 		return resp, err
 	}
 
-	switch repo.Type {
-	case consts.GitLab:
-		s.svcCtx.RepoManager.MuGitlab.Lock()
-		defer s.svcCtx.RepoManager.MuGitlab.Unlock()
-		if req.Status == consts.Active {
-			s.svcCtx.RepoManager.GitLab.Client[req.Id], err = repository.NewGitlabClient(repo.Token)
-			if err != nil {
-				resp.Code = 400
-				resp.Msg = err.Error()
-				return resp, err
-			}
-		} else if req.Status == consts.DisActive {
-			delete(s.svcCtx.RepoManager.GitLab.Client, req.Id)
+	if req.Status == consts.Active {
+		err = s.svcCtx.RepoManager.AddClient(repo)
+		if err != nil {
+			resp.Code = 400
+			resp.Msg = err.Error()
+			return resp, err
 		}
-	case consts.Github:
-		s.svcCtx.RepoManager.MuGitHub.Lock()
-		defer s.svcCtx.RepoManager.MuGitHub.Unlock()
-		if req.Status == consts.Active {
-			s.svcCtx.RepoManager.GitHub.Client[req.Id] = repository.NewGithubClient(repo.Token)
-		} else if req.Status == consts.DisActive {
-			delete(s.svcCtx.RepoManager.GitHub.Client, req.Id)
-		}
+	} else if req.Status == consts.DisActive {
+		s.svcCtx.RepoManager.DelClient(repo)
 	}
+
 	resp.Code = 0
 	resp.Msg = "update status success"
 

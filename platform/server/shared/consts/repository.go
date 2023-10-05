@@ -5,6 +5,9 @@ const (
 	Active       = "active"
 	DisActive    = "disactive"
 	InvalidToken = "invalid_token"
-	GitLab       = 0
-	Github       = iota
+)
+
+const (
+	GitLab = iota + 1
+	Github
 )

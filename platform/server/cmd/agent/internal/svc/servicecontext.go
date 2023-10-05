@@ -19,6 +19,7 @@
 package svc
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/generator"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 )
@@ -26,4 +27,5 @@ import (
 type ServiceContext struct {
 	DaoManager  *dao.Manager
 	RepoManager *repository.Manager
+	Generator   generator.IGenerator
 }

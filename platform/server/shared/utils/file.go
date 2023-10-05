@@ -17,18 +17,10 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
-)
-
-const (
-	GitlabURLPrefix = "https://gitlab.com/"
-	GithubURLPrefix = "https://github.com/"
 )
 
 func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ...string) error {
@@ -62,51 +54,6 @@ func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ..
 	}
 
 	return nil
-}
-
-func ParseGitlabIdlURL(url string) (idlPid, owner, repoName string, err error) {
-	var tempPath string
-	if strings.HasPrefix(url, GitlabURLPrefix) {
-		tempPath = url[len(GitlabURLPrefix):]
-		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
-		if lastQuestionMarkIndex != -1 {
-			tempPath = tempPath[:lastQuestionMarkIndex]
-		}
-	} else {
-		return "", "", "", errors.New("idlPath format wrong,do not have prefix: " + GitlabURLPrefix)
-	}
-	regex := regexp.MustCompile(`([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`)
-	matches := regex.FindStringSubmatch(tempPath)
-	if len(matches) != 5 {
-		return "", "", "", errors.New("idlPath format wrong,cannot parse gitlab URL")
-	}
-	owner = matches[1]
-	repoName = matches[2]
-	idlPid = matches[4]
-
-	return idlPid, owner, repoName, nil
-}
-
-func ParseGithubIdlURL(url string) (idlPid, owner, repoName string, err error) {
-	var tempPath string
-	if strings.HasPrefix(url, GithubURLPrefix) {
-		tempPath = url[len(GithubURLPrefix):]
-		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
-		if lastQuestionMarkIndex != -1 {
-			tempPath = tempPath[:lastQuestionMarkIndex]
-		}
-	} else {
-		return "", "", "", errors.New("idlPath format wrong,do not have prefix: " + GithubURLPrefix)
-	}
-	regex := regexp.MustCompile(`([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`)
-	matches := regex.FindStringSubmatch(tempPath)
-	if len(matches) != 5 {
-		return "", "", "", errors.New("idlPath format wrong,cannot parse github URL")
-	}
-	owner = matches[1]
-	repoName = matches[2]
-	idlPid = matches[4]
-	return idlPid, owner, repoName, nil
 }
 
 func CheckNotExist(src string) bool {

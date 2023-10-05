@@ -18,18 +18,53 @@ package repository
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/xanzy/go-gitlab"
+	"regexp"
 	"strings"
 )
 
 type GitLabApi struct {
-	Client map[int64]*gitlab.Client
+	client *gitlab.Client
 }
 
-func (gl *GitLabApi) GetFile(repoId int64, owner, repoName, filePath, ref string) (*File, error) {
+func NewGitLabApi(client *gitlab.Client) *GitLabApi {
+	return &GitLabApi{
+		client: client,
+	}
+}
+
+const (
+	gitlabURLPrefix = "https://gitlab.com/"
+)
+
+func (a *GitLabApi) ParseUrl(url string) (filePid, owner, repoName string, err error) {
+	var tempPath string
+	if strings.HasPrefix(url, gitlabURLPrefix) {
+		tempPath = url[len(gitlabURLPrefix):]
+		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
+		if lastQuestionMarkIndex != -1 {
+			tempPath = tempPath[:lastQuestionMarkIndex]
+		}
+	} else {
+		return "", "", "", errors.New("idlPath format wrong,do not have prefix: " + gitlabURLPrefix)
+	}
+	regex := regexp.MustCompile(`([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`)
+	matches := regex.FindStringSubmatch(tempPath)
+	if len(matches) != 5 {
+		return "", "", "", errors.New("idlPath format wrong,cannot parse gitlab URL")
+	}
+	owner = matches[1]
+	repoName = matches[2]
+	filePid = matches[4]
+
+	return filePid, owner, repoName, nil
+}
+
+func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
-	fileContent, _, err := gl.Client[repoId].RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
+	fileContent, _, err := a.client.RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +87,7 @@ func (gl *GitLabApi) GetFile(repoId int64, owner, repoName, filePath, ref string
 	}, nil
 }
 
-func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, repoId int64, owner, repoName, branch, commitMessage string) error {
+func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
 	// Implement PushFilesToRepository for GitLab
 	for filePath, content := range files {
 		contentStr := string(content)
@@ -62,7 +97,7 @@ func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, repoId int64
 			Content:       &contentStr,
 		}
 
-		_, _, err := gl.Client[repoId].RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
+		_, _, err := a.client.RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
 		if err != nil {
 			return err
 		}
@@ -71,13 +106,13 @@ func (gl *GitLabApi) PushFilesToRepository(files map[string][]byte, repoId int64
 	return nil
 }
 
-func (gl *GitLabApi) GetRepositoryArchive(repoId int64, owner, repoName, format, ref string) ([]byte, error) {
+func (a *GitLabApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
 	archiveOptions := &gitlab.ArchiveOptions{
 		Format: &format, // Choose the archive format
 	}
 
-	fileData, _, err := gl.Client[repoId].Repositories.Archive(pid, archiveOptions)
+	fileData, _, err := a.client.Repositories.Archive(pid, archiveOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -85,9 +120,9 @@ func (gl *GitLabApi) GetRepositoryArchive(repoId int64, owner, repoName, format,
 	return fileData, nil
 }
 
-func (gl *GitLabApi) GetLatestCommitHash(repoId int64, owner, repoName, filePath, ref string) (string, error) {
+func (a *GitLabApi) GetLatestCommitHash(owner, repoName, filePath, ref string) (string, error) {
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
-	fileContent, _, err := gl.Client[repoId].RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
+	fileContent, _, err := a.client.RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return "", err
 	}

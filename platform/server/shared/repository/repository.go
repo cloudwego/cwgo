@@ -17,6 +17,7 @@
 package repository
 
 type IRepository interface {
+	ParseUrl(url string) (filePid, owner, repoName string, err error)
 	GetFile(owner, repoName, filePid, ref string) (*File, error)
 	PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error
 	GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) //Specify the compressed file format and obtain the byte of the compressed package, gitlab could not specify ref

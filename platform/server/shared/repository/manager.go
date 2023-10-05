@@ -3,10 +3,12 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/google/go-github/v53/github"
 	"github.com/xanzy/go-gitlab"
@@ -14,46 +16,85 @@ import (
 )
 
 type Manager struct {
-	GitHub   *GitHubApi
-	GitLab   *GitLabApi
-	MuGitHub sync.Mutex
-	MuGitlab sync.Mutex
+	daoManager *dao.Manager
+
+	repositoryClients map[int64]IRepository
+
+	sync.RWMutex
 }
 
-func NewRepoManager(DaoManager *dao.Manager) (*Manager, error) {
+func NewRepoManager(daoManager *dao.Manager) (*Manager, error) {
+	repositoryClients := make(map[int64]IRepository)
+
 	manager := &Manager{
-		GitHub: &GitHubApi{make(map[int64]*github.Client)},
-		GitLab: &GitLabApi{make(map[int64]*gitlab.Client)},
+		daoManager:        daoManager,
+		repositoryClients: repositoryClients,
+		RWMutex:           sync.RWMutex{},
 	}
 
-	repos, err := DaoManager.Repository.GetAllRepositories()
+	repos, err := daoManager.Repository.GetAllRepositories()
 	if err != nil {
 		return nil, err
 	}
 
 	for _, r := range repos {
-		switch r.Type {
-		case consts.GitLab:
-			manager.GitLab.Client[r.Id], err = NewGitlabClient(r.Token)
-			if err != nil {
-				if utils.IsTokenError(err) {
-					err = DaoManager.Repository.ChangeRepositoryStatus(r.Id, consts.InvalidToken)
-					if err != nil {
-						return nil, err
-					}
-				} else if utils.IsNetworkError(err) {
-					return nil, errors.New("client initialization request timeout")
-				} else {
-					return nil, errors.New("client initialization request unknown error")
-				}
-			}
-
-		case consts.Github:
-			manager.GitHub.Client[r.Id] = NewGithubClient(r.Token)
+		err = manager.AddClient(r)
+		if err != nil {
+			return nil, err
 		}
 	}
 
 	return manager, nil
+}
+
+func (rm *Manager) AddClient(repository *repository.Repository) error {
+	rm.Lock()
+	defer rm.Unlock()
+
+	switch repository.Type {
+	case consts.GitLab:
+		gitlabClient, err := NewGitlabClient(repository.Token)
+		if err != nil {
+			if utils.IsTokenError(err) {
+				err = rm.daoManager.Repository.ChangeRepositoryStatus(repository.Id, consts.InvalidToken)
+				if err != nil {
+					return err
+				}
+			} else if utils.IsNetworkError(err) {
+				return errors.New("client initialization request timeout")
+			} else {
+				return errors.New("client initialization request unknown error")
+			}
+		}
+
+		rm.repositoryClients[repository.Id] = NewGitLabApi(gitlabClient)
+	case consts.Github:
+		githubClient := NewGithubClient(repository.Token)
+
+		rm.repositoryClients[repository.Id] = NewGitHubApi(githubClient)
+	default:
+		return errors.New("invalid repository type")
+	}
+
+	return nil
+}
+
+func (rm *Manager) DelClient(repository *repository.Repository) {
+	rm.Lock()
+	defer rm.Unlock()
+
+	delete(rm.repositoryClients, repository.Id)
+}
+
+func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
+	rm.RLock()
+	defer rm.RUnlock()
+
+	if client, ok := rm.repositoryClients[repoId]; !ok {
+		return nil, fmt.Errorf("repository client not found, repo_id: %d", repoId)
+	} else {
+		return client, nil
+	}
 }
 
 func NewGitlabClient(token string) (*gitlab.Client, error) {

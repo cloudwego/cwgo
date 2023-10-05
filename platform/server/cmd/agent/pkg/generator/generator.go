@@ -17,4 +17,5 @@
 package generator
 
 type IGenerator interface {
+	Generate(idlPath, serviceName, generatePath string) error
 }
