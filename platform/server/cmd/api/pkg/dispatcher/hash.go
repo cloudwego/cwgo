@@ -83,7 +83,7 @@ func (c *ConsistentHashDispatcher) AddService(serviceId string) error {
 	return nil
 }
 
-func (c *ConsistentHashDispatcher) RemoveService(serviceId string) error {
+func (c *ConsistentHashDispatcher) DelService(serviceId string) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 

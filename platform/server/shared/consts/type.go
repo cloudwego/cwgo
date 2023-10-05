@@ -21,10 +21,6 @@ package consts
 type ServerType uint32
 
 const (
-	ProjectName = "cwgo"
-)
-
-const (
 	ServerTypeNumApi ServerType = iota + 1
 	ServerTypeNumAgent
 
@@ -59,5 +55,52 @@ var (
 	ServerModeMapToNum = map[string]ServerMode{
 		ServerModeDev: ServerModeNumDev,
 		ServerModePro: ServerModeNumPro,
+	}
+)
+
+type RegistryType uint32
+
+const (
+	RegistryTypeNumBuiltin RegistryType = iota + 1
+	RegistryTypeNumConsul
+
+	RegistryTypeBuiltin = "builtin"
+	RegistryTypeConsul  = "consul"
+)
+
+var (
+	RegistryTypeMapToNum = map[string]RegistryType{
+		RegistryTypeBuiltin: RegistryTypeNumBuiltin,
+		RegistryTypeConsul:  RegistryTypeNumConsul,
+	}
+)
+
+type StoreType uint32
+
+const (
+	StoreTypeNumMysql StoreType = iota + 1
+	StoreTypeNumMongo
+	StoreTypeNumRedis
+)
+
+var (
+	StoreTypeMapToNum = map[string]StoreType{
+		"mysql": StoreTypeNumMysql,
+		"mongo": StoreTypeNumMongo,
+		"redis": StoreTypeNumRedis,
+	}
+)
+
+type DispatcherType uint32
+
+const (
+	DispatcherTypeNumHash DispatcherType = iota + 1
+
+	DispatcherTypeHash = "consistent-hash"
+)
+
+var (
+	DispatcherMapToNum = map[string]DispatcherType{
+		DispatcherTypeHash: DispatcherTypeNumHash,
 	}
 )

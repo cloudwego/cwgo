@@ -17,3 +17,36 @@
  */
 
 package registry
+
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/service"
+)
+
+type ConsulRegistry struct {
+}
+
+var _ IRegistry = (*ConsulRegistry)(nil)
+
+func NewConsulRegistry() *ConsulRegistry {
+	return &ConsulRegistry{}
+}
+
+func (r *ConsulRegistry) GetAllService() ([]*service.Service, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *ConsulRegistry) Count() int {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *ConsulRegistry) GetServiceById(s string) (*service.Service, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *ConsulRegistry) ServiceExists(s string) bool {
+	//TODO implement me
+	panic("implement me")
+}

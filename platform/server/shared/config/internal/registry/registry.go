@@ -20,12 +20,14 @@ package registry
 
 import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	kitexregistry "github.com/cloudwego/kitex/pkg/registry"
 )
 
 type IRegistryConfigManager interface {
 	GetRegistryType() consts.RegistryType
+	GetRegistry() registry.IRegistry
 	GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info)
 	GetDiscoveryResolver() discovery.Resolver
 }

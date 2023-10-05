@@ -22,7 +22,7 @@ import "time"
 
 type Task struct {
 	Id           string
-	Type         uint32
+	Type         Type
 	ScheduleTime time.Duration
 	Data         interface{}
 }
@@ -31,6 +31,8 @@ type SyncRepoData struct {
 	RepositoryId string
 }
 
+type Type uint32
+
 const (
-	SyncRepo = iota + 1
+	SyncRepo Type = iota + 1
 )

@@ -43,7 +43,7 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, servi
 
 	switch registryConfig.Type {
 	case consts.RegistryTypeBuiltin:
-		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin, nil)
+		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin)
 		if err != nil {
 			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
 		}

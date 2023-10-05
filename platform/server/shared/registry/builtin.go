@@ -36,34 +36,30 @@ import (
 )
 
 type Manager struct {
-	agents      []*service.Service
+	windows     []*service.Service
 	currentSize int
 	expireTime  time.Duration
 	mutex       sync.Mutex
 }
 
-func (sw *Manager) add(agentService *service.Service, serviceNum int) {
+func (sw *Manager) add(agentService *service.Service) {
 	sw.mutex.Lock()
 	defer sw.mutex.Unlock()
 
-	if sw.currentSize < serviceNum {
-		if sw.currentSize == cap(sw.agents) {
-			var newAgents []*service.Service
-			if cap(sw.agents) == 0 {
-				newAgents = make([]*service.Service, 16)
-			} else {
-				newAgents = make([]*service.Service, cap(sw.agents)<<1)
-			}
-			copy(newAgents, sw.agents)
-			sw.agents = newAgents
+	if sw.currentSize == cap(sw.windows) {
+		// expand slice if full
+		var newAgents []*service.Service
+		if cap(sw.windows) == 0 {
+			newAgents = make([]*service.Service, 16)
+		} else {
+			newAgents = make([]*service.Service, cap(sw.windows)<<1)
 		}
-
-		sw.agents[sw.currentSize] = agentService
-		sw.currentSize++
-	} else {
-		copy(sw.agents, sw.agents[serviceNum-sw.currentSize:])
-		sw.agents[serviceNum-1] = agentService
+		copy(newAgents, sw.windows)
+		sw.windows = newAgents
 	}
+
+	sw.windows[sw.currentSize] = agentService
+	sw.currentSize++
 }
 
 func (sw *Manager) getExpiredServiceIds() []string {
@@ -71,10 +67,13 @@ func (sw *Manager) getExpiredServiceIds() []string {
 	defer sw.mutex.Unlock()
 
 	expiredServiceIds := make([]string, 0)
-	for _, agentService := range sw.agents {
+	for i := 0; i < sw.currentSize; i++ {
+		agentService := sw.windows[i]
 		if agentService.LastUpdateTime.Add(sw.expireTime).Before(time.Now()) {
 			expiredServiceIds = append(expiredServiceIds, agentService.Id)
 		} else {
+			copy(sw.windows, sw.windows[i:])
+			sw.currentSize = sw.currentSize - i
 			break
 		}
 	}
@@ -96,21 +95,21 @@ const (
 )
 
 func NewBuiltinRegistry() *BuiltinRegistry {
-	registry := &BuiltinRegistry{
+	r := &BuiltinRegistry{
 		Mutex:         sync.Mutex{},
 		agents:        make(map[string]*service.Service),
 		cleanInterval: 3 * time.Second,
 		manager: &Manager{
-			agents:      make([]*service.Service, 0),
+			windows:     make([]*service.Service, 0),
 			currentSize: 0,
 			mutex:       sync.Mutex{},
 			expireTime:  time.Minute,
 		},
 	}
 
-	go registry.CleanUp()
+	go r.StartCleanUp()
 
-	return registry
+	return r
 }
 
 func (r *BuiltinRegistry) Register(serviceId string, host string, port int) error {
@@ -124,7 +123,7 @@ func (r *BuiltinRegistry) Register(serviceId string, host string, port int) erro
 
 	r.agents[serviceId] = agentService
 
-	r.manager.add(agentService, r.Count())
+	r.manager.add(agentService)
 
 	return nil
 }
@@ -150,24 +149,24 @@ func (r *BuiltinRegistry) Update(serviceId string) error {
 		return errors.New("service not found")
 	} else {
 		agentService.LastUpdateTime = time.Now()
-		r.manager.add(agentService, r.Count())
+		r.manager.add(agentService)
 		return nil
 	}
 }
 
-func (r *BuiltinRegistry) CleanUp() {
+func (r *BuiltinRegistry) StartCleanUp() {
 	for {
 		time.Sleep(r.cleanInterval)
 
+		r.Lock()
 		expiredServiceIds := r.manager.getExpiredServiceIds()
 
-		r.Mutex.Lock()
 		for _, serviceId := range expiredServiceIds {
 			if _, ok := r.agents[serviceId]; ok {
 				delete(r.agents, serviceId)
 			}
 		}
-		r.Mutex.Unlock()
+		r.Unlock()
 	}
 }
 
@@ -183,16 +182,16 @@ func (r *BuiltinRegistry) GetServiceById(serviceId string) (*service.Service, er
 	}
 }
 
-func (r *BuiltinRegistry) GetAllService() []*service.Service {
+func (r *BuiltinRegistry) GetAllService() ([]*service.Service, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	var services []*service.Service
-	for _, service := range r.agents {
-		services = append(services, service)
+	for _, svr := range r.agents {
+		services = append(services, svr)
 	}
 
-	return services
+	return services, nil
 }
 
 func (r *BuiltinRegistry) ServiceExists(serviceId string) bool {
@@ -216,7 +215,7 @@ func (r *BuiltinRegistryResolver) Target(_ context.Context, target rpcinfo.Endpo
 }
 
 func (r *BuiltinRegistryResolver) Resolve(_ context.Context, _ string) (discovery.Result, error) {
-	services := r.registry.GetAllService()
+	services, _ := r.registry.GetAllService()
 
 	var eps []discovery.Instance
 

@@ -18,4 +18,6 @@
 
 package consts
 
-const ()
+const (
+	ProjectName = "cwgo"
+)

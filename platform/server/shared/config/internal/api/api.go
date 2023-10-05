@@ -21,9 +21,10 @@ package api
 import (
 	"fmt"
 	"github.com/bytedance/gopkg/util/gopool"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/manager"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/dispatcher"
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	http2config "github.com/hertz-contrib/http2/config"
 	http2factory "github.com/hertz-contrib/http2/factory"
@@ -34,7 +35,6 @@ import (
 type ConfigManager struct {
 	config                Config
 	RegistryConfigManager registryconfig.IRegistryConfigManager
-	BuiltinRegistry       *registry.BuiltinRegistry
 	Server                *server.Hertz
 	ServiceId             string
 	ServiceName           string
@@ -42,13 +42,11 @@ type ConfigManager struct {
 
 func NewConfigManager(config Config, registryConfig registryconfig.Config, serviceId string) *ConfigManager {
 	var registryConfigManager registryconfig.IRegistryConfigManager
-	var r *registry.BuiltinRegistry
 	var err error
 
 	switch registryConfig.Type {
 	case consts.RegistryTypeBuiltin:
-		r = registry.NewBuiltinRegistry()
-		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin, r)
+		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin)
 
 	case consts.RegistryTypeConsul:
 		registryConfigManager, err = registryconfig.NewConsulRegistryConfigManager(registryConfig.Consul)
@@ -92,8 +90,22 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, servi
 		config:                config,
 		Server:                hertzServer,
 		RegistryConfigManager: registryConfigManager,
-		BuiltinRegistry:       r,
 		ServiceId:             serviceId,
 		ServiceName:           fmt.Sprintf("%s-%s-%s", "cwgo", consts.ServerTypeAgent, serviceId),
 	}
+}
+
+func (cm *ConfigManager) NewManager() *manager.Manager {
+	var updateInterval time.Duration
+	var err error
+	if cm.config.Dispatcher.UpdateInterval != "" {
+		updateInterval, err = time.ParseDuration(cm.config.Dispatcher.UpdateInterval)
+		if err != nil {
+			panic(fmt.Errorf("invalid update interval, err: %v", err))
+		}
+	} else {
+		updateInterval = manager.DefaultUpdateInterval
+	}
+
+	return manager.NewManager(dispatcher.NewDispatcher(cm.config.Dispatcher), cm.RegistryConfigManager.GetRegistry(), updateInterval)
 }

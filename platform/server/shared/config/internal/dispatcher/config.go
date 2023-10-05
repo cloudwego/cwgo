@@ -16,21 +16,9 @@
  *
  */
 
-package consts
+package dispatcher
 
-type RegistryType uint32
-
-const (
-	RegistryTypeNumBuiltin RegistryType = iota + 1
-	RegistryTypeNumConsul
-
-	RegistryTypeBuiltin = "builtin"
-	RegistryTypeConsul  = "consul"
-)
-
-var (
-	RegistryTypeMapToNum = map[string]RegistryType{
-		RegistryTypeBuiltin: RegistryTypeNumBuiltin,
-		RegistryTypeConsul:  RegistryTypeNumConsul,
-	}
-)
+type Config struct {
+	Type           string `mapstructure:"type"`
+	UpdateInterval string `mapstructure:"updateInterval"`
+}

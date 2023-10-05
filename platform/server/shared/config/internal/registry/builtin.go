@@ -37,16 +37,24 @@ type BuiltinRegistryConfigManager struct {
 	Registry     *registry.BuiltinRegistry
 }
 
-func NewBuiltinRegistryConfigManager(config BuiltinRegistryConfig, r *registry.BuiltinRegistry) (*BuiltinRegistryConfigManager, error) {
+func NewBuiltinRegistryConfigManager(config BuiltinRegistryConfig) (*BuiltinRegistryConfigManager, error) {
 	return &BuiltinRegistryConfigManager{
 		Config:       config,
 		RegistryType: consts.RegistryTypeNumBuiltin,
-		Registry:     r,
+		Registry:     nil,
 	}, nil
 }
 
 func (cm *BuiltinRegistryConfigManager) GetRegistryType() consts.RegistryType {
 	return cm.RegistryType
+}
+
+func (cm *BuiltinRegistryConfigManager) GetRegistry() registry.IRegistry {
+	if cm.Registry == nil {
+		cm.Registry = registry.NewBuiltinRegistry()
+	}
+
+	return cm.Registry
 }
 
 func (cm *BuiltinRegistryConfigManager) GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info) {

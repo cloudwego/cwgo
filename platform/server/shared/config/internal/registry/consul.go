@@ -21,6 +21,7 @@ package registry
 import (
 	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	kitexregistry "github.com/cloudwego/kitex/pkg/registry"
@@ -57,6 +58,7 @@ type ConsulRegistryConfigManager struct {
 	consulApiConfig *consulapi.Config
 	consulClient    *consulapi.Client
 	consulResolver  discovery.Resolver
+	registry        *registry.ConsulRegistry
 }
 
 func NewConsulRegistryConfigManager(config ConsulRegistryConfig) (*ConsulRegistryConfigManager, error) {
@@ -96,6 +98,14 @@ func NewConsulRegistryConfigManager(config ConsulRegistryConfig) (*ConsulRegistr
 
 func (cm *ConsulRegistryConfigManager) GetRegistryType() consts.RegistryType {
 	return cm.RegistryType
+}
+
+func (cm *ConsulRegistryConfigManager) GetRegistry() registry.IRegistry {
+	if cm.registry == nil {
+		cm.registry = registry.NewConsulRegistry()
+	}
+
+	return cm.registry
 }
 
 func (cm *ConsulRegistryConfigManager) GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info) {

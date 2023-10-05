@@ -35,7 +35,7 @@ type Manager struct {
 
 func NewDaoManager() (*Manager, error) {
 	switch config.GetManager().StoreConfigManager.GetStoreType() {
-	case consts.StoreTypeMysql:
+	case consts.StoreTypeNumMysql:
 		mysqlDb, err := config.GetManager().StoreConfigManager.NewMysqlDb()
 		if err != nil {
 			return nil, err
@@ -51,10 +51,10 @@ func NewDaoManager() (*Manager, error) {
 			Template:   templateDaoManager,
 		}, nil
 
-	case consts.StoreTypeMongo:
+	case consts.StoreTypeNumMongo:
 		panic("to be implemented")
 
-	case consts.StoreTypeRedis:
+	case consts.StoreTypeNumRedis:
 		panic("to be implemented")
 
 	default:

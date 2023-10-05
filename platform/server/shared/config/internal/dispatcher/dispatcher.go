@@ -16,20 +16,23 @@
  *
  */
 
-package consts
+package dispatcher
 
-type StoreType uint32
-
-const (
-	StoreTypeMysql StoreType = iota + 1
-	StoreTypeMongo
-	StoreTypeRedis
+import (
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 )
 
-var (
-	StoreTypeMapToNum = map[string]StoreType{
-		"mysql": StoreTypeMysql,
-		"mongo": StoreTypeMongo,
-		"redis": StoreTypeRedis,
+func NewDispatcher(config Config) dispatcher.IDispatcher {
+	dispatcherType, ok := consts.DispatcherMapToNum[config.Type]
+	if !ok {
+		panic("invalid dispatcher type")
 	}
-)
+
+	switch dispatcherType {
+	case consts.DispatcherTypeNumHash:
+		return dispatcher.NewConsistentHashDispatcher()
+	}
+
+	return nil
+}

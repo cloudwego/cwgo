@@ -19,6 +19,7 @@
 package svc
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/manager"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
@@ -31,6 +32,7 @@ type ServiceContext struct {
 	DaoManager      *dao.Manager
 	RepoManager     *repository.Manager
 	BuiltinRegistry *registry.BuiltinRegistry
+	Manager         *manager.Manager
 }
 
 var Svc *ServiceContext
@@ -48,6 +50,7 @@ func InitServiceContext() {
 	Svc = &ServiceContext{
 		DaoManager:      daoManager,
 		RepoManager:     repoManager,
-		BuiltinRegistry: config.GetManager().ApiConfigManager.BuiltinRegistry,
+		BuiltinRegistry: config.GetManager().ApiConfigManager.RegistryConfigManager.GetRegistry().(*registry.BuiltinRegistry),
+		Manager:         config.GetManager().ApiConfigManager.NewManager(),
 	}
 }
