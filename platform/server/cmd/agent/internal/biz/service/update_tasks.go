@@ -93,6 +93,7 @@ func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateT
 	cron.CronInstance.Stop()
 
 	cron.CronInstance.EmptyTask()
+	s.svcCtx.RepoManager.ClearClient()
 
 	for _, t := range tasks {
 		cron.CronInstance.AddTask(t)

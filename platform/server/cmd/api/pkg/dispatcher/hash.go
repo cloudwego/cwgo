@@ -147,6 +147,14 @@ func (c *ConsistentHashDispatcher) GetTaskByServiceId(serviceId string) []*task.
 	return tasks
 }
 
+func (c *ConsistentHashDispatcher) GetServiceIdByTaskId(taskId string) string {
+	serviceId := c.hasher.LocateKey([]byte(taskId))
+	if serviceId != nil {
+		return serviceId.String()
+	}
+	return ""
+}
+
 func (c *ConsistentHashDispatcher) GetTotalTaskNum() int {
 	return len(c.Tasks)
 }

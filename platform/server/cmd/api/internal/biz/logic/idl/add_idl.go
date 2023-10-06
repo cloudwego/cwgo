@@ -22,11 +22,12 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"net/http"
+	"net/url"
 )
 
 const (
-	successMsgAddIDL = "" // TODO: to be filled...
+	successMsgAddIDL = "add idl successfully"
 )
 
 type AddIDLLogic struct {
@@ -42,14 +43,15 @@ func NewAddIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLLogi
 }
 
 func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
-	if !utils.ValidStrings(req.MainIdlPath, req.ServiceName) {
+	_, err := url.Parse(req.MainIdlPath)
+	if err != nil {
 		return &idl.AddIDLRes{
-			Code: 400,
-			Msg:  "err: The input field contains an empty string",
+			Code: http.StatusBadRequest,
+			Msg:  "invalid main idl path",
 		}
 	}
 
-	err := l.svcCtx.DaoManager.Idl.AddIDL(req.RepositoryID, req.MainIdlPath, req.ServiceName)
+	err = l.svcCtx.DaoManager.Idl.AddIDL(req.RepositoryID, req.MainIdlPath, req.ServiceName)
 	if err != nil {
 		return &idl.AddIDLRes{
 			Code: 400,

@@ -101,6 +101,19 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 	return manager
 }
 
+func (m *Manager) GetAgentClient(serviceId string) (agentservice.Client, error) {
+	c, err := agentservice.NewClient(
+		consts.ServiceNameAgent,
+		client.WithResolver(m.resolver),
+		client.WithTag("service_id", serviceId),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
 func (m *Manager) AddTask(t *task.Task) error {
 	err := m.dispatcher.AddTask(t)
 	if err != nil {
@@ -121,14 +134,9 @@ func (m *Manager) UpdateAgentTasks() {
 		go func(serviceId string) {
 			defer wg.Done()
 
-			c, err := agentservice.NewClient(
-				consts.ServiceNameAgent,
-				client.WithResolver(m.resolver),
-				client.WithTag("service_id", serviceId),
-			)
+			c, err := m.GetAgentClient(serviceId)
 			if err != nil {
-				logger.Logger.Error("connect to rpc client failed", zap.Error(err))
-				return
+				logger.Logger.Error("get agent client failed", zap.Error(err))
 			}
 
 			tasks := m.dispatcher.GetTaskByServiceId(serviceId)

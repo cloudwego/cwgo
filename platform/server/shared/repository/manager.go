@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -32,19 +31,11 @@ func NewRepoManager(daoManager *dao.Manager) (*Manager, error) {
 		RWMutex:           sync.RWMutex{},
 	}
 
-	repos, err := daoManager.Repository.GetAllRepositories()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, r := range repos {
-		err = manager.AddClient(r)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	return manager, nil
+}
+
+func (rm *Manager) ClearClient() {
+	rm.repositoryClients = make(map[int64]IRepository)
 }
 
 func (rm *Manager) AddClient(repository *repository.Repository) error {
@@ -91,7 +82,15 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 	defer rm.RUnlock()
 
 	if client, ok := rm.repositoryClients[repoId]; !ok {
-		return nil, fmt.Errorf("repository client not found, repo_id: %d", repoId)
+		repo, err := rm.daoManager.Repository.GetRepository(repoId)
+		if err != nil {
+			return nil, err
+		}
+		err = rm.AddClient(repo)
+		if err != nil {
+			return nil, err
+		}
+		return rm.GetClient(repoId)
 	} else {
 		return client, nil
 	}

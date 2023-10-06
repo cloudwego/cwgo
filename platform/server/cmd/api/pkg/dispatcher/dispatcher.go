@@ -26,5 +26,6 @@ type IDispatcher interface {
 	RemoveTask(taskId string) error
 
 	GetTaskByServiceId(serviceId string) []*task.Task
+	GetServiceIdByTaskId(taskId string) string
 	GetTotalTaskNum() int
 }

@@ -515,8 +515,8 @@ func (p *IDL) String() string {
 
 type AddIDLReq struct {
 	RepositoryID int64  `thrift:"repository_id,1" form:"repository_id,required" json:"repository_id,required"`
-	MainIdlPath  string `thrift:"main_idl_path,2" form:"main_idl_path,required" json:"main_idl_path,required"`
-	ServiceName  string `thrift:"service_name,3" form:"service_name,required" json:"service_name,required"`
+	MainIdlPath  string `thrift:"main_idl_path,2" form:"main_idl_path,required" json:"main_idl_path,required" vd:"len($)>0"`
+	ServiceName  string `thrift:"service_name,3" form:"service_name,required" json:"service_name,required" vd:"len($)>0"`
 }
 
 func NewAddIDLReq() *AddIDLReq {

@@ -1,17 +1,6 @@
 namespace go repository
 
-struct Repository{
-    1: i64 id
-    2: i32 repository_type
-    3: string repository_url
-    4: string token
-    5: string status
-    6: string last_update_time
-    7: string last_sync_time
-    8: bool is_deleted
-    9: string create_time
-    10: string update_time
-}
+include "../base/model.thrift"
 
 struct AddRepositoryReq{
     1: i32 repository_type (api.body="repository_type,required")
@@ -53,7 +42,7 @@ struct GetRepositoriesRes{
     3: GetRepositoriesResData data
 }
 struct GetRepositoriesResData{
-    1: list<Repository> repositories
+    1: list<model.Repository> repositories
 }
 
 struct SyncRepositoryByIdReq{
