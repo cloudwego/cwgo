@@ -114,11 +114,14 @@ layouts:
       package conf
 
       import (
+        "bytes"
       	"io/ioutil"
       	"os"
+        "os/exec"
       	"path/filepath"
       	"sync"
 
+        "github.com/bytedance/sonic"
       	"github.com/cloudwego/hertz/pkg/common/hlog"
       	"github.com/kr/pretty"
       	"gopkg.in/validator.v2"
@@ -142,7 +145,6 @@ layouts:
       	DSN string `yaml:"dsn"`
       }
 
-
       type Redis struct {
       	Address  string `yaml:"address"`
       	Password string `yaml:"password"`
@@ -161,6 +163,10 @@ layouts:
       	LogMaxBackups int    `yaml:"log_max_backups"`
       	LogMaxAge     int    `yaml:"log_max_age"`
       }
+      
+      type BindMainDir struct {
+        Dir string `json:"Dir"`
+      }
 
       // GetConf gets configuration instance
       func GetConf() *Config {
@@ -169,8 +175,7 @@ layouts:
       }
 
       func initConf() {
-      	prefix := "conf"
-      	confFileRelPath := filepath.Join(prefix, filepath.Join(GetEnv(), "conf.yaml"))
+      	confFileRelPath := getConfAbsPath()
       	content, err := ioutil.ReadFile(confFileRelPath)
       	if err != nil {
       		panic(err)
@@ -191,7 +196,26 @@ layouts:
 
       	pretty.Printf("%+v\n", conf)
       }
+      
+      func getConfAbsPath() string {
+        cmd := exec.Command("go", "list", "-m", "-json")
+      
+        var out bytes.Buffer
+        cmd.Stdout = &out
+        cmd.Stderr = &out
+        if err := cmd.Run(); err != nil {
+          panic(err)
+        }
+      
+        bindDir := &BindMainDir{}
+        if err := sonic.Unmarshal(out.Bytes(), bindDir); err != nil {
+          panic(err)
+        }
 
+        prefix := "conf"
+        return filepath.Join(bindDir.Dir, prefix, filepath.Join(GetEnv(), "conf.yaml"))
+      }
+      
       func GetEnv() string {
       	e := os.Getenv("GO_ENV")
       	if len(e) == 0 {
@@ -221,7 +245,6 @@ layouts:
       		return hlog.LevelInfo
       	}
       }
-
 
   - path: conf/dev/conf.yaml
     delims:
@@ -297,7 +320,6 @@ layouts:
         username: ""
         password: ""
         db: 0
-
 
   - path: biz/dal/init.go
     delims:
