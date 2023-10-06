@@ -45,13 +45,13 @@ export default function InnerTable() {
 				setTimeout(
 					Math.random() > 0.5
 						? () => {
-							Toast.success("添加成功！");
-							resolve(true);
-						}
+								Toast.success("添加成功！");
+								resolve(true);
+						  }
 						: () => {
-							Toast.error("Oops errors!");
-							reject(false);
-						},
+								Toast.error("Oops errors!");
+								reject(false);
+						  },
 					1000
 				);
 			}).catch(() => console.log("Oops errors!"));
