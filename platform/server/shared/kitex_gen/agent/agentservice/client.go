@@ -12,9 +12,14 @@ import (
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
 	AddRepository(ctx context.Context, req *agent.AddRepositoryReq, callOptions ...callopt.Option) (r *agent.AddRepositoryRes, err error)
+	DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq, callOptions ...callopt.Option) (r *agent.DeleteRepositoriesRes, err error)
 	UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error)
+	GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq, callOptions ...callopt.Option) (r *agent.GetRepositoriesRes, err error)
 	SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error)
 	AddIDL(ctx context.Context, req *agent.AddIDLReq, callOptions ...callopt.Option) (r *agent.AddIDLRes, err error)
+	DeleteIDL(ctx context.Context, req *agent.DeleteIDLsReq, callOptions ...callopt.Option) (r *agent.DeleteIDLsRes, err error)
+	UpdateIDL(ctx context.Context, req *agent.UpdateIDLReq, callOptions ...callopt.Option) (r *agent.UpdateIDLRes, err error)
+	GetIDLs(ctx context.Context, req *agent.GetIDLsReq, callOptions ...callopt.Option) (r *agent.GetIDLsRes, err error)
 	SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq, callOptions ...callopt.Option) (r *agent.SyncIDLsByIdRes, err error)
 	UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error)
 	GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error)
@@ -54,9 +59,19 @@ func (p *kAgentServiceClient) AddRepository(ctx context.Context, req *agent.AddR
 	return p.kClient.AddRepository(ctx, req)
 }
 
+func (p *kAgentServiceClient) DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq, callOptions ...callopt.Option) (r *agent.DeleteRepositoriesRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeleteRepositories(ctx, req)
+}
+
 func (p *kAgentServiceClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.UpdateRepositoryStatus(ctx, req)
+}
+
+func (p *kAgentServiceClient) GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq, callOptions ...callopt.Option) (r *agent.GetRepositoriesRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetRepositories(ctx, req)
 }
 
 func (p *kAgentServiceClient) SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error) {
@@ -67,6 +82,21 @@ func (p *kAgentServiceClient) SyncRepositoryById(ctx context.Context, req *agent
 func (p *kAgentServiceClient) AddIDL(ctx context.Context, req *agent.AddIDLReq, callOptions ...callopt.Option) (r *agent.AddIDLRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.AddIDL(ctx, req)
+}
+
+func (p *kAgentServiceClient) DeleteIDL(ctx context.Context, req *agent.DeleteIDLsReq, callOptions ...callopt.Option) (r *agent.DeleteIDLsRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeleteIDL(ctx, req)
+}
+
+func (p *kAgentServiceClient) UpdateIDL(ctx context.Context, req *agent.UpdateIDLReq, callOptions ...callopt.Option) (r *agent.UpdateIDLRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateIDL(ctx, req)
+}
+
+func (p *kAgentServiceClient) GetIDLs(ctx context.Context, req *agent.GetIDLsReq, callOptions ...callopt.Option) (r *agent.GetIDLsRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetIDLs(ctx, req)
 }
 
 func (p *kAgentServiceClient) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq, callOptions ...callopt.Option) (r *agent.SyncIDLsByIdRes, err error) {

@@ -86,3 +86,38 @@ func (s *AgentServiceImpl) GenerateCode(ctx context.Context, req *agent.Generate
 
 	return resp, err
 }
+
+// GetRepositories implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq) (resp *agent.GetRepositoriesRes, err error) {
+	resp, err = service.NewGetRepositoriesService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// DeleteIDL implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) DeleteIDL(ctx context.Context, req *agent.DeleteIDLsReq) (resp *agent.DeleteIDLsRes, err error) {
+	resp, err = service.NewDeleteIDLService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// UpdateIDL implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) UpdateIDL(ctx context.Context, req *agent.UpdateIDLReq) (resp *agent.UpdateIDLRes, err error) {
+	resp, err = service.NewUpdateIDLService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// GetIDLs implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) GetIDLs(ctx context.Context, req *agent.GetIDLsReq) (resp *agent.GetIDLsRes, err error) {
+	resp, err = service.NewGetIDLsService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// DeleteRepositories implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq) (resp *agent.DeleteRepositoriesRes, err error) {
+	resp, err = service.NewDeleteRepositoriesService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}

@@ -101,7 +101,19 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 	return manager
 }
 
-func (m *Manager) GetAgentClient(serviceId string) (agentservice.Client, error) {
+func (m *Manager) GetAgentClient() (agentservice.Client, error) {
+	c, err := agentservice.NewClient(
+		consts.ServiceNameAgent,
+		client.WithResolver(m.resolver),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
+func (m *Manager) GetAgentClientByServiceId(serviceId string) (agentservice.Client, error) {
 	c, err := agentservice.NewClient(
 		consts.ServiceNameAgent,
 		client.WithResolver(m.resolver),
@@ -134,7 +146,7 @@ func (m *Manager) UpdateAgentTasks() {
 		go func(serviceId string) {
 			defer wg.Done()
 
-			c, err := m.GetAgentClient(serviceId)
+			c, err := m.GetAgentClientByServiceId(serviceId)
 			if err != nil {
 				logger.Logger.Error("get agent client failed", zap.Error(err))
 			}

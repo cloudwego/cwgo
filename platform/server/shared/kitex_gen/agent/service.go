@@ -11,11 +11,21 @@ import (
 type AgentService interface {
 	AddRepository(ctx context.Context, req *AddRepositoryReq) (r *AddRepositoryRes, err error)
 
+	DeleteRepositories(ctx context.Context, req *DeleteRepositoriesReq) (r *DeleteRepositoriesRes, err error)
+
 	UpdateRepositoryStatus(ctx context.Context, req *UpdateRepositoryStatusReq) (r *UpdateRepositoryStatusRes, err error)
+
+	GetRepositories(ctx context.Context, req *GetRepositoriesReq) (r *GetRepositoriesRes, err error)
 
 	SyncRepositoryById(ctx context.Context, req *SyncRepositoryByIdReq) (r *SyncRepositoryByIdRes, err error)
 
 	AddIDL(ctx context.Context, req *AddIDLReq) (r *AddIDLRes, err error)
+
+	DeleteIDL(ctx context.Context, req *DeleteIDLsReq) (r *DeleteIDLsRes, err error)
+
+	UpdateIDL(ctx context.Context, req *UpdateIDLReq) (r *UpdateIDLRes, err error)
+
+	GetIDLs(ctx context.Context, req *GetIDLsReq) (r *GetIDLsRes, err error)
 
 	SyncIDLsById(ctx context.Context, req *SyncIDLsByIdReq) (r *SyncIDLsByIdRes, err error)
 
@@ -59,11 +69,29 @@ func (p *AgentServiceClient) AddRepository(ctx context.Context, req *AddReposito
 	}
 	return _result.GetSuccess(), nil
 }
+func (p *AgentServiceClient) DeleteRepositories(ctx context.Context, req *DeleteRepositoriesReq) (r *DeleteRepositoriesRes, err error) {
+	var _args AgentServiceDeleteRepositoriesArgs
+	_args.Req = req
+	var _result AgentServiceDeleteRepositoriesResult
+	if err = p.Client_().Call(ctx, "DeleteRepositories", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
 func (p *AgentServiceClient) UpdateRepositoryStatus(ctx context.Context, req *UpdateRepositoryStatusReq) (r *UpdateRepositoryStatusRes, err error) {
 	var _args AgentServiceUpdateRepositoryStatusArgs
 	_args.Req = req
 	var _result AgentServiceUpdateRepositoryStatusResult
 	if err = p.Client_().Call(ctx, "UpdateRepositoryStatus", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+func (p *AgentServiceClient) GetRepositories(ctx context.Context, req *GetRepositoriesReq) (r *GetRepositoriesRes, err error) {
+	var _args AgentServiceGetRepositoriesArgs
+	_args.Req = req
+	var _result AgentServiceGetRepositoriesResult
+	if err = p.Client_().Call(ctx, "GetRepositories", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -82,6 +110,33 @@ func (p *AgentServiceClient) AddIDL(ctx context.Context, req *AddIDLReq) (r *Add
 	_args.Req = req
 	var _result AgentServiceAddIDLResult
 	if err = p.Client_().Call(ctx, "AddIDL", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+func (p *AgentServiceClient) DeleteIDL(ctx context.Context, req *DeleteIDLsReq) (r *DeleteIDLsRes, err error) {
+	var _args AgentServiceDeleteIDLArgs
+	_args.Req = req
+	var _result AgentServiceDeleteIDLResult
+	if err = p.Client_().Call(ctx, "DeleteIDL", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+func (p *AgentServiceClient) UpdateIDL(ctx context.Context, req *UpdateIDLReq) (r *UpdateIDLRes, err error) {
+	var _args AgentServiceUpdateIDLArgs
+	_args.Req = req
+	var _result AgentServiceUpdateIDLResult
+	if err = p.Client_().Call(ctx, "UpdateIDL", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+func (p *AgentServiceClient) GetIDLs(ctx context.Context, req *GetIDLsReq) (r *GetIDLsRes, err error) {
+	var _args AgentServiceGetIDLsArgs
+	_args.Req = req
+	var _result AgentServiceGetIDLsResult
+	if err = p.Client_().Call(ctx, "GetIDLs", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -135,9 +190,14 @@ func (p *AgentServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFunct
 func NewAgentServiceProcessor(handler AgentService) *AgentServiceProcessor {
 	self := &AgentServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
 	self.AddToProcessorMap("AddRepository", &agentServiceProcessorAddRepository{handler: handler})
+	self.AddToProcessorMap("DeleteRepositories", &agentServiceProcessorDeleteRepositories{handler: handler})
 	self.AddToProcessorMap("UpdateRepositoryStatus", &agentServiceProcessorUpdateRepositoryStatus{handler: handler})
+	self.AddToProcessorMap("GetRepositories", &agentServiceProcessorGetRepositories{handler: handler})
 	self.AddToProcessorMap("SyncRepositoryById", &agentServiceProcessorSyncRepositoryById{handler: handler})
 	self.AddToProcessorMap("AddIDL", &agentServiceProcessorAddIDL{handler: handler})
+	self.AddToProcessorMap("DeleteIDL", &agentServiceProcessorDeleteIDL{handler: handler})
+	self.AddToProcessorMap("UpdateIDL", &agentServiceProcessorUpdateIDL{handler: handler})
+	self.AddToProcessorMap("GetIDLs", &agentServiceProcessorGetIDLs{handler: handler})
 	self.AddToProcessorMap("SyncIDLsById", &agentServiceProcessorSyncIDLsById{handler: handler})
 	self.AddToProcessorMap("UpdateTasks", &agentServiceProcessorUpdateTasks{handler: handler})
 	self.AddToProcessorMap("GenerateCode", &agentServiceProcessorGenerateCode{handler: handler})
@@ -209,6 +269,54 @@ func (p *agentServiceProcessorAddRepository) Process(ctx context.Context, seqId 
 	return true, err
 }
 
+type agentServiceProcessorDeleteRepositories struct {
+	handler AgentService
+}
+
+func (p *agentServiceProcessorDeleteRepositories) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AgentServiceDeleteRepositoriesArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("DeleteRepositories", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AgentServiceDeleteRepositoriesResult{}
+	var retval *DeleteRepositoriesRes
+	if retval, err2 = p.handler.DeleteRepositories(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing DeleteRepositories: "+err2.Error())
+		oprot.WriteMessageBegin("DeleteRepositories", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("DeleteRepositories", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
 type agentServiceProcessorUpdateRepositoryStatus struct {
 	handler AgentService
 }
@@ -240,6 +348,54 @@ func (p *agentServiceProcessorUpdateRepositoryStatus) Process(ctx context.Contex
 		result.Success = retval
 	}
 	if err2 = oprot.WriteMessageBegin("UpdateRepositoryStatus", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type agentServiceProcessorGetRepositories struct {
+	handler AgentService
+}
+
+func (p *agentServiceProcessorGetRepositories) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AgentServiceGetRepositoriesArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("GetRepositories", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AgentServiceGetRepositoriesResult{}
+	var retval *GetRepositoriesRes
+	if retval, err2 = p.handler.GetRepositories(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetRepositories: "+err2.Error())
+		oprot.WriteMessageBegin("GetRepositories", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("GetRepositories", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -336,6 +492,150 @@ func (p *agentServiceProcessorAddIDL) Process(ctx context.Context, seqId int32, 
 		result.Success = retval
 	}
 	if err2 = oprot.WriteMessageBegin("AddIDL", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type agentServiceProcessorDeleteIDL struct {
+	handler AgentService
+}
+
+func (p *agentServiceProcessorDeleteIDL) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AgentServiceDeleteIDLArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("DeleteIDL", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AgentServiceDeleteIDLResult{}
+	var retval *DeleteIDLsRes
+	if retval, err2 = p.handler.DeleteIDL(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing DeleteIDL: "+err2.Error())
+		oprot.WriteMessageBegin("DeleteIDL", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("DeleteIDL", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type agentServiceProcessorUpdateIDL struct {
+	handler AgentService
+}
+
+func (p *agentServiceProcessorUpdateIDL) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AgentServiceUpdateIDLArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("UpdateIDL", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AgentServiceUpdateIDLResult{}
+	var retval *UpdateIDLRes
+	if retval, err2 = p.handler.UpdateIDL(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing UpdateIDL: "+err2.Error())
+		oprot.WriteMessageBegin("UpdateIDL", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("UpdateIDL", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type agentServiceProcessorGetIDLs struct {
+	handler AgentService
+}
+
+func (p *agentServiceProcessorGetIDLs) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AgentServiceGetIDLsArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("GetIDLs", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AgentServiceGetIDLsResult{}
+	var retval *GetIDLsRes
+	if retval, err2 = p.handler.GetIDLs(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetIDLs: "+err2.Error())
+		oprot.WriteMessageBegin("GetIDLs", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("GetIDLs", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -843,6 +1143,352 @@ func (p *AgentServiceAddRepositoryResult) Field0DeepEqual(src *AddRepositoryRes)
 	return true
 }
 
+type AgentServiceDeleteRepositoriesArgs struct {
+	Req *DeleteRepositoriesReq `thrift:"req,1" frugal:"1,default,DeleteRepositoriesReq" json:"req"`
+}
+
+func NewAgentServiceDeleteRepositoriesArgs() *AgentServiceDeleteRepositoriesArgs {
+	return &AgentServiceDeleteRepositoriesArgs{}
+}
+
+func (p *AgentServiceDeleteRepositoriesArgs) InitDefault() {
+	*p = AgentServiceDeleteRepositoriesArgs{}
+}
+
+var AgentServiceDeleteRepositoriesArgs_Req_DEFAULT *DeleteRepositoriesReq
+
+func (p *AgentServiceDeleteRepositoriesArgs) GetReq() (v *DeleteRepositoriesReq) {
+	if !p.IsSetReq() {
+		return AgentServiceDeleteRepositoriesArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *AgentServiceDeleteRepositoriesArgs) SetReq(val *DeleteRepositoriesReq) {
+	p.Req = val
+}
+
+var fieldIDToName_AgentServiceDeleteRepositoriesArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AgentServiceDeleteRepositoriesArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AgentServiceDeleteRepositoriesArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceDeleteRepositoriesArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteRepositoriesArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewDeleteRepositoriesReq()
+	if err := p.Req.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceDeleteRepositoriesArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("DeleteRepositories_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteRepositoriesArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteRepositoriesArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceDeleteRepositoriesArgs(%+v)", *p)
+}
+
+func (p *AgentServiceDeleteRepositoriesArgs) DeepEqual(ano *AgentServiceDeleteRepositoriesArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceDeleteRepositoriesArgs) Field1DeepEqual(src *DeleteRepositoriesReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceDeleteRepositoriesResult struct {
+	Success *DeleteRepositoriesRes `thrift:"success,0,optional" frugal:"0,optional,DeleteRepositoriesRes" json:"success,omitempty"`
+}
+
+func NewAgentServiceDeleteRepositoriesResult() *AgentServiceDeleteRepositoriesResult {
+	return &AgentServiceDeleteRepositoriesResult{}
+}
+
+func (p *AgentServiceDeleteRepositoriesResult) InitDefault() {
+	*p = AgentServiceDeleteRepositoriesResult{}
+}
+
+var AgentServiceDeleteRepositoriesResult_Success_DEFAULT *DeleteRepositoriesRes
+
+func (p *AgentServiceDeleteRepositoriesResult) GetSuccess() (v *DeleteRepositoriesRes) {
+	if !p.IsSetSuccess() {
+		return AgentServiceDeleteRepositoriesResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *AgentServiceDeleteRepositoriesResult) SetSuccess(x interface{}) {
+	p.Success = x.(*DeleteRepositoriesRes)
+}
+
+var fieldIDToName_AgentServiceDeleteRepositoriesResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AgentServiceDeleteRepositoriesResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AgentServiceDeleteRepositoriesResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceDeleteRepositoriesResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteRepositoriesResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewDeleteRepositoriesRes()
+	if err := p.Success.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceDeleteRepositoriesResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("DeleteRepositories_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteRepositoriesResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteRepositoriesResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceDeleteRepositoriesResult(%+v)", *p)
+}
+
+func (p *AgentServiceDeleteRepositoriesResult) DeepEqual(ano *AgentServiceDeleteRepositoriesResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceDeleteRepositoriesResult) Field0DeepEqual(src *DeleteRepositoriesRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
 type AgentServiceUpdateRepositoryStatusArgs struct {
 	Req *UpdateRepositoryStatusReq `thrift:"req,1" frugal:"1,default,UpdateRepositoryStatusReq" json:"req"`
 }
@@ -1182,6 +1828,352 @@ func (p *AgentServiceUpdateRepositoryStatusResult) DeepEqual(ano *AgentServiceUp
 }
 
 func (p *AgentServiceUpdateRepositoryStatusResult) Field0DeepEqual(src *UpdateRepositoryStatusRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceGetRepositoriesArgs struct {
+	Req *GetRepositoriesReq `thrift:"req,1" frugal:"1,default,GetRepositoriesReq" json:"req"`
+}
+
+func NewAgentServiceGetRepositoriesArgs() *AgentServiceGetRepositoriesArgs {
+	return &AgentServiceGetRepositoriesArgs{}
+}
+
+func (p *AgentServiceGetRepositoriesArgs) InitDefault() {
+	*p = AgentServiceGetRepositoriesArgs{}
+}
+
+var AgentServiceGetRepositoriesArgs_Req_DEFAULT *GetRepositoriesReq
+
+func (p *AgentServiceGetRepositoriesArgs) GetReq() (v *GetRepositoriesReq) {
+	if !p.IsSetReq() {
+		return AgentServiceGetRepositoriesArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *AgentServiceGetRepositoriesArgs) SetReq(val *GetRepositoriesReq) {
+	p.Req = val
+}
+
+var fieldIDToName_AgentServiceGetRepositoriesArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AgentServiceGetRepositoriesArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AgentServiceGetRepositoriesArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetRepositoriesArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetRepositoriesArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewGetRepositoriesReq()
+	if err := p.Req.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceGetRepositoriesArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetRepositories_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetRepositoriesArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AgentServiceGetRepositoriesArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceGetRepositoriesArgs(%+v)", *p)
+}
+
+func (p *AgentServiceGetRepositoriesArgs) DeepEqual(ano *AgentServiceGetRepositoriesArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceGetRepositoriesArgs) Field1DeepEqual(src *GetRepositoriesReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceGetRepositoriesResult struct {
+	Success *GetRepositoriesRes `thrift:"success,0,optional" frugal:"0,optional,GetRepositoriesRes" json:"success,omitempty"`
+}
+
+func NewAgentServiceGetRepositoriesResult() *AgentServiceGetRepositoriesResult {
+	return &AgentServiceGetRepositoriesResult{}
+}
+
+func (p *AgentServiceGetRepositoriesResult) InitDefault() {
+	*p = AgentServiceGetRepositoriesResult{}
+}
+
+var AgentServiceGetRepositoriesResult_Success_DEFAULT *GetRepositoriesRes
+
+func (p *AgentServiceGetRepositoriesResult) GetSuccess() (v *GetRepositoriesRes) {
+	if !p.IsSetSuccess() {
+		return AgentServiceGetRepositoriesResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *AgentServiceGetRepositoriesResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetRepositoriesRes)
+}
+
+var fieldIDToName_AgentServiceGetRepositoriesResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AgentServiceGetRepositoriesResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AgentServiceGetRepositoriesResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetRepositoriesResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetRepositoriesResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewGetRepositoriesRes()
+	if err := p.Success.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceGetRepositoriesResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetRepositories_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetRepositoriesResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AgentServiceGetRepositoriesResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceGetRepositoriesResult(%+v)", *p)
+}
+
+func (p *AgentServiceGetRepositoriesResult) DeepEqual(ano *AgentServiceGetRepositoriesResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceGetRepositoriesResult) Field0DeepEqual(src *GetRepositoriesRes) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false
@@ -1874,6 +2866,1044 @@ func (p *AgentServiceAddIDLResult) DeepEqual(ano *AgentServiceAddIDLResult) bool
 }
 
 func (p *AgentServiceAddIDLResult) Field0DeepEqual(src *AddIDLRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceDeleteIDLArgs struct {
+	Req *DeleteIDLsReq `thrift:"req,1" frugal:"1,default,DeleteIDLsReq" json:"req"`
+}
+
+func NewAgentServiceDeleteIDLArgs() *AgentServiceDeleteIDLArgs {
+	return &AgentServiceDeleteIDLArgs{}
+}
+
+func (p *AgentServiceDeleteIDLArgs) InitDefault() {
+	*p = AgentServiceDeleteIDLArgs{}
+}
+
+var AgentServiceDeleteIDLArgs_Req_DEFAULT *DeleteIDLsReq
+
+func (p *AgentServiceDeleteIDLArgs) GetReq() (v *DeleteIDLsReq) {
+	if !p.IsSetReq() {
+		return AgentServiceDeleteIDLArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *AgentServiceDeleteIDLArgs) SetReq(val *DeleteIDLsReq) {
+	p.Req = val
+}
+
+var fieldIDToName_AgentServiceDeleteIDLArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AgentServiceDeleteIDLArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AgentServiceDeleteIDLArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceDeleteIDLArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteIDLArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewDeleteIDLsReq()
+	if err := p.Req.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceDeleteIDLArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("DeleteIDL_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteIDLArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteIDLArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceDeleteIDLArgs(%+v)", *p)
+}
+
+func (p *AgentServiceDeleteIDLArgs) DeepEqual(ano *AgentServiceDeleteIDLArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceDeleteIDLArgs) Field1DeepEqual(src *DeleteIDLsReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceDeleteIDLResult struct {
+	Success *DeleteIDLsRes `thrift:"success,0,optional" frugal:"0,optional,DeleteIDLsRes" json:"success,omitempty"`
+}
+
+func NewAgentServiceDeleteIDLResult() *AgentServiceDeleteIDLResult {
+	return &AgentServiceDeleteIDLResult{}
+}
+
+func (p *AgentServiceDeleteIDLResult) InitDefault() {
+	*p = AgentServiceDeleteIDLResult{}
+}
+
+var AgentServiceDeleteIDLResult_Success_DEFAULT *DeleteIDLsRes
+
+func (p *AgentServiceDeleteIDLResult) GetSuccess() (v *DeleteIDLsRes) {
+	if !p.IsSetSuccess() {
+		return AgentServiceDeleteIDLResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *AgentServiceDeleteIDLResult) SetSuccess(x interface{}) {
+	p.Success = x.(*DeleteIDLsRes)
+}
+
+var fieldIDToName_AgentServiceDeleteIDLResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AgentServiceDeleteIDLResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AgentServiceDeleteIDLResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceDeleteIDLResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteIDLResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewDeleteIDLsRes()
+	if err := p.Success.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceDeleteIDLResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("DeleteIDL_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteIDLResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteIDLResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceDeleteIDLResult(%+v)", *p)
+}
+
+func (p *AgentServiceDeleteIDLResult) DeepEqual(ano *AgentServiceDeleteIDLResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceDeleteIDLResult) Field0DeepEqual(src *DeleteIDLsRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceUpdateIDLArgs struct {
+	Req *UpdateIDLReq `thrift:"req,1" frugal:"1,default,UpdateIDLReq" json:"req"`
+}
+
+func NewAgentServiceUpdateIDLArgs() *AgentServiceUpdateIDLArgs {
+	return &AgentServiceUpdateIDLArgs{}
+}
+
+func (p *AgentServiceUpdateIDLArgs) InitDefault() {
+	*p = AgentServiceUpdateIDLArgs{}
+}
+
+var AgentServiceUpdateIDLArgs_Req_DEFAULT *UpdateIDLReq
+
+func (p *AgentServiceUpdateIDLArgs) GetReq() (v *UpdateIDLReq) {
+	if !p.IsSetReq() {
+		return AgentServiceUpdateIDLArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *AgentServiceUpdateIDLArgs) SetReq(val *UpdateIDLReq) {
+	p.Req = val
+}
+
+var fieldIDToName_AgentServiceUpdateIDLArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AgentServiceUpdateIDLArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AgentServiceUpdateIDLArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateIDLArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceUpdateIDLArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewUpdateIDLReq()
+	if err := p.Req.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceUpdateIDLArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("UpdateIDL_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceUpdateIDLArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AgentServiceUpdateIDLArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceUpdateIDLArgs(%+v)", *p)
+}
+
+func (p *AgentServiceUpdateIDLArgs) DeepEqual(ano *AgentServiceUpdateIDLArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceUpdateIDLArgs) Field1DeepEqual(src *UpdateIDLReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceUpdateIDLResult struct {
+	Success *UpdateIDLRes `thrift:"success,0,optional" frugal:"0,optional,UpdateIDLRes" json:"success,omitempty"`
+}
+
+func NewAgentServiceUpdateIDLResult() *AgentServiceUpdateIDLResult {
+	return &AgentServiceUpdateIDLResult{}
+}
+
+func (p *AgentServiceUpdateIDLResult) InitDefault() {
+	*p = AgentServiceUpdateIDLResult{}
+}
+
+var AgentServiceUpdateIDLResult_Success_DEFAULT *UpdateIDLRes
+
+func (p *AgentServiceUpdateIDLResult) GetSuccess() (v *UpdateIDLRes) {
+	if !p.IsSetSuccess() {
+		return AgentServiceUpdateIDLResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *AgentServiceUpdateIDLResult) SetSuccess(x interface{}) {
+	p.Success = x.(*UpdateIDLRes)
+}
+
+var fieldIDToName_AgentServiceUpdateIDLResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AgentServiceUpdateIDLResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AgentServiceUpdateIDLResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateIDLResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceUpdateIDLResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewUpdateIDLRes()
+	if err := p.Success.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceUpdateIDLResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("UpdateIDL_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceUpdateIDLResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AgentServiceUpdateIDLResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceUpdateIDLResult(%+v)", *p)
+}
+
+func (p *AgentServiceUpdateIDLResult) DeepEqual(ano *AgentServiceUpdateIDLResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceUpdateIDLResult) Field0DeepEqual(src *UpdateIDLRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceGetIDLsArgs struct {
+	Req *GetIDLsReq `thrift:"req,1" frugal:"1,default,GetIDLsReq" json:"req"`
+}
+
+func NewAgentServiceGetIDLsArgs() *AgentServiceGetIDLsArgs {
+	return &AgentServiceGetIDLsArgs{}
+}
+
+func (p *AgentServiceGetIDLsArgs) InitDefault() {
+	*p = AgentServiceGetIDLsArgs{}
+}
+
+var AgentServiceGetIDLsArgs_Req_DEFAULT *GetIDLsReq
+
+func (p *AgentServiceGetIDLsArgs) GetReq() (v *GetIDLsReq) {
+	if !p.IsSetReq() {
+		return AgentServiceGetIDLsArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *AgentServiceGetIDLsArgs) SetReq(val *GetIDLsReq) {
+	p.Req = val
+}
+
+var fieldIDToName_AgentServiceGetIDLsArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AgentServiceGetIDLsArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AgentServiceGetIDLsArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetIDLsArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetIDLsArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewGetIDLsReq()
+	if err := p.Req.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceGetIDLsArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetIDLs_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetIDLsArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AgentServiceGetIDLsArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceGetIDLsArgs(%+v)", *p)
+}
+
+func (p *AgentServiceGetIDLsArgs) DeepEqual(ano *AgentServiceGetIDLsArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceGetIDLsArgs) Field1DeepEqual(src *GetIDLsReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceGetIDLsResult struct {
+	Success *GetIDLsRes `thrift:"success,0,optional" frugal:"0,optional,GetIDLsRes" json:"success,omitempty"`
+}
+
+func NewAgentServiceGetIDLsResult() *AgentServiceGetIDLsResult {
+	return &AgentServiceGetIDLsResult{}
+}
+
+func (p *AgentServiceGetIDLsResult) InitDefault() {
+	*p = AgentServiceGetIDLsResult{}
+}
+
+var AgentServiceGetIDLsResult_Success_DEFAULT *GetIDLsRes
+
+func (p *AgentServiceGetIDLsResult) GetSuccess() (v *GetIDLsRes) {
+	if !p.IsSetSuccess() {
+		return AgentServiceGetIDLsResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *AgentServiceGetIDLsResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetIDLsRes)
+}
+
+var fieldIDToName_AgentServiceGetIDLsResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AgentServiceGetIDLsResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AgentServiceGetIDLsResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetIDLsResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetIDLsResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewGetIDLsRes()
+	if err := p.Success.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceGetIDLsResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetIDLs_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetIDLsResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AgentServiceGetIDLsResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceGetIDLsResult(%+v)", *p)
+}
+
+func (p *AgentServiceGetIDLsResult) DeepEqual(ano *AgentServiceGetIDLsResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceGetIDLsResult) Field0DeepEqual(src *GetIDLsRes) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false

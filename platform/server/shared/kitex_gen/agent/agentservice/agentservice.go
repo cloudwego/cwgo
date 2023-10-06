@@ -20,9 +20,14 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	handlerType := (*agent.AgentService)(nil)
 	methods := map[string]kitex.MethodInfo{
 		"AddRepository":          kitex.NewMethodInfo(addRepositoryHandler, newAgentServiceAddRepositoryArgs, newAgentServiceAddRepositoryResult, false),
+		"DeleteRepositories":     kitex.NewMethodInfo(deleteRepositoriesHandler, newAgentServiceDeleteRepositoriesArgs, newAgentServiceDeleteRepositoriesResult, false),
 		"UpdateRepositoryStatus": kitex.NewMethodInfo(updateRepositoryStatusHandler, newAgentServiceUpdateRepositoryStatusArgs, newAgentServiceUpdateRepositoryStatusResult, false),
+		"GetRepositories":        kitex.NewMethodInfo(getRepositoriesHandler, newAgentServiceGetRepositoriesArgs, newAgentServiceGetRepositoriesResult, false),
 		"SyncRepositoryById":     kitex.NewMethodInfo(syncRepositoryByIdHandler, newAgentServiceSyncRepositoryByIdArgs, newAgentServiceSyncRepositoryByIdResult, false),
 		"AddIDL":                 kitex.NewMethodInfo(addIDLHandler, newAgentServiceAddIDLArgs, newAgentServiceAddIDLResult, false),
+		"DeleteIDL":              kitex.NewMethodInfo(deleteIDLHandler, newAgentServiceDeleteIDLArgs, newAgentServiceDeleteIDLResult, false),
+		"UpdateIDL":              kitex.NewMethodInfo(updateIDLHandler, newAgentServiceUpdateIDLArgs, newAgentServiceUpdateIDLResult, false),
+		"GetIDLs":                kitex.NewMethodInfo(getIDLsHandler, newAgentServiceGetIDLsArgs, newAgentServiceGetIDLsResult, false),
 		"SyncIDLsById":           kitex.NewMethodInfo(syncIDLsByIdHandler, newAgentServiceSyncIDLsByIdArgs, newAgentServiceSyncIDLsByIdResult, false),
 		"UpdateTasks":            kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
 		"GenerateCode":           kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
@@ -59,6 +64,24 @@ func newAgentServiceAddRepositoryResult() interface{} {
 	return agent.NewAgentServiceAddRepositoryResult()
 }
 
+func deleteRepositoriesHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceDeleteRepositoriesArgs)
+	realResult := result.(*agent.AgentServiceDeleteRepositoriesResult)
+	success, err := handler.(agent.AgentService).DeleteRepositories(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceDeleteRepositoriesArgs() interface{} {
+	return agent.NewAgentServiceDeleteRepositoriesArgs()
+}
+
+func newAgentServiceDeleteRepositoriesResult() interface{} {
+	return agent.NewAgentServiceDeleteRepositoriesResult()
+}
+
 func updateRepositoryStatusHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*agent.AgentServiceUpdateRepositoryStatusArgs)
 	realResult := result.(*agent.AgentServiceUpdateRepositoryStatusResult)
@@ -75,6 +98,24 @@ func newAgentServiceUpdateRepositoryStatusArgs() interface{} {
 
 func newAgentServiceUpdateRepositoryStatusResult() interface{} {
 	return agent.NewAgentServiceUpdateRepositoryStatusResult()
+}
+
+func getRepositoriesHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceGetRepositoriesArgs)
+	realResult := result.(*agent.AgentServiceGetRepositoriesResult)
+	success, err := handler.(agent.AgentService).GetRepositories(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceGetRepositoriesArgs() interface{} {
+	return agent.NewAgentServiceGetRepositoriesArgs()
+}
+
+func newAgentServiceGetRepositoriesResult() interface{} {
+	return agent.NewAgentServiceGetRepositoriesResult()
 }
 
 func syncRepositoryByIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -111,6 +152,60 @@ func newAgentServiceAddIDLArgs() interface{} {
 
 func newAgentServiceAddIDLResult() interface{} {
 	return agent.NewAgentServiceAddIDLResult()
+}
+
+func deleteIDLHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceDeleteIDLArgs)
+	realResult := result.(*agent.AgentServiceDeleteIDLResult)
+	success, err := handler.(agent.AgentService).DeleteIDL(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceDeleteIDLArgs() interface{} {
+	return agent.NewAgentServiceDeleteIDLArgs()
+}
+
+func newAgentServiceDeleteIDLResult() interface{} {
+	return agent.NewAgentServiceDeleteIDLResult()
+}
+
+func updateIDLHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceUpdateIDLArgs)
+	realResult := result.(*agent.AgentServiceUpdateIDLResult)
+	success, err := handler.(agent.AgentService).UpdateIDL(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceUpdateIDLArgs() interface{} {
+	return agent.NewAgentServiceUpdateIDLArgs()
+}
+
+func newAgentServiceUpdateIDLResult() interface{} {
+	return agent.NewAgentServiceUpdateIDLResult()
+}
+
+func getIDLsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceGetIDLsArgs)
+	realResult := result.(*agent.AgentServiceGetIDLsResult)
+	success, err := handler.(agent.AgentService).GetIDLs(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceGetIDLsArgs() interface{} {
+	return agent.NewAgentServiceGetIDLsArgs()
+}
+
+func newAgentServiceGetIDLsResult() interface{} {
+	return agent.NewAgentServiceGetIDLsResult()
 }
 
 func syncIDLsByIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -187,11 +282,31 @@ func (p *kClient) AddRepository(ctx context.Context, req *agent.AddRepositoryReq
 	return _result.GetSuccess(), nil
 }
 
+func (p *kClient) DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq) (r *agent.DeleteRepositoriesRes, err error) {
+	var _args agent.AgentServiceDeleteRepositoriesArgs
+	_args.Req = req
+	var _result agent.AgentServiceDeleteRepositoriesResult
+	if err = p.c.Call(ctx, "DeleteRepositories", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
 func (p *kClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq) (r *agent.UpdateRepositoryStatusRes, err error) {
 	var _args agent.AgentServiceUpdateRepositoryStatusArgs
 	_args.Req = req
 	var _result agent.AgentServiceUpdateRepositoryStatusResult
 	if err = p.c.Call(ctx, "UpdateRepositoryStatus", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq) (r *agent.GetRepositoriesRes, err error) {
+	var _args agent.AgentServiceGetRepositoriesArgs
+	_args.Req = req
+	var _result agent.AgentServiceGetRepositoriesResult
+	if err = p.c.Call(ctx, "GetRepositories", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -212,6 +327,36 @@ func (p *kClient) AddIDL(ctx context.Context, req *agent.AddIDLReq) (r *agent.Ad
 	_args.Req = req
 	var _result agent.AgentServiceAddIDLResult
 	if err = p.c.Call(ctx, "AddIDL", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteIDL(ctx context.Context, req *agent.DeleteIDLsReq) (r *agent.DeleteIDLsRes, err error) {
+	var _args agent.AgentServiceDeleteIDLArgs
+	_args.Req = req
+	var _result agent.AgentServiceDeleteIDLResult
+	if err = p.c.Call(ctx, "DeleteIDL", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateIDL(ctx context.Context, req *agent.UpdateIDLReq) (r *agent.UpdateIDLRes, err error) {
+	var _args agent.AgentServiceUpdateIDLArgs
+	_args.Req = req
+	var _result agent.AgentServiceUpdateIDLResult
+	if err = p.c.Call(ctx, "UpdateIDL", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetIDLs(ctx context.Context, req *agent.GetIDLsReq) (r *agent.GetIDLsRes, err error) {
+	var _args agent.AgentServiceGetIDLsArgs
+	_args.Req = req
+	var _result agent.AgentServiceGetIDLsResult
+	if err = p.c.Call(ctx, "GetIDLs", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

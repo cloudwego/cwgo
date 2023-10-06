@@ -22,6 +22,9 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
 	"net/http"
 	"net/url"
 )
@@ -51,11 +54,31 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 		}
 	}
 
-	err = l.svcCtx.DaoManager.Idl.AddIDL(req.RepositoryID, req.MainIdlPath, req.ServiceName)
+	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &idl.AddIDLRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+
+	rpcRes, err := client.AddIDL(l.ctx, &agent.AddIDLReq{
+		RepositoryId: req.RepositoryID,
+		MainIdlPath:  req.MainIdlPath,
+		ServiceName:  req.ServiceName,
+	})
+	if err != nil {
+		logger.Logger.Error("connect tp rpc client failed", zap.Error(err))
+		return &idl.AddIDLRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &idl.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 
