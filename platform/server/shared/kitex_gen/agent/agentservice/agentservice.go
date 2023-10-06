@@ -29,6 +29,14 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"UpdateIDL":          kitex.NewMethodInfo(updateIDLHandler, newAgentServiceUpdateIDLArgs, newAgentServiceUpdateIDLResult, false),
 		"GetIDLs":            kitex.NewMethodInfo(getIDLsHandler, newAgentServiceGetIDLsArgs, newAgentServiceGetIDLsResult, false),
 		"SyncIDLsById":       kitex.NewMethodInfo(syncIDLsByIdHandler, newAgentServiceSyncIDLsByIdArgs, newAgentServiceSyncIDLsByIdResult, false),
+		"AddTemplate":        kitex.NewMethodInfo(addTemplateHandler, newAgentServiceAddTemplateArgs, newAgentServiceAddTemplateResult, false),
+		"DeleteTemplate":     kitex.NewMethodInfo(deleteTemplateHandler, newAgentServiceDeleteTemplateArgs, newAgentServiceDeleteTemplateResult, false),
+		"UpdateTemplate":     kitex.NewMethodInfo(updateTemplateHandler, newAgentServiceUpdateTemplateArgs, newAgentServiceUpdateTemplateResult, false),
+		"GetTemplates":       kitex.NewMethodInfo(getTemplatesHandler, newAgentServiceGetTemplatesArgs, newAgentServiceGetTemplatesResult, false),
+		"AddTemplateItem":    kitex.NewMethodInfo(addTemplateItemHandler, newAgentServiceAddTemplateItemArgs, newAgentServiceAddTemplateItemResult, false),
+		"DeleteTemplateItem": kitex.NewMethodInfo(deleteTemplateItemHandler, newAgentServiceDeleteTemplateItemArgs, newAgentServiceDeleteTemplateItemResult, false),
+		"UpdateTemplateItem": kitex.NewMethodInfo(updateTemplateItemHandler, newAgentServiceUpdateTemplateItemArgs, newAgentServiceUpdateTemplateItemResult, false),
+		"GetTemplateItems":   kitex.NewMethodInfo(getTemplateItemsHandler, newAgentServiceGetTemplateItemsArgs, newAgentServiceGetTemplateItemsResult, false),
 		"UpdateTasks":        kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
 		"GenerateCode":       kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
 	}
@@ -226,6 +234,150 @@ func newAgentServiceSyncIDLsByIdResult() interface{} {
 	return agent.NewAgentServiceSyncIDLsByIdResult()
 }
 
+func addTemplateHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceAddTemplateArgs)
+	realResult := result.(*agent.AgentServiceAddTemplateResult)
+	success, err := handler.(agent.AgentService).AddTemplate(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceAddTemplateArgs() interface{} {
+	return agent.NewAgentServiceAddTemplateArgs()
+}
+
+func newAgentServiceAddTemplateResult() interface{} {
+	return agent.NewAgentServiceAddTemplateResult()
+}
+
+func deleteTemplateHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceDeleteTemplateArgs)
+	realResult := result.(*agent.AgentServiceDeleteTemplateResult)
+	success, err := handler.(agent.AgentService).DeleteTemplate(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceDeleteTemplateArgs() interface{} {
+	return agent.NewAgentServiceDeleteTemplateArgs()
+}
+
+func newAgentServiceDeleteTemplateResult() interface{} {
+	return agent.NewAgentServiceDeleteTemplateResult()
+}
+
+func updateTemplateHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceUpdateTemplateArgs)
+	realResult := result.(*agent.AgentServiceUpdateTemplateResult)
+	success, err := handler.(agent.AgentService).UpdateTemplate(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceUpdateTemplateArgs() interface{} {
+	return agent.NewAgentServiceUpdateTemplateArgs()
+}
+
+func newAgentServiceUpdateTemplateResult() interface{} {
+	return agent.NewAgentServiceUpdateTemplateResult()
+}
+
+func getTemplatesHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceGetTemplatesArgs)
+	realResult := result.(*agent.AgentServiceGetTemplatesResult)
+	success, err := handler.(agent.AgentService).GetTemplates(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceGetTemplatesArgs() interface{} {
+	return agent.NewAgentServiceGetTemplatesArgs()
+}
+
+func newAgentServiceGetTemplatesResult() interface{} {
+	return agent.NewAgentServiceGetTemplatesResult()
+}
+
+func addTemplateItemHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceAddTemplateItemArgs)
+	realResult := result.(*agent.AgentServiceAddTemplateItemResult)
+	success, err := handler.(agent.AgentService).AddTemplateItem(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceAddTemplateItemArgs() interface{} {
+	return agent.NewAgentServiceAddTemplateItemArgs()
+}
+
+func newAgentServiceAddTemplateItemResult() interface{} {
+	return agent.NewAgentServiceAddTemplateItemResult()
+}
+
+func deleteTemplateItemHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceDeleteTemplateItemArgs)
+	realResult := result.(*agent.AgentServiceDeleteTemplateItemResult)
+	success, err := handler.(agent.AgentService).DeleteTemplateItem(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceDeleteTemplateItemArgs() interface{} {
+	return agent.NewAgentServiceDeleteTemplateItemArgs()
+}
+
+func newAgentServiceDeleteTemplateItemResult() interface{} {
+	return agent.NewAgentServiceDeleteTemplateItemResult()
+}
+
+func updateTemplateItemHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceUpdateTemplateItemArgs)
+	realResult := result.(*agent.AgentServiceUpdateTemplateItemResult)
+	success, err := handler.(agent.AgentService).UpdateTemplateItem(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceUpdateTemplateItemArgs() interface{} {
+	return agent.NewAgentServiceUpdateTemplateItemArgs()
+}
+
+func newAgentServiceUpdateTemplateItemResult() interface{} {
+	return agent.NewAgentServiceUpdateTemplateItemResult()
+}
+
+func getTemplateItemsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceGetTemplateItemsArgs)
+	realResult := result.(*agent.AgentServiceGetTemplateItemsResult)
+	success, err := handler.(agent.AgentService).GetTemplateItems(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceGetTemplateItemsArgs() interface{} {
+	return agent.NewAgentServiceGetTemplateItemsArgs()
+}
+
+func newAgentServiceGetTemplateItemsResult() interface{} {
+	return agent.NewAgentServiceGetTemplateItemsResult()
+}
+
 func updateTasksHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*agent.AgentServiceUpdateTasksArgs)
 	realResult := result.(*agent.AgentServiceUpdateTasksResult)
@@ -367,6 +519,86 @@ func (p *kClient) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq) 
 	_args.Req = req
 	var _result agent.AgentServiceSyncIDLsByIdResult
 	if err = p.c.Call(ctx, "SyncIDLsById", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) AddTemplate(ctx context.Context, req *agent.AddTemplateReq) (r *agent.AddTemplateRes, err error) {
+	var _args agent.AgentServiceAddTemplateArgs
+	_args.Req = req
+	var _result agent.AgentServiceAddTemplateResult
+	if err = p.c.Call(ctx, "AddTemplate", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteTemplate(ctx context.Context, req *agent.DeleteTemplateReq) (r *agent.DeleteTemplateRes, err error) {
+	var _args agent.AgentServiceDeleteTemplateArgs
+	_args.Req = req
+	var _result agent.AgentServiceDeleteTemplateResult
+	if err = p.c.Call(ctx, "DeleteTemplate", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateTemplate(ctx context.Context, req *agent.UpdateTemplateReq) (r *agent.UpdateTemplateRes, err error) {
+	var _args agent.AgentServiceUpdateTemplateArgs
+	_args.Req = req
+	var _result agent.AgentServiceUpdateTemplateResult
+	if err = p.c.Call(ctx, "UpdateTemplate", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetTemplates(ctx context.Context, req *agent.GetTemplatesReq) (r *agent.GetTemplatesRes, err error) {
+	var _args agent.AgentServiceGetTemplatesArgs
+	_args.Req = req
+	var _result agent.AgentServiceGetTemplatesResult
+	if err = p.c.Call(ctx, "GetTemplates", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) AddTemplateItem(ctx context.Context, req *agent.AddTemplateItemReq) (r *agent.AddTemplateItemRes, err error) {
+	var _args agent.AgentServiceAddTemplateItemArgs
+	_args.Req = req
+	var _result agent.AgentServiceAddTemplateItemResult
+	if err = p.c.Call(ctx, "AddTemplateItem", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteTemplateItem(ctx context.Context, req *agent.DeleteTemplateItemReq) (r *agent.DeleteTemplateItemRes, err error) {
+	var _args agent.AgentServiceDeleteTemplateItemArgs
+	_args.Req = req
+	var _result agent.AgentServiceDeleteTemplateItemResult
+	if err = p.c.Call(ctx, "DeleteTemplateItem", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateTemplateItem(ctx context.Context, req *agent.UpdateTemplateItemReq) (r *agent.UpdateTemplateItemRes, err error) {
+	var _args agent.AgentServiceUpdateTemplateItemArgs
+	_args.Req = req
+	var _result agent.AgentServiceUpdateTemplateItemResult
+	if err = p.c.Call(ctx, "UpdateTemplateItem", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq) (r *agent.GetTemplateItemsRes, err error) {
+	var _args agent.AgentServiceGetTemplateItemsArgs
+	_args.Req = req
+	var _result agent.AgentServiceGetTemplateItemsResult
+	if err = p.c.Call(ctx, "GetTemplateItems", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

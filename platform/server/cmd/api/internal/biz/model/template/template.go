@@ -11,7 +11,7 @@ import (
 )
 
 type AddTemplateReq struct {
-	Name string `thrift:"name,1" form:"name,required" json:"name,required"`
+	Name string `thrift:"name,1" form:"name,required" json:"name,required" vd:"len($)>0"`
 	Type int32  `thrift:"type,2" form:"type,required" json:"type,required"`
 }
 
@@ -719,7 +719,7 @@ func (p *DeleteTemplateRes) String() string {
 
 type UpdateTemplateReq struct {
 	ID   int64  `thrift:"id,1" form:"id,required" json:"id,required"`
-	Name string `thrift:"name,2" form:"name,required" json:"name,required"`
+	Name string `thrift:"name,2" form:"name,required" json:"name,required" vd:"len($)>0"`
 }
 
 func NewUpdateTemplateReq() *UpdateTemplateReq {
@@ -1753,7 +1753,7 @@ func (p *GetTemplatesResData) String() string {
 
 type AddTemplateItemReq struct {
 	TemplateID int64  `thrift:"template_id,1" form:"template_id" json:"template_id" query:"template_id"`
-	Name       string `thrift:"name,2" form:"name,required" json:"name,required"`
+	Name       string `thrift:"name,2" form:"name,required" json:"name,required" vd:"len($)>0"`
 	Content    string `thrift:"content,3" form:"content,required" json:"content,required"`
 }
 
@@ -2506,7 +2506,7 @@ func (p *DeleteTemplateItemRes) String() string {
 
 type UpdateTemplateItemReq struct {
 	ID      int64  `thrift:"id,1" form:"id,required" json:"id,required"`
-	Name    string `thrift:"name,2" form:"name" json:"name"`
+	Name    string `thrift:"name,2" form:"name" json:"name" vd:"len($)>0"`
 	Content string `thrift:"content,3" form:"content" json:"content"`
 }
 
@@ -2917,37 +2917,19 @@ func (p *UpdateTemplateItemRes) String() string {
 }
 
 type GetTemplateItemsReq struct {
-	Page    int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
-	Limit   int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
-	Order   int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
-	OrderBy string `thrift:"order_by,4" json:"order_by" query:"order_by"`
+	ID int32 `thrift:"id,1" json:"id" query:"page" vd:"$>=0"`
 }
 
 func NewGetTemplateItemsReq() *GetTemplateItemsReq {
 	return &GetTemplateItemsReq{}
 }
 
-func (p *GetTemplateItemsReq) GetPage() (v int32) {
-	return p.Page
-}
-
-func (p *GetTemplateItemsReq) GetLimit() (v int32) {
-	return p.Limit
-}
-
-func (p *GetTemplateItemsReq) GetOrder() (v int32) {
-	return p.Order
-}
-
-func (p *GetTemplateItemsReq) GetOrderBy() (v string) {
-	return p.OrderBy
+func (p *GetTemplateItemsReq) GetID() (v int32) {
+	return p.ID
 }
 
 var fieldIDToName_GetTemplateItemsReq = map[int16]string{
-	1: "page",
-	2: "limit",
-	3: "order",
-	4: "order_by",
+	1: "id",
 }
 
 func (p *GetTemplateItemsReq) Read(iprot thrift.TProtocol) (err error) {
@@ -2972,36 +2954,6 @@ func (p *GetTemplateItemsReq) Read(iprot thrift.TProtocol) (err error) {
 		case 1:
 			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 2:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 3:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 4:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -3043,34 +2995,7 @@ func (p *GetTemplateItemsReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
-		p.Page = v
-	}
-	return nil
-}
-
-func (p *GetTemplateItemsReq) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		p.Limit = v
-	}
-	return nil
-}
-
-func (p *GetTemplateItemsReq) ReadField3(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		p.Order = v
-	}
-	return nil
-}
-
-func (p *GetTemplateItemsReq) ReadField4(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		p.OrderBy = v
+		p.ID = v
 	}
 	return nil
 }
@@ -3083,18 +3008,6 @@ func (p *GetTemplateItemsReq) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
-			goto WriteFieldError
-		}
-		if err = p.writeField4(oprot); err != nil {
-			fieldId = 4
 			goto WriteFieldError
 		}
 
@@ -3117,10 +3030,10 @@ WriteStructEndError:
 }
 
 func (p *GetTemplateItemsReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page", thrift.I32, 1); err != nil {
+	if err = oprot.WriteFieldBegin("id", thrift.I32, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Page); err != nil {
+	if err := oprot.WriteI32(p.ID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3131,57 +3044,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *GetTemplateItemsReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("limit", thrift.I32, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.Limit); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *GetTemplateItemsReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("order", thrift.I32, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.Order); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
-}
-
-func (p *GetTemplateItemsReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("order_by", thrift.STRING, 4); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.OrderBy); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
 func (p *GetTemplateItemsReq) String() string {
@@ -3591,15 +3453,15 @@ type TemplateService interface {
 
 	UpdateTemplate(ctx context.Context, req *UpdateTemplateReq) (r *UpdateTemplateRes, err error)
 
-	GetTemplates(ctx context.Context, req *GetTemplateItemsReq) (r *GetTemplatesRes, err error)
+	GetTemplates(ctx context.Context, req *GetTemplatesReq) (r *GetTemplatesRes, err error)
 
 	AddTemplateItem(ctx context.Context, req *AddTemplateItemReq) (r *AddTemplateItemRes, err error)
 
-	DeleteTemplateItem(ctx context.Context, req *DeleteTemplateItemReq) (r *DeleteTemplateRes, err error)
+	DeleteTemplateItem(ctx context.Context, req *DeleteTemplateItemReq) (r *DeleteTemplateItemRes, err error)
 
 	UpdateTemplateItem(ctx context.Context, req *UpdateTemplateItemReq) (r *UpdateTemplateItemRes, err error)
 
-	GetTemplateItems(ctx context.Context, req *GetTemplatesReq) (r *GetTemplateItemsRes, err error)
+	GetTemplateItems(ctx context.Context, req *GetTemplateItemsReq) (r *GetTemplateItemsRes, err error)
 }
 
 type TemplateServiceClient struct {
@@ -3655,7 +3517,7 @@ func (p *TemplateServiceClient) UpdateTemplate(ctx context.Context, req *UpdateT
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *TemplateServiceClient) GetTemplates(ctx context.Context, req *GetTemplateItemsReq) (r *GetTemplatesRes, err error) {
+func (p *TemplateServiceClient) GetTemplates(ctx context.Context, req *GetTemplatesReq) (r *GetTemplatesRes, err error) {
 	var _args TemplateServiceGetTemplatesArgs
 	_args.Req = req
 	var _result TemplateServiceGetTemplatesResult
@@ -3673,7 +3535,7 @@ func (p *TemplateServiceClient) AddTemplateItem(ctx context.Context, req *AddTem
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *TemplateServiceClient) DeleteTemplateItem(ctx context.Context, req *DeleteTemplateItemReq) (r *DeleteTemplateRes, err error) {
+func (p *TemplateServiceClient) DeleteTemplateItem(ctx context.Context, req *DeleteTemplateItemReq) (r *DeleteTemplateItemRes, err error) {
 	var _args TemplateServiceDeleteTemplateItemArgs
 	_args.Req = req
 	var _result TemplateServiceDeleteTemplateItemResult
@@ -3691,7 +3553,7 @@ func (p *TemplateServiceClient) UpdateTemplateItem(ctx context.Context, req *Upd
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *TemplateServiceClient) GetTemplateItems(ctx context.Context, req *GetTemplatesReq) (r *GetTemplateItemsRes, err error) {
+func (p *TemplateServiceClient) GetTemplateItems(ctx context.Context, req *GetTemplateItemsReq) (r *GetTemplateItemsRes, err error) {
 	var _args TemplateServiceGetTemplateItemsArgs
 	_args.Req = req
 	var _result TemplateServiceGetTemplateItemsResult
@@ -4008,7 +3870,7 @@ func (p *templateServiceProcessorDeleteTemplateItem) Process(ctx context.Context
 	iprot.ReadMessageEnd()
 	var err2 error
 	result := TemplateServiceDeleteTemplateItemResult{}
-	var retval *DeleteTemplateRes
+	var retval *DeleteTemplateItemRes
 	if retval, err2 = p.handler.DeleteTemplateItem(ctx, args.Req); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing DeleteTemplateItem: "+err2.Error())
 		oprot.WriteMessageBegin("DeleteTemplateItem", thrift.EXCEPTION, seqId)
@@ -5010,16 +4872,16 @@ func (p *TemplateServiceUpdateTemplateResult) String() string {
 }
 
 type TemplateServiceGetTemplatesArgs struct {
-	Req *GetTemplateItemsReq `thrift:"req,1"`
+	Req *GetTemplatesReq `thrift:"req,1"`
 }
 
 func NewTemplateServiceGetTemplatesArgs() *TemplateServiceGetTemplatesArgs {
 	return &TemplateServiceGetTemplatesArgs{}
 }
 
-var TemplateServiceGetTemplatesArgs_Req_DEFAULT *GetTemplateItemsReq
+var TemplateServiceGetTemplatesArgs_Req_DEFAULT *GetTemplatesReq
 
-func (p *TemplateServiceGetTemplatesArgs) GetReq() (v *GetTemplateItemsReq) {
+func (p *TemplateServiceGetTemplatesArgs) GetReq() (v *GetTemplatesReq) {
 	if !p.IsSetReq() {
 		return TemplateServiceGetTemplatesArgs_Req_DEFAULT
 	}
@@ -5094,7 +4956,7 @@ ReadStructEndError:
 }
 
 func (p *TemplateServiceGetTemplatesArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.Req = NewGetTemplateItemsReq()
+	p.Req = NewGetTemplatesReq()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
 	}
@@ -5739,16 +5601,16 @@ func (p *TemplateServiceDeleteTemplateItemArgs) String() string {
 }
 
 type TemplateServiceDeleteTemplateItemResult struct {
-	Success *DeleteTemplateRes `thrift:"success,0,optional"`
+	Success *DeleteTemplateItemRes `thrift:"success,0,optional"`
 }
 
 func NewTemplateServiceDeleteTemplateItemResult() *TemplateServiceDeleteTemplateItemResult {
 	return &TemplateServiceDeleteTemplateItemResult{}
 }
 
-var TemplateServiceDeleteTemplateItemResult_Success_DEFAULT *DeleteTemplateRes
+var TemplateServiceDeleteTemplateItemResult_Success_DEFAULT *DeleteTemplateItemRes
 
-func (p *TemplateServiceDeleteTemplateItemResult) GetSuccess() (v *DeleteTemplateRes) {
+func (p *TemplateServiceDeleteTemplateItemResult) GetSuccess() (v *DeleteTemplateItemRes) {
 	if !p.IsSetSuccess() {
 		return TemplateServiceDeleteTemplateItemResult_Success_DEFAULT
 	}
@@ -5823,7 +5685,7 @@ ReadStructEndError:
 }
 
 func (p *TemplateServiceDeleteTemplateItemResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewDeleteTemplateRes()
+	p.Success = NewDeleteTemplateItemRes()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
@@ -6178,16 +6040,16 @@ func (p *TemplateServiceUpdateTemplateItemResult) String() string {
 }
 
 type TemplateServiceGetTemplateItemsArgs struct {
-	Req *GetTemplatesReq `thrift:"req,1"`
+	Req *GetTemplateItemsReq `thrift:"req,1"`
 }
 
 func NewTemplateServiceGetTemplateItemsArgs() *TemplateServiceGetTemplateItemsArgs {
 	return &TemplateServiceGetTemplateItemsArgs{}
 }
 
-var TemplateServiceGetTemplateItemsArgs_Req_DEFAULT *GetTemplatesReq
+var TemplateServiceGetTemplateItemsArgs_Req_DEFAULT *GetTemplateItemsReq
 
-func (p *TemplateServiceGetTemplateItemsArgs) GetReq() (v *GetTemplatesReq) {
+func (p *TemplateServiceGetTemplateItemsArgs) GetReq() (v *GetTemplateItemsReq) {
 	if !p.IsSetReq() {
 		return TemplateServiceGetTemplateItemsArgs_Req_DEFAULT
 	}
@@ -6262,7 +6124,7 @@ ReadStructEndError:
 }
 
 func (p *TemplateServiceGetTemplateItemsArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.Req = NewGetTemplatesReq()
+	p.Req = NewGetTemplateItemsReq()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
 	}

@@ -22,11 +22,15 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgAddTemplate = "" // TODO: to be filled...
+	successMsgAddTemplate = "add template successfully"
 )
 
 type AddTemplateLogic struct {
@@ -42,25 +46,37 @@ func NewAddTemplateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddTe
 }
 
 func (l *AddTemplateLogic) AddTemplate(req *template.AddTemplateReq) (res *template.AddTemplateRes) {
-	if !utils.ValidStrings(req.Name) {
+	if _, ok := consts.TemplateTypeNumMap[int(req.Type)]; !ok {
 		return &template.AddTemplateRes{
-			Code: 400,
-			Msg:  "err: The input field contains an empty string",
+			Code: http.StatusBadRequest,
+			Msg:  "invalid template type",
 		}
 	}
-	//TODO: valid template type
 
-	if !utils.ValidStrings(req.Name) {
+	client, err := l.svcCtx.Manager.GetAgentClient()
+	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &template.AddTemplateRes{
-			Code: 400,
-			Msg:  "err: The input field contains an empty string",
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
-	err := l.svcCtx.DaoManager.Template.AddTemplate(req.Name, req.Type)
+
+	rpcRes, err := client.AddTemplate(l.ctx, &agent.AddTemplateReq{
+		Name: req.Name,
+		Type: req.Type,
+	})
 	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
 		return &template.AddTemplateRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &template.AddTemplateRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

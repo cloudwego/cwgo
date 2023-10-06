@@ -22,11 +22,14 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgUpdateTemplateItem = "" // TODO: to be filled...
+	successMsgUpdateTemplateItem = "update template item successfully"
 )
 
 type UpdateTemplateItemLogic struct {
@@ -42,18 +45,31 @@ func NewUpdateTemplateItemLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *UpdateTemplateItemLogic) UpdateTemplateItem(req *template.UpdateTemplateItemReq) (res *template.UpdateTemplateItemRes) {
-	if !utils.ValidStrings(req.Name, req.Content) {
+	client, err := l.svcCtx.Manager.GetAgentClient()
+	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &template.UpdateTemplateItemRes{
-			Code: 400,
-			Msg:  "err: The input field contains an empty string",
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 
-	err := l.svcCtx.DaoManager.Template.UpdateTemplateItem(req.ID, req.Name, req.Content)
+	rpcRes, err := client.UpdateTemplateItem(l.ctx, &agent.UpdateTemplateItemReq{
+		Id:      req.ID,
+		Name:    req.Name,
+		Content: req.Content,
+	})
 	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
 		return &template.UpdateTemplateItemRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &template.UpdateTemplateItemRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

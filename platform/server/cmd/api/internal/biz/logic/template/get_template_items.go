@@ -22,10 +22,14 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgGetTemplateItems = "" // TODO: to be filled...
+	successMsgGetTemplateItems = "get template items successfully"
 )
 
 type GetTemplateItemsLogic struct {
@@ -41,31 +45,35 @@ func NewGetTemplateItemsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *GetTemplateItemsLogic) GetTemplateItems(req *template.GetTemplateItemsReq) (res *template.GetTemplateItemsRes) {
-	items, err := l.svcCtx.DaoManager.Template.GetTemplateItems(req.Page, req.Limit, req.Order, req.OrderBy)
+	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &template.GetTemplateItemsRes{
-			Code: 400,
-			Msg:  err.Error(),
-			Data: nil,
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 
-	itemRes := make([]*template.TemplateItem, len(items))
-	for i, item := range items {
-		itemRes[i] = &template.TemplateItem{
-			ID:         item.Id,
-			TemplateID: item.TemplateId,
-			Name:       item.Name,
-			Content:    item.Content,
-			IsDeleted:  item.IsDeleted,
-			CreateTime: item.CreateTime,
-			UpdateTime: item.UpdateTime,
+	rpcRes, err := client.GetTemplateItems(l.ctx, &agent.GetTemplateItemsReq{
+		Id: req.ID,
+	})
+	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		return &template.GetTemplateItemsRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &template.GetTemplateItemsRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 
 	return &template.GetTemplateItemsRes{
 		Code: 0,
 		Msg:  successMsgGetTemplateItems,
-		Data: &template.GetTemplateItemsResData{TemplateItems: itemRes},
+		Data: &template.GetTemplateItemsResData{TemplateItems: rpcRes.Data.TemplateItems},
 	}
 }

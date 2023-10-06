@@ -121,3 +121,59 @@ func (s *AgentServiceImpl) UpdateRepository(ctx context.Context, req *agent.Upda
 
 	return resp, err
 }
+
+// AddTemplate implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) AddTemplate(ctx context.Context, req *agent.AddTemplateReq) (resp *agent.AddTemplateRes, err error) {
+	resp, err = service.NewAddTemplateService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// DeleteTemplate implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) DeleteTemplate(ctx context.Context, req *agent.DeleteTemplateReq) (resp *agent.DeleteTemplateRes, err error) {
+	resp, err = service.NewDeleteTemplateService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// UpdateTemplate implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) UpdateTemplate(ctx context.Context, req *agent.UpdateTemplateReq) (resp *agent.UpdateTemplateRes, err error) {
+	resp, err = service.NewUpdateTemplateService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// GetTemplates implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) GetTemplates(ctx context.Context, req *agent.GetTemplateItemsReq) (resp *agent.GetTemplatesRes, err error) {
+	resp, err = service.NewGetTemplatesService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// AddTemplateItem implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) AddTemplateItem(ctx context.Context, req *agent.AddTemplateItemReq) (resp *agent.AddTemplateItemRes, err error) {
+	resp, err = service.NewAddTemplateItemService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// DeleteTemplateItem implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) DeleteTemplateItem(ctx context.Context, req *agent.DeleteTemplateItemReq) (resp *agent.DeleteTemplateRes, err error) {
+	resp, err = service.NewDeleteTemplateItemService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// UpdateTemplateItem implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) UpdateTemplateItem(ctx context.Context, req *agent.UpdateTemplateItemReq) (resp *agent.UpdateTemplateItemRes, err error) {
+	resp, err = service.NewUpdateTemplateItemService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// GetTemplateItems implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) GetTemplateItems(ctx context.Context, req *agent.GetTemplatesReq) (resp *agent.GetTemplateItemsRes, err error) {
+	resp, err = service.NewGetTemplateItemsService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}

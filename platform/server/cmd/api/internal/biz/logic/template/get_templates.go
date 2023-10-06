@@ -22,10 +22,15 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgGetTemplates = "" // TODO: to be filled...
+	successMsgGetTemplates = "get templates successfully"
 )
 
 type GetTemplatesLogic struct {
@@ -41,30 +46,66 @@ func NewGetTemplatesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetT
 }
 
 func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *template.GetTemplatesRes) {
-	templates, err := l.svcCtx.DaoManager.Template.GetTemplates(req.Page, req.Limit, req.Order, req.OrderBy)
-	if err != nil {
+	if req.Order != consts.OrderNumInc && req.Order != consts.OrderNumDec {
 		return &template.GetTemplatesRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusBadRequest,
+			Msg:  "invalid order num",
 			Data: nil,
 		}
 	}
 
-	templateRes := make([]*template.Template, len(templates))
-	for i, templa := range templates {
-		templateRes[i] = &template.Template{
-			ID:         templa.Id,
-			Name:       templa.Name,
-			Type:       templa.Type,
-			IsDeleted:  templa.IsDeleted,
-			CreateTime: templa.CreateTime,
-			UpdateTime: templa.UpdateTime,
+	switch req.OrderBy {
+	case "create_time":
+
+	case "update_time":
+
+	default:
+		return &template.GetTemplatesRes{
+			Code: http.StatusBadRequest,
+			Msg:  "invalid order by",
+			Data: nil,
+		}
+	}
+
+	if req.Page == 0 {
+		req.Page = 1
+	}
+	if req.Limit == 0 {
+		req.Limit = consts.DefaultLimit
+	}
+
+	client, err := l.svcCtx.Manager.GetAgentClient()
+	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		return &template.GetTemplatesRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+
+	rpcRes, err := client.GetTemplates(l.ctx, &agent.GetTemplatesReq{
+		Page:    req.Page,
+		Limit:   req.Limit,
+		Order:   req.Order,
+		OrderBy: req.OrderBy,
+	})
+	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		return &template.GetTemplatesRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &template.GetTemplatesRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 
 	return &template.GetTemplatesRes{
 		Code: 0,
 		Msg:  successMsgGetTemplates,
-		Data: &template.GetTemplatesResData{Templates: templateRes},
+		Data: &template.GetTemplatesResData{Templates: rpcRes.Data.Templates},
 	}
 }

@@ -22,11 +22,14 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgAddTemplateItem = "" // TODO: to be filled...
+	successMsgAddTemplateItem = "add template item successfully"
 )
 
 type AddTemplateItemLogic struct {
@@ -42,17 +45,31 @@ func NewAddTemplateItemLogic(ctx context.Context, svcCtx *svc.ServiceContext) *A
 }
 
 func (l *AddTemplateItemLogic) AddTemplateItem(req *template.AddTemplateItemReq) (res *template.AddTemplateItemRes) {
-	if !utils.ValidStrings(req.Name, req.Content) {
+	client, err := l.svcCtx.Manager.GetAgentClient()
+	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &template.AddTemplateItemRes{
-			Code: 400,
-			Msg:  "err: The input field contains an empty string",
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
-	err := l.svcCtx.DaoManager.Template.AddTemplateItem(req.TemplateID, req.Name, req.Content)
+
+	rpcRes, err := client.AddTemplateItem(l.ctx, &agent.AddTemplateItemReq{
+		TemplateId: req.TemplateID,
+		Name:       req.Name,
+		Content:    req.Content,
+	})
 	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
 		return &template.AddTemplateItemRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &template.AddTemplateItemRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 
