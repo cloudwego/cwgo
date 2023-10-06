@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS `repository`;
 CREATE TABLE `repository` (
   `id` bigint(20) NOT NULL COMMENT 'repository id',
   `repository_type` tinyint(4) NOT NULL COMMENT 'repository type',
+  `store_type` tinyint(4) NOT NULL COMMENT 'store type',
   `repository_url` varchar(1024) NOT NULL COMMENT 'repository URL',
   `last_update_time` datetime DEFAULT NULL COMMENT 'last update time',
   `last_sync_time` datetime DEFAULT NULL COMMENT 'last sync time',

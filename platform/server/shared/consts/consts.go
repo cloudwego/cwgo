@@ -24,3 +24,7 @@ const (
 	ServiceNameApi   = ProjectName + "-" + ServerTypeApi
 	ServiceNameAgent = ProjectName + "-" + ServerTypeAgent
 )
+
+const (
+	DefaultLimit = 20
+)

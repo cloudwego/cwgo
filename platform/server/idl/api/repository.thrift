@@ -4,7 +4,7 @@ include "../model/model.thrift"
 
 struct AddRepositoryReq{
     1: i32 repository_type (api.body="repository_type,required")
-    2: string repository_url (api.body="repository_url,required")
+    2: string repository_url (api.body="repository_url,required",api.vd="len($)>0")
     3: string token (api.body="token")
 }
 struct AddRepositoryRes{
@@ -13,7 +13,7 @@ struct AddRepositoryRes{
 }
 
 struct DeleteRepositoriesReq{
-    1: list<string> ids (api.body="ids,required")
+    1: list<string> ids (api.body="ids,required",api.vd="len($)>0")
 }
 struct DeleteRepositoriesRes{
     1: i32 code
@@ -46,7 +46,7 @@ struct GetRepositoriesResData{
 }
 
 struct SyncRepositoryByIdReq{
-    1: list<i64> ids (api.body="ids,required")
+    1: list<i64> ids (api.body="ids,required",api.vd="len($)>0")
 }
 struct SyncRepositoryByIdRes{
     1: i32 code

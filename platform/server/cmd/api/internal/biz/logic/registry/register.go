@@ -28,7 +28,7 @@ import (
 )
 
 const (
-	successMsgRegister = "" // TODO: to be filled...
+	successMsgRegister = "register service successfully"
 )
 
 type RegisterLogic struct {

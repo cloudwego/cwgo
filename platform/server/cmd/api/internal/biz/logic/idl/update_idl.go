@@ -22,11 +22,15 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
+	"net/url"
 )
 
 const (
-	successMsgUpdateIDL = "" // TODO: to be filled...
+	successMsgUpdateIDL = "update idl successfully"
 )
 
 type UpdateIDLLogic struct {
@@ -42,18 +46,39 @@ func NewUpdateIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateI
 }
 
 func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes) {
-	if !utils.ValidStrings(req.MainIdlPath, req.ServiceName) {
+	_, err := url.Parse(req.MainIdlPath)
+	if err != nil {
 		return &idl.UpdateIDLRes{
-			Code: 400,
-			Msg:  "err: The input field contains an empty string",
+			Code: http.StatusBadRequest,
+			Msg:  "invalid main idl path",
 		}
 	}
 
-	err := l.svcCtx.DaoManager.Idl.UpdateIDL(req.ID, req.RepositoryID, req.MainIdlPath, req.ServiceName)
+	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &idl.UpdateIDLRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+
+	rpcRes, err := client.UpdateIDL(l.ctx, &agent.UpdateIDLReq{
+		RepositoryId: req.RepositoryID,
+		MainIdlPath:  req.MainIdlPath,
+		ServiceName:  req.ServiceName,
+	})
+	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		return &idl.UpdateIDLRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &idl.UpdateIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

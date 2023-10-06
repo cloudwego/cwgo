@@ -22,10 +22,14 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgDeleteRepository = "" // TODO: to be filled...
+	successMsgDeleteRepository = "delete repository successfully"
 )
 
 type DeleteRepositoryLogic struct {
@@ -41,11 +45,29 @@ func NewDeleteRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *DeleteRepositoryLogic) DeleteRepository(req *repository.DeleteRepositoriesReq) (res *repository.DeleteRepositoriesRes) {
-	err := l.svcCtx.DaoManager.Repository.DeleteRepository(req.Ids)
+	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &repository.DeleteRepositoriesRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+
+	rpcRes, err := client.DeleteRepositories(l.ctx, &agent.DeleteRepositoriesReq{
+		Ids: req.Ids,
+	})
+	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		return &repository.DeleteRepositoriesRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &repository.DeleteRepositoriesRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

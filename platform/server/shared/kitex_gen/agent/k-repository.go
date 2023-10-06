@@ -765,7 +765,7 @@ func (p *DeleteRepositoriesRes) field2Length() int {
 	return l
 }
 
-func (p *UpdateRepositoryStatusReq) FastRead(buf []byte) (int, error) {
+func (p *UpdateRepositoryReq) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -788,7 +788,7 @@ func (p *UpdateRepositoryStatusReq) FastRead(buf []byte) (int, error) {
 		}
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRING {
 				l, err = p.FastReadField1(buf[offset:])
 				offset += l
 				if err != nil {
@@ -804,6 +804,20 @@ func (p *UpdateRepositoryStatusReq) FastRead(buf []byte) (int, error) {
 		case 2:
 			if fieldTypeId == thrift.STRING {
 				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField3(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -841,7 +855,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UpdateRepositoryStatusReq[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UpdateRepositoryReq[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -850,10 +864,10 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusReq) FastReadField1(buf []byte) (int, error) {
+func (p *UpdateRepositoryReq) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
@@ -864,7 +878,21 @@ func (p *UpdateRepositoryStatusReq) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *UpdateRepositoryStatusReq) FastReadField2(buf []byte) (int, error) {
+func (p *UpdateRepositoryReq) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.Token = v
+
+	}
+	return offset, nil
+}
+
+func (p *UpdateRepositoryReq) FastReadField3(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -879,71 +907,91 @@ func (p *UpdateRepositoryStatusReq) FastReadField2(buf []byte) (int, error) {
 }
 
 // for compatibility
-func (p *UpdateRepositoryStatusReq) FastWrite(buf []byte) int {
+func (p *UpdateRepositoryReq) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *UpdateRepositoryStatusReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *UpdateRepositoryReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UpdateRepositoryStatusReq")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UpdateRepositoryReq")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
+		offset += p.fastWriteField3(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
 	return offset
 }
 
-func (p *UpdateRepositoryStatusReq) BLength() int {
+func (p *UpdateRepositoryReq) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("UpdateRepositoryStatusReq")
+	l += bthrift.Binary.StructBeginLength("UpdateRepositoryReq")
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
+		l += p.field3Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
 	return l
 }
 
-func (p *UpdateRepositoryStatusReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *UpdateRepositoryReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "id", thrift.I64, 1)
-	offset += bthrift.Binary.WriteI64(buf[offset:], p.Id)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "id", thrift.STRING, 1)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Id)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
 }
 
-func (p *UpdateRepositoryStatusReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *UpdateRepositoryReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "status", thrift.STRING, 2)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "token", thrift.STRING, 2)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Token)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *UpdateRepositoryReq) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "status", thrift.STRING, 3)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Status)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
 }
 
-func (p *UpdateRepositoryStatusReq) field1Length() int {
+func (p *UpdateRepositoryReq) field1Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("id", thrift.I64, 1)
-	l += bthrift.Binary.I64Length(p.Id)
+	l += bthrift.Binary.FieldBeginLength("id", thrift.STRING, 1)
+	l += bthrift.Binary.StringLengthNocopy(p.Id)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
 }
 
-func (p *UpdateRepositoryStatusReq) field2Length() int {
+func (p *UpdateRepositoryReq) field2Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("status", thrift.STRING, 2)
+	l += bthrift.Binary.FieldBeginLength("token", thrift.STRING, 2)
+	l += bthrift.Binary.StringLengthNocopy(p.Token)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *UpdateRepositoryReq) field3Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("status", thrift.STRING, 3)
 	l += bthrift.Binary.StringLengthNocopy(p.Status)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
 }
 
-func (p *UpdateRepositoryStatusRes) FastRead(buf []byte) (int, error) {
+func (p *UpdateRepositoryRes) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -1019,7 +1067,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UpdateRepositoryStatusRes[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UpdateRepositoryRes[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -1028,7 +1076,7 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusRes) FastReadField1(buf []byte) (int, error) {
+func (p *UpdateRepositoryRes) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
@@ -1042,7 +1090,7 @@ func (p *UpdateRepositoryStatusRes) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *UpdateRepositoryStatusRes) FastReadField2(buf []byte) (int, error) {
+func (p *UpdateRepositoryRes) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -1057,13 +1105,13 @@ func (p *UpdateRepositoryStatusRes) FastReadField2(buf []byte) (int, error) {
 }
 
 // for compatibility
-func (p *UpdateRepositoryStatusRes) FastWrite(buf []byte) int {
+func (p *UpdateRepositoryRes) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *UpdateRepositoryStatusRes) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *UpdateRepositoryRes) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UpdateRepositoryStatusRes")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UpdateRepositoryRes")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
@@ -1073,9 +1121,9 @@ func (p *UpdateRepositoryStatusRes) FastWriteNocopy(buf []byte, binaryWriter bth
 	return offset
 }
 
-func (p *UpdateRepositoryStatusRes) BLength() int {
+func (p *UpdateRepositoryRes) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("UpdateRepositoryStatusRes")
+	l += bthrift.Binary.StructBeginLength("UpdateRepositoryRes")
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
@@ -1085,7 +1133,7 @@ func (p *UpdateRepositoryStatusRes) BLength() int {
 	return l
 }
 
-func (p *UpdateRepositoryStatusRes) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *UpdateRepositoryRes) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "code", thrift.I32, 1)
 	offset += bthrift.Binary.WriteI32(buf[offset:], p.Code)
@@ -1094,7 +1142,7 @@ func (p *UpdateRepositoryStatusRes) fastWriteField1(buf []byte, binaryWriter bth
 	return offset
 }
 
-func (p *UpdateRepositoryStatusRes) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *UpdateRepositoryRes) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "msg", thrift.STRING, 2)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Msg)
@@ -1103,7 +1151,7 @@ func (p *UpdateRepositoryStatusRes) fastWriteField2(buf []byte, binaryWriter bth
 	return offset
 }
 
-func (p *UpdateRepositoryStatusRes) field1Length() int {
+func (p *UpdateRepositoryRes) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("code", thrift.I32, 1)
 	l += bthrift.Binary.I32Length(p.Code)
@@ -1112,7 +1160,7 @@ func (p *UpdateRepositoryStatusRes) field1Length() int {
 	return l
 }
 
-func (p *UpdateRepositoryStatusRes) field2Length() int {
+func (p *UpdateRepositoryRes) field2Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("msg", thrift.STRING, 2)
 	l += bthrift.Binary.StringLengthNocopy(p.Msg)

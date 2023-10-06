@@ -20,11 +20,12 @@ struct DeleteRepositoriesRes{
     2: string msg
 }
 
-struct UpdateRepositoryStatusReq{
-    1: i64 id
-    2: string status
+struct UpdateRepositoryReq{
+    1: string id
+    2: string token (api.body="token")
+    3: string status (api.body="status")
 }
-struct UpdateRepositoryStatusRes{
+struct UpdateRepositoryRes{
     1: i32 code
     2: string msg
 }

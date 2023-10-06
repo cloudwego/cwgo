@@ -194,11 +194,11 @@ func (r *MysqlRepositoryManager) GetRepositories(page, limit, order int32, order
 
 	switch order {
 	case consts.OrderNumInc:
-		orderBy = orderBy + " " + consts.Inc
+		orderBy = orderBy + " " + consts.OrderInc
 	case consts.OrderNumDec:
-		orderBy = orderBy + " " + consts.Dec
+		orderBy = orderBy + " " + consts.OrderDec
 	default:
-		orderBy = orderBy + " " + consts.Inc
+		orderBy = orderBy + " " + consts.OrderInc
 	}
 
 	offset := (page - 1) * limit

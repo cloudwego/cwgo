@@ -7,7 +7,7 @@ include "idl.thrift"
 service AgentService {
     repository.AddRepositoryRes AddRepository(1: repository.AddRepositoryReq req)
     repository.DeleteRepositoriesRes DeleteRepositories(1: repository.DeleteRepositoriesReq req)
-    repository.UpdateRepositoryStatusRes UpdateRepositoryStatus(1: repository.UpdateRepositoryStatusReq req)
+    repository.UpdateRepositoryRes UpdateRepository(1: repository.UpdateRepositoryReq req)
     repository.GetRepositoriesRes GetRepositories(1: repository.GetRepositoriesReq req)
     repository.SyncRepositoryByIdRes SyncRepositoryById(1: repository.SyncRepositoryByIdReq req)
 

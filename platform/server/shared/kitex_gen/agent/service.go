@@ -13,7 +13,7 @@ type AgentService interface {
 
 	DeleteRepositories(ctx context.Context, req *DeleteRepositoriesReq) (r *DeleteRepositoriesRes, err error)
 
-	UpdateRepositoryStatus(ctx context.Context, req *UpdateRepositoryStatusReq) (r *UpdateRepositoryStatusRes, err error)
+	UpdateRepository(ctx context.Context, req *UpdateRepositoryReq) (r *UpdateRepositoryRes, err error)
 
 	GetRepositories(ctx context.Context, req *GetRepositoriesReq) (r *GetRepositoriesRes, err error)
 
@@ -78,11 +78,11 @@ func (p *AgentServiceClient) DeleteRepositories(ctx context.Context, req *Delete
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *AgentServiceClient) UpdateRepositoryStatus(ctx context.Context, req *UpdateRepositoryStatusReq) (r *UpdateRepositoryStatusRes, err error) {
-	var _args AgentServiceUpdateRepositoryStatusArgs
+func (p *AgentServiceClient) UpdateRepository(ctx context.Context, req *UpdateRepositoryReq) (r *UpdateRepositoryRes, err error) {
+	var _args AgentServiceUpdateRepositoryArgs
 	_args.Req = req
-	var _result AgentServiceUpdateRepositoryStatusResult
-	if err = p.Client_().Call(ctx, "UpdateRepositoryStatus", &_args, &_result); err != nil {
+	var _result AgentServiceUpdateRepositoryResult
+	if err = p.Client_().Call(ctx, "UpdateRepository", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -191,7 +191,7 @@ func NewAgentServiceProcessor(handler AgentService) *AgentServiceProcessor {
 	self := &AgentServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
 	self.AddToProcessorMap("AddRepository", &agentServiceProcessorAddRepository{handler: handler})
 	self.AddToProcessorMap("DeleteRepositories", &agentServiceProcessorDeleteRepositories{handler: handler})
-	self.AddToProcessorMap("UpdateRepositoryStatus", &agentServiceProcessorUpdateRepositoryStatus{handler: handler})
+	self.AddToProcessorMap("UpdateRepository", &agentServiceProcessorUpdateRepository{handler: handler})
 	self.AddToProcessorMap("GetRepositories", &agentServiceProcessorGetRepositories{handler: handler})
 	self.AddToProcessorMap("SyncRepositoryById", &agentServiceProcessorSyncRepositoryById{handler: handler})
 	self.AddToProcessorMap("AddIDL", &agentServiceProcessorAddIDL{handler: handler})
@@ -317,16 +317,16 @@ func (p *agentServiceProcessorDeleteRepositories) Process(ctx context.Context, s
 	return true, err
 }
 
-type agentServiceProcessorUpdateRepositoryStatus struct {
+type agentServiceProcessorUpdateRepository struct {
 	handler AgentService
 }
 
-func (p *agentServiceProcessorUpdateRepositoryStatus) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-	args := AgentServiceUpdateRepositoryStatusArgs{}
+func (p *agentServiceProcessorUpdateRepository) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AgentServiceUpdateRepositoryArgs{}
 	if err = args.Read(iprot); err != nil {
 		iprot.ReadMessageEnd()
 		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
-		oprot.WriteMessageBegin("UpdateRepositoryStatus", thrift.EXCEPTION, seqId)
+		oprot.WriteMessageBegin("UpdateRepository", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
 		oprot.WriteMessageEnd()
 		oprot.Flush(ctx)
@@ -335,11 +335,11 @@ func (p *agentServiceProcessorUpdateRepositoryStatus) Process(ctx context.Contex
 
 	iprot.ReadMessageEnd()
 	var err2 error
-	result := AgentServiceUpdateRepositoryStatusResult{}
-	var retval *UpdateRepositoryStatusRes
-	if retval, err2 = p.handler.UpdateRepositoryStatus(ctx, args.Req); err2 != nil {
-		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing UpdateRepositoryStatus: "+err2.Error())
-		oprot.WriteMessageBegin("UpdateRepositoryStatus", thrift.EXCEPTION, seqId)
+	result := AgentServiceUpdateRepositoryResult{}
+	var retval *UpdateRepositoryRes
+	if retval, err2 = p.handler.UpdateRepository(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing UpdateRepository: "+err2.Error())
+		oprot.WriteMessageBegin("UpdateRepository", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
 		oprot.WriteMessageEnd()
 		oprot.Flush(ctx)
@@ -347,7 +347,7 @@ func (p *agentServiceProcessorUpdateRepositoryStatus) Process(ctx context.Contex
 	} else {
 		result.Success = retval
 	}
-	if err2 = oprot.WriteMessageBegin("UpdateRepositoryStatus", thrift.REPLY, seqId); err2 != nil {
+	if err2 = oprot.WriteMessageBegin("UpdateRepository", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -1489,39 +1489,39 @@ func (p *AgentServiceDeleteRepositoriesResult) Field0DeepEqual(src *DeleteReposi
 	return true
 }
 
-type AgentServiceUpdateRepositoryStatusArgs struct {
-	Req *UpdateRepositoryStatusReq `thrift:"req,1" frugal:"1,default,UpdateRepositoryStatusReq" json:"req"`
+type AgentServiceUpdateRepositoryArgs struct {
+	Req *UpdateRepositoryReq `thrift:"req,1" frugal:"1,default,UpdateRepositoryReq" json:"req"`
 }
 
-func NewAgentServiceUpdateRepositoryStatusArgs() *AgentServiceUpdateRepositoryStatusArgs {
-	return &AgentServiceUpdateRepositoryStatusArgs{}
+func NewAgentServiceUpdateRepositoryArgs() *AgentServiceUpdateRepositoryArgs {
+	return &AgentServiceUpdateRepositoryArgs{}
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) InitDefault() {
-	*p = AgentServiceUpdateRepositoryStatusArgs{}
+func (p *AgentServiceUpdateRepositoryArgs) InitDefault() {
+	*p = AgentServiceUpdateRepositoryArgs{}
 }
 
-var AgentServiceUpdateRepositoryStatusArgs_Req_DEFAULT *UpdateRepositoryStatusReq
+var AgentServiceUpdateRepositoryArgs_Req_DEFAULT *UpdateRepositoryReq
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) GetReq() (v *UpdateRepositoryStatusReq) {
+func (p *AgentServiceUpdateRepositoryArgs) GetReq() (v *UpdateRepositoryReq) {
 	if !p.IsSetReq() {
-		return AgentServiceUpdateRepositoryStatusArgs_Req_DEFAULT
+		return AgentServiceUpdateRepositoryArgs_Req_DEFAULT
 	}
 	return p.Req
 }
-func (p *AgentServiceUpdateRepositoryStatusArgs) SetReq(val *UpdateRepositoryStatusReq) {
+func (p *AgentServiceUpdateRepositoryArgs) SetReq(val *UpdateRepositoryReq) {
 	p.Req = val
 }
 
-var fieldIDToName_AgentServiceUpdateRepositoryStatusArgs = map[int16]string{
+var fieldIDToName_AgentServiceUpdateRepositoryArgs = map[int16]string{
 	1: "req",
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) IsSetReq() bool {
+func (p *AgentServiceUpdateRepositoryArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) Read(iprot thrift.TProtocol) (err error) {
+func (p *AgentServiceUpdateRepositoryArgs) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1570,7 +1570,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateRepositoryStatusArgs[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateRepositoryArgs[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1580,17 +1580,17 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.Req = NewUpdateRepositoryStatusReq()
+func (p *AgentServiceUpdateRepositoryArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewUpdateRepositoryReq()
 	if err := p.Req.Read(iprot); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) Write(oprot thrift.TProtocol) (err error) {
+func (p *AgentServiceUpdateRepositoryArgs) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("UpdateRepositoryStatus_args"); err != nil {
+	if err = oprot.WriteStructBegin("UpdateRepository_args"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1617,7 +1617,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *AgentServiceUpdateRepositoryArgs) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1634,14 +1634,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) String() string {
+func (p *AgentServiceUpdateRepositoryArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AgentServiceUpdateRepositoryStatusArgs(%+v)", *p)
+	return fmt.Sprintf("AgentServiceUpdateRepositoryArgs(%+v)", *p)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) DeepEqual(ano *AgentServiceUpdateRepositoryStatusArgs) bool {
+func (p *AgentServiceUpdateRepositoryArgs) DeepEqual(ano *AgentServiceUpdateRepositoryArgs) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1653,7 +1653,7 @@ func (p *AgentServiceUpdateRepositoryStatusArgs) DeepEqual(ano *AgentServiceUpda
 	return true
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) Field1DeepEqual(src *UpdateRepositoryStatusReq) bool {
+func (p *AgentServiceUpdateRepositoryArgs) Field1DeepEqual(src *UpdateRepositoryReq) bool {
 
 	if !p.Req.DeepEqual(src) {
 		return false
@@ -1661,39 +1661,39 @@ func (p *AgentServiceUpdateRepositoryStatusArgs) Field1DeepEqual(src *UpdateRepo
 	return true
 }
 
-type AgentServiceUpdateRepositoryStatusResult struct {
-	Success *UpdateRepositoryStatusRes `thrift:"success,0,optional" frugal:"0,optional,UpdateRepositoryStatusRes" json:"success,omitempty"`
+type AgentServiceUpdateRepositoryResult struct {
+	Success *UpdateRepositoryRes `thrift:"success,0,optional" frugal:"0,optional,UpdateRepositoryRes" json:"success,omitempty"`
 }
 
-func NewAgentServiceUpdateRepositoryStatusResult() *AgentServiceUpdateRepositoryStatusResult {
-	return &AgentServiceUpdateRepositoryStatusResult{}
+func NewAgentServiceUpdateRepositoryResult() *AgentServiceUpdateRepositoryResult {
+	return &AgentServiceUpdateRepositoryResult{}
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) InitDefault() {
-	*p = AgentServiceUpdateRepositoryStatusResult{}
+func (p *AgentServiceUpdateRepositoryResult) InitDefault() {
+	*p = AgentServiceUpdateRepositoryResult{}
 }
 
-var AgentServiceUpdateRepositoryStatusResult_Success_DEFAULT *UpdateRepositoryStatusRes
+var AgentServiceUpdateRepositoryResult_Success_DEFAULT *UpdateRepositoryRes
 
-func (p *AgentServiceUpdateRepositoryStatusResult) GetSuccess() (v *UpdateRepositoryStatusRes) {
+func (p *AgentServiceUpdateRepositoryResult) GetSuccess() (v *UpdateRepositoryRes) {
 	if !p.IsSetSuccess() {
-		return AgentServiceUpdateRepositoryStatusResult_Success_DEFAULT
+		return AgentServiceUpdateRepositoryResult_Success_DEFAULT
 	}
 	return p.Success
 }
-func (p *AgentServiceUpdateRepositoryStatusResult) SetSuccess(x interface{}) {
-	p.Success = x.(*UpdateRepositoryStatusRes)
+func (p *AgentServiceUpdateRepositoryResult) SetSuccess(x interface{}) {
+	p.Success = x.(*UpdateRepositoryRes)
 }
 
-var fieldIDToName_AgentServiceUpdateRepositoryStatusResult = map[int16]string{
+var fieldIDToName_AgentServiceUpdateRepositoryResult = map[int16]string{
 	0: "success",
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) IsSetSuccess() bool {
+func (p *AgentServiceUpdateRepositoryResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) Read(iprot thrift.TProtocol) (err error) {
+func (p *AgentServiceUpdateRepositoryResult) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1742,7 +1742,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateRepositoryStatusResult[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateRepositoryResult[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1752,17 +1752,17 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) ReadField0(iprot thrift.TProtocol) error {
-	p.Success = NewUpdateRepositoryStatusRes()
+func (p *AgentServiceUpdateRepositoryResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewUpdateRepositoryRes()
 	if err := p.Success.Read(iprot); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) Write(oprot thrift.TProtocol) (err error) {
+func (p *AgentServiceUpdateRepositoryResult) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("UpdateRepositoryStatus_result"); err != nil {
+	if err = oprot.WriteStructBegin("UpdateRepository_result"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1789,7 +1789,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) writeField0(oprot thrift.TProtocol) (err error) {
+func (p *AgentServiceUpdateRepositoryResult) writeField0(oprot thrift.TProtocol) (err error) {
 	if p.IsSetSuccess() {
 		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
 			goto WriteFieldBeginError
@@ -1808,14 +1808,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) String() string {
+func (p *AgentServiceUpdateRepositoryResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AgentServiceUpdateRepositoryStatusResult(%+v)", *p)
+	return fmt.Sprintf("AgentServiceUpdateRepositoryResult(%+v)", *p)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) DeepEqual(ano *AgentServiceUpdateRepositoryStatusResult) bool {
+func (p *AgentServiceUpdateRepositoryResult) DeepEqual(ano *AgentServiceUpdateRepositoryResult) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1827,7 +1827,7 @@ func (p *AgentServiceUpdateRepositoryStatusResult) DeepEqual(ano *AgentServiceUp
 	return true
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) Field0DeepEqual(src *UpdateRepositoryStatusRes) bool {
+func (p *AgentServiceUpdateRepositoryResult) Field0DeepEqual(src *UpdateRepositoryRes) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false

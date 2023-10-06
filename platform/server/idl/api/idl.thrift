@@ -13,7 +13,7 @@ struct AddIDLRes{
 }
 
 struct DeleteIDLsReq{
-    1: list<i64> ids (api.body="ids,required")
+    1: list<i64> ids (api.body="ids,required",api.vd="len($)>0")
 }
 struct DeleteIDLsRes{
     1: i32 code
@@ -47,7 +47,7 @@ struct GetIDLsResData{
 }
 
 struct SyncIDLsByIdReq{
-    1: list<i64> ids (api.body="ids,required")
+    1: list<i64> ids (api.body="ids,required",api.vd="len($)>0")
 }
 struct SyncIDLsByIdRes{
     1: i32 code

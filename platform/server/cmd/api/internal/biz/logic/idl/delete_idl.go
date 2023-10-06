@@ -22,10 +22,14 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgDeleteIDL = "" // TODO: to be filled...
+	successMsgDeleteIDL = "delete idls successfully"
 )
 
 type DeleteIDLLogic struct {
@@ -41,11 +45,29 @@ func NewDeleteIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DeleteI
 }
 
 func (l *DeleteIDLLogic) DeleteIDL(req *idl.DeleteIDLsReq) (res *idl.DeleteIDLsRes) {
-	err := l.svcCtx.DaoManager.Idl.DeleteIDLs(req.Ids)
+	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &idl.DeleteIDLsRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+
+	rpcRes, err := client.DeleteIDL(l.ctx, &agent.DeleteIDLsReq{
+		Ids: req.Ids,
+	})
+	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		return &idl.DeleteIDLsRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &idl.DeleteIDLsRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

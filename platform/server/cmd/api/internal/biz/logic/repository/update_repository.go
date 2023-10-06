@@ -22,11 +22,14 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgUpdateRepository = "" // TODO: to be filled...
+	successMsgUpdateRepository = "update repository successfully"
 )
 
 type UpdateRepositoryLogic struct {
@@ -42,21 +45,33 @@ func NewUpdateRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *UpdateRepositoryLogic) UpdateRepository(req *repository.UpdateRepositoryReq) (res *repository.UpdateRepositoryRes) {
-	if !utils.ValidStrings(req.ID, req.Token, req.Status) {
+	client, err := l.svcCtx.Manager.GetAgentClient()
+	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &repository.UpdateRepositoryRes{
-			Code: 400,
-			Msg:  "err: The input field contains an empty string",
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 
-	err := l.svcCtx.DaoManager.Repository.UpdateRepository(req.ID, req.Token, req.Status)
+	rpcRes, err := client.UpdateRepository(l.ctx, &agent.UpdateRepositoryReq{
+		Id:     req.ID,
+		Token:  req.Token,
+		Status: req.Status,
+	})
 	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
 		return &repository.UpdateRepositoryRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
-	//TODO: 给agent发送status变更
+	if rpcRes.Code != 0 {
+		return &repository.UpdateRepositoryRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
+		}
+	}
 
 	return &repository.UpdateRepositoryRes{
 		Code: 0,

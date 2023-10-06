@@ -928,39 +928,48 @@ func (p *DeleteRepositoriesRes) Field2DeepEqual(src string) bool {
 	return true
 }
 
-type UpdateRepositoryStatusReq struct {
-	Id     int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
-	Status string `thrift:"status,2" frugal:"2,default,string" json:"status"`
+type UpdateRepositoryReq struct {
+	Id     string `thrift:"id,1" frugal:"1,default,string" json:"id"`
+	Token  string `thrift:"token,2" frugal:"2,default,string" json:"token"`
+	Status string `thrift:"status,3" frugal:"3,default,string" json:"status"`
 }
 
-func NewUpdateRepositoryStatusReq() *UpdateRepositoryStatusReq {
-	return &UpdateRepositoryStatusReq{}
+func NewUpdateRepositoryReq() *UpdateRepositoryReq {
+	return &UpdateRepositoryReq{}
 }
 
-func (p *UpdateRepositoryStatusReq) InitDefault() {
-	*p = UpdateRepositoryStatusReq{}
+func (p *UpdateRepositoryReq) InitDefault() {
+	*p = UpdateRepositoryReq{}
 }
 
-func (p *UpdateRepositoryStatusReq) GetId() (v int64) {
+func (p *UpdateRepositoryReq) GetId() (v string) {
 	return p.Id
 }
 
-func (p *UpdateRepositoryStatusReq) GetStatus() (v string) {
+func (p *UpdateRepositoryReq) GetToken() (v string) {
+	return p.Token
+}
+
+func (p *UpdateRepositoryReq) GetStatus() (v string) {
 	return p.Status
 }
-func (p *UpdateRepositoryStatusReq) SetId(val int64) {
+func (p *UpdateRepositoryReq) SetId(val string) {
 	p.Id = val
 }
-func (p *UpdateRepositoryStatusReq) SetStatus(val string) {
+func (p *UpdateRepositoryReq) SetToken(val string) {
+	p.Token = val
+}
+func (p *UpdateRepositoryReq) SetStatus(val string) {
 	p.Status = val
 }
 
-var fieldIDToName_UpdateRepositoryStatusReq = map[int16]string{
+var fieldIDToName_UpdateRepositoryReq = map[int16]string{
 	1: "id",
-	2: "status",
+	2: "token",
+	3: "status",
 }
 
-func (p *UpdateRepositoryStatusReq) Read(iprot thrift.TProtocol) (err error) {
+func (p *UpdateRepositoryReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -980,7 +989,7 @@ func (p *UpdateRepositoryStatusReq) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -992,6 +1001,16 @@ func (p *UpdateRepositoryStatusReq) Read(iprot thrift.TProtocol) (err error) {
 		case 2:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1019,7 +1038,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UpdateRepositoryStatusReq[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UpdateRepositoryReq[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1029,8 +1048,8 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusReq) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI64(); err != nil {
+func (p *UpdateRepositoryReq) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
 		p.Id = v
@@ -1038,7 +1057,16 @@ func (p *UpdateRepositoryStatusReq) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UpdateRepositoryStatusReq) ReadField2(iprot thrift.TProtocol) error {
+func (p *UpdateRepositoryReq) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.Token = v
+	}
+	return nil
+}
+
+func (p *UpdateRepositoryReq) ReadField3(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -1047,9 +1075,9 @@ func (p *UpdateRepositoryStatusReq) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UpdateRepositoryStatusReq) Write(oprot thrift.TProtocol) (err error) {
+func (p *UpdateRepositoryReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("UpdateRepositoryStatusReq"); err != nil {
+	if err = oprot.WriteStructBegin("UpdateRepositoryReq"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1059,6 +1087,10 @@ func (p *UpdateRepositoryStatusReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
 			goto WriteFieldError
 		}
 
@@ -1080,11 +1112,11 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
+func (p *UpdateRepositoryReq) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("id", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Id); err != nil {
+	if err := oprot.WriteString(p.Id); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1097,11 +1129,11 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.STRING, 2); err != nil {
+func (p *UpdateRepositoryReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("token", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Status); err != nil {
+	if err := oprot.WriteString(p.Token); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1114,14 +1146,31 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusReq) String() string {
+func (p *UpdateRepositoryReq) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("status", thrift.STRING, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Status); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *UpdateRepositoryReq) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UpdateRepositoryStatusReq(%+v)", *p)
+	return fmt.Sprintf("UpdateRepositoryReq(%+v)", *p)
 }
 
-func (p *UpdateRepositoryStatusReq) DeepEqual(ano *UpdateRepositoryStatusReq) bool {
+func (p *UpdateRepositoryReq) DeepEqual(ano *UpdateRepositoryReq) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1130,20 +1179,30 @@ func (p *UpdateRepositoryStatusReq) DeepEqual(ano *UpdateRepositoryStatusReq) bo
 	if !p.Field1DeepEqual(ano.Id) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.Status) {
+	if !p.Field2DeepEqual(ano.Token) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Status) {
 		return false
 	}
 	return true
 }
 
-func (p *UpdateRepositoryStatusReq) Field1DeepEqual(src int64) bool {
+func (p *UpdateRepositoryReq) Field1DeepEqual(src string) bool {
 
-	if p.Id != src {
+	if strings.Compare(p.Id, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *UpdateRepositoryStatusReq) Field2DeepEqual(src string) bool {
+func (p *UpdateRepositoryReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Token, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *UpdateRepositoryReq) Field3DeepEqual(src string) bool {
 
 	if strings.Compare(p.Status, src) != 0 {
 		return false
@@ -1151,39 +1210,39 @@ func (p *UpdateRepositoryStatusReq) Field2DeepEqual(src string) bool {
 	return true
 }
 
-type UpdateRepositoryStatusRes struct {
+type UpdateRepositoryRes struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewUpdateRepositoryStatusRes() *UpdateRepositoryStatusRes {
-	return &UpdateRepositoryStatusRes{}
+func NewUpdateRepositoryRes() *UpdateRepositoryRes {
+	return &UpdateRepositoryRes{}
 }
 
-func (p *UpdateRepositoryStatusRes) InitDefault() {
-	*p = UpdateRepositoryStatusRes{}
+func (p *UpdateRepositoryRes) InitDefault() {
+	*p = UpdateRepositoryRes{}
 }
 
-func (p *UpdateRepositoryStatusRes) GetCode() (v int32) {
+func (p *UpdateRepositoryRes) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *UpdateRepositoryStatusRes) GetMsg() (v string) {
+func (p *UpdateRepositoryRes) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *UpdateRepositoryStatusRes) SetCode(val int32) {
+func (p *UpdateRepositoryRes) SetCode(val int32) {
 	p.Code = val
 }
-func (p *UpdateRepositoryStatusRes) SetMsg(val string) {
+func (p *UpdateRepositoryRes) SetMsg(val string) {
 	p.Msg = val
 }
 
-var fieldIDToName_UpdateRepositoryStatusRes = map[int16]string{
+var fieldIDToName_UpdateRepositoryRes = map[int16]string{
 	1: "code",
 	2: "msg",
 }
 
-func (p *UpdateRepositoryStatusRes) Read(iprot thrift.TProtocol) (err error) {
+func (p *UpdateRepositoryRes) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -1242,7 +1301,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UpdateRepositoryStatusRes[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_UpdateRepositoryRes[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -1252,7 +1311,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusRes) ReadField1(iprot thrift.TProtocol) error {
+func (p *UpdateRepositoryRes) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -1261,7 +1320,7 @@ func (p *UpdateRepositoryStatusRes) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UpdateRepositoryStatusRes) ReadField2(iprot thrift.TProtocol) error {
+func (p *UpdateRepositoryRes) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -1270,9 +1329,9 @@ func (p *UpdateRepositoryStatusRes) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *UpdateRepositoryStatusRes) Write(oprot thrift.TProtocol) (err error) {
+func (p *UpdateRepositoryRes) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("UpdateRepositoryStatusRes"); err != nil {
+	if err = oprot.WriteStructBegin("UpdateRepositoryRes"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -1303,7 +1362,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusRes) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *UpdateRepositoryRes) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("code", thrift.I32, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1320,7 +1379,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusRes) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *UpdateRepositoryRes) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("msg", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -1337,14 +1396,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *UpdateRepositoryStatusRes) String() string {
+func (p *UpdateRepositoryRes) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UpdateRepositoryStatusRes(%+v)", *p)
+	return fmt.Sprintf("UpdateRepositoryRes(%+v)", *p)
 }
 
-func (p *UpdateRepositoryStatusRes) DeepEqual(ano *UpdateRepositoryStatusRes) bool {
+func (p *UpdateRepositoryRes) DeepEqual(ano *UpdateRepositoryRes) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -1359,14 +1418,14 @@ func (p *UpdateRepositoryStatusRes) DeepEqual(ano *UpdateRepositoryStatusRes) bo
 	return true
 }
 
-func (p *UpdateRepositoryStatusRes) Field1DeepEqual(src int32) bool {
+func (p *UpdateRepositoryRes) Field1DeepEqual(src int32) bool {
 
 	if p.Code != src {
 		return false
 	}
 	return true
 }
-func (p *UpdateRepositoryStatusRes) Field2DeepEqual(src string) bool {
+func (p *UpdateRepositoryRes) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.Msg, src) != 0 {
 		return false

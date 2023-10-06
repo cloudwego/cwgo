@@ -22,10 +22,14 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgSyncIDLs = "" // TODO: to be filled...
+	successMsgSyncIDLs = "sync idls successfully"
 )
 
 type SyncIDLsLogic struct {
@@ -41,7 +45,31 @@ func NewSyncIDLsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SyncIDLs
 }
 
 func (l *SyncIDLsLogic) SyncIDLs(req *idl.SyncIDLsByIdReq) (res *idl.SyncIDLsByIdRes) {
-	//TODO: 调用agent
+	client, err := l.svcCtx.Manager.GetAgentClient()
+	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		return &idl.SyncIDLsByIdRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+
+	rpcRes, err := client.SyncIDLsById(l.ctx, &agent.SyncIDLsByIdReq{
+		Ids: req.Ids,
+	})
+	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		return &idl.SyncIDLsByIdRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &idl.SyncIDLsByIdRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
+		}
+	}
 
 	return &idl.SyncIDLsByIdRes{
 		Code: 0,

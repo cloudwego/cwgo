@@ -108,11 +108,11 @@ func (r *MysqlTemplateManager) GetTemplates(page, limit, order int32, orderBy st
 
 	switch order {
 	case consts.OrderNumInc:
-		orderBy = orderBy + " " + consts.Inc
+		orderBy = orderBy + " " + consts.OrderInc
 	case consts.OrderNumDec:
-		orderBy = orderBy + " " + consts.Dec
+		orderBy = orderBy + " " + consts.OrderDec
 	default:
-		orderBy = orderBy + " " + consts.Inc
+		orderBy = orderBy + " " + consts.OrderInc
 	}
 
 	res := r.db.
@@ -189,11 +189,11 @@ func (r *MysqlTemplateManager) GetTemplateItems(page, limit, order int32, orderB
 
 	switch order {
 	case consts.OrderNumInc:
-		orderBy = orderBy + " " + consts.Inc
+		orderBy = orderBy + " " + consts.OrderInc
 	case consts.OrderNumDec:
-		orderBy = orderBy + " " + consts.Dec
+		orderBy = orderBy + " " + consts.OrderDec
 	default:
-		orderBy = orderBy + " " + consts.Inc
+		orderBy = orderBy + " " + consts.OrderInc
 	}
 
 	res := r.db.

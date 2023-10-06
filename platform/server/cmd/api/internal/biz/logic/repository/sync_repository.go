@@ -22,10 +22,14 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgSyncRepository = "" // TODO: to be filled...
+	successMsgSyncRepository = "sync repository successfully"
 )
 
 type SyncRepositoryLogic struct {
@@ -41,7 +45,31 @@ func NewSyncRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Sy
 }
 
 func (l *SyncRepositoryLogic) SyncRepository(req *repository.SyncRepositoryByIdReq) (res *repository.SyncRepositoryByIdRes) {
-	// TODO: to be filled...
+	client, err := l.svcCtx.Manager.GetAgentClient()
+	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		return &repository.SyncRepositoryByIdRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+
+	rpcRes, err := client.SyncRepositoryById(l.ctx, &agent.SyncRepositoryByIdReq{
+		Ids: req.Ids,
+	})
+	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		return &repository.SyncRepositoryByIdRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &repository.SyncRepositoryByIdRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
+		}
+	}
 
 	return &repository.SyncRepositoryByIdRes{
 		Code: 0,

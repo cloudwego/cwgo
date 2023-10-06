@@ -13,7 +13,7 @@ import (
 type Client interface {
 	AddRepository(ctx context.Context, req *agent.AddRepositoryReq, callOptions ...callopt.Option) (r *agent.AddRepositoryRes, err error)
 	DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq, callOptions ...callopt.Option) (r *agent.DeleteRepositoriesRes, err error)
-	UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error)
+	UpdateRepository(ctx context.Context, req *agent.UpdateRepositoryReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryRes, err error)
 	GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq, callOptions ...callopt.Option) (r *agent.GetRepositoriesRes, err error)
 	SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error)
 	AddIDL(ctx context.Context, req *agent.AddIDLReq, callOptions ...callopt.Option) (r *agent.AddIDLRes, err error)
@@ -64,9 +64,9 @@ func (p *kAgentServiceClient) DeleteRepositories(ctx context.Context, req *agent
 	return p.kClient.DeleteRepositories(ctx, req)
 }
 
-func (p *kAgentServiceClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error) {
+func (p *kAgentServiceClient) UpdateRepository(ctx context.Context, req *agent.UpdateRepositoryReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UpdateRepositoryStatus(ctx, req)
+	return p.kClient.UpdateRepository(ctx, req)
 }
 
 func (p *kAgentServiceClient) GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq, callOptions ...callopt.Option) (r *agent.GetRepositoriesRes, err error) {

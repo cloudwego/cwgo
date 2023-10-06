@@ -12,32 +12,8 @@ func ValidStrings(ss ...string) bool {
 	return true
 }
 
-func ValidOrder(order int32) bool {
-	if order != consts.OrderNumInc && order != consts.OrderNumDec {
-		return false
-	}
-
-	return true
-}
-
-func ValidOrderBy(orderBy string) bool {
-	if orderBy != consts.OrderByCreateTime && orderBy != consts.OrderBySyncTime && orderBy != consts.OrderByUpdateTime {
-		return false
-	}
-
-	return true
-}
-
 func ValidStatus(status string) bool {
 	if status != consts.RepositoryStatusActive && status != consts.RepositoryStatusDisactive {
-		return false
-	}
-
-	return true
-}
-
-func ValidRepoType(_type int32) bool {
-	if _type != consts.RepositoryTypeNumGitLab && _type != consts.RepositoryTypeNumGithub {
 		return false
 	}
 

@@ -19,18 +19,18 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "AgentService"
 	handlerType := (*agent.AgentService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"AddRepository":          kitex.NewMethodInfo(addRepositoryHandler, newAgentServiceAddRepositoryArgs, newAgentServiceAddRepositoryResult, false),
-		"DeleteRepositories":     kitex.NewMethodInfo(deleteRepositoriesHandler, newAgentServiceDeleteRepositoriesArgs, newAgentServiceDeleteRepositoriesResult, false),
-		"UpdateRepositoryStatus": kitex.NewMethodInfo(updateRepositoryStatusHandler, newAgentServiceUpdateRepositoryStatusArgs, newAgentServiceUpdateRepositoryStatusResult, false),
-		"GetRepositories":        kitex.NewMethodInfo(getRepositoriesHandler, newAgentServiceGetRepositoriesArgs, newAgentServiceGetRepositoriesResult, false),
-		"SyncRepositoryById":     kitex.NewMethodInfo(syncRepositoryByIdHandler, newAgentServiceSyncRepositoryByIdArgs, newAgentServiceSyncRepositoryByIdResult, false),
-		"AddIDL":                 kitex.NewMethodInfo(addIDLHandler, newAgentServiceAddIDLArgs, newAgentServiceAddIDLResult, false),
-		"DeleteIDL":              kitex.NewMethodInfo(deleteIDLHandler, newAgentServiceDeleteIDLArgs, newAgentServiceDeleteIDLResult, false),
-		"UpdateIDL":              kitex.NewMethodInfo(updateIDLHandler, newAgentServiceUpdateIDLArgs, newAgentServiceUpdateIDLResult, false),
-		"GetIDLs":                kitex.NewMethodInfo(getIDLsHandler, newAgentServiceGetIDLsArgs, newAgentServiceGetIDLsResult, false),
-		"SyncIDLsById":           kitex.NewMethodInfo(syncIDLsByIdHandler, newAgentServiceSyncIDLsByIdArgs, newAgentServiceSyncIDLsByIdResult, false),
-		"UpdateTasks":            kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
-		"GenerateCode":           kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
+		"AddRepository":      kitex.NewMethodInfo(addRepositoryHandler, newAgentServiceAddRepositoryArgs, newAgentServiceAddRepositoryResult, false),
+		"DeleteRepositories": kitex.NewMethodInfo(deleteRepositoriesHandler, newAgentServiceDeleteRepositoriesArgs, newAgentServiceDeleteRepositoriesResult, false),
+		"UpdateRepository":   kitex.NewMethodInfo(updateRepositoryHandler, newAgentServiceUpdateRepositoryArgs, newAgentServiceUpdateRepositoryResult, false),
+		"GetRepositories":    kitex.NewMethodInfo(getRepositoriesHandler, newAgentServiceGetRepositoriesArgs, newAgentServiceGetRepositoriesResult, false),
+		"SyncRepositoryById": kitex.NewMethodInfo(syncRepositoryByIdHandler, newAgentServiceSyncRepositoryByIdArgs, newAgentServiceSyncRepositoryByIdResult, false),
+		"AddIDL":             kitex.NewMethodInfo(addIDLHandler, newAgentServiceAddIDLArgs, newAgentServiceAddIDLResult, false),
+		"DeleteIDL":          kitex.NewMethodInfo(deleteIDLHandler, newAgentServiceDeleteIDLArgs, newAgentServiceDeleteIDLResult, false),
+		"UpdateIDL":          kitex.NewMethodInfo(updateIDLHandler, newAgentServiceUpdateIDLArgs, newAgentServiceUpdateIDLResult, false),
+		"GetIDLs":            kitex.NewMethodInfo(getIDLsHandler, newAgentServiceGetIDLsArgs, newAgentServiceGetIDLsResult, false),
+		"SyncIDLsById":       kitex.NewMethodInfo(syncIDLsByIdHandler, newAgentServiceSyncIDLsByIdArgs, newAgentServiceSyncIDLsByIdResult, false),
+		"UpdateTasks":        kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
+		"GenerateCode":       kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "agent",
@@ -82,22 +82,22 @@ func newAgentServiceDeleteRepositoriesResult() interface{} {
 	return agent.NewAgentServiceDeleteRepositoriesResult()
 }
 
-func updateRepositoryStatusHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*agent.AgentServiceUpdateRepositoryStatusArgs)
-	realResult := result.(*agent.AgentServiceUpdateRepositoryStatusResult)
-	success, err := handler.(agent.AgentService).UpdateRepositoryStatus(ctx, realArg.Req)
+func updateRepositoryHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceUpdateRepositoryArgs)
+	realResult := result.(*agent.AgentServiceUpdateRepositoryResult)
+	success, err := handler.(agent.AgentService).UpdateRepository(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newAgentServiceUpdateRepositoryStatusArgs() interface{} {
-	return agent.NewAgentServiceUpdateRepositoryStatusArgs()
+func newAgentServiceUpdateRepositoryArgs() interface{} {
+	return agent.NewAgentServiceUpdateRepositoryArgs()
 }
 
-func newAgentServiceUpdateRepositoryStatusResult() interface{} {
-	return agent.NewAgentServiceUpdateRepositoryStatusResult()
+func newAgentServiceUpdateRepositoryResult() interface{} {
+	return agent.NewAgentServiceUpdateRepositoryResult()
 }
 
 func getRepositoriesHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -292,11 +292,11 @@ func (p *kClient) DeleteRepositories(ctx context.Context, req *agent.DeleteRepos
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq) (r *agent.UpdateRepositoryStatusRes, err error) {
-	var _args agent.AgentServiceUpdateRepositoryStatusArgs
+func (p *kClient) UpdateRepository(ctx context.Context, req *agent.UpdateRepositoryReq) (r *agent.UpdateRepositoryRes, err error) {
+	var _args agent.AgentServiceUpdateRepositoryArgs
 	_args.Req = req
-	var _result agent.AgentServiceUpdateRepositoryStatusResult
-	if err = p.c.Call(ctx, "UpdateRepositoryStatus", &_args, &_result); err != nil {
+	var _result agent.AgentServiceUpdateRepositoryResult
+	if err = p.c.Call(ctx, "UpdateRepository", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

@@ -45,13 +45,6 @@ func (s *AgentServiceImpl) AddRepository(ctx context.Context, req *agent.AddRepo
 	return resp, err
 }
 
-// UpdateRepositoryStatus implements the AgentServiceImpl interface.
-func (s *AgentServiceImpl) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq) (resp *agent.UpdateRepositoryStatusRes, err error) {
-	resp, err = service.NewUpdateRepositoryStatusService(ctx, s.svcCtx).Run(req)
-
-	return resp, err
-}
-
 // SyncRepositoryById implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq) (resp *agent.SyncRepositoryByIdRes, err error) {
 	resp, err = service.NewSyncRepositoryByIdService(ctx, s.svcCtx).Run(req)
@@ -118,6 +111,13 @@ func (s *AgentServiceImpl) GetIDLs(ctx context.Context, req *agent.GetIDLsReq) (
 // DeleteRepositories implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq) (resp *agent.DeleteRepositoriesRes, err error) {
 	resp, err = service.NewDeleteRepositoriesService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// UpdateRepository implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) UpdateRepository(ctx context.Context, req *agent.UpdateRepositoryReq) (resp *agent.UpdateRepositoryRes, err error) {
+	resp, err = service.NewUpdateRepositoryService(ctx, s.svcCtx).Run(req)
 
 	return resp, err
 }

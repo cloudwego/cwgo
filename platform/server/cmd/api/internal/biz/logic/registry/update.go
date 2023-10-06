@@ -28,7 +28,7 @@ import (
 )
 
 const (
-	successMsgUpdate = "" // TODO: to be filled...
+	successMsgUpdate = "update service successfully"
 )
 
 type UpdateLogic struct {

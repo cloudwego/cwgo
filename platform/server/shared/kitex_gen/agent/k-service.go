@@ -539,7 +539,7 @@ func (p *AgentServiceDeleteRepositoriesResult) field0Length() int {
 	return l
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) FastRead(buf []byte) (int, error) {
+func (p *AgentServiceUpdateRepositoryArgs) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -601,7 +601,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateRepositoryStatusArgs[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateRepositoryArgs[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -610,10 +610,10 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) FastReadField1(buf []byte) (int, error) {
+func (p *AgentServiceUpdateRepositoryArgs) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	tmp := NewUpdateRepositoryStatusReq()
+	tmp := NewUpdateRepositoryReq()
 	if l, err := tmp.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -624,13 +624,13 @@ func (p *AgentServiceUpdateRepositoryStatusArgs) FastReadField1(buf []byte) (int
 }
 
 // for compatibility
-func (p *AgentServiceUpdateRepositoryStatusArgs) FastWrite(buf []byte) int {
+func (p *AgentServiceUpdateRepositoryArgs) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *AgentServiceUpdateRepositoryArgs) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UpdateRepositoryStatus_args")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UpdateRepository_args")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 	}
@@ -639,9 +639,9 @@ func (p *AgentServiceUpdateRepositoryStatusArgs) FastWriteNocopy(buf []byte, bin
 	return offset
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) BLength() int {
+func (p *AgentServiceUpdateRepositoryArgs) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("UpdateRepositoryStatus_args")
+	l += bthrift.Binary.StructBeginLength("UpdateRepository_args")
 	if p != nil {
 		l += p.field1Length()
 	}
@@ -650,7 +650,7 @@ func (p *AgentServiceUpdateRepositoryStatusArgs) BLength() int {
 	return l
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *AgentServiceUpdateRepositoryArgs) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "req", thrift.STRUCT, 1)
 	offset += p.Req.FastWriteNocopy(buf[offset:], binaryWriter)
@@ -658,7 +658,7 @@ func (p *AgentServiceUpdateRepositoryStatusArgs) fastWriteField1(buf []byte, bin
 	return offset
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) field1Length() int {
+func (p *AgentServiceUpdateRepositoryArgs) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("req", thrift.STRUCT, 1)
 	l += p.Req.BLength()
@@ -666,7 +666,7 @@ func (p *AgentServiceUpdateRepositoryStatusArgs) field1Length() int {
 	return l
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) FastRead(buf []byte) (int, error) {
+func (p *AgentServiceUpdateRepositoryResult) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -728,7 +728,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateRepositoryStatusResult[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceUpdateRepositoryResult[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -737,10 +737,10 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) FastReadField0(buf []byte) (int, error) {
+func (p *AgentServiceUpdateRepositoryResult) FastReadField0(buf []byte) (int, error) {
 	offset := 0
 
-	tmp := NewUpdateRepositoryStatusRes()
+	tmp := NewUpdateRepositoryRes()
 	if l, err := tmp.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -751,13 +751,13 @@ func (p *AgentServiceUpdateRepositoryStatusResult) FastReadField0(buf []byte) (i
 }
 
 // for compatibility
-func (p *AgentServiceUpdateRepositoryStatusResult) FastWrite(buf []byte) int {
+func (p *AgentServiceUpdateRepositoryResult) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *AgentServiceUpdateRepositoryResult) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UpdateRepositoryStatus_result")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "UpdateRepository_result")
 	if p != nil {
 		offset += p.fastWriteField0(buf[offset:], binaryWriter)
 	}
@@ -766,9 +766,9 @@ func (p *AgentServiceUpdateRepositoryStatusResult) FastWriteNocopy(buf []byte, b
 	return offset
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) BLength() int {
+func (p *AgentServiceUpdateRepositoryResult) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("UpdateRepositoryStatus_result")
+	l += bthrift.Binary.StructBeginLength("UpdateRepository_result")
 	if p != nil {
 		l += p.field0Length()
 	}
@@ -777,7 +777,7 @@ func (p *AgentServiceUpdateRepositoryStatusResult) BLength() int {
 	return l
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) fastWriteField0(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *AgentServiceUpdateRepositoryResult) fastWriteField0(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	if p.IsSetSuccess() {
 		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "success", thrift.STRUCT, 0)
@@ -787,7 +787,7 @@ func (p *AgentServiceUpdateRepositoryStatusResult) fastWriteField0(buf []byte, b
 	return offset
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) field0Length() int {
+func (p *AgentServiceUpdateRepositoryResult) field0Length() int {
 	l := 0
 	if p.IsSetSuccess() {
 		l += bthrift.Binary.FieldBeginLength("success", thrift.STRUCT, 0)
@@ -3135,11 +3135,11 @@ func (p *AgentServiceDeleteRepositoriesResult) GetResult() interface{} {
 	return p.Success
 }
 
-func (p *AgentServiceUpdateRepositoryStatusArgs) GetFirstArgument() interface{} {
+func (p *AgentServiceUpdateRepositoryArgs) GetFirstArgument() interface{} {
 	return p.Req
 }
 
-func (p *AgentServiceUpdateRepositoryStatusResult) GetResult() interface{} {
+func (p *AgentServiceUpdateRepositoryResult) GetResult() interface{} {
 	return p.Success
 }
 

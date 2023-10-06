@@ -123,11 +123,11 @@ func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*
 
 	switch order {
 	case consts.OrderNumInc:
-		orderBy = orderBy + " " + consts.Inc
+		orderBy = orderBy + " " + consts.OrderInc
 	case consts.OrderNumDec:
-		orderBy = orderBy + " " + consts.Dec
+		orderBy = orderBy + " " + consts.OrderDec
 	default:
-		orderBy = orderBy + " " + consts.Inc
+		orderBy = orderBy + " " + consts.OrderInc
 	}
 
 	res := r.db.

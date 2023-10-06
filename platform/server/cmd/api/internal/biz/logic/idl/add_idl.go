@@ -69,7 +69,7 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 		ServiceName:  req.ServiceName,
 	})
 	if err != nil {
-		logger.Logger.Error("connect tp rpc client failed", zap.Error(err))
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
 		return &idl.AddIDLRes{
 			Code: http.StatusInternalServerError,
 			Msg:  "internal err",

@@ -12,7 +12,7 @@ struct AddTemplateRes{
 }
 
 struct DeleteTemplateReq{
-    1: list<i64> ids (api.body="ids,required")
+    1: list<i64> ids (api.body="ids,required",api.vd="len($)>0")
 }
 struct DeleteTemplateRes{
     1: i32 code
@@ -54,7 +54,7 @@ struct AddTemplateItemRes{
 }
 
 struct DeleteTemplateItemReq{
-    1: list<i64> ids (api.body="ids,required")
+    1: list<i64> ids (api.body="ids,required",api.vd="len($)>0")
 }
 struct DeleteTemplateItemRes{
     1: i32 code

@@ -22,11 +22,15 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgGetIDLs = "" // TODO: to be filled...
+	successMsgGetIDLs = "get idls successfully"
 )
 
 type GetIDLsLogic struct {
@@ -42,41 +46,68 @@ func NewGetIDLsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetIDLsLo
 }
 
 func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
-	if !utils.ValidOrder(req.Order) || !utils.ValidOrderBy(req.OrderBy) {
+	if req.Order != consts.OrderNumInc && req.Order != consts.OrderNumDec {
 		return &idl.GetIDLsRes{
-			Code: 400,
-			Msg:  "err: invalid field",
+			Code: http.StatusBadRequest,
+			Msg:  "invalid order num",
 			Data: nil,
 		}
 	}
-	idls, err := l.svcCtx.DaoManager.Idl.GetIDLs(req.Page, req.Limit, req.Order, req.OrderBy)
+
+	switch req.OrderBy {
+	case "last_sync_time":
+
+	case "create_time":
+
+	case "update_time":
+
+	default:
+		return &idl.GetIDLsRes{
+			Code: http.StatusBadRequest,
+			Msg:  "invalid order by",
+			Data: nil,
+		}
+	}
+
+	if req.Page == 0 {
+		req.Page = 1
+	}
+	if req.Limit == 0 {
+		req.Limit = consts.DefaultLimit
+	}
+
+	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
 		return &idl.GetIDLsRes{
-			Code: 400,
-			Msg:  err.Error(),
-			Data: nil,
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 
-	idlRes := make([]*idl.IDL, len(idls))
-
-	for i, id := range idls {
-		idlRes[i] = &idl.IDL{
-			ID:           id.Id,
-			RepositoryID: id.RepositoryId,
-			MainIdlPath:  id.MainIdlPath,
-			Content:      id.Content,
-			ServiceName:  id.ServiceName,
-			LastSyncTime: id.LastSyncTime,
-			IsDeleted:    id.IsDeleted,
-			CreateTime:   id.CreateTime,
-			UpdateTime:   id.UpdateTime,
+	rpcRes, err := client.GetIDLs(l.ctx, &agent.GetIDLsReq{
+		Page:    req.Page,
+		Limit:   req.Limit,
+		Order:   req.Order,
+		OrderBy: req.OrderBy,
+	})
+	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		return &idl.GetIDLsRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &idl.GetIDLsRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 
 	return &idl.GetIDLsRes{
 		Code: 0,
 		Msg:  successMsgGetIDLs,
-		Data: &idl.GetIDLsResData{Idls: idlRes},
+		Data: &idl.GetIDLsResData{Idls: rpcRes.Data.Idls},
 	}
 }

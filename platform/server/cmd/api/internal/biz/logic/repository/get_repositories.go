@@ -22,10 +22,15 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
+	"net/http"
 )
 
 const (
-	successMsgGetRepositories = "" // TODO: to be filled...
+	successMsgGetRepositories = "get repositories successfully"
 )
 
 type GetRepositoriesLogic struct {
@@ -41,34 +46,70 @@ func NewGetRepositoriesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 }
 
 func (l *GetRepositoriesLogic) GetRepositories(req *repository.GetRepositoriesReq) (res *repository.GetRepositoriesRes) {
-	repos, err := l.svcCtx.DaoManager.Repository.GetRepositories(req.Page, req.Limit, req.Order, req.OrderBy)
-	if err != nil {
+	if req.Order != consts.OrderNumInc && req.Order != consts.OrderNumDec {
 		return &repository.GetRepositoriesRes{
-			Code: 400,
-			Msg:  err.Error(),
+			Code: http.StatusBadRequest,
+			Msg:  "invalid order num",
 			Data: nil,
 		}
 	}
 
-	repoRes := make([]*repository.Repository, len(repos))
-	for i, repo := range repos {
-		repoRes[i] = &repository.Repository{
-			ID:             repo.Id,
-			RepositoryType: repo.RepositoryType,
-			RepositoryURL:  repo.RepositoryUrl,
-			Token:          repo.Token,
-			Status:         repo.Status,
-			LastUpdateTime: repo.LastUpdateTime,
-			LastSyncTime:   repo.LastSyncTime,
-			IsDeleted:      repo.IsDeleted,
-			CreateTime:     repo.CreateTime,
-			UpdateTime:     repo.UpdateTime,
+	switch req.OrderBy {
+	case "last_update_time":
+
+	case "last_sync_time":
+
+	case "create_time":
+
+	case "update_time":
+
+	default:
+		return &repository.GetRepositoriesRes{
+			Code: http.StatusBadRequest,
+			Msg:  "invalid order by",
+			Data: nil,
+		}
+	}
+
+	if req.Page == 0 {
+		req.Page = 1
+	}
+	if req.Limit == 0 {
+		req.Limit = consts.DefaultLimit
+	}
+
+	client, err := l.svcCtx.Manager.GetAgentClient()
+	if err != nil {
+		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		return &repository.GetRepositoriesRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+
+	rpcRes, err := client.GetRepositories(l.ctx, &agent.GetRepositoriesReq{
+		Page:    req.Page,
+		Limit:   req.Limit,
+		Order:   req.Order,
+		OrderBy: req.OrderBy,
+	})
+	if err != nil {
+		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		return &repository.GetRepositoriesRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}
+	}
+	if rpcRes.Code != 0 {
+		return &repository.GetRepositoriesRes{
+			Code: http.StatusBadRequest,
+			Msg:  rpcRes.Msg,
 		}
 	}
 
 	return &repository.GetRepositoriesRes{
 		Code: 0,
 		Msg:  successMsgGetRepositories,
-		Data: &repository.GetRepositoriesResData{Repositories: repoRes},
+		Data: &repository.GetRepositoriesResData{Repositories: rpcRes.Data.Repositories},
 	}
 }

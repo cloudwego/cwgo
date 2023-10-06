@@ -28,7 +28,7 @@ import (
 )
 
 const (
-	successMsgDeregister = "" // TODO: to be filled...
+	successMsgDeregister = "deregister service successfully"
 )
 
 type DeregisterLogic struct {
