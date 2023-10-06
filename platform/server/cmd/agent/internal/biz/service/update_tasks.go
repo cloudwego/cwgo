@@ -44,7 +44,7 @@ func NewUpdateTasksService(ctx context.Context, svcCtx *svc.ServiceContext) *Upd
 
 // Run create note info
 func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateTasksRes, err error) {
-	tasks := make([]*task.Task, len(req.Tasks))
+	tasks := make([]*task.Task, 0, len(req.Tasks))
 
 	for _, t := range req.Tasks {
 		tp := task.Type(t.Type)
@@ -68,14 +68,37 @@ func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateT
 				ScheduleTime: scheduleTime,
 				Data:         data,
 			})
+		case task.SyncRepo:
+			var data task.SyncRepoData
+			err := sonic.Unmarshal([]byte(t.Data), &data)
+			if err != nil {
+				logger.Logger.Error("json unmarshal failed", zap.Error(err), zap.String("data", t.Data))
+				return &agent.UpdateTasksRes{
+					Code: http.StatusInternalServerError,
+					Msg:  "internal err",
+				}, nil
+			}
+
+			scheduleTime, _ := time.ParseDuration(t.ScheduleTime)
+
+			tasks = append(tasks, &task.Task{
+				Id:           t.Id,
+				Type:         task.Type(t.Type),
+				ScheduleTime: scheduleTime,
+				Data:         data,
+			})
 		}
 	}
+
+	cron.CronInstance.Stop()
 
 	cron.CronInstance.EmptyTask()
 
 	for _, t := range tasks {
 		cron.CronInstance.AddTask(t)
 	}
+
+	cron.CronInstance.Start()
 
 	return &agent.UpdateTasksRes{
 		Code: 0,

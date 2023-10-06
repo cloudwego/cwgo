@@ -2,6 +2,8 @@ namespace go registry
 
 struct RegisterReq{
     1: string service_id (api.query="service_id,required")
+    2: string host (api.query="host,required")
+    3: i32 port (api.query="port,required")
 }
 struct RegisterRes{
     1: i32 code

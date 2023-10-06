@@ -22,6 +22,7 @@ import (
 	"fmt"
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/transmeta"
@@ -68,16 +69,19 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, servi
 
 func (cm *ConfigManager) GetKitexServerOptions() []server.Option {
 	var KitexServerOptions []server.Option
-	if addr, err := net.ResolveTCPAddr("tcp", cm.config.Addr); err != nil {
+	addr, err := net.ResolveTCPAddr("tcp", cm.config.Addr)
+	if err != nil {
 		panic(fmt.Sprintf("resolve tcp addr failed, err: %v, addr: %s", err, cm.config.Addr))
 	} else {
 		KitexServerOptions = append(KitexServerOptions, server.WithServiceAddr(addr))
 	}
 
+	pubListenOn := utils.FigureOutListenOn(addr.String())
+
 	kitexRegistry, kitexRegistryInfo := cm.RegistryConfigManager.GetKitexRegistry(
 		cm.ServiceName,
 		cm.ServiceId,
-		cm.config.Addr,
+		pubListenOn,
 	)
 
 	KitexServerOptions = append(KitexServerOptions, server.WithRegistry(kitexRegistry))

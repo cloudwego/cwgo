@@ -22,10 +22,15 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os"
+	"strings"
 )
 
 const (
 	defaultNetwork = "tcp"
+	allEths        = "0.0.0.0"
+	envPodIP       = "POD_IP"
+	consulTags     = "consul_tags"
 )
 
 var _ net.Addr = (*NetAddr)(nil)
@@ -46,6 +51,28 @@ func (na *NetAddr) Network() string {
 	return na.network
 }
 
+func FigureOutListenOn(listenOn string) string {
+	fields := strings.Split(listenOn, ":")
+	if len(fields) == 0 {
+		return listenOn
+	}
+
+	host := fields[0]
+	if len(host) > 0 && host != allEths {
+		return listenOn
+	}
+
+	ip := os.Getenv(envPodIP)
+	if len(ip) == 0 {
+		ip = InternalIp()
+	}
+	if len(ip) == 0 {
+		return listenOn
+	}
+
+	return strings.Join(append([]string{ip}, fields[1:]...), ":")
+}
+
 // String implements the net.Addr interface.
 func (na *NetAddr) String() string {
 	return na.address
@@ -56,6 +83,7 @@ func ParseAddr(addr net.Addr) (host string, port int, err error) {
 	if err != nil {
 		return "", 0, err
 	}
+
 	if host == "" || host == "::" {
 		host, err = getLocalIPv4Address()
 		if err != nil {
@@ -89,4 +117,40 @@ func getLocalIPv4Address() (string, error) {
 		}
 	}
 	return "", errors.New("not found ipv4 address")
+}
+
+func InternalIp() string {
+	infs, err := net.Interfaces()
+	if err != nil {
+		return ""
+	}
+
+	for _, inf := range infs {
+		if isEthDown(inf.Flags) || isLoopback(inf.Flags) {
+			continue
+		}
+
+		addrs, err := inf.Addrs()
+		if err != nil {
+			continue
+		}
+
+		for _, addr := range addrs {
+			if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil {
+					return ipnet.IP.String()
+				}
+			}
+		}
+	}
+
+	return ""
+}
+
+func isEthDown(f net.Flags) bool {
+	return f&net.FlagUp != net.FlagUp
+}
+
+func isLoopback(f net.Flags) bool {
+	return f&net.FlagLoopback == net.FlagLoopback
 }

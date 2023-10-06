@@ -46,6 +46,7 @@ func NewUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateLogi
 func (l *UpdateLogic) Update(req *registry.UpdateReq) (res *registry.UpdateRes) {
 	err := l.svcCtx.BuiltinRegistry.Update(req.ServiceID)
 	if err != nil {
+		// TODO: agent is stable while registry restarted
 		logger.Logger.Error("update service failed", zap.Error(err))
 		return &registry.UpdateRes{
 			Code: http.StatusBadRequest,

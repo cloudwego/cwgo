@@ -41,6 +41,14 @@ func InitCron(service agent.AgentService) {
 	}
 }
 
+func (c *Cron) Start() {
+	c.scheduler.StartAsync()
+}
+
+func (c *Cron) Stop() {
+	c.scheduler.Stop()
+}
+
 func (c *Cron) AddTask(t *task.Task) {
 	switch t.Type {
 	case task.SyncIdl:

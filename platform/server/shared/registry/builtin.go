@@ -26,11 +26,14 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/service"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	kitexregistry "github.com/cloudwego/kitex/pkg/registry"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -220,9 +223,10 @@ func (r *BuiltinRegistryResolver) Resolve(_ context.Context, _ string) (discover
 	var eps []discovery.Instance
 
 	for _, svr := range services {
+
 		eps = append(eps, discovery.NewInstance(
 			"tcp",
-			fmt.Sprintf("%s:%d", svr.Host, svr.Port),
+			net.JoinHostPort(svr.Host, strconv.Itoa(svr.Port)),
 			1,
 			map[string]string{"service_id": svr.Id},
 		))
@@ -285,7 +289,14 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 		return errors.New("service_id not found")
 	}
 
-	httpRes, err := http.Get(fmt.Sprintf("http://%s/api/registry/register?service_id=%s", rc.addr, serviceId))
+	host, port, _ := utils.ParseAddr(info.Addr)
+
+	httpRes, err := http.Get(fmt.Sprintf("http://%s/api/registry/register?service_id=%s&host=%s&port=%d",
+		rc.addr,
+		serviceId,
+		host,
+		port,
+	))
 	if err != nil {
 		return err
 	}

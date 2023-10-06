@@ -51,7 +51,7 @@ func Register(ctx context.Context, rCtx *app.RequestContext) {
 
 	l := registrylogic.NewRegisterLogic(ctx, svc.Svc)
 
-	res := l.Register(&req, rCtx.RemoteAddr())
+	res := l.Register(&req)
 
 	logger.Logger.Debug("http response args", zap.Reflect("args", res))
 
