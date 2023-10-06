@@ -1,0 +1,16 @@
+.footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    color: var(--semi-color-text-2);
+    background-color: rgba(var(--semi-grey-0), 1);
+}
+.copyright {
+    display: flex;
+    align-items: center;
+}
+.logo {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
