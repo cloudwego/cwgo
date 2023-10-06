@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "lint:script": "eslint --ext .js,.jsx,.ts,.tsx --fix --quiet ./src",
+    "lint:script": "eslint --ext .js,.jsx,.ts,.tsx --fix --quiet src",
     "preview": "vite preview",
-    "prepare": "cd ../../.. && husky install platform/server/web/.husky"
+    "prepare": "cd ../.. && husky install platform/server/web/.husky"
   },
   "dependencies": {
     "@codemirror/legacy-modes": "^6.3.3",

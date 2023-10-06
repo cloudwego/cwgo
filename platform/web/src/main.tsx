@@ -6,9 +6,9 @@ import {
 } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
-import IdlPage from "./pages/IdlPage/index.tsx";
-import RepositoryPage from "./pages/RepositoryPage/index.tsx";
-import TemplatePage from "./pages/TemplatePage/index.tsx";
+import IdlPage from "./pages/IdlPage";
+import RepositoryPage from "./pages/RepositoryPage";
+import TemplatePage from "./pages/TemplatePage";
 
 const router = createBrowserRouter([
 	{
