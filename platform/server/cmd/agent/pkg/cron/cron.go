@@ -17,37 +17,44 @@
 package cron
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/task"
 	"github.com/go-co-op/gocron"
 	"time"
 )
 
-type ICron interface {
-	AddTask()
-	DeleteTask()
-	GetTasks()
-}
-
 type Cron struct {
 	scheduler *gocron.Scheduler
+	service   agent.AgentService
 }
 
-func NewCron() *Cron {
+var CronInstance *Cron
+
+func InitCron(service agent.AgentService) {
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.TagsUnique()
 
-	return &Cron{
+	CronInstance = &Cron{
 		scheduler: scheduler,
+		service:   service,
 	}
 }
 
 func (c *Cron) AddTask(t *task.Task) {
 	switch t.Type {
+	case task.SyncIdl:
+		_, _ = c.scheduler.Every(t.ScheduleTime).Tag(t.Id).Do(func() {
+
+		})
 	case task.SyncRepo:
-		c.scheduler.Every(t.ScheduleTime).Tag(t.Id).Do(func() {
+		_, _ = c.scheduler.Every(t.ScheduleTime).Tag(t.Id).Do(func() {
 
 		})
 	default:
 
 	}
+}
+
+func (c *Cron) EmptyTask() {
+	c.scheduler.Clear()
 }

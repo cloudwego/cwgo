@@ -22,16 +22,14 @@ import (
 	"context"
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
-	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent/agentservice"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/service"
 	"github.com/cloudwego/kitex/client"
-	"go.uber.org/zap"
+	"github.com/cloudwego/kitex/pkg/discovery"
 	"sync"
 	"time"
 )
@@ -42,13 +40,14 @@ type Manager struct {
 	updateInterval time.Duration
 	dispatcher     dispatcher.IDispatcher
 	registry       registry.IRegistry
+	resolver       discovery.Resolver
 }
 
 const (
 	DefaultUpdateInterval = time.Second * 3
 )
 
-func NewManager(dispatcher dispatcher.IDispatcher, registry registry.IRegistry, updateInterval time.Duration) *Manager {
+func NewManager(dispatcher dispatcher.IDispatcher, registry registry.IRegistry, resolver discovery.Resolver, updateInterval time.Duration) *Manager {
 	// TODO: init dispatcher tasks
 
 	return &Manager{
@@ -56,6 +55,7 @@ func NewManager(dispatcher dispatcher.IDispatcher, registry registry.IRegistry, 
 		updateInterval: updateInterval,
 		dispatcher:     dispatcher,
 		registry:       registry,
+		resolver:       resolver,
 	}
 }
 
@@ -65,7 +65,6 @@ func (m *Manager) StartUpdate() {
 
 		services, err := m.registry.GetAllService()
 		if err != nil {
-			logger.Logger.Error("get registry service failed", zap.Error(err))
 			continue
 		}
 
@@ -95,7 +94,6 @@ func (m *Manager) StartUpdate() {
 		for _, serviceId := range addServiceIds {
 			err = m.dispatcher.AddService(serviceId)
 			if err != nil {
-				logger.Logger.Error("add service to dispatcher failed", zap.Error(err))
 				continue
 			}
 		}
@@ -103,7 +101,6 @@ func (m *Manager) StartUpdate() {
 		for _, serviceId := range delServicesIds {
 			err = m.dispatcher.DelService(serviceId)
 			if err != nil {
-				logger.Logger.Error("del service to dispatcher failed", zap.Error(err))
 				continue
 			}
 		}
@@ -118,14 +115,11 @@ func (m *Manager) StartUpdate() {
 				go func(serviceId string) {
 					defer wg.Done()
 
-					c, err := agentservice.NewClient(
+					c, _ := agentservice.NewClient(
 						consts.ProjectName+"-"+consts.ServerTypeAgent,
-						client.WithResolver(config.GetManager().ApiConfigManager.RegistryConfigManager.GetDiscoveryResolver()),
+						client.WithResolver(m.resolver),
 						client.WithTag("service_id", serviceId),
 					)
-					if err != nil {
-						logger.Logger.Error("connect to agent failed", zap.Error(err), zap.String("service_id", serviceId))
-					}
 
 					tasks := m.dispatcher.GetTaskByServiceId(serviceId)
 
@@ -134,19 +128,13 @@ func (m *Manager) StartUpdate() {
 						data, _ := sonic.MarshalString(t.Data)
 						tasksModels[i] = &base.Task{
 							Id:           t.Id,
-							Type:         t.Type,
+							Type:         int32(t.Type),
 							ScheduleTime: t.ScheduleTime.String(),
 							Data:         data,
 						}
 					}
 
-					res, err := c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasksModels})
-					if err != nil {
-						logger.Logger.Error("call rpc client failed", zap.Error(err), zap.String("service_id", serviceId))
-					}
-					if res.Code != 0 {
-						logger.Logger.Error("update tasks failed", zap.String("err", res.Msg))
-					}
+					_, _ = c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasksModels})
 				}(svr.Id)
 			}
 			wg.Wait()

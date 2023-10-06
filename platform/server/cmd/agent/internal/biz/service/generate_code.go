@@ -100,7 +100,7 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	}
 	defer os.RemoveAll(tempDir)
 
-	idlFiles, err := client.GetFile(owner, repoName, idlPid, consts.MainRef)
+	idlFile, err := client.GetFile(owner, repoName, idlPid, consts.MainRef)
 	if err != nil {
 		logger.Logger.Error("get idl files failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
@@ -110,8 +110,8 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	}
 
 	// Create a thrift file in a temporary folder
-	filePathOnDisk := fmt.Sprintf("%s/%s", tempDir, idlFiles.Name)
-	if err := ioutil.WriteFile(filePathOnDisk, idlFiles.Content, 0644); err != nil {
+	filePathOnDisk := fmt.Sprintf("%s/%s", tempDir, idlFile.Name)
+	if err := ioutil.WriteFile(filePathOnDisk, idlFile.Content, 0644); err != nil {
 		logger.Logger.Error("write file failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
 			Code: http.StatusInternalServerError,
@@ -119,7 +119,7 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 		}, nil
 	}
 
-	err = s.svcCtx.Generator.Generate(idlFiles.Name, idl.ServiceName, tempDir)
+	err = s.svcCtx.Generator.Generate(idlFile.Name, idl.ServiceName, tempDir)
 	if err != nil {
 		logger.Logger.Error("generate file failed", zap.Error(err))
 		return &agent.GenerateCodeRes{

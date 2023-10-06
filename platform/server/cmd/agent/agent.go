@@ -21,7 +21,9 @@ package agent
 import (
 	"context"
 	"errors"
+	"github.com/cloudwego/cwgo/platform/server/cmd/agent/handler"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/cron"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/generator"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -117,16 +119,22 @@ func run(opts *setupOptions) error {
 	// get server options
 	kitexServerOptions := config.GetManager().AgentConfigManager.GetKitexServerOptions()
 
+	// init agent service
+	agentService := handler.NewAgentServiceImpl(
+		ctx,
+		&svc.ServiceContext{
+			DaoManager:  daoManager,
+			RepoManager: repoManager,
+			Generator:   generator.NewCwgoGenerator(),
+		},
+	)
+
+	// init cron
+	cron.InitCron(agentService)
+
 	// start service
 	svr := agentservice.NewServer(
-		&AgentServiceImpl{
-			ctx: ctx,
-			svcCtx: &svc.ServiceContext{
-				DaoManager:  daoManager,
-				RepoManager: repoManager,
-				Generator:   generator.NewCwgoGenerator(),
-			},
-		},
+		agentService,
 		kitexServerOptions...,
 	)
 

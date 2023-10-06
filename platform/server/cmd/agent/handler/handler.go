@@ -16,7 +16,7 @@
  *
  */
 
-package agent
+package handler
 
 import (
 	"context"
@@ -29,6 +29,13 @@ import (
 type AgentServiceImpl struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
+}
+
+func NewAgentServiceImpl(ctx context.Context, svcCtx *svc.ServiceContext) *AgentServiceImpl {
+	return &AgentServiceImpl{
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
 }
 
 // GenerateCode implements the AgentServiceImpl interface.

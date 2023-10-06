@@ -107,5 +107,5 @@ func (cm *ConfigManager) NewManager() *manager.Manager {
 		updateInterval = manager.DefaultUpdateInterval
 	}
 
-	return manager.NewManager(dispatcher.NewDispatcher(cm.config.Dispatcher), cm.RegistryConfigManager.GetRegistry(), updateInterval)
+	return manager.NewManager(dispatcher.NewDispatcher(cm.config.Dispatcher), cm.RegistryConfigManager.GetRegistry(), cm.RegistryConfigManager.GetDiscoveryResolver(), updateInterval)
 }

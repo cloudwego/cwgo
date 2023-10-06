@@ -27,8 +27,12 @@ type Task struct {
 	Data         interface{}
 }
 
+type SyncIdlData struct {
+	IdlId int64 `json:"idl_id"`
+}
+
 type SyncRepoData struct {
-	RepositoryId string `json:"repository_id"`
+	RepositoryId int64 `json:"repository_id"`
 }
 
 type Type uint32

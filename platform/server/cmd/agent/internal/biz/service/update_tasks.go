@@ -20,8 +20,15 @@ package service
 
 import (
 	"context"
+	"github.com/bytedance/sonic"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/cron"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/task"
+	"go.uber.org/zap"
+	"net/http"
+	"time"
 )
 
 type UpdateTasksService struct {
@@ -37,7 +44,41 @@ func NewUpdateTasksService(ctx context.Context, svcCtx *svc.ServiceContext) *Upd
 
 // Run create note info
 func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateTasksRes, err error) {
-	// Finish your business logic.
+	tasks := make([]*task.Task, len(req.Tasks))
 
-	return
+	for _, t := range req.Tasks {
+		tp := task.Type(t.Type)
+		switch tp {
+		case task.SyncIdl:
+			var data task.SyncIdlData
+			err := sonic.Unmarshal([]byte(t.Data), &data)
+			if err != nil {
+				logger.Logger.Error("json unmarshal failed", zap.Error(err), zap.String("data", t.Data))
+				return &agent.UpdateTasksRes{
+					Code: http.StatusInternalServerError,
+					Msg:  "internal err",
+				}, nil
+			}
+
+			scheduleTime, _ := time.ParseDuration(t.ScheduleTime)
+
+			tasks = append(tasks, &task.Task{
+				Id:           t.Id,
+				Type:         task.Type(t.Type),
+				ScheduleTime: scheduleTime,
+				Data:         data,
+			})
+		}
+	}
+
+	cron.CronInstance.EmptyTask()
+
+	for _, t := range tasks {
+		cron.CronInstance.AddTask(t)
+	}
+
+	return &agent.UpdateTasksRes{
+		Code: 0,
+		Msg:  "update tasks successfully",
+	}, nil
 }
