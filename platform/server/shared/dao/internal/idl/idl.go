@@ -20,7 +20,7 @@ package idl
 
 import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
 )
@@ -29,8 +29,8 @@ type IIdlDaoManager interface {
 	AddIDL(repoId int64, idlPath, serviceName string) error
 	DeleteIDLs(ids []int64) error
 	UpdateIDL(id, repoId int64, idlPath, serviceName string) error
-	GetIDL(id int64) (idl.IDL, error)
-	GetIDLs(page, limit, order int32, orderBy string) ([]*idl.IDL, error)
+	GetIDL(id int64) (model.IDL, error)
+	GetIDLs(page, limit, order int32, orderBy string) ([]*model.IDL, error)
 	SyncIDLContent(id int64, content string) error
 }
 
@@ -48,7 +48,7 @@ func NewMysqlIDL(db *gorm.DB) *MysqlIDLManager {
 
 func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) error {
 	timeNow := utils.GetCurrentTime()
-	idl := idl.IDL{
+	idl := model.IDL{
 		RepositoryId: repoId,
 		MainIdlPath:  idlPath,
 		ServiceName:  serviceName,
@@ -56,7 +56,9 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) erro
 		CreateTime:   timeNow,
 		UpdateTime:   timeNow,
 	}
-	res := r.db.Table(consts.TableNameIDL).Create(&idl)
+	res := r.db.
+		Table(consts.TableNameIDL).
+		Create(&idl)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -65,8 +67,10 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) erro
 }
 
 func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
-	var idl idl.IDL
-	res := r.db.Table(consts.TableNameIDL).Delete(&idl, ids)
+	var idl model.IDL
+	res := r.db.
+		Table(consts.TableNameIDL).
+		Delete(&idl, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -76,13 +80,18 @@ func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
 
 func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Table(consts.TableNameIDL).Where("id = ?", id).Updates(idl.IDL{
-		Id:           id,
-		RepositoryId: repoId,
-		MainIdlPath:  idlPath,
-		ServiceName:  serviceName,
-		UpdateTime:   timeNow,
-	})
+	res := r.db.
+		Table(consts.TableNameIDL).
+		Where("id = ?", id).
+		Updates(
+			model.IDL{
+				Id:           id,
+				RepositoryId: repoId,
+				MainIdlPath:  idlPath,
+				ServiceName:  serviceName,
+				UpdateTime:   timeNow,
+			},
+		)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -90,9 +99,12 @@ func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName strin
 	return nil
 }
 
-func (r *MysqlIDLManager) GetIDL(id int64) (idl.IDL, error) {
-	var idl idl.IDL
-	res := r.db.Table(consts.TableNameIDL).Where("id = ?", id).First(&idl)
+func (r *MysqlIDLManager) GetIDL(id int64) (model.IDL, error) {
+	var idl model.IDL
+	res := r.db.
+		Table(consts.TableNameIDL).
+		Where("id = ?", id).
+		First(&idl)
 	if res.Error != nil {
 		return idl, res.Error
 	}
@@ -100,8 +112,8 @@ func (r *MysqlIDLManager) GetIDL(id int64) (idl.IDL, error) {
 	return idl, nil
 }
 
-func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*idl.IDL, error) {
-	var IDLs []*idl.IDL
+func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*model.IDL, error) {
+	var IDLs []*model.IDL
 	offset := (page - 1) * limit
 
 	// Default sort field to 'update_time' if not provided
@@ -118,7 +130,12 @@ func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*
 		orderBy = orderBy + " " + consts.Inc
 	}
 
-	res := r.db.Table(consts.TableNameIDL).Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&IDLs)
+	res := r.db.
+		Table(consts.TableNameIDL).
+		Offset(int(offset)).
+		Limit(int(limit)).
+		Order(orderBy).
+		Find(&IDLs)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -128,11 +145,16 @@ func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*
 
 func (r *MysqlIDLManager) SyncIDLContent(id int64, content string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Table(consts.TableNameIDL).Where("id = ?", id).Updates(idl.IDL{
-		Content:      content,
-		LastSyncTime: timeNow,
-		UpdateTime:   timeNow,
-	})
+	res := r.db.
+		Table(consts.TableNameIDL).
+		Where("id = ?", id).
+		Updates(
+			model.IDL{
+				Content:      content,
+				LastSyncTime: timeNow,
+				UpdateTime:   timeNow,
+			},
+		)
 	if res.Error != nil {
 		return res.Error
 	}

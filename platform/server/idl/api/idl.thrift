@@ -1,21 +1,11 @@
 namespace go idl
 
-struct IDL{
-    1: i64 id
-    2: i64 repository_id
-    3: string main_idl_path
-    4: string content
-    5: string service_name
-    6: string last_sync_time
-    7: bool is_deleted
-    8: string create_time
-    9: string update_time
-}
+include "../model/model.thrift"
 
 struct AddIDLReq{
     1: i64 repository_id (api.body="repository_id,required")
-    2: string main_idl_path (api.body="main_idl_path,required")
-    3: string service_name (api.body="service_name,required")
+    2: string main_idl_path (api.body="main_idl_path,required",api.vd="len($)>0")
+    3: string service_name (api.body="service_name,required",api.vd="len($)>0")
 }
 struct AddIDLRes{
     1: i32 code
@@ -53,7 +43,7 @@ struct GetIDLsRes{
     3: GetIDLsResData data
 }
 struct GetIDLsResData{
-    1: list<IDL> idls
+    1: list<model.IDL> idls
 }
 
 struct SyncIDLsByIdReq{

@@ -1,4 +1,4 @@
-namespace go base
+namespace go model
 
 struct Task{
     1: string id

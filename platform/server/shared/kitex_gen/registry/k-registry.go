@@ -59,6 +59,34 @@ func (p *RegisterReq) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.I32 {
+				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -108,6 +136,34 @@ func (p *RegisterReq) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *RegisterReq) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.Host = v
+
+	}
+	return offset, nil
+}
+
+func (p *RegisterReq) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.Port = v
+
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *RegisterReq) FastWrite(buf []byte) int {
 	return 0
@@ -117,7 +173,9 @@ func (p *RegisterReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWri
 	offset := 0
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "RegisterReq")
 	if p != nil {
+		offset += p.fastWriteField3(buf[offset:], binaryWriter)
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
+		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -129,6 +187,8 @@ func (p *RegisterReq) BLength() int {
 	l += bthrift.Binary.StructBeginLength("RegisterReq")
 	if p != nil {
 		l += p.field1Length()
+		l += p.field2Length()
+		l += p.field3Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -144,10 +204,46 @@ func (p *RegisterReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWri
 	return offset
 }
 
+func (p *RegisterReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "host", thrift.STRING, 2)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Host)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *RegisterReq) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "port", thrift.I32, 3)
+	offset += bthrift.Binary.WriteI32(buf[offset:], p.Port)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
 func (p *RegisterReq) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("service_id", thrift.STRING, 1)
 	l += bthrift.Binary.StringLengthNocopy(p.ServiceId)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *RegisterReq) field2Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("host", thrift.STRING, 2)
+	l += bthrift.Binary.StringLengthNocopy(p.Host)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *RegisterReq) field3Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("port", thrift.I32, 3)
+	l += bthrift.Binary.I32Length(p.Port)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l

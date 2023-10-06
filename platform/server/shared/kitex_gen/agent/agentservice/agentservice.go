@@ -19,11 +19,13 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "AgentService"
 	handlerType := (*agent.AgentService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"GenerateCode":           kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
-		"SyncRepositoryById":     kitex.NewMethodInfo(syncRepositoryByIdHandler, newAgentServiceSyncRepositoryByIdArgs, newAgentServiceSyncRepositoryByIdResult, false),
+		"AddRepository":          kitex.NewMethodInfo(addRepositoryHandler, newAgentServiceAddRepositoryArgs, newAgentServiceAddRepositoryResult, false),
 		"UpdateRepositoryStatus": kitex.NewMethodInfo(updateRepositoryStatusHandler, newAgentServiceUpdateRepositoryStatusArgs, newAgentServiceUpdateRepositoryStatusResult, false),
+		"SyncRepositoryById":     kitex.NewMethodInfo(syncRepositoryByIdHandler, newAgentServiceSyncRepositoryByIdArgs, newAgentServiceSyncRepositoryByIdResult, false),
+		"AddIDL":                 kitex.NewMethodInfo(addIDLHandler, newAgentServiceAddIDLArgs, newAgentServiceAddIDLResult, false),
 		"SyncIDLsById":           kitex.NewMethodInfo(syncIDLsByIdHandler, newAgentServiceSyncIDLsByIdArgs, newAgentServiceSyncIDLsByIdResult, false),
 		"UpdateTasks":            kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
+		"GenerateCode":           kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "agent",
@@ -39,22 +41,40 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	return svcInfo
 }
 
-func generateCodeHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*agent.AgentServiceGenerateCodeArgs)
-	realResult := result.(*agent.AgentServiceGenerateCodeResult)
-	success, err := handler.(agent.AgentService).GenerateCode(ctx, realArg.Req)
+func addRepositoryHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceAddRepositoryArgs)
+	realResult := result.(*agent.AgentServiceAddRepositoryResult)
+	success, err := handler.(agent.AgentService).AddRepository(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newAgentServiceGenerateCodeArgs() interface{} {
-	return agent.NewAgentServiceGenerateCodeArgs()
+func newAgentServiceAddRepositoryArgs() interface{} {
+	return agent.NewAgentServiceAddRepositoryArgs()
 }
 
-func newAgentServiceGenerateCodeResult() interface{} {
-	return agent.NewAgentServiceGenerateCodeResult()
+func newAgentServiceAddRepositoryResult() interface{} {
+	return agent.NewAgentServiceAddRepositoryResult()
+}
+
+func updateRepositoryStatusHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceUpdateRepositoryStatusArgs)
+	realResult := result.(*agent.AgentServiceUpdateRepositoryStatusResult)
+	success, err := handler.(agent.AgentService).UpdateRepositoryStatus(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceUpdateRepositoryStatusArgs() interface{} {
+	return agent.NewAgentServiceUpdateRepositoryStatusArgs()
+}
+
+func newAgentServiceUpdateRepositoryStatusResult() interface{} {
+	return agent.NewAgentServiceUpdateRepositoryStatusResult()
 }
 
 func syncRepositoryByIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -75,22 +95,22 @@ func newAgentServiceSyncRepositoryByIdResult() interface{} {
 	return agent.NewAgentServiceSyncRepositoryByIdResult()
 }
 
-func updateRepositoryStatusHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*agent.AgentServiceUpdateRepositoryStatusArgs)
-	realResult := result.(*agent.AgentServiceUpdateRepositoryStatusResult)
-	success, err := handler.(agent.AgentService).UpdateRepositoryStatus(ctx, realArg.Req)
+func addIDLHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceAddIDLArgs)
+	realResult := result.(*agent.AgentServiceAddIDLResult)
+	success, err := handler.(agent.AgentService).AddIDL(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newAgentServiceUpdateRepositoryStatusArgs() interface{} {
-	return agent.NewAgentServiceUpdateRepositoryStatusArgs()
+func newAgentServiceAddIDLArgs() interface{} {
+	return agent.NewAgentServiceAddIDLArgs()
 }
 
-func newAgentServiceUpdateRepositoryStatusResult() interface{} {
-	return agent.NewAgentServiceUpdateRepositoryStatusResult()
+func newAgentServiceAddIDLResult() interface{} {
+	return agent.NewAgentServiceAddIDLResult()
 }
 
 func syncIDLsByIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -129,6 +149,24 @@ func newAgentServiceUpdateTasksResult() interface{} {
 	return agent.NewAgentServiceUpdateTasksResult()
 }
 
+func generateCodeHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceGenerateCodeArgs)
+	realResult := result.(*agent.AgentServiceGenerateCodeResult)
+	success, err := handler.(agent.AgentService).GenerateCode(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceGenerateCodeArgs() interface{} {
+	return agent.NewAgentServiceGenerateCodeArgs()
+}
+
+func newAgentServiceGenerateCodeResult() interface{} {
+	return agent.NewAgentServiceGenerateCodeResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -139,11 +177,21 @@ func newServiceClient(c client.Client) *kClient {
 	}
 }
 
-func (p *kClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq) (r *agent.GenerateCodeRes, err error) {
-	var _args agent.AgentServiceGenerateCodeArgs
+func (p *kClient) AddRepository(ctx context.Context, req *agent.AddRepositoryReq) (r *agent.AddRepositoryRes, err error) {
+	var _args agent.AgentServiceAddRepositoryArgs
 	_args.Req = req
-	var _result agent.AgentServiceGenerateCodeResult
-	if err = p.c.Call(ctx, "GenerateCode", &_args, &_result); err != nil {
+	var _result agent.AgentServiceAddRepositoryResult
+	if err = p.c.Call(ctx, "AddRepository", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq) (r *agent.UpdateRepositoryStatusRes, err error) {
+	var _args agent.AgentServiceUpdateRepositoryStatusArgs
+	_args.Req = req
+	var _result agent.AgentServiceUpdateRepositoryStatusResult
+	if err = p.c.Call(ctx, "UpdateRepositoryStatus", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -159,11 +207,11 @@ func (p *kClient) SyncRepositoryById(ctx context.Context, req *agent.SyncReposit
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq) (r *agent.UpdateRepositoryStatusRes, err error) {
-	var _args agent.AgentServiceUpdateRepositoryStatusArgs
+func (p *kClient) AddIDL(ctx context.Context, req *agent.AddIDLReq) (r *agent.AddIDLRes, err error) {
+	var _args agent.AgentServiceAddIDLArgs
 	_args.Req = req
-	var _result agent.AgentServiceUpdateRepositoryStatusResult
-	if err = p.c.Call(ctx, "UpdateRepositoryStatus", &_args, &_result); err != nil {
+	var _result agent.AgentServiceAddIDLResult
+	if err = p.c.Call(ctx, "AddIDL", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -184,6 +232,16 @@ func (p *kClient) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq) (r
 	_args.Req = req
 	var _result agent.AgentServiceUpdateTasksResult
 	if err = p.c.Call(ctx, "UpdateTasks", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq) (r *agent.GenerateCodeRes, err error) {
+	var _args agent.AgentServiceGenerateCodeArgs
+	_args.Req = req
+	var _result agent.AgentServiceGenerateCodeResult
+	if err = p.c.Call(ctx, "GenerateCode", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

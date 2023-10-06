@@ -11,6 +11,8 @@ import (
 
 type RegisterReq struct {
 	ServiceId string `thrift:"service_id,1" frugal:"1,default,string" json:"service_id"`
+	Host      string `thrift:"host,2" frugal:"2,default,string" json:"host"`
+	Port      int32  `thrift:"port,3" frugal:"3,default,i32" json:"port"`
 }
 
 func NewRegisterReq() *RegisterReq {
@@ -24,12 +26,28 @@ func (p *RegisterReq) InitDefault() {
 func (p *RegisterReq) GetServiceId() (v string) {
 	return p.ServiceId
 }
+
+func (p *RegisterReq) GetHost() (v string) {
+	return p.Host
+}
+
+func (p *RegisterReq) GetPort() (v int32) {
+	return p.Port
+}
 func (p *RegisterReq) SetServiceId(val string) {
 	p.ServiceId = val
+}
+func (p *RegisterReq) SetHost(val string) {
+	p.Host = val
+}
+func (p *RegisterReq) SetPort(val int32) {
+	p.Port = val
 }
 
 var fieldIDToName_RegisterReq = map[int16]string{
 	1: "service_id",
+	2: "host",
+	3: "port",
 }
 
 func (p *RegisterReq) Read(iprot thrift.TProtocol) (err error) {
@@ -54,6 +72,26 @@ func (p *RegisterReq) Read(iprot thrift.TProtocol) (err error) {
 		case 1:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -100,6 +138,24 @@ func (p *RegisterReq) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *RegisterReq) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.Host = v
+	}
+	return nil
+}
+
+func (p *RegisterReq) ReadField3(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.Port = v
+	}
+	return nil
+}
+
 func (p *RegisterReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("RegisterReq"); err != nil {
@@ -108,6 +164,14 @@ func (p *RegisterReq) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
 			goto WriteFieldError
 		}
 
@@ -146,6 +210,40 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
+func (p *RegisterReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("host", thrift.STRING, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Host); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *RegisterReq) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("port", thrift.I32, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Port); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
 func (p *RegisterReq) String() string {
 	if p == nil {
 		return "<nil>"
@@ -162,12 +260,32 @@ func (p *RegisterReq) DeepEqual(ano *RegisterReq) bool {
 	if !p.Field1DeepEqual(ano.ServiceId) {
 		return false
 	}
+	if !p.Field2DeepEqual(ano.Host) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.Port) {
+		return false
+	}
 	return true
 }
 
 func (p *RegisterReq) Field1DeepEqual(src string) bool {
 
 	if strings.Compare(p.ServiceId, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *RegisterReq) Field2DeepEqual(src string) bool {
+
+	if strings.Compare(p.Host, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *RegisterReq) Field3DeepEqual(src int32) bool {
+
+	if p.Port != src {
 		return false
 	}
 	return true

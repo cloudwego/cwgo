@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/repository"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/google/go-github/v53/github"
 	"github.com/xanzy/go-gitlab"
@@ -38,7 +38,7 @@ func (rm *Manager) ClearClient() {
 	rm.repositoryClients = make(map[int64]IRepository)
 }
 
-func (rm *Manager) AddClient(repository *repository.Repository) error {
+func (rm *Manager) AddClient(repository *model.Repository) error {
 	rm.Lock()
 	defer rm.Unlock()
 
@@ -70,7 +70,7 @@ func (rm *Manager) AddClient(repository *repository.Repository) error {
 	return nil
 }
 
-func (rm *Manager) DelClient(repository *repository.Repository) {
+func (rm *Manager) DelClient(repository *model.Repository) {
 	rm.Lock()
 	defer rm.Unlock()
 

@@ -20,7 +20,7 @@ package template
 
 import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
 )
@@ -29,12 +29,12 @@ type ITemplateDaoManager interface {
 	AddTemplate(name string, _type int32) error
 	DeleteTemplate(ids []int64) error
 	UpdateTemplate(id int64, name string) error
-	GetTemplates(page, limit, order int32, orderBy string) ([]*template.Template, error)
+	GetTemplates(page, limit, order int32, orderBy string) ([]*model.Template, error)
 
 	AddTemplateItem(templateId int64, name, content string) error
 	DeleteTemplateItem(ids []int64) error
 	UpdateTemplateItem(id int64, name, content string) error
-	GetTemplateItems(page, limit, order int32, orderBy string) ([]*template.TemplateItem, error)
+	GetTemplateItems(page, limit, order int32, orderBy string) ([]*model.TemplateItem, error)
 }
 
 type MysqlTemplateManager struct {
@@ -51,13 +51,15 @@ func NewMysqlTemplate(db *gorm.DB) *MysqlTemplateManager {
 
 func (r *MysqlTemplateManager) AddTemplate(name string, _type int32) error {
 	timeNow := utils.GetCurrentTime()
-	template := template.Template{
+	template := model.Template{
 		Name:       name,
 		Type:       _type,
 		CreateTime: timeNow,
 		UpdateTime: timeNow,
 	}
-	res := r.db.Table(consts.TableNameTemplate).Create(&template)
+	res := r.db.
+		Table(consts.TableNameTemplate).
+		Create(&template)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -66,8 +68,10 @@ func (r *MysqlTemplateManager) AddTemplate(name string, _type int32) error {
 }
 
 func (r *MysqlTemplateManager) DeleteTemplate(ids []int64) error {
-	var template template.Template
-	res := r.db.Table(consts.TableNameTemplate).Delete(&template, ids)
+	var template model.Template
+	res := r.db.
+		Table(consts.TableNameTemplate).
+		Delete(&template, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -77,10 +81,15 @@ func (r *MysqlTemplateManager) DeleteTemplate(ids []int64) error {
 
 func (r *MysqlTemplateManager) UpdateTemplate(id int64, name string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Table(consts.TableNameTemplate).Where("id = ?", id).Updates(template.Template{
-		Name:       name,
-		UpdateTime: timeNow,
-	})
+	res := r.db.
+		Table(consts.TableNameTemplate).
+		Where("id = ?", id).
+		Updates(
+			model.Template{
+				Name:       name,
+				UpdateTime: timeNow,
+			},
+		)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -88,8 +97,8 @@ func (r *MysqlTemplateManager) UpdateTemplate(id int64, name string) error {
 	return nil
 }
 
-func (r *MysqlTemplateManager) GetTemplates(page, limit, order int32, orderBy string) ([]*template.Template, error) {
-	var templates []*template.Template
+func (r *MysqlTemplateManager) GetTemplates(page, limit, order int32, orderBy string) ([]*model.Template, error) {
+	var templates []*model.Template
 	offset := (page - 1) * limit
 
 	// Default sort field to 'update_time' if not provided
@@ -106,7 +115,12 @@ func (r *MysqlTemplateManager) GetTemplates(page, limit, order int32, orderBy st
 		orderBy = orderBy + " " + consts.Inc
 	}
 
-	res := r.db.Table(consts.TableNameTemplate).Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&templates)
+	res := r.db.
+		Table(consts.TableNameTemplate).
+		Offset(int(offset)).
+		Limit(int(limit)).
+		Order(orderBy).
+		Find(&templates)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -116,14 +130,16 @@ func (r *MysqlTemplateManager) GetTemplates(page, limit, order int32, orderBy st
 
 func (r *MysqlTemplateManager) AddTemplateItem(templateId int64, name, content string) error {
 	timeNow := utils.GetCurrentTime()
-	templateItem := template.TemplateItem{
+	templateItem := model.TemplateItem{
 		TemplateId: templateId,
 		Name:       name,
 		Content:    content,
 		CreateTime: timeNow,
 		UpdateTime: timeNow,
 	}
-	res := r.db.Table(consts.TableNameTemplateItem).Create(&templateItem)
+	res := r.db.
+		Table(consts.TableNameTemplateItem).
+		Create(&templateItem)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -132,8 +148,10 @@ func (r *MysqlTemplateManager) AddTemplateItem(templateId int64, name, content s
 }
 
 func (r *MysqlTemplateManager) DeleteTemplateItem(ids []int64) error {
-	var template template.TemplateItem
-	res := r.db.Table(consts.TableNameTemplateItem).Delete(&template, ids)
+	var template model.TemplateItem
+	res := r.db.
+		Table(consts.TableNameTemplateItem).
+		Delete(&template, ids)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -143,11 +161,16 @@ func (r *MysqlTemplateManager) DeleteTemplateItem(ids []int64) error {
 
 func (r *MysqlTemplateManager) UpdateTemplateItem(id int64, name, content string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.Table(consts.TableNameTemplateItem).Where("id = ?", id).Updates(template.TemplateItem{
-		Name:       name,
-		Content:    content,
-		UpdateTime: timeNow,
-	})
+	res := r.db.
+		Table(consts.TableNameTemplateItem).
+		Where("id = ?", id).
+		Updates(
+			model.TemplateItem{
+				Name:       name,
+				Content:    content,
+				UpdateTime: timeNow,
+			},
+		)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -155,8 +178,8 @@ func (r *MysqlTemplateManager) UpdateTemplateItem(id int64, name, content string
 	return nil
 }
 
-func (r *MysqlTemplateManager) GetTemplateItems(page, limit, order int32, orderBy string) ([]*template.TemplateItem, error) {
-	var templateItems []*template.TemplateItem
+func (r *MysqlTemplateManager) GetTemplateItems(page, limit, order int32, orderBy string) ([]*model.TemplateItem, error) {
+	var templateItems []*model.TemplateItem
 	offset := (page - 1) * limit
 
 	// Default sort field to 'update_time' if not provided
@@ -173,7 +196,12 @@ func (r *MysqlTemplateManager) GetTemplateItems(page, limit, order int32, orderB
 		orderBy = orderBy + " " + consts.Inc
 	}
 
-	res := r.db.Table(consts.TableNameTemplateItem).Offset(int(offset)).Limit(int(limit)).Order(orderBy).Find(&templateItems)
+	res := r.db.
+		Table(consts.TableNameTemplateItem).
+		Offset(int(offset)).
+		Limit(int(limit)).
+		Order(orderBy).
+		Find(&templateItems)
 	if res.Error != nil {
 		return nil, res.Error
 	}

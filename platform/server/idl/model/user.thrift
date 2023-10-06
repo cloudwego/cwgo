@@ -1,4 +1,4 @@
-namespace go base
+namespace go model
 
 struct UserInfo{
     1: i64 user_id;

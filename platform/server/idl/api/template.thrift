@@ -1,6 +1,6 @@
 namespace go template
 
-include "../base/model.thrift"
+include "../model/model.thrift"
 
 struct AddTemplateReq{
     1: string name (api.body="name,required")

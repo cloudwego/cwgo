@@ -28,7 +28,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent/agentservice"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/service"
@@ -141,10 +141,10 @@ func (m *Manager) UpdateAgentTasks() {
 
 			tasks := m.dispatcher.GetTaskByServiceId(serviceId)
 
-			tasksModels := make([]*base.Task, len(tasks))
+			tasksModels := make([]*model.Task, len(tasks))
 			for i, t := range tasks {
 				data, _ := sonic.MarshalString(t.Data)
-				tasksModels[i] = &base.Task{
+				tasksModels[i] = &model.Task{
 					Id:           t.Id,
 					Type:         int32(t.Type),
 					ScheduleTime: t.ScheduleTime.String(),

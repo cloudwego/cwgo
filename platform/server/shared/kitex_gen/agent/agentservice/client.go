@@ -11,11 +11,13 @@ import (
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
-	GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error)
-	SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error)
+	AddRepository(ctx context.Context, req *agent.AddRepositoryReq, callOptions ...callopt.Option) (r *agent.AddRepositoryRes, err error)
 	UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error)
+	SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error)
+	AddIDL(ctx context.Context, req *agent.AddIDLReq, callOptions ...callopt.Option) (r *agent.AddIDLRes, err error)
 	SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq, callOptions ...callopt.Option) (r *agent.SyncIDLsByIdRes, err error)
 	UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error)
+	GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -47,9 +49,14 @@ type kAgentServiceClient struct {
 	*kClient
 }
 
-func (p *kAgentServiceClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error) {
+func (p *kAgentServiceClient) AddRepository(ctx context.Context, req *agent.AddRepositoryReq, callOptions ...callopt.Option) (r *agent.AddRepositoryRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.GenerateCode(ctx, req)
+	return p.kClient.AddRepository(ctx, req)
+}
+
+func (p *kAgentServiceClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateRepositoryStatus(ctx, req)
 }
 
 func (p *kAgentServiceClient) SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error) {
@@ -57,9 +64,9 @@ func (p *kAgentServiceClient) SyncRepositoryById(ctx context.Context, req *agent
 	return p.kClient.SyncRepositoryById(ctx, req)
 }
 
-func (p *kAgentServiceClient) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryStatusRes, err error) {
+func (p *kAgentServiceClient) AddIDL(ctx context.Context, req *agent.AddIDLReq, callOptions ...callopt.Option) (r *agent.AddIDLRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UpdateRepositoryStatus(ctx, req)
+	return p.kClient.AddIDL(ctx, req)
 }
 
 func (p *kAgentServiceClient) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq, callOptions ...callopt.Option) (r *agent.SyncIDLsByIdRes, err error) {
@@ -70,4 +77,9 @@ func (p *kAgentServiceClient) SyncIDLsById(ctx context.Context, req *agent.SyncI
 func (p *kAgentServiceClient) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.UpdateTasks(ctx, req)
+}
+
+func (p *kAgentServiceClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GenerateCode(ctx, req)
 }

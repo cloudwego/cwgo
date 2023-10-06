@@ -38,9 +38,16 @@ func NewAgentServiceImpl(ctx context.Context, svcCtx *svc.ServiceContext) *Agent
 	}
 }
 
-// GenerateCode implements the AgentServiceImpl interface.
-func (s *AgentServiceImpl) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq) (resp *agent.GenerateCodeRes, err error) {
-	resp, err = service.NewGenerateCodeService(ctx, s.svcCtx).Run(req)
+// AddRepository implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) AddRepository(ctx context.Context, req *agent.AddRepositoryReq) (resp *agent.AddRepositoryRes, err error) {
+	resp, err = service.NewAddRepositoryService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// UpdateRepositoryStatus implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq) (resp *agent.UpdateRepositoryStatusRes, err error) {
+	resp, err = service.NewUpdateRepositoryStatusService(ctx, s.svcCtx).Run(req)
 
 	return resp, err
 }
@@ -52,9 +59,9 @@ func (s *AgentServiceImpl) SyncRepositoryById(ctx context.Context, req *agent.Sy
 	return resp, err
 }
 
-// UpdateRepositoryStatus implements the AgentServiceImpl interface.
-func (s *AgentServiceImpl) UpdateRepositoryStatus(ctx context.Context, req *agent.UpdateRepositoryStatusReq) (resp *agent.UpdateRepositoryStatusRes, err error) {
-	resp, err = service.NewUpdateRepositoryStatusService(ctx, s.svcCtx).Run(req)
+// AddIDL implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) AddIDL(ctx context.Context, req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
+	resp, err = service.NewAddIDLService(ctx, s.svcCtx).Run(req)
 
 	return resp, err
 }
@@ -69,6 +76,13 @@ func (s *AgentServiceImpl) SyncIDLsById(ctx context.Context, req *agent.SyncIDLs
 // UpdateTasks implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq) (resp *agent.UpdateTasksRes, err error) {
 	resp, err = service.NewUpdateTasksService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// GenerateCode implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq) (resp *agent.GenerateCodeRes, err error) {
+	resp, err = service.NewGenerateCodeService(ctx, s.svcCtx).Run(req)
 
 	return resp, err
 }

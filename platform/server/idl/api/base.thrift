@@ -1,6 +1,6 @@
 namespace go base
 
-include "../base/user.thrift"
+include "../model/user.thrift"
 
 struct PingReq{
 }

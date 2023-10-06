@@ -1,6 +1,6 @@
 namespace go repository
 
-include "../base/model.thrift"
+include "../model/model.thrift"
 
 struct AddRepositoryReq{
     1: i32 repository_type (api.body="repository_type,required")
