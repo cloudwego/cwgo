@@ -11,8 +11,8 @@ import (
 
 type Repository struct {
 	Id             int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
-	RepositoryUrl  string `thrift:"repository_url,2" frugal:"2,default,string" json:"repository_url"`
-	Type           int32  `thrift:"type,3" frugal:"3,default,i32" json:"type"`
+	RepositoryType int32  `thrift:"repository_type,2" frugal:"2,default,i32" json:"repository_type"`
+	RepositoryUrl  string `thrift:"repository_url,3" frugal:"3,default,string" json:"repository_url"`
 	Token          string `thrift:"token,4" frugal:"4,default,string" json:"token"`
 	Status         string `thrift:"status,5" frugal:"5,default,string" json:"status"`
 	LastUpdateTime string `thrift:"last_update_time,6" frugal:"6,default,string" json:"last_update_time"`
@@ -20,7 +20,6 @@ type Repository struct {
 	IsDeleted      bool   `thrift:"is_deleted,8" frugal:"8,default,bool" json:"is_deleted"`
 	CreateTime     string `thrift:"create_time,9" frugal:"9,default,string" json:"create_time"`
 	UpdateTime     string `thrift:"update_time,10" frugal:"10,default,string" json:"update_time"`
-	RepoType       int32  `thrift:"repo_type,11" frugal:"11,default,i32" json:"repo_type"`
 }
 
 func NewRepository() *Repository {
@@ -35,12 +34,12 @@ func (p *Repository) GetId() (v int64) {
 	return p.Id
 }
 
-func (p *Repository) GetRepositoryUrl() (v string) {
-	return p.RepositoryUrl
+func (p *Repository) GetRepositoryType() (v int32) {
+	return p.RepositoryType
 }
 
-func (p *Repository) GetType() (v int32) {
-	return p.Type
+func (p *Repository) GetRepositoryUrl() (v string) {
+	return p.RepositoryUrl
 }
 
 func (p *Repository) GetToken() (v string) {
@@ -70,18 +69,14 @@ func (p *Repository) GetCreateTime() (v string) {
 func (p *Repository) GetUpdateTime() (v string) {
 	return p.UpdateTime
 }
-
-func (p *Repository) GetRepoType() (v int32) {
-	return p.RepoType
-}
 func (p *Repository) SetId(val int64) {
 	p.Id = val
 }
+func (p *Repository) SetRepositoryType(val int32) {
+	p.RepositoryType = val
+}
 func (p *Repository) SetRepositoryUrl(val string) {
 	p.RepositoryUrl = val
-}
-func (p *Repository) SetType(val int32) {
-	p.Type = val
 }
 func (p *Repository) SetToken(val string) {
 	p.Token = val
@@ -104,14 +99,11 @@ func (p *Repository) SetCreateTime(val string) {
 func (p *Repository) SetUpdateTime(val string) {
 	p.UpdateTime = val
 }
-func (p *Repository) SetRepoType(val int32) {
-	p.RepoType = val
-}
 
 var fieldIDToName_Repository = map[int16]string{
 	1:  "id",
-	2:  "repository_url",
-	3:  "type",
+	2:  "repository_type",
+	3:  "repository_url",
 	4:  "token",
 	5:  "status",
 	6:  "last_update_time",
@@ -119,7 +111,6 @@ var fieldIDToName_Repository = map[int16]string{
 	8:  "is_deleted",
 	9:  "create_time",
 	10: "update_time",
-	11: "repo_type",
 }
 
 func (p *Repository) Read(iprot thrift.TProtocol) (err error) {
@@ -152,7 +143,7 @@ func (p *Repository) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -162,7 +153,7 @@ func (p *Repository) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 3:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -241,16 +232,6 @@ func (p *Repository) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
-		case 11:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField11(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -291,19 +272,19 @@ func (p *Repository) ReadField1(iprot thrift.TProtocol) error {
 }
 
 func (p *Repository) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
-		p.RepositoryUrl = v
+		p.RepositoryType = v
 	}
 	return nil
 }
 
 func (p *Repository) ReadField3(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.Type = v
+		p.RepositoryUrl = v
 	}
 	return nil
 }
@@ -371,15 +352,6 @@ func (p *Repository) ReadField10(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *Repository) ReadField11(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		p.RepoType = v
-	}
-	return nil
-}
-
 func (p *Repository) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("Repository"); err != nil {
@@ -426,10 +398,6 @@ func (p *Repository) Write(oprot thrift.TProtocol) (err error) {
 			fieldId = 10
 			goto WriteFieldError
 		}
-		if err = p.writeField11(oprot); err != nil {
-			fieldId = 11
-			goto WriteFieldError
-		}
 
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
@@ -467,10 +435,10 @@ WriteFieldEndError:
 }
 
 func (p *Repository) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("repository_url", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("repository_type", thrift.I32, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.RepositoryUrl); err != nil {
+	if err := oprot.WriteI32(p.RepositoryType); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -484,10 +452,10 @@ WriteFieldEndError:
 }
 
 func (p *Repository) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("type", thrift.I32, 3); err != nil {
+	if err = oprot.WriteFieldBegin("repository_url", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Type); err != nil {
+	if err := oprot.WriteString(p.RepositoryUrl); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -619,23 +587,6 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 10 end error: ", p), err)
 }
 
-func (p *Repository) writeField11(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("repo_type", thrift.I32, 11); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.RepoType); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 11 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 11 end error: ", p), err)
-}
-
 func (p *Repository) String() string {
 	if p == nil {
 		return "<nil>"
@@ -652,10 +603,10 @@ func (p *Repository) DeepEqual(ano *Repository) bool {
 	if !p.Field1DeepEqual(ano.Id) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.RepositoryUrl) {
+	if !p.Field2DeepEqual(ano.RepositoryType) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Type) {
+	if !p.Field3DeepEqual(ano.RepositoryUrl) {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.Token) {
@@ -679,9 +630,6 @@ func (p *Repository) DeepEqual(ano *Repository) bool {
 	if !p.Field10DeepEqual(ano.UpdateTime) {
 		return false
 	}
-	if !p.Field11DeepEqual(ano.RepoType) {
-		return false
-	}
 	return true
 }
 
@@ -692,16 +640,16 @@ func (p *Repository) Field1DeepEqual(src int64) bool {
 	}
 	return true
 }
-func (p *Repository) Field2DeepEqual(src string) bool {
+func (p *Repository) Field2DeepEqual(src int32) bool {
 
-	if strings.Compare(p.RepositoryUrl, src) != 0 {
+	if p.RepositoryType != src {
 		return false
 	}
 	return true
 }
-func (p *Repository) Field3DeepEqual(src int32) bool {
+func (p *Repository) Field3DeepEqual(src string) bool {
 
-	if p.Type != src {
+	if strings.Compare(p.RepositoryUrl, src) != 0 {
 		return false
 	}
 	return true
@@ -751,13 +699,6 @@ func (p *Repository) Field9DeepEqual(src string) bool {
 func (p *Repository) Field10DeepEqual(src string) bool {
 
 	if strings.Compare(p.UpdateTime, src) != 0 {
-		return false
-	}
-	return true
-}
-func (p *Repository) Field11DeepEqual(src int32) bool {
-
-	if p.RepoType != src {
 		return false
 	}
 	return true

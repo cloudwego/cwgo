@@ -18,7 +18,10 @@
 
 package task
 
-import "time"
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"time"
+)
 
 type Task struct {
 	Id           string
@@ -41,3 +44,13 @@ const (
 	SyncIdl Type = iota + 1
 	SyncRepo
 )
+
+func NewTask(tp Type, scheduleTime time.Duration, data interface{}) *Task {
+	taskId, _ := utils.NewTaskId()
+	return &Task{
+		Id:           taskId,
+		Type:         tp,
+		ScheduleTime: scheduleTime,
+		Data:         data,
+	}
+}

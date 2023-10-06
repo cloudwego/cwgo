@@ -20,4 +20,7 @@ package consts
 
 const (
 	ProjectName = "cwgo"
+
+	ServiceNameApi   = ProjectName + "-" + ServerTypeApi
+	ServiceNameAgent = ProjectName + "-" + ServerTypeAgent
 )

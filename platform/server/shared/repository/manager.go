@@ -51,8 +51,8 @@ func (rm *Manager) AddClient(repository *repository.Repository) error {
 	rm.Lock()
 	defer rm.Unlock()
 
-	switch repository.Type {
-	case consts.GitLab:
+	switch repository.RepositoryType {
+	case consts.RepositoryTypeNumGitLab:
 		gitlabClient, err := NewGitlabClient(repository.Token)
 		if err != nil {
 			if utils.IsTokenError(err) {
@@ -68,7 +68,7 @@ func (rm *Manager) AddClient(repository *repository.Repository) error {
 		}
 
 		rm.repositoryClients[repository.Id] = NewGitLabApi(gitlabClient)
-	case consts.Github:
+	case consts.RepositoryTypeNumGithub:
 		githubClient := NewGithubClient(repository.Token)
 
 		rm.repositoryClients[repository.Id] = NewGitHubApi(githubClient)

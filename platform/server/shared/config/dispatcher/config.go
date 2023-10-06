@@ -18,6 +18,25 @@
 
 package dispatcher
 
+import (
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+)
+
 type Config struct {
 	Type string `mapstructure:"type"`
+}
+
+func (c Config) NewDispatcher() dispatcher.IDispatcher {
+	dispatcherType, ok := consts.DispatcherMapToNum[c.Type]
+	if !ok {
+		panic("invalid dispatcher type")
+	}
+
+	switch dispatcherType {
+	case consts.DispatcherTypeNumHash:
+		return dispatcher.NewConsistentHashDispatcher()
+	default:
+		return nil
+	}
 }

@@ -18,11 +18,12 @@ package config
 
 import (
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/api"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/store"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/spf13/viper"
@@ -33,12 +34,12 @@ type Manager struct {
 	ServerMode         consts.ServerMode
 	ServiceId          string
 	Config             Config
-	StoreConfigManager *store.StoreConfigManager
 	ApiConfigManager   *api.ConfigManager
 	AgentConfigManager *agent.ConfigManager
 }
 
 type Config struct {
+	App      app.Config      `mapstructure:"app"`
 	Logger   logger.Config   `mapstructure:"logger"`
 	Registry registry.Config `mapstructure:"registry"`
 	Store    store.Config    `mapstructure:"store"`
@@ -96,12 +97,11 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 	switch serverType {
 	case consts.ServerTypeNumApi:
 		manager = &Manager{
-			ServerType:         serverType,
-			ServerMode:         serverMode,
-			ServiceId:          serviceId,
-			Config:             config,
-			StoreConfigManager: store.NewStoreConfigManager(config.Store),
-			ApiConfigManager:   api.NewConfigManager(config.Api, config.Registry, serviceId),
+			ServerType:       serverType,
+			ServerMode:       serverMode,
+			ServiceId:        serviceId,
+			Config:           config,
+			ApiConfigManager: api.NewConfigManager(config.Api, config.Registry, serviceId),
 		}
 	case consts.ServerTypeNumAgent:
 		manager = &Manager{
@@ -109,7 +109,6 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 			ServerMode:         serverMode,
 			ServiceId:          serviceId,
 			Config:             config,
-			StoreConfigManager: store.NewStoreConfigManager(config.Store),
 			AgentConfigManager: agent.NewConfigManager(config.Agent, config.Registry, serviceId),
 		}
 	}

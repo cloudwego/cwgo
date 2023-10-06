@@ -104,7 +104,7 @@ func run(opts *setupOptions) error {
 	logger.InitLogger()
 
 	// init dao
-	daoManager, err := dao.NewDaoManager()
+	daoManager, err := dao.NewDaoManager(config.GetManager().Config.Store)
 	if err != nil {
 		return err
 	}

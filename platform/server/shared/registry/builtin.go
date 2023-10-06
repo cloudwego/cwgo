@@ -211,7 +211,7 @@ func NewBuiltinRegistryResolver(r *BuiltinRegistry) (discovery.Resolver, error) 
 }
 
 func (r *BuiltinRegistryResolver) Target(_ context.Context, target rpcinfo.EndpointInfo) (description string) {
-	return consts.ProjectName + "-" + consts.ServerTypeAgent
+	return consts.ServiceNameAgent
 }
 
 func (r *BuiltinRegistryResolver) Resolve(_ context.Context, _ string) (discovery.Result, error) {

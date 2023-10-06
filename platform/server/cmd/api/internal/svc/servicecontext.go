@@ -38,7 +38,7 @@ type ServiceContext struct {
 var Svc *ServiceContext
 
 func InitServiceContext() {
-	daoManager, err := dao.NewDaoManager()
+	daoManager, err := dao.NewDaoManager(config.GetManager().Config.Store)
 	if err != nil {
 		logger.Logger.Fatal("initialize dao manager failed", zap.Error(err))
 	}
@@ -51,6 +51,12 @@ func InitServiceContext() {
 		DaoManager:      daoManager,
 		RepoManager:     repoManager,
 		BuiltinRegistry: config.GetManager().ApiConfigManager.RegistryConfigManager.GetRegistry().(*registry.BuiltinRegistry),
-		Manager:         config.GetManager().ApiConfigManager.NewManager(),
+		Manager: manager.NewManager(
+			config.GetManager().Config.App,
+			daoManager,
+			config.GetManager().Config.Api.Dispatcher.NewDispatcher(),
+			config.GetManager().ApiConfigManager.RegistryConfigManager.GetRegistry(),
+			config.GetManager().ApiConfigManager.RegistryConfigManager.GetDiscoveryResolver(),
+		),
 	}
 }

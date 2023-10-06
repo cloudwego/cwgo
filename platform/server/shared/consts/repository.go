@@ -8,6 +8,6 @@ const (
 )
 
 const (
-	GitLab = iota + 1
-	Github
+	RepositoryTypeNumGitLab = iota + 1
+	RepositoryTypeNumGithub
 )

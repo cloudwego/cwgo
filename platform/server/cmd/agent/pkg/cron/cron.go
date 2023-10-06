@@ -17,6 +17,7 @@
 package cron
 
 import (
+	"context"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/task"
 	"github.com/go-co-op/gocron"
@@ -44,11 +45,15 @@ func (c *Cron) AddTask(t *task.Task) {
 	switch t.Type {
 	case task.SyncIdl:
 		_, _ = c.scheduler.Every(t.ScheduleTime).Tag(t.Id).Do(func() {
-
+			_, _ = c.service.SyncIDLsById(context.Background(), &agent.SyncIDLsByIdReq{
+				Ids: []int64{t.Data.(task.SyncIdlData).IdlId},
+			})
 		})
 	case task.SyncRepo:
 		_, _ = c.scheduler.Every(t.ScheduleTime).Tag(t.Id).Do(func() {
-
+			_, _ = c.service.SyncRepositoryById(context.Background(), &agent.SyncRepositoryByIdReq{
+				Ids: []int64{t.Data.(task.SyncRepoData).RepositoryId},
+			})
 		})
 	default:
 

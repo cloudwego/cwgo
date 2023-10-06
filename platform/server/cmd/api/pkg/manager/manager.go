@@ -20,14 +20,18 @@ package manager
 
 import (
 	"context"
+	"fmt"
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent/agentservice"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/service"
+	"github.com/cloudwego/cwgo/platform/server/shared/task"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	"sync"
@@ -35,110 +39,183 @@ import (
 )
 
 type Manager struct {
+	sync.Mutex
+	updateTaskInterval    time.Duration
+	currentUpdateTaskTime time.Time
+	lastUpdateTaskTime    time.Time
+
 	agents []*service.Service
 
-	updateInterval time.Duration
-	dispatcher     dispatcher.IDispatcher
-	registry       registry.IRegistry
-	resolver       discovery.Resolver
+	syncAgentServiceInterval time.Duration
+	syncRepositoryInterval   time.Duration
+	syncIdlInterval          time.Duration
+
+	daoManager *dao.Manager
+	dispatcher dispatcher.IDispatcher
+	registry   registry.IRegistry
+	resolver   discovery.Resolver
 }
 
-const (
-	DefaultUpdateInterval = time.Second * 3
-)
+func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatcher.IDispatcher, registry registry.IRegistry, resolver discovery.Resolver) *Manager {
+	manager := &Manager{
+		Mutex:                 sync.Mutex{},
+		updateTaskInterval:    3 * time.Second,
+		currentUpdateTaskTime: time.Time{},
+		lastUpdateTaskTime:    time.Now(),
 
-func NewManager(dispatcher dispatcher.IDispatcher, registry registry.IRegistry, resolver discovery.Resolver, updateInterval time.Duration) *Manager {
-	// TODO: init dispatcher tasks
+		agents: make([]*service.Service, 0),
 
-	return &Manager{
-		agents:         make([]*service.Service, 0),
-		updateInterval: updateInterval,
-		dispatcher:     dispatcher,
-		registry:       registry,
-		resolver:       resolver,
+		syncAgentServiceInterval: appConf.GetSyncAgentServiceInterval(),
+		syncRepositoryInterval:   appConf.GetSyncRepositoryInterval(),
+		syncIdlInterval:          appConf.GetSyncIdlInterval(),
+
+		daoManager: daoManager,
+		dispatcher: dispatcher,
+		registry:   registry,
+		resolver:   resolver,
 	}
+
+	repos, err := daoManager.Repository.GetAllRepositories()
+	if err != nil {
+		panic(fmt.Sprintf("get all repositories failed, err: %v", err))
+	}
+
+	for _, repo := range repos {
+		err = manager.AddTask(task.NewTask(
+			task.SyncRepo,
+			manager.syncRepositoryInterval,
+			task.SyncRepoData{
+				RepositoryId: repo.Id,
+			},
+		))
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	go manager.StartUpdate()
+
+	return manager
+}
+
+func (m *Manager) AddTask(t *task.Task) error {
+	err := m.dispatcher.AddTask(t)
+	if err != nil {
+		return fmt.Errorf("add task to dispatcher failed, err: %v", err)
+	}
+
+	m.Lock()
+	m.currentUpdateTaskTime = time.Now()
+	m.Unlock()
+
+	return nil
+}
+
+func (m *Manager) UpdateAgentTasks() {
+	var wg sync.WaitGroup
+	for _, svr := range m.agents {
+		wg.Add(1)
+		go func(serviceId string) {
+			defer wg.Done()
+
+			c, _ := agentservice.NewClient(
+				consts.ServiceNameAgent,
+				client.WithResolver(m.resolver),
+				client.WithTag("service_id", serviceId),
+			)
+
+			tasks := m.dispatcher.GetTaskByServiceId(serviceId)
+
+			tasksModels := make([]*base.Task, len(tasks))
+			for i, t := range tasks {
+				data, _ := sonic.MarshalString(t.Data)
+				tasksModels[i] = &base.Task{
+					Id:           t.Id,
+					Type:         int32(t.Type),
+					ScheduleTime: t.ScheduleTime.String(),
+					Data:         data,
+				}
+			}
+
+			_, _ = c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasksModels})
+		}(svr.Id)
+	}
+	wg.Wait()
 }
 
 func (m *Manager) StartUpdate() {
-	for {
-		time.Sleep(m.updateInterval)
+	go func() {
+		for {
+			time.Sleep(m.syncAgentServiceInterval)
+			m.SyncService()
+		}
+	}()
 
-		services, err := m.registry.GetAllService()
+	go func() {
+		for {
+			time.Sleep(100 * time.Millisecond)
+
+			m.Lock()
+			if m.lastUpdateTaskTime != m.currentUpdateTaskTime {
+				if m.lastUpdateTaskTime.Add(m.updateTaskInterval).After(m.currentUpdateTaskTime) {
+					m.UpdateAgentTasks()
+					m.lastUpdateTaskTime = m.currentUpdateTaskTime
+				}
+			}
+			m.Unlock()
+		}
+	}()
+
+}
+
+func (m *Manager) SyncService() {
+	services, err := m.registry.GetAllService()
+	if err != nil {
+		return
+	}
+
+	seta := make(map[string]struct{})
+	setb := make(map[string]struct{})
+	var addServiceIds, delServicesIds []string
+
+	for _, svr := range m.agents {
+		seta[svr.Id] = struct{}{}
+	}
+	for _, svr := range services {
+		setb[svr.Id] = struct{}{}
+	}
+
+	for serviceId := range seta {
+		if _, ok := setb[serviceId]; !ok {
+			delServicesIds = append(delServicesIds, serviceId)
+		}
+	}
+
+	for serviceId := range setb {
+		if _, ok := seta[serviceId]; !ok {
+			addServiceIds = append(addServiceIds, serviceId)
+		}
+	}
+
+	for _, serviceId := range addServiceIds {
+		err = m.dispatcher.AddService(serviceId)
 		if err != nil {
 			continue
 		}
+	}
 
-		seta := make(map[string]struct{})
-		setb := make(map[string]struct{})
-		var addServiceIds, delServicesIds []string
-
-		for _, svr := range m.agents {
-			seta[svr.Id] = struct{}{}
+	for _, serviceId := range delServicesIds {
+		err = m.dispatcher.DelService(serviceId)
+		if err != nil {
+			continue
 		}
-		for _, svr := range services {
-			setb[svr.Id] = struct{}{}
-		}
+	}
 
-		for serviceId := range seta {
-			if _, ok := setb[serviceId]; !ok {
-				delServicesIds = append(delServicesIds, serviceId)
-			}
-		}
+	m.agents = services
 
-		for serviceId := range setb {
-			if _, ok := seta[serviceId]; !ok {
-				addServiceIds = append(addServiceIds, serviceId)
-			}
-		}
-
-		for _, serviceId := range addServiceIds {
-			err = m.dispatcher.AddService(serviceId)
-			if err != nil {
-				continue
-			}
-		}
-
-		for _, serviceId := range delServicesIds {
-			err = m.dispatcher.DelService(serviceId)
-			if err != nil {
-				continue
-			}
-		}
-
-		m.agents = services
-
-		if len(addServiceIds) != 0 || len(delServicesIds) != 0 {
-			// service changed, update cron
-			var wg sync.WaitGroup
-			for _, svr := range m.agents {
-				wg.Add(1)
-				go func(serviceId string) {
-					defer wg.Done()
-
-					c, _ := agentservice.NewClient(
-						consts.ProjectName+"-"+consts.ServerTypeAgent,
-						client.WithResolver(m.resolver),
-						client.WithTag("service_id", serviceId),
-					)
-
-					tasks := m.dispatcher.GetTaskByServiceId(serviceId)
-
-					tasksModels := make([]*base.Task, len(tasks))
-					for i, t := range tasks {
-						data, _ := sonic.MarshalString(t.Data)
-						tasksModels[i] = &base.Task{
-							Id:           t.Id,
-							Type:         int32(t.Type),
-							ScheduleTime: t.ScheduleTime.String(),
-							Data:         data,
-						}
-					}
-
-					_, _ = c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasksModels})
-				}(svr.Id)
-			}
-			wg.Wait()
-		}
+	if len(addServiceIds) != 0 || len(delServicesIds) != 0 {
+		// service changed, update cron
+		m.UpdateAgentTasks()
 	}
 }
 

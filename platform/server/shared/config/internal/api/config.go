@@ -18,7 +18,9 @@
 
 package api
 
-import "github.com/cloudwego/cwgo/platform/server/shared/config/internal/dispatcher"
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/config/dispatcher"
+)
 
 type Config struct {
 	Host           string                `mapstructure:"host"`

@@ -68,7 +68,7 @@ func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int32, error) {
 		return 0, result.Error
 	}
 
-	return repo.RepoType, nil
+	return repo.RepositoryType, nil
 }
 
 func (r *MysqlRepositoryManager) GetRepository(id int64) (*repository.Repository, error) {
@@ -114,7 +114,7 @@ func (r *MysqlRepositoryManager) AddRepository(repoURL, token, status string, re
 		RepositoryUrl:  repoURL,
 		Token:          token,
 		Status:         status,
-		RepoType:       repoType,
+		RepositoryType: repoType,
 		LastUpdateTime: "0",
 		LastSyncTime:   timeNow,
 		CreateTime:     timeNow,

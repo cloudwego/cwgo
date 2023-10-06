@@ -2,8 +2,8 @@ namespace go repository
 
 struct Repository{
     1: i64 id
-    2: string repository_url
-    3: i32 type
+    2: i32 repository_type
+    3: string repository_url
     4: string token
     5: string status
     6: string last_update_time
@@ -11,7 +11,6 @@ struct Repository{
     8: bool is_deleted
     9: string create_time
     10: string update_time
-    11: i32 repo_type
 }
 
 struct AddRepositoryReq{

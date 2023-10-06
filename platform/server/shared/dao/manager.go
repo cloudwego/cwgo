@@ -20,11 +20,11 @@ package dao
 
 import (
 	"fmt"
-	"github.com/cloudwego/cwgo/platform/server/shared/config"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/dao/idl"
-	"github.com/cloudwego/cwgo/platform/server/shared/dao/repository"
-	"github.com/cloudwego/cwgo/platform/server/shared/dao/template"
+	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/idl"
+	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/repository"
+	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/template"
 )
 
 type Manager struct {
@@ -33,10 +33,10 @@ type Manager struct {
 	Template   template.ITemplateDaoManager
 }
 
-func NewDaoManager() (*Manager, error) {
-	switch config.GetManager().StoreConfigManager.GetStoreType() {
+func NewDaoManager(conf store.Config) (*Manager, error) {
+	switch conf.GetStoreType() {
 	case consts.StoreTypeNumMysql:
-		mysqlDb, err := config.GetManager().StoreConfigManager.NewMysqlDb()
+		mysqlDb, err := conf.NewMysqlDB()
 		if err != nil {
 			return nil, err
 		}

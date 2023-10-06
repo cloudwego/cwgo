@@ -18,13 +18,28 @@
 
 package store
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
 
 type Config struct {
 	Type  string `mapstructure:"type"`
 	Mysql Mysql  `mapstructure:"mysql"`
 	Mongo Mongo  `mapstructure:"mongo"`
 	Redis Redis  `mapstructure:"redis"`
+}
+
+func (c Config) GetStoreType() consts.StoreType {
+	return consts.StoreTypeMapToNum[c.Type]
+}
+
+func (c Config) NewMysqlDB() (*gorm.DB, error) {
+	return gorm.Open(mysql.Open(c.Mysql.GetDsn()), &gorm.Config{
+		PrepareStmt: true,
+	})
 }
 
 type Mysql struct {

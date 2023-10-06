@@ -37,7 +37,7 @@ func ValidStatus(status string) bool {
 }
 
 func ValidRepoType(_type int32) bool {
-	if _type != consts.GitLab && _type != consts.Github {
+	if _type != consts.RepositoryTypeNumGitLab && _type != consts.RepositoryTypeNumGithub {
 		return false
 	}
 

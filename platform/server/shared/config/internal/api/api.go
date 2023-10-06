@@ -21,8 +21,6 @@ package api
 import (
 	"fmt"
 	"github.com/bytedance/gopkg/util/gopool"
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/manager"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/dispatcher"
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -93,19 +91,4 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, servi
 		ServiceId:             serviceId,
 		ServiceName:           fmt.Sprintf("%s-%s-%s", "cwgo", consts.ServerTypeAgent, serviceId),
 	}
-}
-
-func (cm *ConfigManager) NewManager() *manager.Manager {
-	var updateInterval time.Duration
-	var err error
-	if cm.config.UpdateInterval != "" {
-		updateInterval, err = time.ParseDuration(cm.config.UpdateInterval)
-		if err != nil {
-			panic(fmt.Errorf("invalid update interval, err: %v", err))
-		}
-	} else {
-		updateInterval = manager.DefaultUpdateInterval
-	}
-
-	return manager.NewManager(dispatcher.NewDispatcher(cm.config.Dispatcher), cm.RegistryConfigManager.GetRegistry(), cm.RegistryConfigManager.GetDiscoveryResolver(), updateInterval)
 }
