@@ -20,8 +20,8 @@ package template
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
@@ -49,7 +49,7 @@ func (l *UpdateTemplateLogic) UpdateTemplate(req *template.UpdateTemplateReq) (r
 		}
 	}
 
-	err := l.svcCtx.DaoManager.Template.UpdateTemplate(req.Id, req.Name)
+	err := l.svcCtx.DaoManager.Template.UpdateTemplate(req.ID, req.Name)
 	if err != nil {
 		return &template.UpdateTemplateRes{
 			Code: 400,

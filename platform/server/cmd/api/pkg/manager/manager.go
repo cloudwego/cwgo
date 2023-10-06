@@ -29,11 +29,13 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent/agentservice"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/service"
 	"github.com/cloudwego/cwgo/platform/server/shared/task"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/discovery"
+	"go.uber.org/zap"
 	"sync"
 	"time"
 )
@@ -81,13 +83,14 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 	}
 
 	for _, repo := range repos {
-		err = manager.AddTask(task.NewTask(
-			task.SyncRepo,
-			manager.syncRepositoryInterval,
-			task.SyncRepoData{
-				RepositoryId: repo.Id,
-			},
-		))
+		err = manager.AddTask(
+			task.NewTask(
+				task.SyncRepo,
+				manager.syncRepositoryInterval,
+				task.SyncRepoData{
+					RepositoryId: repo.Id,
+				},
+			))
 		if err != nil {
 			panic(err)
 		}
@@ -118,11 +121,15 @@ func (m *Manager) UpdateAgentTasks() {
 		go func(serviceId string) {
 			defer wg.Done()
 
-			c, _ := agentservice.NewClient(
+			c, err := agentservice.NewClient(
 				consts.ServiceNameAgent,
 				client.WithResolver(m.resolver),
 				client.WithTag("service_id", serviceId),
 			)
+			if err != nil {
+				logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+				return
+			}
 
 			tasks := m.dispatcher.GetTaskByServiceId(serviceId)
 
@@ -137,7 +144,12 @@ func (m *Manager) UpdateAgentTasks() {
 				}
 			}
 
-			_, _ = c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasksModels})
+			rpcRes, err := c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasksModels})
+			if err != nil {
+				logger.Logger.Error("update tasks to rpc client failed", zap.Error(err))
+			} else if rpcRes.Code != 0 {
+				logger.Logger.Error("update tasks failed", zap.String("err", rpcRes.Msg))
+			}
 		}(svr.Id)
 	}
 	wg.Wait()
@@ -157,7 +169,7 @@ func (m *Manager) StartUpdate() {
 
 			m.Lock()
 			if m.lastUpdateTaskTime != m.currentUpdateTaskTime {
-				if m.lastUpdateTaskTime.Add(m.updateTaskInterval).After(m.currentUpdateTaskTime) {
+				if m.currentUpdateTaskTime.Add(m.updateTaskInterval).After(time.Now()) {
 					m.UpdateAgentTasks()
 					m.lastUpdateTaskTime = m.currentUpdateTaskTime
 				}
@@ -165,7 +177,6 @@ func (m *Manager) StartUpdate() {
 			m.Unlock()
 		}
 	}()
-
 }
 
 func (m *Manager) SyncService() {

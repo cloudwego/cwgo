@@ -47,14 +47,14 @@ func (s *UpdateRepositoryStatusService) Run(req *agent.UpdateRepositoryStatusReq
 		return resp, err
 	}
 
-	if req.Status == consts.Active {
+	if req.Status == consts.RepositoryStatusActive {
 		err = s.svcCtx.RepoManager.AddClient(repo)
 		if err != nil {
 			resp.Code = 400
 			resp.Msg = err.Error()
 			return resp, err
 		}
-	} else if req.Status == consts.DisActive {
+	} else if req.Status == consts.RepositoryStatusDisactive {
 		s.svcCtx.RepoManager.DelClient(repo)
 	}
 

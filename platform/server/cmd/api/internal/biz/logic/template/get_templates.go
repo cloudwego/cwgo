@@ -20,8 +20,8 @@ package template
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
 )
 
 const (
@@ -50,9 +50,21 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 		}
 	}
 
+	templateRes := make([]*template.Template, len(templates))
+	for i, templa := range templates {
+		templateRes[i] = &template.Template{
+			ID:         templa.Id,
+			Name:       templa.Name,
+			Type:       templa.Type,
+			IsDeleted:  templa.IsDeleted,
+			CreateTime: templa.CreateTime,
+			UpdateTime: templa.UpdateTime,
+		}
+	}
+
 	return &template.GetTemplatesRes{
 		Code: 0,
 		Msg:  successMsgGetTemplates,
-		Data: &template.GetTemplatesResData{Templates: templates},
+		Data: &template.GetTemplatesResData{Templates: templateRes},
 	}
 }

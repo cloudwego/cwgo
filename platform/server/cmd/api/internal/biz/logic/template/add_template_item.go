@@ -20,8 +20,8 @@ package template
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
@@ -48,7 +48,7 @@ func (l *AddTemplateItemLogic) AddTemplateItem(req *template.AddTemplateItemReq)
 			Msg:  "err: The input field contains an empty string",
 		}
 	}
-	err := l.svcCtx.DaoManager.Template.AddTemplateItem(req.TemplateId, req.Name, req.Content)
+	err := l.svcCtx.DaoManager.Template.AddTemplateItem(req.TemplateID, req.Name, req.Content)
 	if err != nil {
 		return &template.AddTemplateItemRes{
 			Code: 400,

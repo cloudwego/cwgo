@@ -1,7 +1,7 @@
 namespace go registry
 
 struct RegisterReq{
-    1: string service_id (api.form="service_id,required")
+    1: string service_id (api.query="service_id,required")
 }
 struct RegisterRes{
     1: i32 code
@@ -9,7 +9,7 @@ struct RegisterRes{
 }
 
 struct DeregisterReq{
-    1: string service_id (api.form="service_id,required")
+    1: string service_id (api.query="service_id,required")
 }
 struct DeRegisterRes{
     1: i32 code
@@ -17,7 +17,7 @@ struct DeRegisterRes{
 }
 
 struct UpdateReq{
-    1: string service_id (api.form="service_id,required")
+    1: string service_id (api.query="service_id,required")
 }
 struct UpdateRes{
     1: i32 code

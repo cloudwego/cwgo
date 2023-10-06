@@ -20,8 +20,8 @@ package idl
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
@@ -49,7 +49,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 		}
 	}
 
-	err := l.svcCtx.DaoManager.Idl.UpdateIDL(req.Id, req.RepositoryId, req.MainIdlPath, req.ServiceName)
+	err := l.svcCtx.DaoManager.Idl.UpdateIDL(req.ID, req.RepositoryID, req.MainIdlPath, req.ServiceName)
 	if err != nil {
 		return &idl.UpdateIDLRes{
 			Code: 400,

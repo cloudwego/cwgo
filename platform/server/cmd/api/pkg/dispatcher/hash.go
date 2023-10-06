@@ -60,7 +60,10 @@ func NewConsistentHashDispatcher() *ConsistentHashDispatcher {
 	)
 
 	return &ConsistentHashDispatcher{
-		hasher: consistentHasher,
+		mutex:            sync.Mutex{},
+		hasher:           consistentHasher,
+		Tasks:            make(map[string]*task.Task),
+		ServiceWithTasks: make(map[string]map[string]*task.Task),
 	}
 }
 
@@ -76,6 +79,11 @@ func (c *ConsistentHashDispatcher) AddService(serviceId string) error {
 
 	for taskId, t := range c.Tasks {
 		m := c.hasher.LocateKey([]byte(taskId)).String()
+		_, ok := serviceWithTasks[m]
+		if !ok {
+			serviceWithTasks[m] = make(map[string]*task.Task)
+		}
+
 		serviceWithTasks[m][taskId] = t
 	}
 	c.ServiceWithTasks = serviceWithTasks
@@ -108,8 +116,10 @@ func (c *ConsistentHashDispatcher) AddTask(task *task.Task) error {
 	defer c.mutex.Unlock()
 
 	c.Tasks[task.Id] = task
-	m := c.hasher.LocateKey([]byte(task.Id)).String()
-	c.ServiceWithTasks[m][task.Id] = task
+	m := c.hasher.LocateKey([]byte(task.Id))
+	if m != nil {
+		c.ServiceWithTasks[m.String()][task.Id] = task
+	}
 
 	return nil
 }
@@ -119,14 +129,16 @@ func (c *ConsistentHashDispatcher) RemoveTask(taskId string) error {
 	defer c.mutex.Unlock()
 
 	delete(c.Tasks, taskId)
-	m := c.hasher.LocateKey([]byte(taskId)).String()
-	delete(c.ServiceWithTasks[m], taskId)
+	m := c.hasher.LocateKey([]byte(taskId))
+	if m != nil {
+		delete(c.ServiceWithTasks[m.String()], taskId)
+	}
 
 	return nil
 }
 
 func (c *ConsistentHashDispatcher) GetTaskByServiceId(serviceId string) []*task.Task {
-	tasks := make([]*task.Task, len(c.ServiceWithTasks[serviceId]))
+	tasks := make([]*task.Task, 0, len(c.ServiceWithTasks[serviceId]))
 
 	for _, t := range c.ServiceWithTasks[serviceId] {
 		tasks = append(tasks, t)

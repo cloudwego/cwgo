@@ -29,7 +29,7 @@ func ValidOrderBy(orderBy string) bool {
 }
 
 func ValidStatus(status string) bool {
-	if status != consts.Active && status != consts.DisActive {
+	if status != consts.RepositoryStatusActive && status != consts.RepositoryStatusDisactive {
 		return false
 	}
 

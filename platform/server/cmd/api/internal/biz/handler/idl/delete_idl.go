@@ -21,9 +21,9 @@ package idl
 import (
 	"context"
 	idllogic "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/logic/idl"
+	idlmodel "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/model/response"
-	idlmodel "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertzconsts "github.com/cloudwego/hertz/pkg/protocol/consts"

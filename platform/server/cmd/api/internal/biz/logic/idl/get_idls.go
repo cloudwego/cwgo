@@ -20,8 +20,8 @@ package idl
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
@@ -58,9 +58,25 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 		}
 	}
 
+	idlRes := make([]*idl.IDL, len(idls))
+
+	for i, id := range idls {
+		idlRes[i] = &idl.IDL{
+			ID:           id.Id,
+			RepositoryID: id.RepositoryId,
+			MainIdlPath:  id.MainIdlPath,
+			Content:      id.Content,
+			ServiceName:  id.ServiceName,
+			LastSyncTime: id.LastSyncTime,
+			IsDeleted:    id.IsDeleted,
+			CreateTime:   id.CreateTime,
+			UpdateTime:   id.UpdateTime,
+		}
+	}
+
 	return &idl.GetIDLsRes{
 		Code: 0,
 		Msg:  successMsgGetIDLs,
-		Data: &idl.GetIDLsResData{Idls: idls},
+		Data: &idl.GetIDLsResData{Idls: idlRes},
 	}
 }

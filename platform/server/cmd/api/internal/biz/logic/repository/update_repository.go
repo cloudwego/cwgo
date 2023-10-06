@@ -20,8 +20,8 @@ package repository
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
@@ -42,14 +42,14 @@ func NewUpdateRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *UpdateRepositoryLogic) UpdateRepository(req *repository.UpdateRepositoryReq) (res *repository.UpdateRepositoryRes) {
-	if !utils.ValidStrings(req.Id, req.Token, req.Status) {
+	if !utils.ValidStrings(req.ID, req.Token, req.Status) {
 		return &repository.UpdateRepositoryRes{
 			Code: 400,
 			Msg:  "err: The input field contains an empty string",
 		}
 	}
 
-	err := l.svcCtx.DaoManager.Repository.UpdateRepository(req.Id, req.Token, req.Status)
+	err := l.svcCtx.DaoManager.Repository.UpdateRepository(req.ID, req.Token, req.Status)
 	if err != nil {
 		return &repository.UpdateRepositoryRes{
 			Code: 400,

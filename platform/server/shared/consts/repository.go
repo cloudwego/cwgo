@@ -1,13 +1,17 @@
 package consts
 
 const (
-	MainRef      = "main"
-	Active       = "active"
-	DisActive    = "disactive"
+	MainRef = "main"
+
 	InvalidToken = "invalid_token"
 )
 
 const (
 	RepositoryTypeNumGitLab = iota + 1
 	RepositoryTypeNumGithub
+)
+
+const (
+	RepositoryStatusActive    = "active"
+	RepositoryStatusDisactive = "disactive"
 )

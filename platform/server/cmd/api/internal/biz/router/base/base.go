@@ -1,19 +1,19 @@
 /*
- *
- *  * Copyright 2022 CloudWeGo Authors
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
- *
+*
+*  * Copyright 2022 CloudWeGo Authors
+*  *
+*  * Licensed under the Apache License, Version 2.0 (the "License");
+*  * you may not use this file except in compliance with the License.
+*  * You may obtain a copy of the License at
+*  *
+*  *     http://www.apache.org/licenses/LICENSE-2.0
+*  *
+*  * Unless required by applicable law or agreed to in writing, software
+*  * distributed under the License is distributed on an "AS IS" BASIS,
+*  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*  * See the License for the specific language governing permissions and
+*  * limitations under the License.
+*
  */
 
 package base
@@ -21,7 +21,7 @@ package base
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler/base"
+	base "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler/base"
 )
 
 /*
@@ -35,5 +35,6 @@ func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
 	root.POST("/login", append(_loginMw(), base.Login)...)
+	root.GET("/ping", append(_pingMw(), base.Ping)...)
 	root.POST("/register", append(_registerMw(), base.Register)...)
 }

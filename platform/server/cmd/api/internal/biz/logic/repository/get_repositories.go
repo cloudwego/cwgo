@@ -20,8 +20,8 @@ package repository
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/repository"
 )
 
 const (
@@ -50,9 +50,25 @@ func (l *GetRepositoriesLogic) GetRepositories(req *repository.GetRepositoriesRe
 		}
 	}
 
+	repoRes := make([]*repository.Repository, len(repos))
+	for i, repo := range repos {
+		repoRes[i] = &repository.Repository{
+			ID:             repo.Id,
+			RepositoryType: repo.RepositoryType,
+			RepositoryURL:  repo.RepositoryUrl,
+			Token:          repo.Token,
+			Status:         repo.Status,
+			LastUpdateTime: repo.LastUpdateTime,
+			LastSyncTime:   repo.LastSyncTime,
+			IsDeleted:      repo.IsDeleted,
+			CreateTime:     repo.CreateTime,
+			UpdateTime:     repo.UpdateTime,
+		}
+	}
+
 	return &repository.GetRepositoriesRes{
 		Code: 0,
 		Msg:  successMsgGetRepositories,
-		Data: &repository.GetRepositoriesResData{Repositories: repos},
+		Data: &repository.GetRepositoriesResData{Repositories: repoRes},
 	}
 }
