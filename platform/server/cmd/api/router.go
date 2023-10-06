@@ -19,13 +19,9 @@
 package api
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
-	r.GET("/ping", handler.Ping)
-
-	// your code ...
 }
