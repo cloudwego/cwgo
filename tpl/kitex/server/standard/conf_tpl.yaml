@@ -7,17 +7,16 @@ body: |-
   import (
     "bytes"
     "io/ioutil"
-  	"os"
+    "os"
     "os/exec"
-  	"path/filepath"
-  	"sync"
-
-  	"gopkg.in/validator.v2"
-  	"gopkg.in/yaml.v2"
+    "path/filepath"
+    "sync"
 
     "github.com/bytedance/sonic"
-  	"github.com/cloudwego/kitex/pkg/klog"
-  	"github.com/kr/pretty"
+    "github.com/cloudwego/kitex/pkg/klog"
+    "github.com/kr/pretty"
+    "gopkg.in/validator.v2"
+    "gopkg.in/yaml.v2"
   )
 
   var (
