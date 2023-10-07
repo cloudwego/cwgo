@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/google/go-github/v53/github"
 	"io/ioutil"
 	"net/http"
@@ -168,4 +169,23 @@ func (a *GitHubApi) GetLatestCommitHash(owner, repoName, filePath, ref string) (
 	}
 
 	return *fileContent.SHA, nil
+}
+
+func (a *GitHubApi) DeleteDirs(owner, repoName string, folderPaths ...string) error {
+
+	for _, folderPath := range folderPaths {
+		filePath := fmt.Sprintf("%s/%s", folderPath, ".gitkeep")
+
+		commitOpts := &github.RepositoryContentFileOptions{
+			Message: github.String(fmt.Sprintf("Delete folder %s", folderPath)),
+			Branch:  github.String("main"), // 设置要删除的文件夹所在的分支
+		}
+
+		_, _, err := a.client.Repositories.DeleteFile(context.Background(), owner, repoName, filePath, commitOpts)
+		if err != nil && !utils.IsFileNotFoundError(err) {
+			return err
+		}
+	}
+
+	return nil
 }

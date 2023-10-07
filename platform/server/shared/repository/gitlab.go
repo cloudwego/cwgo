@@ -20,6 +20,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/xanzy/go-gitlab"
 	"regexp"
 	"strings"
@@ -127,4 +128,21 @@ func (a *GitLabApi) GetLatestCommitHash(owner, repoName, filePath, ref string) (
 		return "", err
 	}
 	return fileContent.LastCommitID, nil
+}
+
+func (a *GitLabApi) DeleteDirs(owner, repoName string, folderPaths ...string) error {
+	pid := fmt.Sprintf("%s/%s", owner, repoName)
+	for _, folderPath := range folderPaths {
+		_, err := a.client.RepositoryFiles.DeleteFile(pid, folderPath, &gitlab.DeleteFileOptions{
+			Branch:        gitlab.String("main"),             // 设置要删除的文件夹所在的分支
+			AuthorEmail:   gitlab.String("test@example.com"), // 替换为您的邮箱
+			AuthorName:    gitlab.String("test"),             // 替换为您的名称
+			CommitMessage: gitlab.String(fmt.Sprintf("Delete folder %s", folderPath)),
+		})
+		if err != nil && !utils.IsFileNotFoundError(err) {
+			return err
+		}
+	}
+
+	return nil
 }

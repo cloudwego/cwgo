@@ -30,6 +30,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -111,6 +112,14 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 
 	// Create a thrift file in a temporary folder
 	filePathOnDisk := fmt.Sprintf("%s/%s", tempDir, idlFile.Name)
+	dir := filepath.Dir(filePathOnDisk)
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		return &agent.GenerateCodeRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
+	}
+
 	if err := ioutil.WriteFile(filePathOnDisk, idlFile.Content, 0644); err != nil {
 		logger.Logger.Error("write file failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
