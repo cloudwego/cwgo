@@ -41,7 +41,6 @@ import (
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/generator"
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"
-	"github.com/cloudwego/kitex/tool/internal_pkg/util"
 )
 
 func convertKitexArgs(sa *config.ServerArgument, kitexArgument *kargs.Arguments) (err error) {
@@ -126,7 +125,7 @@ Flags:
 }
 
 func checkKitexArgs(a *kargs.Arguments) (err error) {
-	// check IDL`
+	// check IDL
 	a.IDLType, err = utils.GetIdlType(a.IDL, consts.Protobuf)
 	if err != nil {
 		return err
@@ -140,14 +139,15 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 		}
 	}
 
-	// check path
-	pathToGo, err := exec.LookPath("go")
+	gopath, err := utils.GetGOPATH()
 	if err != nil {
-		log.Warn(err)
-		os.Exit(1)
+		return fmt.Errorf("get gopath failed: %s", err)
+	}
+	if gopath == "" {
+		return fmt.Errorf("GOPATH is not set")
 	}
 
-	gosrc := filepath.Join(util.GetGOPATH(), "src")
+	gosrc := filepath.Join(gopath, "src")
 	gosrc, err = filepath.Abs(gosrc)
 	if err != nil {
 		log.Warn("Get GOPATH/src path failed:", err.Error())
@@ -173,7 +173,7 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 	}
 
 	if a.ModuleName != "" {
-		module, p, ok := util.SearchGoMod(curpath)
+		module, p, ok := utils.SearchGoMod(curpath, true)
 		if ok {
 			// go.mod exists
 			if module != a.ModuleName {
@@ -187,7 +187,7 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 			}
 			a.PackagePrefix = filepath.Join(a.ModuleName, a.PackagePrefix, generator.KitexGenPath)
 		} else {
-			if err = initGoMod(pathToGo, a.ModuleName); err != nil {
+			if err = utils.InitGoMod(a.ModuleName); err != nil {
 				log.Warn("Init go mod failed:", err.Error())
 				os.Exit(1)
 			}
@@ -200,21 +200,6 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 	}
 	a.OutputPath = curpath
 	return nil
-}
-
-func initGoMod(pathToGo, module string) error {
-	if util.Exists("go.mod") {
-		return nil
-	}
-
-	cmd := &exec.Cmd{
-		Path:   pathToGo,
-		Args:   []string{"go", "mod", "init", module},
-		Stdin:  os.Stdin,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-	}
-	return cmd.Run()
 }
 
 func replaceThriftVersion(args *kargs.Arguments) {
@@ -341,9 +326,12 @@ var hertzEngine *route.Engine
 func init() {
 	hertzEngine = initHertz()
 }
-
 `
-	if util.Exists("hex_trans_handler.go") {
+	exist, err := utils.PathExist("hex_trans_handler.go")
+	if err != nil {
+		return err
+	}
+	if exist {
 		return nil
 	}
 	tmpl := template.Must(template.New("hex_trans_handler").Parse(tmplContent))

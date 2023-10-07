@@ -26,7 +26,6 @@ import (
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/hertz/cmd/hz/util"
 )
 
 func check(sa *config.ServerArgument) error {
@@ -60,7 +59,7 @@ func check(sa *config.ServerArgument) error {
 		sa.OutDir = ap
 	}
 
-	gopath, err := util.GetGOPATH()
+	gopath, err := utils.GetGOPATH()
 	if err != nil {
 		return fmt.Errorf("get gopath failed: %s", err)
 	}
