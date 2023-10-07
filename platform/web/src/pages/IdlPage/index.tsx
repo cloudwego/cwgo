@@ -29,14 +29,6 @@ const columns = [
 		}
 	},
 	{
-		title: "IDL 仓库",
-		dataIndex: "url",
-		width: "15rem",
-		render: (value: string) => {
-			return <a href="#">{value}</a>;
-		}
-	},
-	{
 		title: "主 IDL 文件路径",
 		dataIndex: "main_idl_path",
 		width: "15rem",
@@ -45,9 +37,25 @@ const columns = [
 		}
 	},
 	{
+		title: "创建时间",
+		dataIndex: "create_time",
+		width: "12.5rem",
+		render: (value: string) => {
+			return <div>{value}</div>;
+		}
+	},
+	{
+		title: "更新时间",
+		dataIndex: "update_time",
+		width: "12.5rem",
+		render: (value: string) => {
+			return <div>{value}</div>;
+		}
+	},
+	{
 		title: "最近一次同步时间",
 		dataIndex: "last_sync_time",
-		width: "20rem",
+		width: "10rem",
 		render: (value: string) => {
 			return <div>{value}</div>;
 		}
@@ -55,7 +63,7 @@ const columns = [
 	{
 		title: "状态",
 		dataIndex: "status",
-		width: "10rem",
+		width: "5rem",
 		render: (value: string) => {
 			return value ? (
 				<Tag color="green" size="large">

@@ -40,7 +40,7 @@ const columns = [
 	{
 		title: "IDL 变动检测时间",
 		dataIndex: "last_sync_time",
-		width: 200,
+		width: 150,
 		render: (value: string) => {
 			return <div>{value}</div>;
 		}

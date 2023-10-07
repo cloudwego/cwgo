@@ -7,38 +7,30 @@ export default function AllInfoBox({ type }: { type: "idl" | "repo" }) {
 		data = [
 			{
 				title: "recorded_psm_count",
-				value: "1000"
-			},
-			{
-				title: "normal_psm_count",
-				value: "1000"
+				value: "5"
 			},
 			{
 				title: "psm_list_last_full_sync_time",
-				value: "2021-08-01 00:00:00"
+				value: "2 秒前"
 			},
 			{
 				title: "idl_file_path_last_full_sync_time",
-				value: "2021-08-01 00:00:00"
+				value: "2 秒前"
 			},
 			{
 				title: "idl_info_last_full_sync_time",
-				value: "2021-08-01 00:00:00"
+				value: "2 秒前"
 			}
 		];
 	} else {
 		data = [
 			{
 				title: "recorded_repository_count",
-				value: "1000"
-			},
-			{
-				title: "normal_repository_count",
-				value: "1000"
+				value: "7"
 			},
 			{
 				title: "repository_last_full_sync_time",
-				value: "2021-08-01 00:00:00"
+				value: "2秒前"
 			},
 			{
 				title: "whether_to_stop_updating",
