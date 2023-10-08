@@ -19,6 +19,7 @@ package config
 import (
 	"strings"
 
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/urfave/cli/v2"
 )
 
@@ -44,10 +45,10 @@ func NewClientArgument() *ClientArgument {
 }
 
 func (c *ClientArgument) ParseCli(ctx *cli.Context) error {
-	c.Type = strings.ToUpper(ctx.String(ServiceType))
-	c.Registry = strings.ToUpper(ctx.String(Registry))
-	c.Verbose = ctx.Bool(Verbose)
-	c.SliceParam.ProtoSearchPath = ctx.StringSlice(ProtoSearchPath)
-	c.SliceParam.Pass = ctx.StringSlice(Pass)
+	c.Type = strings.ToUpper(ctx.String(consts.ServiceType))
+	c.Registry = strings.ToUpper(ctx.String(consts.Registry))
+	c.Verbose = ctx.Bool(consts.Verbose)
+	c.SliceParam.ProtoSearchPath = ctx.StringSlice(consts.ProtoSearchPath)
+	c.SliceParam.Pass = ctx.StringSlice(consts.Pass)
 	return nil
 }

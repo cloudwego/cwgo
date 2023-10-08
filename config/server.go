@@ -19,6 +19,7 @@ package config
 import (
 	"strings"
 
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/urfave/cli/v2"
 )
 
@@ -54,20 +55,20 @@ func NewServerArgument() *ServerArgument {
 }
 
 func (s *ServerArgument) ParseCli(ctx *cli.Context) error {
-	s.Type = strings.ToUpper(ctx.String(ServiceType))
-	s.Registry = strings.ToUpper(ctx.String(Registry))
-	s.Verbose = ctx.Bool(Verbose)
-	s.SliceParam.ProtoSearchPath = ctx.StringSlice(ProtoSearchPath)
-	s.SliceParam.Pass = ctx.StringSlice(Pass)
+	s.Type = strings.ToUpper(ctx.String(consts.ServiceType))
+	s.Registry = strings.ToUpper(ctx.String(consts.Registry))
+	s.Verbose = ctx.Bool(consts.Verbose)
+	s.SliceParam.ProtoSearchPath = ctx.StringSlice(consts.ProtoSearchPath)
+	s.SliceParam.Pass = ctx.StringSlice(consts.Pass)
 	return nil
 }
 
 func (s *SliceParam) WriteAnswer(name string, value interface{}) error {
-	if name == Pass {
-		s.Pass = strings.Split(value.(string), " ")
+	if name == consts.Pass {
+		s.Pass = strings.Split(value.(string), consts.BlackSpace)
 	}
-	if name == ProtoSearchPath {
-		s.ProtoSearchPath = strings.Split(value.(string), " ")
+	if name == consts.ProtoSearchPath {
+		s.ProtoSearchPath = strings.Split(value.(string), consts.BlackSpace)
 	}
 	return nil
 }

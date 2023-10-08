@@ -101,8 +101,8 @@ Flags:
 	}
 
 	// Non-standard template
-	if strings.HasSuffix(sa.Template, ".git") {
-		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, "server"))
+	if strings.HasSuffix(sa.Template, consts.SuffixGit) {
+		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, consts.Server))
 		if err != nil {
 			return err
 		}
@@ -110,13 +110,13 @@ Flags:
 		if err != nil {
 			return err
 		}
-		gitPath = path.Join(tpl.KitexDir, "server", gitPath)
+		gitPath = path.Join(tpl.KitexDir, consts.Server, gitPath)
 		kitexArgument.TemplateDir = gitPath
 	} else {
 		if len(sa.Template) != 0 {
 			kitexArgument.TemplateDir = sa.Template
 		} else {
-			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, "server", config.Standard)
+			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, consts.Server, consts.Standard)
 		}
 	}
 
@@ -241,8 +241,8 @@ func hzArgsForHex(c *config.ServerArgument) (*hzConfig.Argument, error) {
 	hzArgs.CmdType = meta.CmdUpdate // update command is enough for hex
 	// these options are aligned with the kitex
 	hzArgs.ThriftOptions = append(hzArgs.ThriftOptions, "naming_style=golint", "ignore_initialisms", "gen_setter", "gen_deep_equal", "compatible_names", "frugal_tag")
-	hzArgs.ModelDir = "kitex_gen"
-	if hzArgs.CustomizePackage == path.Join(tpl.HertzDir, "server", config.Standard, packageLayoutFile) {
+	hzArgs.ModelDir = consts.DefaultKitexModelDir
+	if hzArgs.CustomizePackage == path.Join(tpl.HertzDir, consts.Server, consts.Standard, consts.PackageLayoutFile) {
 		hzArgs.CustomizePackage = "" // disable the default hertz template for hex
 	}
 	return hzArgs, nil
@@ -358,7 +358,7 @@ func init() {
 }
 
 func addHexOptions() error {
-	filePath := "main.go"
+	filePath := consts.Main
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return err
@@ -378,7 +378,7 @@ func addHexOptions() error {
 	if !found {
 		return nil
 	}
-	outputFile, err := os.Create("main.go")
+	outputFile, err := os.Create(consts.Main)
 	if err != nil {
 		return err
 	}

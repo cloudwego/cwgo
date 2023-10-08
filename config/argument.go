@@ -17,6 +17,7 @@
 package config
 
 import (
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -48,70 +49,11 @@ func NewArgument() *Argument {
 	}
 }
 
-const (
-	RPC  = "RPC"
-	HTTP = "HTTP"
-)
-
-const (
-	Standard = "standard"
-)
-
-const (
-	Zk      = "ZK"
-	Nacos   = "NACOS"
-	Etcd    = "ETCD"
-	Polaris = "POLARIS"
-)
-
-type DataBaseType string
-
-const (
-	MySQL     DataBaseType = "mysql"
-	SQLServer DataBaseType = "sqlserver"
-	Sqlite    DataBaseType = "sqlite"
-	Postgres  DataBaseType = "postgres"
-)
-
 type DialectorFunc func(string) gorm.Dialector
 
-var OpenTypeFuncMap = map[DataBaseType]DialectorFunc{
-	MySQL:     mysql.Open,
-	SQLServer: sqlserver.Open,
-	Sqlite:    sqlite.Open,
-	Postgres:  postgres.Open,
+var OpenTypeFuncMap = map[consts.DataBaseType]DialectorFunc{
+	consts.MySQL:     mysql.Open,
+	consts.SQLServer: sqlserver.Open,
+	consts.Sqlite:    sqlite.Open,
+	consts.Postgres:  postgres.Open,
 }
-
-type ToolType string
-
-const (
-	Hz    ToolType = "hz"
-	Kitex ToolType = "kitex"
-)
-
-const (
-	OutDir   = "out_dir"
-	Verbose  = "verbose"
-	Template = "template"
-
-	Service         = "service"
-	ServiceType     = "type"
-	Module          = "module"
-	IDLPath         = "idl"
-	Registry        = "registry"
-	Pass            = "pass"
-	ProtoSearchPath = "proto_search_path"
-
-	DSN          = "dsn"
-	DBType       = "db_type"
-	Tables       = "tables"
-	OnlyModel    = "only_model"
-	OutFile      = "out_file"
-	UnitTest     = "unittest"
-	ModelPkgName = "model_pkg"
-	Nullable     = "nullable"
-	Signable     = "signable"
-	IndexTag     = "index_tag"
-	TypeTag      = "type_tag"
-	HexTag       = "hex"
-)
