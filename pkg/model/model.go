@@ -20,13 +20,14 @@ import (
 	"fmt"
 
 	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/consts"
 
 	"gorm.io/gen"
 	"gorm.io/gorm"
 )
 
 func Model(c *config.ModelArgument) error {
-	dialector := config.OpenTypeFuncMap[config.DataBaseType(c.Type)]
+	dialector := config.OpenTypeFuncMap[consts.DataBaseType(c.Type)]
 	db, err := gorm.Open(dialector(c.DSN))
 	if err != nil {
 		return err

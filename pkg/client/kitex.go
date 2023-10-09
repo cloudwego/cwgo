@@ -95,8 +95,8 @@ Flags:
 	kitexArgument.GenerateMain = false
 
 	// Non-standard template
-	if strings.HasSuffix(sa.Template, ".git") {
-		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, "client"))
+	if strings.HasSuffix(sa.Template, consts.SuffixGit) {
+		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, consts.Client))
 		if err != nil {
 			return err
 		}
@@ -104,13 +104,13 @@ Flags:
 		if err != nil {
 			return err
 		}
-		gitPath = path.Join(tpl.KitexDir, "client", gitPath)
+		gitPath = path.Join(tpl.KitexDir, consts.Client, gitPath)
 		kitexArgument.TemplateDir = gitPath
 	} else {
 		if len(sa.Template) != 0 {
 			kitexArgument.TemplateDir = sa.Template
 		} else {
-			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, "client", config.Standard)
+			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, consts.Client, consts.Standard)
 		}
 	}
 

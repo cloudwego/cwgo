@@ -19,11 +19,12 @@ package config
 import (
 	"fmt"
 
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/urfave/cli/v2"
 )
 
 type FallbackArgument struct {
-	ToolType ToolType
+	ToolType consts.ToolType
 	Args     []string
 }
 
@@ -37,12 +38,12 @@ func (c *FallbackArgument) ParseCli(ctx *cli.Context) error {
 		return fmt.Errorf("please input tool type")
 	}
 
-	c.ToolType = ToolType(args[0])
-	switch ToolType(args[0]) {
-	case Hz:
-		c.ToolType = Hz
-	case Kitex:
-		c.ToolType = Kitex
+	c.ToolType = consts.ToolType(args[0])
+	switch consts.ToolType(args[0]) {
+	case consts.Hz:
+		c.ToolType = consts.Hz
+	case consts.KitexTool:
+		c.ToolType = consts.KitexTool
 	default:
 		return fmt.Errorf("tool type is not supported")
 	}

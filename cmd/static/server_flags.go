@@ -18,22 +18,23 @@ package static
 
 import (
 	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/urfave/cli/v2"
 )
 
 func serverFlags() []cli.Flag {
 	globalArgs := config.GetGlobalArgs()
 	return []cli.Flag{
-		&cli.StringFlag{Name: config.Service, Usage: "Specify the service name.", Destination: &globalArgs.ServerArgument.Service},
-		&cli.StringFlag{Name: config.ServiceType, Usage: "Specify the generate type. (RPC or HTTP)", Value: config.RPC},
-		&cli.StringFlag{Name: config.Module, Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ServerArgument.GoMod},
-		&cli.StringFlag{Name: config.IDLPath, Usage: "Specify the IDL file path. (.thrift or .proto)", Destination: &globalArgs.ServerArgument.IdlPath},
-		&cli.StringFlag{Name: config.OutDir, Value: ".", Aliases: []string{"o"}, Usage: "Specify the output path. Currently cwgo supports git templates, such as `--template https://github.com/***/cwgo_template.git`.", Destination: &globalArgs.ServerArgument.OutDir},
-		&cli.StringFlag{Name: config.Template, Usage: "Specify the layout template.", Destination: &globalArgs.ServerArgument.Template},
-		&cli.StringFlag{Name: config.Registry, Usage: "Specify the registry, default is None."},
-		&cli.StringSliceFlag{Name: config.ProtoSearchPath, Aliases: []string{"I"}, Usage: "Add an IDL search path for includes."},
-		&cli.StringSliceFlag{Name: config.Pass, Usage: "Pass param to hz or Kitex."},
-		&cli.BoolFlag{Name: config.Verbose, Usage: "Turn on verbose mode."},
-		&cli.BoolFlag{Name: config.HexTag, Usage: "Add HTTP listen for Kitex.", Destination: &globalArgs.Hex},
+		&cli.StringFlag{Name: consts.Service, Usage: "Specify the service name.", Destination: &globalArgs.ServerArgument.Service},
+		&cli.StringFlag{Name: consts.ServiceType, Usage: "Specify the generate type. (RPC or HTTP)", Value: consts.RPC},
+		&cli.StringFlag{Name: consts.Module, Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ServerArgument.GoMod},
+		&cli.StringFlag{Name: consts.IDLPath, Usage: "Specify the IDL file path. (.thrift or .proto)", Destination: &globalArgs.ServerArgument.IdlPath},
+		&cli.StringFlag{Name: consts.OutDir, Value: ".", Aliases: []string{"o"}, Usage: "Specify the output path. Currently cwgo supports git templates, such as `--template https://github.com/***/cwgo_template.git`.", Destination: &globalArgs.ServerArgument.OutDir},
+		&cli.StringFlag{Name: consts.Template, Usage: "Specify the layout template.", Destination: &globalArgs.ServerArgument.Template},
+		&cli.StringFlag{Name: consts.Registry, Usage: "Specify the registry, default is None."},
+		&cli.StringSliceFlag{Name: consts.ProtoSearchPath, Aliases: []string{"I"}, Usage: "Add an IDL search path for includes."},
+		&cli.StringSliceFlag{Name: consts.Pass, Usage: "Pass param to hz or Kitex."},
+		&cli.BoolFlag{Name: consts.Verbose, Usage: "Turn on verbose mode."},
+		&cli.BoolFlag{Name: consts.HexTag, Usage: "Add HTTP listen for Kitex.", Destination: &globalArgs.Hex},
 	}
 }

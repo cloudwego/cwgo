@@ -30,15 +30,15 @@ import (
 )
 
 func check(sa *config.ServerArgument) error {
-	if sa.Type != config.RPC && sa.Type != config.HTTP {
+	if sa.Type != consts.RPC && sa.Type != consts.HTTP {
 		return errors.New("generate type not supported")
 	}
 
 	if sa.Registry != "" &&
-		sa.Registry != config.Zk &&
-		sa.Registry != config.Nacos &&
-		sa.Registry != config.Etcd &&
-		sa.Registry != config.Polaris {
+		sa.Registry != consts.Zk &&
+		sa.Registry != consts.Nacos &&
+		sa.Registry != consts.Etcd &&
+		sa.Registry != consts.Polaris {
 		return errors.New("unsupported registry")
 	}
 
@@ -69,7 +69,7 @@ func check(sa *config.ServerArgument) error {
 	}
 
 	sa.GoPath = gopath
-	sa.GoSrc = filepath.Join(gopath, "src")
+	sa.GoSrc = filepath.Join(gopath, consts.Src)
 
 	// Generate the project under gopath, use the relative path as the package name
 	if strings.HasPrefix(sa.Cwd, sa.GoSrc) {
