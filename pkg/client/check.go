@@ -24,19 +24,20 @@ import (
 	"strings"
 
 	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 )
 
 func check(ca *config.ClientArgument) error {
-	if ca.Type != config.RPC && ca.Type != config.HTTP {
+	if ca.Type != consts.RPC && ca.Type != consts.HTTP {
 		return errors.New("generate type not supported")
 	}
 
 	if ca.Registry != "" &&
-		ca.Registry != config.Zk &&
-		ca.Registry != config.Nacos &&
-		ca.Registry != config.Etcd &&
-		ca.Registry != config.Polaris {
+		ca.Registry != consts.Zk &&
+		ca.Registry != consts.Nacos &&
+		ca.Registry != consts.Etcd &&
+		ca.Registry != consts.Polaris {
 		return errors.New("unsupported registry")
 	}
 
@@ -51,8 +52,8 @@ func check(ca *config.ClientArgument) error {
 	}
 	ca.Cwd = dir
 	if ca.OutDir == "" {
-		if strings.ToUpper(ca.Type) == config.HTTP {
-			ca.OutDir = "biz/http"
+		if strings.ToUpper(ca.Type) == consts.HTTP {
+			ca.OutDir = consts.DefaultHZClientDir
 		} else {
 			ca.OutDir = dir
 		}
@@ -71,7 +72,7 @@ func check(ca *config.ClientArgument) error {
 	}
 
 	ca.GoPath = gopath
-	ca.GoSrc = filepath.Join(gopath, "src")
+	ca.GoSrc = filepath.Join(gopath, consts.Src)
 
 	// Generate the project under gopath, use the relative path as the package name
 	if strings.HasPrefix(ca.Cwd, ca.GoSrc) {

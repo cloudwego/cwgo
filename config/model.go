@@ -19,6 +19,7 @@ package config
 import (
 	"strings"
 
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/urfave/cli/v2"
 )
 
@@ -39,23 +40,23 @@ type ModelArgument struct {
 
 func NewModelArgument() *ModelArgument {
 	return &ModelArgument{
-		OutPath: "biz/dal/query",
-		OutFile: "gen.go",
+		OutPath: consts.DefaultDbOutDir,
+		OutFile: consts.DefaultDbOutFile,
 	}
 }
 
 func (c *ModelArgument) ParseCli(ctx *cli.Context) error {
-	c.DSN = ctx.String(DSN)
-	c.Type = strings.ToLower(ctx.String(DBType))
-	c.Tables = ctx.StringSlice(Tables)
-	c.OnlyModel = ctx.Bool(OnlyModel)
-	c.OutPath = ctx.String(OutDir)
-	c.OutFile = ctx.String(OutFile)
-	c.WithUnitTest = ctx.Bool(UnitTest)
-	c.ModelPkgName = ctx.String(ModelPkgName)
-	c.FieldNullable = ctx.Bool(Nullable)
-	c.FieldSignable = ctx.Bool(Signable)
-	c.FieldWithIndexTag = ctx.Bool(IndexTag)
-	c.FieldWithTypeTag = ctx.Bool(TypeTag)
+	c.DSN = ctx.String(consts.DSN)
+	c.Type = strings.ToLower(ctx.String(consts.DBType))
+	c.Tables = ctx.StringSlice(consts.Tables)
+	c.OnlyModel = ctx.Bool(consts.OnlyModel)
+	c.OutPath = ctx.String(consts.OutDir)
+	c.OutFile = ctx.String(consts.OutFile)
+	c.WithUnitTest = ctx.Bool(consts.UnitTest)
+	c.ModelPkgName = ctx.String(consts.ModelPkgName)
+	c.FieldNullable = ctx.Bool(consts.Nullable)
+	c.FieldSignable = ctx.Bool(consts.Signable)
+	c.FieldWithIndexTag = ctx.Bool(consts.IndexTag)
+	c.FieldWithTypeTag = ctx.Bool(consts.TypeTag)
 	return nil
 }

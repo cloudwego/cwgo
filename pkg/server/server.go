@@ -26,6 +26,7 @@ import (
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/kx_registry"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/hertz/cmd/hz/app"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
@@ -43,7 +44,7 @@ func Server(c *config.ServerArgument) error {
 	}
 
 	switch c.Type {
-	case config.RPC:
+	case consts.RPC:
 		var args kargs.Arguments
 		log.Verbose = c.Verbose
 		err = convertKitexArgs(c, &args)
@@ -84,7 +85,7 @@ func Server(c *config.ServerArgument) error {
 			}
 		}
 		replaceThriftVersion(&args)
-	case config.HTTP:
+	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)
 		err = convertHzArgument(c, args)

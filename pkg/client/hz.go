@@ -25,13 +25,9 @@ import (
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/tpl"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
-)
-
-const (
-	layoutFile        = "layout.yaml"
-	packageLayoutFile = "package.yaml"
 )
 
 func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument) (err error) {
@@ -41,8 +37,8 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 		return fmt.Errorf("idl path %s is not absolute", ca.IdlPath)
 	}
 
-	if strings.HasSuffix(ca.Template, ".git") {
-		err = utils.GitClone(ca.Template, path.Join(tpl.HertzDir, "client"))
+	if strings.HasSuffix(ca.Template, consts.SuffixGit) {
+		err = utils.GitClone(ca.Template, path.Join(tpl.HertzDir, consts.Client))
 		if err != nil {
 			return err
 		}
@@ -50,16 +46,16 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 		if err != nil {
 			return err
 		}
-		gitPath = path.Join(tpl.HertzDir, "client", gitPath)
-		hzArgument.CustomizeLayout = path.Join(gitPath, layoutFile)
-		hzArgument.CustomizePackage = path.Join(gitPath, packageLayoutFile)
+		gitPath = path.Join(tpl.HertzDir, consts.Client, gitPath)
+		hzArgument.CustomizeLayout = path.Join(gitPath, consts.LayoutFile)
+		hzArgument.CustomizePackage = path.Join(gitPath, consts.PackageLayoutFile)
 	} else {
 		if len(ca.Template) != 0 {
-			hzArgument.CustomizeLayout = path.Join(ca.Template, layoutFile)
-			hzArgument.CustomizePackage = path.Join(ca.Template, packageLayoutFile)
+			hzArgument.CustomizeLayout = path.Join(ca.Template, consts.LayoutFile)
+			hzArgument.CustomizePackage = path.Join(ca.Template, consts.PackageLayoutFile)
 		} else {
-			hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, "client", config.Standard, layoutFile)
-			hzArgument.CustomizePackage = path.Join(tpl.HertzDir, "client", config.Standard, packageLayoutFile)
+			hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, consts.Client, consts.Standard, consts.LayoutFile)
+			hzArgument.CustomizePackage = path.Join(tpl.HertzDir, consts.Client, consts.Standard, consts.PackageLayoutFile)
 		}
 	}
 
@@ -82,7 +78,7 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 	// specific commands from -pass param
 	f := flag.NewFlagSet("", flag.ContinueOnError)
 	f.StringVar(&hzArgument.HandlerDir, "handler_dir", "", "")
-	f.StringVar(&hzArgument.ModelDir, "model_dir", "hertz_gen", "")
+	f.StringVar(&hzArgument.ModelDir, "model_dir", consts.DefaultHZModelDir, "")
 	f.StringVar(&hzArgument.ClientDir, "client_dir", ca.OutDir, "")
 	f.StringVar(&hzArgument.Use, "use", "", "")
 	f.StringVar(&hzArgument.BaseDomain, "base_domain", "", "")

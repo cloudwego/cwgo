@@ -16,27 +16,21 @@ package dynamic
 
 import (
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/cloudwego/cwgo/config"
-)
-
-const (
-	Server = "server"
-	Client = "client"
-	DB     = "db"
+	"github.com/cloudwego/cwgo/pkg/consts"
 )
 
 func commonQuestion() []*survey.Question {
 	return []*survey.Question{
 		{
-			Name: "type",
+			Name: consts.ServiceType,
 			Prompt: &survey.Select{
 				Message: "Select service type",
-				Options: []string{"RPC", "HTTP"},
+				Options: []string{consts.RPC, consts.HTTP},
 			},
 			Validate: survey.Required,
 		},
 		{
-			Name: "service",
+			Name: consts.Service,
 			Prompt: &survey.Input{
 				Message: "Please input service name",
 			},
@@ -76,7 +70,7 @@ func defaultConfig() []*survey.Question {
 
 func protoSearch() []*survey.Question {
 	return []*survey.Question{{
-		Name: "proto_search_path",
+		Name: consts.ProtoSearchPath,
 		Prompt: &survey.Input{
 			Message: "Please input proto search path if exists, space as separator",
 		},
@@ -86,7 +80,7 @@ func protoSearch() []*survey.Question {
 func customConfig() []*survey.Question {
 	return []*survey.Question{
 		{
-			Name: "pass",
+			Name: consts.Pass,
 			Prompt: &survey.Input{
 				Message: "Please input custom param",
 			},
@@ -97,10 +91,10 @@ func customConfig() []*survey.Question {
 func registryConfig() []*survey.Question {
 	return []*survey.Question{
 		{
-			Name: "registry",
+			Name: consts.Registry,
 			Prompt: &survey.Select{
 				Message: "Please select a registry",
-				Options: []string{config.Zk, config.Polaris, config.Etcd, config.Nacos},
+				Options: []string{consts.Zk, consts.Polaris, consts.Etcd, consts.Nacos},
 			},
 			Validate: survey.Required,
 		},

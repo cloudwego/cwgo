@@ -83,7 +83,3 @@ third-party component open-source licenses will include Licenses.
 - Feishu group (Register for [Feishu](https://www.larksuite.com/en-US/download) and join the group)
 
   ![LarkGroup](images/lark_group.png)
-
-- WeChat: CloudWeGo community
-
-  ![WechatGroup](images/wechat_group_en.png)
