@@ -30,7 +30,6 @@ import (
 	"github.com/cloudwego/hertz/cmd/hz/app"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
-	"github.com/cloudwego/hertz/cmd/hz/util"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"
 	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/thriftgo"
@@ -99,7 +98,7 @@ func Server(c *config.ServerArgument) error {
 			if c.GoMod == "" {
 				return fmt.Errorf("output directory %s is not under GOPATH/src. Please specify a module name with the '-module' flag", c.Cwd)
 			}
-			module, path, ok := util.SearchGoMod(".", false)
+			module, path, ok := utils.SearchGoMod(".", false)
 			if ok {
 				// go.mod exists
 				if module != c.GoMod {
@@ -130,7 +129,7 @@ func Server(c *config.ServerArgument) error {
 				return cli.Exit(err, meta.LoadError)
 			}
 
-			module, path, ok := util.SearchGoMod(".", false)
+			module, path, ok := utils.SearchGoMod(".", false)
 			if ok {
 				// go.mod exists
 				if c.GoMod != "" && module != c.GoMod {

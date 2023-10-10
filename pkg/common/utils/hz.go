@@ -31,5 +31,6 @@ func SetHzVerboseLog(v bool) {
 }
 
 func IsHzNew(outputDir string) bool {
-	return !Exists(path.Join(outputDir, ".hz"))
+	exist, _ := PathExist(path.Join(outputDir, ".hz"))
+	return !exist
 }
