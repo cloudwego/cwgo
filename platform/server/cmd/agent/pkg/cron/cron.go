@@ -17,37 +17,57 @@
 package cron
 
 import (
+	"context"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/task"
 	"github.com/go-co-op/gocron"
 	"time"
 )
 
-type ICron interface {
-	AddTask()
-	DeleteTask()
-	GetTasks()
-}
-
 type Cron struct {
 	scheduler *gocron.Scheduler
+	service   agent.AgentService
 }
 
-func NewCron() *Cron {
+var CronInstance *Cron
+
+func InitCron(service agent.AgentService) {
 	scheduler := gocron.NewScheduler(time.UTC)
 	scheduler.TagsUnique()
 
-	return &Cron{
+	CronInstance = &Cron{
 		scheduler: scheduler,
+		service:   service,
 	}
+}
+
+func (c *Cron) Start() {
+	c.scheduler.StartAsync()
+}
+
+func (c *Cron) Stop() {
+	c.scheduler.Stop()
 }
 
 func (c *Cron) AddTask(t *task.Task) {
 	switch t.Type {
+	case task.SyncIdl:
+		_, _ = c.scheduler.Every(t.ScheduleTime).Tag(t.Id).Do(func() {
+			_, _ = c.service.SyncIDLsById(context.Background(), &agent.SyncIDLsByIdReq{
+				Ids: []int64{t.Data.(task.SyncIdlData).IdlId},
+			})
+		})
 	case task.SyncRepo:
-		c.scheduler.Every(t.ScheduleTime).Tag(t.Id).Do(func() {
-
+		_, _ = c.scheduler.Every(t.ScheduleTime).Tag(t.Id).Do(func() {
+			_, _ = c.service.SyncRepositoryById(context.Background(), &agent.SyncRepositoryByIdReq{
+				Ids: []int64{t.Data.(task.SyncRepoData).RepositoryId},
+			})
 		})
 	default:
 
 	}
+}
+
+func (c *Cron) EmptyTask() {
+	c.scheduler.Clear()
 }

@@ -23,7 +23,8 @@ import (
 )
 
 type IRegistry interface {
-	Count() int
-	GetServiceById(string) (service.IService, error)
+	GetAllService() ([]*service.Service, error)
+	Count() int // get current service num in registry
+	GetServiceById(string) (*service.Service, error)
 	ServiceExists(string) bool
 }

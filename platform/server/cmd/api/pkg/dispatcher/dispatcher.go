@@ -20,11 +20,12 @@ import "github.com/cloudwego/cwgo/platform/server/shared/task"
 
 type IDispatcher interface {
 	AddService(serviceId string) error
-	RemoveService(serviceId string) error
+	DelService(serviceId string) error
 
 	AddTask(task *task.Task) error
 	RemoveTask(taskId string) error
 
 	GetTaskByServiceId(serviceId string) []*task.Task
+	GetServiceIdByTaskId(taskId string) string
 	GetTotalTaskNum() int
 }

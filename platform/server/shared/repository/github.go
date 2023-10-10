@@ -18,34 +18,57 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/google/go-github/v53/github"
-	"golang.org/x/oauth2"
 	"io/ioutil"
 	"net/http"
+	"regexp"
+	"strings"
 )
 
 type GitHubApi struct {
-	Client *github.Client
+	client *github.Client
 }
 
-func NewGithubClient(token string) *GitHubApi {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-
+func NewGitHubApi(client *github.Client) *GitHubApi {
 	return &GitHubApi{
-		Client: github.NewClient(tc),
+		client: client,
 	}
 }
 
-func (g *GitHubApi) GetFile(owner, repoName, filePid, ref string) (*File, error) {
+const (
+	githubURLPrefix = "https://github.com/"
+)
+
+func (a *GitHubApi) ParseUrl(url string) (filePid, owner, repoName string, err error) {
+	var tempPath string
+	if strings.HasPrefix(url, githubURLPrefix) {
+		tempPath = url[len(githubURLPrefix):]
+		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
+		if lastQuestionMarkIndex != -1 {
+			tempPath = tempPath[:lastQuestionMarkIndex]
+		}
+	} else {
+		return "", "", "", errors.New("idlPath format wrong,do not have prefix: " + githubURLPrefix)
+	}
+	regex := regexp.MustCompile(`([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`)
+	matches := regex.FindStringSubmatch(tempPath)
+	if len(matches) != 5 {
+		return "", "", "", errors.New("idlPath format wrong,cannot parse github URL")
+	}
+	owner = matches[1]
+	repoName = matches[2]
+	filePid = matches[4]
+	return filePid, owner, repoName, nil
+}
+
+func (a *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
 	opts := &github.RepositoryContentGetOptions{
 		Ref: ref,
 	}
-	fileContent, _, err := g.Client.Repositories.DownloadContents(context.Background(), owner, repoName, filePid, opts)
+	fileContent, _, err := a.client.Repositories.DownloadContents(context.Background(), owner, repoName, filePath, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -57,14 +80,14 @@ func (g *GitHubApi) GetFile(owner, repoName, filePid, ref string) (*File, error)
 	}
 
 	return &File{
-		Name:    filePid,
+		Name:    filePath,
 		Content: content,
 	}, nil
 }
 
-func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
+func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
 	// Get a reference to the default branch
-	ref, _, err := g.Client.Git.GetRef(context.Background(), owner, repoName, "refs/heads/"+branch)
+	ref, _, err := a.client.Git.GetRef(context.Background(), owner, repoName, "refs/heads/"+branch)
 	if err != nil {
 		return err
 	}
@@ -78,13 +101,13 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 			Mode:    github.String("100644"),
 		})
 	}
-	newTree, _, err := g.Client.Git.CreateTree(context.Background(), owner, repoName, *ref.Object.SHA, treeEntries)
+	newTree, _, err := a.client.Git.CreateTree(context.Background(), owner, repoName, *ref.Object.SHA, treeEntries)
 	if err != nil {
 		return err
 	}
 
 	// Create a new commit object, using the new tree as its foundation
-	newCommit, _, err := g.Client.Git.CreateCommit(context.Background(), owner, repoName, &github.Commit{
+	newCommit, _, err := a.client.Git.CreateCommit(context.Background(), owner, repoName, &github.Commit{
 		Message: github.String(commitMessage),
 		Tree:    newTree,
 	})
@@ -93,7 +116,7 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	}
 
 	// Update branch references to point to new submissions
-	_, _, err = g.Client.Git.UpdateRef(context.Background(), owner, repoName, &github.Reference{
+	_, _, err = a.client.Git.UpdateRef(context.Background(), owner, repoName, &github.Reference{
 		Ref: github.String("refs/heads/" + branch),
 		Object: &github.GitObject{
 			SHA:  newCommit.SHA,
@@ -107,12 +130,12 @@ func (g *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	return nil
 }
 
-func (g *GitHubApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
+func (a *GitHubApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
 	opts := &github.RepositoryContentGetOptions{
 		Ref: ref,
 	}
 
-	archiveLink, _, err := g.Client.Repositories.GetArchiveLink(context.Background(), owner, repoName, github.ArchiveFormat(format), opts, false)
+	archiveLink, _, err := a.client.Repositories.GetArchiveLink(context.Background(), owner, repoName, github.ArchiveFormat(format), opts, false)
 	if err != nil {
 		return nil, err
 	}
@@ -135,15 +158,34 @@ func (g *GitHubApi) GetRepositoryArchive(owner, repoName, format, ref string) ([
 	return archiveData, nil
 }
 
-func (gl *GitHubApi) GetLatestCommitHash(owner, repoName, filePid, ref string) (string, error) {
+func (a *GitHubApi) GetLatestCommitHash(owner, repoName, filePath, ref string) (string, error) {
 	opts := &github.RepositoryContentGetOptions{
 		Ref: ref,
 	}
 
-	fileContent, _, _, err := gl.Client.Repositories.GetContents(context.Background(), owner, repoName, filePid, opts)
+	fileContent, _, _, err := a.client.Repositories.GetContents(context.Background(), owner, repoName, filePath, opts)
 	if err != nil {
 		return "", err
 	}
 
 	return *fileContent.SHA, nil
+}
+
+func (a *GitHubApi) DeleteDirs(owner, repoName string, folderPaths ...string) error {
+
+	for _, folderPath := range folderPaths {
+		filePath := fmt.Sprintf("%s/%s", folderPath, ".gitkeep")
+
+		commitOpts := &github.RepositoryContentFileOptions{
+			Message: github.String(fmt.Sprintf("Delete folder %s", folderPath)),
+			Branch:  github.String("main"), // 设置要删除的文件夹所在的分支
+		}
+
+		_, _, err := a.client.Repositories.DeleteFile(context.Background(), owner, repoName, filePath, commitOpts)
+		if err != nil && !utils.IsFileNotFoundError(err) {
+			return err
+		}
+	}
+
+	return nil
 }

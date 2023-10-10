@@ -17,3 +17,90 @@
  */
 
 package api
+
+import (
+	"errors"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"os"
+)
+
+func run(opts *setupOptions) error {
+	var (
+		serverMode consts.ServerMode
+		configType consts.ConfigType
+	)
+	var ok bool
+	// priority: command line > env > config > default
+	if opts.ServerMode != "" {
+		serverMode, ok = consts.ServerModeMapToNum[opts.ServerMode]
+		if !ok {
+			return errors.New("invalid server_mode")
+		}
+	}
+	if serverMode == 0 {
+		if serverModeStr := os.Getenv(consts.ServerTypeEnvName); serverModeStr != "" {
+			serverMode, ok = consts.ServerModeMapToNum[serverModeStr]
+			if !ok {
+				return errors.New("invalid server_mode")
+			}
+		}
+		if serverMode == 0 {
+			serverMode = consts.ServerModeNumPro
+		}
+	}
+
+	if opts.ConfigType != "" {
+		configType, ok = consts.ConfigTypeMapToNum[opts.ConfigType]
+		if !ok {
+			return errors.New("invalid config_type")
+		}
+	}
+	if configType == 0 {
+		if configTypeStr := os.Getenv(consts.ConfigTypeEnvName); configTypeStr != "" {
+			configType, ok = consts.ConfigTypeMapToNum[configTypeStr]
+			if ok {
+				return errors.New("invalid config_type")
+			}
+		}
+		if configType == 0 {
+			configType = consts.ConfigTypeNumFile
+		}
+	}
+
+	var metadata interface{}
+	switch configType {
+	case consts.ConfigTypeNumFile:
+		var configPath string
+
+		if opts.ConfigPath != "" {
+			configPath = opts.ConfigPath
+		} else if configPath = os.Getenv(consts.ConfigPathEnvName); configPath == "" {
+			configPath = consts.ConfigDefaultPath
+		}
+
+		metadata = config.FileConfig{
+			Path: configPath,
+		}
+	}
+
+	// init config
+	err := config.InitManager(consts.ServerTypeNumApi, serverMode, configType, metadata)
+	if err != nil {
+		return err
+	}
+
+	// init logger
+	logger.InitLogger()
+
+	// init service context
+	svc.InitServiceContext()
+
+	// start api service
+	register(config.GetManager().ApiConfigManager.Server)
+	config.GetManager().ApiConfigManager.Server.Spin()
+
+	return nil
+}

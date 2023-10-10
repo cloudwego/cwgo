@@ -17,3 +17,85 @@
  */
 
 package agent
+
+import (
+	"fmt"
+	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"github.com/cloudwego/kitex/pkg/limit"
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/pkg/transmeta"
+	"github.com/cloudwego/kitex/server"
+	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	"net"
+)
+
+type ConfigManager struct {
+	config                Config
+	RegistryConfigManager registryconfig.IRegistryConfigManager
+	ServiceId             string
+	ServiceName           string
+}
+
+func NewConfigManager(config Config, registryConfig registryconfig.Config, serviceId string) *ConfigManager {
+	var registryConfigManager registryconfig.IRegistryConfigManager
+	var err error
+
+	switch registryConfig.Type {
+	case consts.RegistryTypeBuiltin:
+		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin)
+		if err != nil {
+			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
+		}
+
+	case consts.RegistryTypeConsul:
+		registryConfigManager, err = registryconfig.NewConsulRegistryConfigManager(registryConfig.Consul)
+		if err != nil {
+			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
+		}
+
+	default:
+
+	}
+
+	return &ConfigManager{
+		config:                config,
+		RegistryConfigManager: registryConfigManager,
+		ServiceId:             serviceId,
+		ServiceName:           fmt.Sprintf("%s-%s-%s", "cwgo", consts.ServerTypeAgent, serviceId),
+	}
+}
+
+func (cm *ConfigManager) GetKitexServerOptions() []server.Option {
+	var KitexServerOptions []server.Option
+	addr, err := net.ResolveTCPAddr("tcp", cm.config.Addr)
+	if err != nil {
+		panic(fmt.Sprintf("resolve tcp addr failed, err: %v, addr: %s", err, cm.config.Addr))
+	} else {
+		KitexServerOptions = append(KitexServerOptions, server.WithServiceAddr(addr))
+	}
+
+	pubListenOn := utils.FigureOutListenOn(addr.String())
+
+	kitexRegistry, kitexRegistryInfo := cm.RegistryConfigManager.GetKitexRegistry(
+		cm.ServiceName,
+		cm.ServiceId,
+		pubListenOn,
+	)
+
+	KitexServerOptions = append(KitexServerOptions, server.WithRegistry(kitexRegistry))
+	KitexServerOptions = append(KitexServerOptions, server.WithRegistryInfo(kitexRegistryInfo))
+
+	KitexServerOptions = append(KitexServerOptions, server.WithLimit(&limit.Option{MaxConnections: 2000, MaxQPS: 500}))
+
+	KitexServerOptions = append(KitexServerOptions, server.WithSuite(tracing.NewServerSuite()))
+	KitexServerOptions = append(KitexServerOptions, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
+		ServiceName: cm.ServiceName,
+	}))
+
+	// thrift meta handler
+	KitexServerOptions = append(KitexServerOptions, server.WithMetaHandler(transmeta.ServerTTHeaderHandler))
+
+	return KitexServerOptions
+}

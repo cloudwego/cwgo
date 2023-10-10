@@ -17,35 +17,109 @@
 package config
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/idl"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/repository"
+	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/api"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"github.com/spf13/viper"
 )
 
-type IManager interface {
-	GetIdlManager() idl.IIdlManager
-	GetRepositoryManager() repository.IRepositoryManager
+type Manager struct {
+	ServerType         consts.ServerType
+	ServerMode         consts.ServerMode
+	ServiceId          string
+	Config             Config
+	ApiConfigManager   *api.ConfigManager
+	AgentConfigManager *agent.ConfigManager
 }
 
-type Manager struct {
-	IdlManager        idl.IIdlManager
-	RepositoryManager repository.IRepositoryManager
+type Config struct {
+	App      app.Config      `mapstructure:"app"`
+	Logger   logger.Config   `mapstructure:"logger"`
+	Registry registry.Config `mapstructure:"registry"`
+	Store    store.Config    `mapstructure:"store"`
+	Api      api.Config      `mapstructure:"api"`
+	Agent    agent.Config    `mapstructure:"agent"`
 }
 
 var manager *Manager
 
-func NewManager() *Manager {
+type FileConfig struct {
+	Path string
+}
 
-	return &Manager{}
+func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, configType consts.ConfigType, metadata ...interface{}) error {
+	var config Config
+
+	switch configType {
+	case consts.ConfigTypeNumFile:
+		var configPath string
+
+		if metadata != nil {
+			if fileConfig, ok := metadata[0].(FileConfig); ok {
+				configPath = fileConfig.Path
+			}
+		}
+
+		configPath = fmt.Sprintf("config-%s.yaml", consts.ServerModeMapToStr[serverMode])
+
+		fmt.Printf("get config path: %s\n", configPath)
+
+		v := viper.New()
+		v.SetConfigType("yaml")
+		v.SetConfigFile(configPath)
+		err := v.ReadInConfig()
+		if err != nil {
+			panic(fmt.Sprintf("get config file failed, err: %v", err))
+		}
+
+		if err := v.Unmarshal(&config); err != nil {
+			return fmt.Errorf("unmarshal Config failed, err: %v", err)
+		}
+
+	case consts.ConfigTypeNumApollo:
+		// TODO: to be implemented
+		panic("to be implemented")
+	default:
+
+	}
+
+	serviceId, err := utils.NewServiceId()
+	if err != nil {
+		return err
+	}
+
+	switch serverType {
+	case consts.ServerTypeNumApi:
+		manager = &Manager{
+			ServerType:       serverType,
+			ServerMode:       serverMode,
+			ServiceId:        serviceId,
+			Config:           config,
+			ApiConfigManager: api.NewConfigManager(config.Api, config.Registry, serviceId),
+		}
+	case consts.ServerTypeNumAgent:
+		manager = &Manager{
+			ServerType:         serverType,
+			ServerMode:         serverMode,
+			ServiceId:          serviceId,
+			Config:             config,
+			AgentConfigManager: agent.NewConfigManager(config.Agent, config.Registry, serviceId),
+		}
+	}
+
+	return nil
 }
 
 func GetManager() *Manager {
+	if manager == nil {
+		panic("config manager not initialized")
+	}
+
 	return manager
-}
-
-func (m *Manager) GetIdlManager() idl.IIdlManager {
-	return m.IdlManager
-}
-
-func (m *Manager) GetRepositoryManager() repository.IRepositoryManager {
-	return m.RepositoryManager
 }

@@ -1,21 +1,11 @@
 namespace go repository
 
-struct Repository{
-    1: string id
-    2: string repository_url
-    3: i32 type
-    4: string token
-    5: string status
-    6: string last_update_time
-    7: string last_sync_time
-    8: string create_time
-    9: string update_time
-    10: i8 repo_type
-}
+include "../model/model.thrift"
 
 struct AddRepositoryReq{
-    1: string repository_url (api.body="repository_url,required")
-    2: string token (api.body="token")
+    1: i32 repository_type (api.body="repository_type,required")
+    2: string repository_url (api.body="repository_url,required",api.vd="len($)>0")
+    3: string token (api.body="token")
 }
 struct AddRepositoryRes{
     1: i32 code
@@ -23,7 +13,7 @@ struct AddRepositoryRes{
 }
 
 struct DeleteRepositoriesReq{
-    1: list<string> ids (api.body="ids,required")
+    1: list<string> ids (api.body="ids,required",api.vd="len($)>0")
 }
 struct DeleteRepositoriesRes{
     1: i32 code
@@ -33,6 +23,7 @@ struct DeleteRepositoriesRes{
 struct UpdateRepositoryReq{
     1: string id
     2: string token (api.body="token")
+    3: string status (api.body="status")
 }
 struct UpdateRepositoryRes{
     1: i32 code
@@ -42,6 +33,8 @@ struct UpdateRepositoryRes{
 struct GetRepositoriesReq{
     1: i32 page (api.query="page",api.vd="$>=0")
     2: i32 limit (api.query="limit",api.vd="$>=0")
+    3: i32 order (api.query="order",api.vd="$>=0")
+    4: string order_by (api.query="order_by")
 }
 struct GetRepositoriesRes{
     1: i32 code
@@ -49,11 +42,11 @@ struct GetRepositoriesRes{
     3: GetRepositoriesResData data
 }
 struct GetRepositoriesResData{
-    1: list<Repository> repositories
+    1: list<model.Repository> repositories
 }
 
 struct SyncRepositoryByIdReq{
-    1: list<i64> ids (api.body="ids,required")
+    1: list<i64> ids (api.body="ids,required",api.vd="len($)>0")
 }
 struct SyncRepositoryByIdRes{
     1: i32 code

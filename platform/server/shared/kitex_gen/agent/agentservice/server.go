@@ -2,7 +2,7 @@
 package agentservice
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	server "github.com/cloudwego/kitex/server"
 )
 

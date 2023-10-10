@@ -1,0 +1,53 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint:script": "eslint --ext .js,.jsx,.ts,.tsx --fix --quiet src",
+    "preview": "vite preview",
+    "prepare": "cd ../.. && husky install platform/server/web/.husky"
+  },
+  "dependencies": {
+    "@codemirror/legacy-modes": "^6.3.3",
+    "@douyinfe/semi-icons": "^2.42.3",
+    "@douyinfe/semi-ui": "^2.42.3",
+    "@uiw/codemirror-theme-okaidia": "^4.21.13",
+    "@uiw/react-codemirror": "^4.21.13",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.15.0",
+    "reset-css": "^5.0.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.3",
+    "commitlint": "^17.7.1",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.0.3",
+    "sass": "^1.66.1",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vite-plugin-eslint": "^1.8.1",
+    "yaml": "link:@codemirror/legacy-modes/mode/yaml"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,tsx,ts}": [
+      "npm run lint:script",
+      "git add ."
+    ]
+  }
+}

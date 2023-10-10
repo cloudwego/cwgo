@@ -17,3 +17,23 @@
  */
 
 package agent
+
+import "github.com/spf13/cobra"
+
+type setupOptions struct {
+	ServerMode string
+	ConfigType string
+	ConfigPath string
+}
+
+func newSetupOptions() *setupOptions {
+	return &setupOptions{}
+}
+
+func (o *setupOptions) AddFlags(cmd *cobra.Command) {
+	flagSet := cmd.Flags()
+
+	flagSet.StringVarP(&o.ServerMode, "server_mode", "", "", "")
+	flagSet.StringVarP(&o.ConfigType, "config_type", "", "", "")
+	flagSet.StringVarP(&o.ConfigPath, "config_path", "", "", "")
+}

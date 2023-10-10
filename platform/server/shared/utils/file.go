@@ -17,15 +17,11 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 )
-
-const GitlabURLPrefix = "https://gitlab.com/"
 
 func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ...string) error {
 	for _, folder := range folders {
@@ -60,26 +56,27 @@ func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ..
 	return nil
 }
 
-func ParseIdlURL(url string) (idlPid, owner, repoName string, err error) {
-	var tempPath string
-	if strings.HasPrefix(url, GitlabURLPrefix) {
-		tempPath = url[len(GitlabURLPrefix):]
-		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
-		if lastQuestionMarkIndex != -1 {
-			tempPath = tempPath[:lastQuestionMarkIndex]
+func CheckNotExist(src string) bool {
+	_, err := os.Stat(src)
+
+	return os.IsNotExist(err)
+}
+
+func MkDir(src string) error {
+	err := os.MkdirAll(src, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func IsNotExistMkDir(src string) error {
+	if notExist := CheckNotExist(src); notExist == true {
+		if err := MkDir(src); err != nil {
+			return err
 		}
-	} else {
-		return "", "", "", errors.New("idlPath format wrong,do not have prefix:\"https://gitlab.com/\"")
 	}
-	urlParts := strings.Split(tempPath, "/")
-	if len(urlParts) < 5 {
-		return "", "", "", errors.New("idlPath format wrong")
-	}
-	owner = urlParts[0]
-	repoName = urlParts[1]
-	for i := 5; i < len(urlParts); i++ {
-		idlPid = idlPid + "/" + urlParts[i]
-	}
-	idlPid = idlPid[1:]
-	return idlPid, owner, repoName, nil
+
+	return nil
 }

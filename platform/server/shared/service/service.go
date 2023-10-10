@@ -18,8 +18,22 @@
 
 package service
 
-import "context"
+import (
+	"time"
+)
 
-type IService interface {
-	GenerateCode(ctx context.Context, idlId int64) error
+type Service struct {
+	Id             string
+	Host           string
+	Port           int
+	LastUpdateTime time.Time
+}
+
+func NewService(serviceId, host string, port int) (*Service, error) {
+	return &Service{
+		Id:             serviceId,
+		Host:           host,
+		Port:           port,
+		LastUpdateTime: time.Now(),
+	}, nil
 }
