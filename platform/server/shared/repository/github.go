@@ -92,6 +92,12 @@ func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 		return err
 	}
 
+	// Obtain the tree for the default branch
+	baseTree, _, err := a.client.Git.GetTree(context.Background(), owner, repoName, *ref.Object.SHA, false)
+	if err != nil {
+		return err
+	}
+
 	// Create a new Tree object for the file to be pushed
 	var treeEntries []*github.TreeEntry
 	for filePath, content := range files {
@@ -101,6 +107,10 @@ func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 			Mode:    github.String("100644"),
 		})
 	}
+
+	// Add a new file to the tree of the default branch
+	treeEntries = append(treeEntries, baseTree.Entries...)
+
 	newTree, _, err := a.client.Git.CreateTree(context.Background(), owner, repoName, *ref.Object.SHA, treeEntries)
 	if err != nil {
 		return err
@@ -110,6 +120,7 @@ func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	newCommit, _, err := a.client.Git.CreateCommit(context.Background(), owner, repoName, &github.Commit{
 		Message: github.String(commitMessage),
 		Tree:    newTree,
+		Parents: []*github.Commit{{SHA: ref.Object.SHA}},
 	})
 	if err != nil {
 		return err
