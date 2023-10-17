@@ -25,7 +25,6 @@ import (
 	"go/printer"
 	"go/token"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -147,13 +146,13 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 		return fmt.Errorf("GOPATH is not set")
 	}
 
-	gosrc := filepath.Join(gopath, "src")
+	gosrc := filepath.Join(gopath, consts.Src)
 	gosrc, err = filepath.Abs(gosrc)
 	if err != nil {
 		log.Warn("Get GOPATH/src path failed:", err.Error())
 		os.Exit(1)
 	}
-	curpath, err := filepath.Abs(".")
+	curpath, err := filepath.Abs(consts.CurrentDir)
 	if err != nil {
 		log.Warn("Get current path failed:", err.Error())
 		os.Exit(1)
@@ -200,20 +199,6 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 	}
 	a.OutputPath = curpath
 	return nil
-}
-
-func replaceThriftVersion(args *kargs.Arguments) {
-	if args.IDLType == "thrift" {
-		cmd := "go mod edit -replace github.com/apache/thrift=github.com/apache/thrift@v0.13.0"
-		argv := strings.Split(cmd, " ")
-		err := exec.Command(argv[0], argv[1:]...).Run()
-
-		res := "Done"
-		if err != nil {
-			res = err.Error()
-		}
-		log.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
-	}
 }
 
 func hzArgsForHex(c *config.ServerArgument) (*hzConfig.Argument, error) {

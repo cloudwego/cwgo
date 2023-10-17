@@ -28,15 +28,16 @@ import (
 	"strings"
 
 	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/kitex/tool/internal_pkg/log"
 )
 
 func GetGOPATH() (gopath string, err error) {
-	ps := filepath.SplitList(os.Getenv("GOPATH"))
+	ps := filepath.SplitList(os.Getenv(consts.GOPATH))
 	if len(ps) > 0 {
 		gopath = ps[0]
 	}
 	if gopath == "" {
-		cmd := exec.Command("go", "env", "GOPATH")
+		cmd := exec.Command(consts.Go, consts.Env, consts.GOPATH)
 		var out bytes.Buffer
 		cmd.Stderr = &out
 		cmd.Stdout = &out
@@ -54,7 +55,7 @@ func GetGOPATH() (gopath string, err error) {
 	if !isExist {
 		return "", err
 	}
-	return strings.Replace(gopath, "/", string(os.PathSeparator), -1), nil
+	return strings.Replace(gopath, consts.Slash, string(os.PathSeparator), -1), nil
 }
 
 // GetBuildGoPaths returns the list of Go path directories.
@@ -64,13 +65,13 @@ func GetBuildGoPaths() []string {
 		if p == "" || p == build.Default.GOROOT {
 			continue
 		}
-		if strings.HasPrefix(p, "~") {
+		if strings.HasPrefix(p, consts.Tilde) {
 			continue
 		}
 		all = append(all, p)
 	}
 	for k, v := range all {
-		if strings.HasSuffix(v, "/") || strings.HasSuffix(v, string(os.PathSeparator)) {
+		if strings.HasSuffix(v, consts.Slash) || strings.HasSuffix(v, string(os.PathSeparator)) {
 			v = v[:len(v)-1]
 		}
 		all[k] = v
@@ -84,10 +85,10 @@ var goModReg = regexp.MustCompile(`^\s*module\s+(\S+)\s*`)
 // the root directory. When the go.mod is found, its module name and path will be returned.
 func SearchGoMod(cwd string, recurse bool) (moduleName, path string, found bool) {
 	for {
-		path = filepath.Join(cwd, "go.mod")
+		path = filepath.Join(cwd, consts.GoMod)
 		data, err := ioutil.ReadFile(path)
 		if err == nil {
-			for _, line := range strings.Split(string(data), "\n") {
+			for _, line := range strings.Split(string(data), consts.LineBreak) {
 				m := goModReg.FindStringSubmatch(line)
 				if m != nil {
 					return m[1], cwd, true
@@ -112,20 +113,20 @@ func SearchGoMod(cwd string, recurse bool) (moduleName, path string, found bool)
 }
 
 func InitGoMod(module string) error {
-	isExist, err := PathExist("go.mod")
+	isExist, err := PathExist(consts.GoMod)
 	if err != nil {
 		return err
 	}
 	if isExist {
 		return nil
 	}
-	gg, err := exec.LookPath("go")
+	gg, err := exec.LookPath(consts.Go)
 	if err != nil {
 		return err
 	}
 	cmd := &exec.Cmd{
 		Path:   gg,
-		Args:   []string{"go", "mod", "init", module},
+		Args:   []string{consts.Go, consts.Mod, consts.Init, module},
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
@@ -136,4 +137,18 @@ func InitGoMod(module string) error {
 // IsWindows determines whether the current operating system is Windows
 func IsWindows() bool {
 	return consts.SysType == consts.WindowsOS
+}
+
+func ReplaceThriftVersion(idlType string) {
+	if idlType == consts.Thrift {
+		cmd := "go mod edit -replace github.com/apache/thrift=github.com/apache/thrift@v0.13.0"
+		argv := strings.Split(cmd, consts.BlackSpace)
+		err := exec.Command(argv[0], argv[1:]...).Run()
+
+		res := "Done"
+		if err != nil {
+			res = err.Error()
+		}
+		log.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
+	}
 }
