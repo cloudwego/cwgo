@@ -107,8 +107,9 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	return nil
 }
 
-func (a *GitLabApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
+func (a *GitLabApi) GetRepositoryArchive(owner, repoName, ref string) ([]byte, error) {
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
+	format := "tar"
 	archiveOptions := &gitlab.ArchiveOptions{
 		Format: &format, // Choose the archive format
 	}

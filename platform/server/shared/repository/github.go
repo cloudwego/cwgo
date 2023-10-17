@@ -141,11 +141,12 @@ func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	return nil
 }
 
-func (a *GitHubApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
+func (a *GitHubApi) GetRepositoryArchive(owner, repoName, ref string) ([]byte, error) {
 	opts := &github.RepositoryContentGetOptions{
 		Ref: ref,
 	}
 
+	format := "tarball"
 	archiveLink, _, err := a.client.Repositories.GetArchiveLink(context.Background(), owner, repoName, github.ArchiveFormat(format), opts, false)
 	if err != nil {
 		return nil, err

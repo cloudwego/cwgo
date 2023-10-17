@@ -17,7 +17,11 @@
 package utils
 
 import (
+	"archive/tar"
+	"bytes"
+	"compress/gzip"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -79,4 +83,61 @@ func IsNotExistMkDir(src string) error {
 	}
 
 	return nil
+}
+
+func UnTar(archiveData []byte, tempDir string, IsTarball bool) (string, error) {
+	var tarReader *tar.Reader
+	if IsTarball {
+		tarballBuffer := bytes.NewReader(archiveData)
+
+		gzipReader, err := gzip.NewReader(tarballBuffer)
+		if err != nil {
+			return "", err
+		}
+		defer gzipReader.Close()
+
+		tarReader = tar.NewReader(gzipReader)
+	} else {
+		tarReader = tar.NewReader(bytes.NewReader(archiveData))
+	}
+	var rootDirName string
+
+	for {
+		header, err := tarReader.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return "", err
+		}
+
+		if header.Typeflag != tar.TypeDir && header.Typeflag != tar.TypeReg {
+			continue
+		}
+
+		if rootDirName == "" {
+			rootDirName = header.Name
+		}
+
+		targetPath := filepath.Join(tempDir, header.Name)
+
+		switch header.Typeflag {
+		case tar.TypeDir:
+			if err := os.MkdirAll(targetPath, os.ModePerm); err != nil {
+				return "", err
+			}
+
+		case tar.TypeReg:
+			file, err := os.Create(targetPath)
+			if err != nil {
+				return "", err
+			}
+			defer file.Close()
+
+			if _, err := io.Copy(file, tarReader); err != nil {
+				return "", err
+			}
+		}
+	}
+	return rootDirName, nil
 }

@@ -20,7 +20,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
@@ -30,7 +29,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 )
 
@@ -101,34 +99,30 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	}
 	defer os.RemoveAll(tempDir)
 
-	idlFile, err := client.GetFile(owner, repoName, idlPid, consts.MainRef)
+	archiveData, err := client.GetRepositoryArchive(owner, repoName, consts.MainRef)
 	if err != nil {
-		logger.Logger.Error("get idl files failed", zap.Error(err))
+		logger.Logger.Error("get archive failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
 			Code: http.StatusInternalServerError,
 			Msg:  "internal err",
 		}, nil
 	}
 
-	// Create a thrift file in a temporary folder
-	filePathOnDisk := fmt.Sprintf("%s/%s", tempDir, idlFile.Name)
-	dir := filepath.Dir(filePathOnDisk)
-	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+	isTarBall := false
+	if repo.StoreType == consts.RepositoryTypeNumGithub {
+		isTarBall = true
+	}
+
+	archiveName, err := utils.UnTar(archiveData, tempDir, isTarBall)
+	if err != nil {
+		logger.Logger.Error("parse archive failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
 			Code: http.StatusInternalServerError,
 			Msg:  "internal err",
 		}, nil
 	}
 
-	if err := ioutil.WriteFile(filePathOnDisk, idlFile.Content, 0644); err != nil {
-		logger.Logger.Error("write file failed", zap.Error(err))
-		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
-		}, nil
-	}
-
-	err = s.svcCtx.Generator.Generate(idlFile.Name, idl.ServiceName, tempDir)
+	err = s.svcCtx.Generator.Generate(archiveName+idlPid, idl.ServiceName, tempDir)
 	if err != nil {
 		logger.Logger.Error("generate file failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
