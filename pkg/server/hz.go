@@ -49,10 +49,20 @@ func convertHzArgument(sa *config.ServerArgument, hzArgument *hzConfig.Argument)
 		gitPath = path.Join(tpl.HertzDir, consts.Server, gitPath)
 		hzArgument.CustomizeLayout = path.Join(gitPath, consts.LayoutFile)
 		hzArgument.CustomizePackage = path.Join(gitPath, consts.PackageLayoutFile)
+		layoutDataPath := path.Join(gitPath, "render.json")
+		isExist, _ := utils.PathExist(layoutDataPath)
+		if isExist {
+			hzArgument.CustomizeLayoutData = layoutDataPath
+		}
 	} else {
 		if len(sa.Template) != 0 {
 			hzArgument.CustomizeLayout = path.Join(sa.Template, consts.LayoutFile)
 			hzArgument.CustomizePackage = path.Join(sa.Template, consts.PackageLayoutFile)
+			layoutDataPath := path.Join(sa.Template, "render.json")
+			isExist, _ := utils.PathExist(layoutDataPath)
+			if isExist {
+				hzArgument.CustomizeLayoutData = layoutDataPath
+			}
 		} else {
 			hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, consts.Server, consts.Standard, consts.LayoutFile)
 			hzArgument.CustomizePackage = path.Join(tpl.HertzDir, consts.Server, consts.Standard, consts.PackageLayoutFile)
