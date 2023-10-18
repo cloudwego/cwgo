@@ -6,7 +6,9 @@ import (
 	"regexp"
 )
 
-func GetDependentFilePaths(mainIdlPath string) ([]string, error) {
+type ThriftFile struct{}
+
+func (_ *ThriftFile) GetDependentFilePaths(mainIdlPath string) ([]string, error) {
 	processedPaths := make(map[string]bool)
 	relatedPaths := make(map[string]bool)
 	var resultPaths []string
