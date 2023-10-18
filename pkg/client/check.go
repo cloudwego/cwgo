@@ -76,19 +76,31 @@ func check(ca *config.ClientArgument) error {
 
 	// Generate the project under gopath, use the relative path as the package name
 	if strings.HasPrefix(ca.Cwd, ca.GoSrc) {
-		if gopkg, err := filepath.Rel(ca.GoSrc, ca.Cwd); err != nil {
+		if goPkg, err := filepath.Rel(ca.GoSrc, ca.Cwd); err != nil {
 			return fmt.Errorf("get relative path to GOPATH/src failed: %s", err)
 		} else {
-			ca.GoPkg = gopkg
+			ca.GoPkg = goPkg
 		}
+
 		if ca.GoMod == "" {
-			ca.GoMod = ca.GoPkg
+			if utils.IsWindows() {
+				ca.GoMod = strings.ReplaceAll(ca.GoPkg, consts.BackSlash, consts.Slash)
+			} else {
+				ca.GoMod = ca.GoPkg
+			}
 		}
-		if ca.GoMod != "" && ca.GoMod != ca.GoPkg {
-			return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", ca.GoMod, ca.GoPkg)
-		}
-		if ca.GoMod == "" {
-			ca.GoMod = ca.GoPkg
+
+		if ca.GoMod != "" {
+			if utils.IsWindows() {
+				goPkgSlash := strings.ReplaceAll(ca.GoPkg, consts.BackSlash, consts.Slash)
+				if goPkgSlash != ca.GoMod {
+					return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", ca.GoMod, goPkgSlash)
+				}
+			} else {
+				if ca.GoMod != ca.GoPkg {
+					return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", ca.GoMod, ca.GoPkg)
+				}
+			}
 		}
 	}
 	return nil

@@ -34,7 +34,10 @@ const (
 	DB     = "db"
 )
 
-const Protobuf = "protobuf"
+const (
+	Thrift   = "thrift"
+	Protobuf = "protobuf"
+)
 
 // SysType is the running program's operating system type
 const SysType = runtime.GOOS
@@ -46,6 +49,8 @@ const (
 	BackSlash  = "\\"
 	BlackSpace = " "
 	Comma      = ";"
+	Tilde      = "~"
+	LineBreak  = "\n"
 )
 
 // Package Name
@@ -56,6 +61,7 @@ const (
 	DefaultKitexModelDir = "kitex_gen"
 	DefaultDbOutDir      = "biz/dal/query"
 	Standard             = "standard"
+	CurrentDir           = "."
 )
 
 // File Name
@@ -66,6 +72,8 @@ const (
 	SuffixGit          = ".git"
 	DefaultDbOutFile   = "gen.go"
 	Main               = "main.go"
+	GoMod              = "go.mod"
+	HzFile             = ".hz"
 )
 
 // Registration Center
@@ -95,6 +103,12 @@ const (
 )
 
 const (
+	Go     = "go"
+	GOPATH = "GOPATH"
+	Env    = "env"
+	Mod    = "mod"
+	Init   = "init"
+
 	OutDir   = "out_dir"
 	Verbose  = "verbose"
 	Template = "template"

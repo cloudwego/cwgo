@@ -61,7 +61,7 @@ func Server(c *config.ServerArgument) error {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
 				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
-					replaceThriftVersion(&args)
+					utils.ReplaceThriftVersion(args.IDLType)
 				}
 			}
 			os.Exit(1)
@@ -84,7 +84,7 @@ func Server(c *config.ServerArgument) error {
 				log.Warn("please add \"opts = append(opts,server.WithTransHandlerFactory(&mixTransHandlerFactory{nil}))\", to your kitex options")
 			}
 		}
-		replaceThriftVersion(&args)
+		utils.ReplaceThriftVersion(args.IDLType)
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)
@@ -98,7 +98,7 @@ func Server(c *config.ServerArgument) error {
 			if c.GoMod == "" {
 				return fmt.Errorf("output directory %s is not under GOPATH/src. Please specify a module name with the '-module' flag", c.Cwd)
 			}
-			module, path, ok := utils.SearchGoMod(".", false)
+			module, path, ok := utils.SearchGoMod(consts.CurrentDir, false)
 			if ok {
 				// go.mod exists
 				if module != c.GoMod {
@@ -129,7 +129,7 @@ func Server(c *config.ServerArgument) error {
 				return cli.Exit(err, meta.LoadError)
 			}
 
-			module, path, ok := utils.SearchGoMod(".", false)
+			module, path, ok := utils.SearchGoMod(consts.CurrentDir, false)
 			if ok {
 				// go.mod exists
 				if c.GoMod != "" && module != c.GoMod {
@@ -137,7 +137,7 @@ func Server(c *config.ServerArgument) error {
 				}
 				args.Gomod = module
 			} else {
-				workPath, err := filepath.Abs(".")
+				workPath, err := filepath.Abs(consts.CurrentDir)
 				if err != nil {
 					return fmt.Errorf(err.Error())
 				}

@@ -64,12 +64,12 @@ func Client(c *config.ClientArgument) error {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
 				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
-					replaceThriftVersion(&args)
+					utils.ReplaceThriftVersion(args.IDLType)
 				}
 			}
 			os.Exit(1)
 		}
-		replaceThriftVersion(&args)
+		utils.ReplaceThriftVersion(args.IDLType)
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)

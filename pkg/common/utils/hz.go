@@ -19,6 +19,7 @@ package utils
 import (
 	"path"
 
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 )
 
@@ -31,6 +32,6 @@ func SetHzVerboseLog(v bool) {
 }
 
 func IsHzNew(outputDir string) bool {
-	exist, _ := PathExist(path.Join(outputDir, ".hz"))
+	exist, _ := PathExist(path.Join(outputDir, consts.HzFile))
 	return !exist
 }
