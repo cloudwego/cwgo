@@ -21,7 +21,9 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"net/http"
 )
 
 type AddIDLService struct {
@@ -37,7 +39,29 @@ func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLSe
 
 // Run create note info
 func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
-	// Finish your business logic.
+	// check main idl path
+	repoClient, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
+
+	idlPid, owner, repoName, err := repoClient.ParseUrl(req.MainIdlPath)
+
+	_, err = repoClient.GetFile(owner, repoName, idlPid, consts.MainRef)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "invalid main idl path",
+		}, nil
+	}
+
+	// TODO: get idl info
+
+	// add idl
+	err = s.svcCtx.DaoManager.Idl.AddIDL(req.RepositoryId, req.MainIdlPath, req.ServiceName)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "",
+		}, nil
+	}
 
 	return
 }

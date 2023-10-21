@@ -23,7 +23,7 @@ type IDispatcher interface {
 	DelService(serviceId string) error
 
 	AddTask(task *task.Task) error
-	RemoveTask(taskId string) error
+	DelTask(taskId string) error
 
 	GetTaskByServiceId(serviceId string) []*task.Task
 	GetServiceIdByTaskId(taskId string) string

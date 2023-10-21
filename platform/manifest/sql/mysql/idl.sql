@@ -27,7 +27,7 @@ CREATE TABLE `idl` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `repository_id` bigint(20) NOT NULL COMMENT 'repository id',
   `main_idl_path` varchar(255) NOT NULL COMMENT 'main idl path',
-  `content` text COMMENT 'idl content',
+  `commit_hash` varchar(64) COMMENT 'commit hash',
   `service_name` varchar(255) NOT NULL COMMENT 'service name',
   `last_sync_time` varchar(255) NOT NULL COMMENT 'last update time',
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'is deleted',

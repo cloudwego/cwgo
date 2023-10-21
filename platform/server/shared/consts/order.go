@@ -8,6 +8,4 @@ const (
 	OrderDec = "desc"
 
 	OrderByUpdateTime = "update_time"
-	OrderByCreateTime = "create_time"
-	OrderBySyncTime   = "last_sync_time"
 )
