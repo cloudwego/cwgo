@@ -85,6 +85,7 @@ func IsNotExistMkDir(src string) error {
 	return nil
 }
 
+// UnTar Persist the tar compressed package to the specified disk. If using tarball, gzip decompression is required first
 func UnTar(archiveData []byte, tempDir string, IsTarball bool) (string, error) {
 	var tarReader *tar.Reader
 	if IsTarball {
