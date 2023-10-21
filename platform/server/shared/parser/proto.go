@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"bufio"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -9,36 +9,49 @@ import (
 
 type ProtoFile struct{}
 
-func (_ *ProtoFile) GetDependentFilePaths(mainProtoPath string) ([]string, error) {
-	visited := make(map[string]struct{})
+func (_ *ProtoFile) GetDependentFilePaths(mainIdlPath string) ([]string, error) {
+	processedPaths := make(map[string]bool)
+	relatedPaths := make(map[string]bool)
+	var resultPaths []string
 
-	importPaths := make([]string, 0)
+	baseDir := filepath.Dir(mainIdlPath)
 
-	dir := filepath.Dir(mainProtoPath)
-
-	var findImports func(string) error
-	findImports = func(protoPath string) error {
-		if _, ok := visited[protoPath]; ok {
+	var processFile func(filePath string) error
+	processFile = func(filePath string) error {
+		if processedPaths[filePath] {
 			return nil
 		}
 
-		visited[protoPath] = struct{}{}
-
-		file, err := os.Open(protoPath)
+		thriftContent, err := ioutil.ReadFile(filePath)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
+		regex := regexp.MustCompile(importPattern)
 
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			line := scanner.Text()
-			importStatement := regexp.MustCompile(importPattern).FindStringSubmatch(line)
-			if len(importStatement) > 1 {
-				importPath := importStatement[1]
-				fullImportPath := filepath.Join(dir, importPath)
-				importPaths = append(importPaths, fullImportPath)
-				if err := findImports(fullImportPath); err != nil {
+		matches := regex.FindAllStringSubmatch(string(thriftContent), -1)
+		var includePaths []string
+
+		for _, match := range matches {
+			if len(match) >= 2 {
+				includePath := match[1]
+				// Obtain the fields in the import here and process them
+				absolutePath := filepath.Clean(filepath.Join(baseDir, includePath))
+				_, err := os.Stat(absolutePath)
+				if err != nil {
+					continue
+				}
+				includePaths = append(includePaths, absolutePath)
+			}
+		}
+
+		processedPaths[filePath] = true
+
+		for _, includePath := range includePaths {
+			if !relatedPaths[includePath] {
+				relatedPaths[includePath] = true
+				resultPaths = append(resultPaths, includePath)
+				err := processFile(includePath)
+				if err != nil {
 					return err
 				}
 			}
@@ -47,9 +60,16 @@ func (_ *ProtoFile) GetDependentFilePaths(mainProtoPath string) ([]string, error
 		return nil
 	}
 
-	if err := findImports(mainProtoPath); err != nil {
+	err := processFile(mainIdlPath)
+	if err != nil {
 		return nil, err
 	}
 
-	return importPaths, nil
+	mainIdlDir := filepath.Dir(mainIdlPath)
+	relativePaths := make([]string, len(resultPaths))
+	for i, path := range resultPaths {
+		relativePaths[i], _ = filepath.Rel(mainIdlDir, path)
+	}
+
+	return relativePaths, nil
 }
