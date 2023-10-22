@@ -1,12 +1,5 @@
 namespace go model
 
-struct Task{
-    1: string id
-    2: i32 type
-    3: string schedule_time
-    4: string data
-}
-
 struct IDL{
     1: i64 id
     2: i64 repository_id

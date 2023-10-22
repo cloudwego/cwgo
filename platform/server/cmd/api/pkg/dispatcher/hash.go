@@ -21,7 +21,7 @@ package dispatcher
 import (
 	"errors"
 	"github.com/buraksezer/consistent"
-	"github.com/cloudwego/cwgo/platform/server/shared/task"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"hash/fnv"
 	"sync"
 )
@@ -44,8 +44,8 @@ type ConsistentHashDispatcher struct {
 	mutex sync.Mutex
 
 	hasher           *consistent.Consistent
-	Tasks            map[string]*task.Task
-	ServiceWithTasks map[string]map[string]*task.Task
+	Tasks            map[string]*model.Task
+	ServiceWithTasks map[string]map[string]*model.Task
 }
 
 func NewConsistentHashDispatcher() *ConsistentHashDispatcher {
@@ -62,8 +62,8 @@ func NewConsistentHashDispatcher() *ConsistentHashDispatcher {
 	return &ConsistentHashDispatcher{
 		mutex:            sync.Mutex{},
 		hasher:           consistentHasher,
-		Tasks:            make(map[string]*task.Task),
-		ServiceWithTasks: make(map[string]map[string]*task.Task),
+		Tasks:            make(map[string]*model.Task),
+		ServiceWithTasks: make(map[string]map[string]*model.Task),
 	}
 }
 
@@ -75,13 +75,13 @@ func (c *ConsistentHashDispatcher) AddService(serviceId string) error {
 
 	members := c.hasher.GetMembers()
 
-	serviceWithTasks := make(map[string]map[string]*task.Task, len(members))
+	serviceWithTasks := make(map[string]map[string]*model.Task, len(members))
 
 	for taskId, t := range c.Tasks {
 		m := c.hasher.LocateKey([]byte(taskId)).String()
 		_, ok := serviceWithTasks[m]
 		if !ok {
-			serviceWithTasks[m] = make(map[string]*task.Task)
+			serviceWithTasks[m] = make(map[string]*model.Task)
 		}
 
 		serviceWithTasks[m][taskId] = t
@@ -111,7 +111,7 @@ func (c *ConsistentHashDispatcher) DelService(serviceId string) error {
 	return nil
 }
 
-func (c *ConsistentHashDispatcher) AddTask(task *task.Task) error {
+func (c *ConsistentHashDispatcher) AddTask(task *model.Task) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -137,8 +137,8 @@ func (c *ConsistentHashDispatcher) RemoveTask(taskId string) error {
 	return nil
 }
 
-func (c *ConsistentHashDispatcher) GetTaskByServiceId(serviceId string) []*task.Task {
-	tasks := make([]*task.Task, 0, len(c.ServiceWithTasks[serviceId]))
+func (c *ConsistentHashDispatcher) GetTaskByServiceId(serviceId string) []*model.Task {
+	tasks := make([]*model.Task, 0, len(c.ServiceWithTasks[serviceId]))
 
 	for _, t := range c.ServiceWithTasks[serviceId] {
 		tasks = append(tasks, t)
