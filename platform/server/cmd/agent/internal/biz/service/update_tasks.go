@@ -20,15 +20,10 @@ package service
 
 import (
 	"context"
-	"github.com/bytedance/sonic"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/cron"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
-	"github.com/cloudwego/cwgo/platform/server/shared/task"
-	"go.uber.org/zap"
-	"net/http"
-	"time"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 )
 
 type UpdateTasksService struct {
@@ -44,48 +39,31 @@ func NewUpdateTasksService(ctx context.Context, svcCtx *svc.ServiceContext) *Upd
 
 // Run create note info
 func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateTasksRes, err error) {
-	tasks := make([]*task.Task, 0, len(req.Tasks))
+	tasks := make([]*model.Task, 0, len(req.Tasks))
 
 	for _, t := range req.Tasks {
-		tp := task.Type(t.Type)
-		switch tp {
-		case task.SyncIdl:
-			var data task.SyncIdlData
-			err := sonic.Unmarshal([]byte(t.Data), &data)
-			if err != nil {
-				logger.Logger.Error("json unmarshal failed", zap.Error(err), zap.String("data", t.Data))
-				return &agent.UpdateTasksRes{
-					Code: http.StatusInternalServerError,
-					Msg:  "internal err",
-				}, nil
-			}
+		switch t.Type {
+		case model.Type_sync_idl_data:
+			var data model.SyncIdlData
 
-			scheduleTime, _ := time.ParseDuration(t.ScheduleTime)
-
-			tasks = append(tasks, &task.Task{
+			tasks = append(tasks, &model.Task{
 				Id:           t.Id,
-				Type:         task.Type(t.Type),
-				ScheduleTime: scheduleTime,
-				Data:         data,
+				Type:         t.Type,
+				ScheduleTime: t.ScheduleTime,
+				Data: &model.Data{
+					SyncIdlData: &data,
+				},
 			})
-		case task.SyncRepo:
-			var data task.SyncRepoData
-			err := sonic.Unmarshal([]byte(t.Data), &data)
-			if err != nil {
-				logger.Logger.Error("json unmarshal failed", zap.Error(err), zap.String("data", t.Data))
-				return &agent.UpdateTasksRes{
-					Code: http.StatusInternalServerError,
-					Msg:  "internal err",
-				}, nil
-			}
+		case model.Type_sync_repo_data:
+			var data model.SyncRepoData
 
-			scheduleTime, _ := time.ParseDuration(t.ScheduleTime)
-
-			tasks = append(tasks, &task.Task{
+			tasks = append(tasks, &model.Task{
 				Id:           t.Id,
-				Type:         task.Type(t.Type),
-				ScheduleTime: scheduleTime,
-				Data:         data,
+				Type:         t.Type,
+				ScheduleTime: t.ScheduleTime,
+				Data: &model.Data{
+					SyncRepoData: &data,
+				},
 			})
 		}
 	}

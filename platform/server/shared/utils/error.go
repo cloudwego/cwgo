@@ -20,6 +20,7 @@ func IsNetworkError(err error) bool {
 	return false
 }
 
+// IsFileNotFoundError Determine if it is file not found error issue
 func IsFileNotFoundError(err error) bool {
 	return strings.Contains(err.Error(), "A file with this name doesn't exist")
 }

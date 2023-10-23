@@ -19,38 +19,16 @@
 package task
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
-	"time"
 )
 
-type Task struct {
-	Id           string
-	Type         Type
-	ScheduleTime time.Duration
-	Data         interface{}
-}
-
-type SyncIdlData struct {
-	IdlId int64 `json:"idl_id"`
-}
-
-type SyncRepoData struct {
-	RepositoryId int64 `json:"repository_id"`
-}
-
-type Type uint32
-
-const (
-	SyncIdl Type = iota + 1
-	SyncRepo
-)
-
-func NewTask(tp Type, scheduleTime time.Duration, data interface{}) *Task {
+func NewTask(tp model.Type, scheduleTime string, data *model.Data) *model.Task {
 	taskId, _ := utils.NewTaskId()
-	return &Task{
+	return &model.Task{
 		Id:           taskId,
-		Type:         tp,
 		ScheduleTime: scheduleTime,
+		Type:         tp,
 		Data:         data,
 	}
 }
