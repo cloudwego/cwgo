@@ -39,23 +39,23 @@ import (
 )
 
 type Manager struct {
-	windows     []*service.Service
+	windows     []service.Service
 	currentSize int
 	expireTime  time.Duration
 	mutex       sync.Mutex
 }
 
-func (sw *Manager) add(agentService *service.Service) {
+func (sw *Manager) add(agentService service.Service) {
 	sw.mutex.Lock()
 	defer sw.mutex.Unlock()
 
 	if sw.currentSize == cap(sw.windows) {
 		// expand slice if full
-		var newAgents []*service.Service
+		var newAgents []service.Service
 		if cap(sw.windows) == 0 {
-			newAgents = make([]*service.Service, 16)
+			newAgents = make([]service.Service, 16)
 		} else {
-			newAgents = make([]*service.Service, cap(sw.windows)<<1)
+			newAgents = make([]service.Service, cap(sw.windows)<<1)
 		}
 		copy(newAgents, sw.windows)
 		sw.windows = newAgents
@@ -69,16 +69,22 @@ func (sw *Manager) getExpiredServiceIds() []string {
 	sw.mutex.Lock()
 	defer sw.mutex.Unlock()
 
-	expiredServiceIds := make([]string, 0)
-	for i := 0; i < sw.currentSize; i++ {
+	expiredServiceMap := make(map[string]struct{})
+	i := 0
+	for i = 0; i < sw.currentSize; i++ {
 		agentService := sw.windows[i]
 		if agentService.LastUpdateTime.Add(sw.expireTime).Before(time.Now()) {
-			expiredServiceIds = append(expiredServiceIds, agentService.Id)
+			expiredServiceMap[agentService.Id] = struct{}{}
 		} else {
-			copy(sw.windows, sw.windows[i:])
-			sw.currentSize = sw.currentSize - i
 			break
 		}
+	}
+	copy(sw.windows, sw.windows[i:])
+	sw.currentSize = sw.currentSize - i
+
+	expiredServiceIds := make([]string, 0, len(expiredServiceMap))
+	for expiredServiceId := range expiredServiceMap {
+		expiredServiceIds = append(expiredServiceIds, expiredServiceId)
 	}
 
 	return expiredServiceIds
@@ -103,7 +109,7 @@ func NewBuiltinRegistry() *BuiltinRegistry {
 		agents:        make(map[string]*service.Service),
 		cleanInterval: 3 * time.Second,
 		manager: &Manager{
-			windows:     make([]*service.Service, 0),
+			windows:     make([]service.Service, 0),
 			currentSize: 0,
 			mutex:       sync.Mutex{},
 			expireTime:  time.Minute,
@@ -126,7 +132,7 @@ func (r *BuiltinRegistry) Register(serviceId string, host string, port int) erro
 
 	r.agents[serviceId] = agentService
 
-	r.manager.add(agentService)
+	r.manager.add(*agentService)
 
 	return nil
 }
@@ -152,7 +158,7 @@ func (r *BuiltinRegistry) Update(serviceId string) error {
 		return errors.New("service not found")
 	} else {
 		agentService.LastUpdateTime = time.Now()
-		r.manager.add(agentService)
+		r.manager.add(*agentService)
 		return nil
 	}
 }
