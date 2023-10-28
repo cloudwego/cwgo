@@ -131,7 +131,7 @@ Examples:
 
 Examples:
   # Generate DB model code 
-  cwgo  model --db_type mysql --dsn "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8&parseTime=True&loc=Local"
+  cwgo  model --db_type mysql --dsn "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8mb4&parseTime=True&loc=Local"
 `
 
 	InitName  = "init"
