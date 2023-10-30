@@ -3,13 +3,16 @@ package repository
 import (
 	"context"
 	"errors"
+	"strconv"
 	"sync"
+	"time"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/google/go-github/v53/github"
+	"github.com/patrickmn/go-cache"
 	"github.com/xanzy/go-gitlab"
 	"golang.org/x/oauth2"
 )
@@ -17,18 +20,24 @@ import (
 type Manager struct {
 	daoManager *dao.Manager
 
-	repositoryClients map[int64]IRepository
+	repositoryClients      map[int64]IRepository
+	repositoryClientsCache *cache.Cache
 
 	sync.RWMutex
 }
+
+const (
+	repositoryClientDefaultExpiration = 24 * time.Hour
+)
 
 func NewRepoManager(daoManager *dao.Manager) (*Manager, error) {
 	repositoryClients := make(map[int64]IRepository)
 
 	manager := &Manager{
-		daoManager:        daoManager,
-		repositoryClients: repositoryClients,
-		RWMutex:           sync.RWMutex{},
+		daoManager:             daoManager,
+		repositoryClients:      repositoryClients,
+		repositoryClientsCache: cache.New(repositoryClientDefaultExpiration, 1*time.Minute),
+		RWMutex:                sync.RWMutex{},
 	}
 
 	return manager, nil
@@ -58,11 +67,13 @@ func (rm *Manager) AddClient(repository *model.Repository) error {
 			}
 		}
 
-		rm.repositoryClients[repository.Id] = NewGitLabApi(gitlabClient)
+		rm.repositoryClientsCache.SetDefault(strconv.FormatInt(repository.Id, 10), NewGitLabApi(gitlabClient))
+		//rm.repositoryClients[repository.Id] = NewGitLabApi(gitlabClient)
 	case consts.RepositoryTypeNumGithub:
 		githubClient := NewGithubClient(repository.Token)
 
-		rm.repositoryClients[repository.Id] = NewGitHubApi(githubClient)
+		rm.repositoryClientsCache.SetDefault(strconv.FormatInt(repository.Id, 10), NewGitHubApi(githubClient))
+		//rm.repositoryClients[repository.Id] = NewGitHubApi(githubClient)
 	default:
 		return errors.New("invalid repository type")
 	}
@@ -81,7 +92,7 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 	rm.RLock()
 	defer rm.RUnlock()
 
-	if client, ok := rm.repositoryClients[repoId]; !ok {
+	if clientIface, ok := rm.repositoryClientsCache.Get(strconv.FormatInt(repoId, 10)); !ok {
 		repo, err := rm.daoManager.Repository.GetRepository(repoId)
 		if err != nil {
 			return nil, err
@@ -92,7 +103,7 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 		}
 		return rm.GetClient(repoId)
 	} else {
-		return client, nil
+		return clientIface.(IRepository), nil
 	}
 }
 
