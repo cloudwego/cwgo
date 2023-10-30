@@ -16,16 +16,18 @@
 
 package dispatcher
 
-import "github.com/cloudwego/cwgo/platform/server/shared/task"
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+)
 
 type IDispatcher interface {
 	AddService(serviceId string) error
 	DelService(serviceId string) error
 
-	AddTask(task *task.Task) error
-	DelTask(taskId string) error
+	AddTask(task *model.Task) error
+	RemoveTask(taskId string) error
 
-	GetTaskByServiceId(serviceId string) []*task.Task
+	GetTaskByServiceId(serviceId string) []*model.Task
 	GetServiceIdByTaskId(taskId string) string
 	GetTotalTaskNum() int
 }

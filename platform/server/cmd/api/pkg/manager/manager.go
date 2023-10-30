@@ -21,7 +21,6 @@ package manager
 import (
 	"context"
 	"fmt"
-	"github.com/bytedance/sonic"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -85,10 +84,12 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 	for _, repo := range repos {
 		err = manager.AddTask(
 			task.NewTask(
-				task.SyncRepo,
-				manager.syncRepositoryInterval,
-				task.SyncRepoData{
-					RepositoryId: repo.Id,
+				model.Type_sync_repo_data,
+				manager.syncRepositoryInterval.String(),
+				&model.Data{
+					SyncRepoData: &model.SyncRepoData{
+						RepositoryId: repo.Id,
+					},
 				},
 			))
 		if err != nil {
@@ -126,7 +127,7 @@ func (m *Manager) GetAgentClientByServiceId(serviceId string) (agentservice.Clie
 	return c, nil
 }
 
-func (m *Manager) AddTask(t *task.Task) error {
+func (m *Manager) AddTask(t *model.Task) error {
 	err := m.dispatcher.AddTask(t)
 	if err != nil {
 		return fmt.Errorf("add task to dispatcher failed, err: %v", err)
@@ -155,12 +156,11 @@ func (m *Manager) UpdateAgentTasks() {
 
 			tasksModels := make([]*model.Task, len(tasks))
 			for i, t := range tasks {
-				data, _ := sonic.MarshalString(t.Data)
 				tasksModels[i] = &model.Task{
 					Id:           t.Id,
-					Type:         int32(t.Type),
-					ScheduleTime: t.ScheduleTime.String(),
-					Data:         data,
+					Type:         t.Type,
+					ScheduleTime: t.ScheduleTime,
+					Data:         t.Data,
 				}
 			}
 

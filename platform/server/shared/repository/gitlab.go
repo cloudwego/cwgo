@@ -42,6 +42,8 @@ const (
 
 func (a *GitLabApi) ParseUrl(url string) (filePid, owner, repoName string, err error) {
 	var tempPath string
+
+	// Determine if it is a GitLab prefix
 	if strings.HasPrefix(url, gitlabURLPrefix) {
 		tempPath = url[len(gitlabURLPrefix):]
 		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
@@ -51,6 +53,8 @@ func (a *GitLabApi) ParseUrl(url string) (filePid, owner, repoName string, err e
 	} else {
 		return "", "", "", errors.New("idlPath format wrong,do not have prefix: " + gitlabURLPrefix)
 	}
+
+	// Using regular expressions to match fields
 	regex := regexp.MustCompile(`([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`)
 	matches := regex.FindStringSubmatch(tempPath)
 	if len(matches) != 5 {
@@ -64,19 +68,23 @@ func (a *GitLabApi) ParseUrl(url string) (filePid, owner, repoName string, err e
 }
 
 func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
+	// Construct the project ID (pid) by combining owner and repoName
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
+
+	// Retrieve the file content from GitLab repository
 	fileContent, _, err := a.client.RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
 
+	// Extract the file name from the file path
 	name := filePath
 	index := strings.LastIndex(filePath, "/")
 	if index != -1 {
 		name = name[index+1:]
 	}
 
-	// Decoding the content of base64 encoded files
+	// Decode the base64 encoded file content
 	decodedContent, err := base64.StdEncoding.DecodeString(fileContent.Content)
 	if err != nil {
 		return nil, err
@@ -89,7 +97,7 @@ func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error
 }
 
 func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
-	// Implement PushFilesToRepository for GitLab
+	// PushFilesToRepository implementation for GitLab
 	for filePath, content := range files {
 		contentStr := string(content)
 		opts := &gitlab.CreateFileOptions{
@@ -98,6 +106,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 			Content:       &contentStr,
 		}
 
+		// Create files in the repository
 		_, _, err := a.client.RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
 		if err != nil {
 			return err
@@ -107,12 +116,19 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	return nil
 }
 
-func (a *GitLabApi) GetRepositoryArchive(owner, repoName, format, ref string) ([]byte, error) {
+func (a *GitLabApi) GetRepositoryArchive(owner, repoName, ref string) ([]byte, error) {
+	// Generate the project ID by combining owner and repoName
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
+
+	// Specify the desired archive format
+	format := "tar"
+
+	// Set archive options
 	archiveOptions := &gitlab.ArchiveOptions{
 		Format: &format, // Choose the archive format
 	}
 
+	// Request the archive from the GitLab API
 	fileData, _, err := a.client.Repositories.Archive(pid, archiveOptions)
 	if err != nil {
 		return nil, err
@@ -122,23 +138,34 @@ func (a *GitLabApi) GetRepositoryArchive(owner, repoName, format, ref string) ([
 }
 
 func (a *GitLabApi) GetLatestCommitHash(owner, repoName, filePath, ref string) (string, error) {
+	// Generate the project ID by combining owner and repoName
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
+
+	// Request the file content from the GitLab API
 	fileContent, _, err := a.client.RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return "", err
 	}
+
+	// Extract and return the last commit ID
 	return fileContent.LastCommitID, nil
 }
 
 func (a *GitLabApi) DeleteDirs(owner, repoName string, folderPaths ...string) error {
+	// Generate the project ID by combining owner and repoName
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
+
+	// Iterate over the folder paths and delete each one
 	for _, folderPath := range folderPaths {
+		// Attempt to delete the specified folder
 		_, err := a.client.RepositoryFiles.DeleteFile(pid, folderPath, &gitlab.DeleteFileOptions{
-			Branch:        gitlab.String("main"),             // 设置要删除的文件夹所在的分支
-			AuthorEmail:   gitlab.String("test@example.com"), // 替换为您的邮箱
-			AuthorName:    gitlab.String("test"),             // 替换为您的名称
+			Branch:        gitlab.String("main"),             // Set the branch where the folder is located
+			AuthorEmail:   gitlab.String("test@example.com"), // Replace with your email
+			AuthorName:    gitlab.String("test"),             // Replace with your name
 			CommitMessage: gitlab.String(fmt.Sprintf("Delete folder %s", folderPath)),
 		})
+
+		// Check for errors, but ignore if it's a "file not found" error
 		if err != nil && !utils.IsFileNotFoundError(err) {
 			return err
 		}

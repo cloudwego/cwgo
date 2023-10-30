@@ -30,6 +30,7 @@ func NewCwgoGenerator() *CwgoGenerator {
 }
 
 func (g *CwgoGenerator) Generate(idlPath, serviceName, generatePath string) error {
+	// Fixed options were used to generate code, which can be optimized to be optional in the future
 	cwgoCmd := exec.Command("cwgo", "client",
 		"--idl", idlPath,
 		"--type", "rpc",
