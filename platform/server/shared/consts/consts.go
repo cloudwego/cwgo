@@ -28,3 +28,7 @@ const (
 const (
 	DefaultLimit = 20
 )
+
+const (
+	RdbKeyRegistryService = ProjectName + ":" + "registry:service:%s"
+)

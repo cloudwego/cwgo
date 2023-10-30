@@ -101,7 +101,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 			ServerMode:       serverMode,
 			ServiceId:        serviceId,
 			Config:           config,
-			ApiConfigManager: api.NewConfigManager(config.Api, config.Registry, serviceId),
+			ApiConfigManager: api.NewConfigManager(config.Api, config.Registry, config.Store, serviceId),
 		}
 	case consts.ServerTypeNumAgent:
 		manager = &Manager{
@@ -109,7 +109,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 			ServerMode:         serverMode,
 			ServiceId:          serviceId,
 			Config:             config,
-			AgentConfigManager: agent.NewConfigManager(config.Agent, config.Registry, serviceId),
+			AgentConfigManager: agent.NewConfigManager(config.Agent, config.Registry, config.Store, serviceId),
 		}
 	}
 

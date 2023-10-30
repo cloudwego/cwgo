@@ -6,9 +6,9 @@ require (
 	github.com/apache/thrift v0.13.0
 	github.com/buraksezer/consistent v0.10.0
 	github.com/bytedance/gopkg v0.0.0-20230728082804-614d0af6619b
+	github.com/bytedance/sonic v1.9.1
 	github.com/cloudwego/hertz v0.7.0
 	github.com/cloudwego/kitex v0.7.0
-	github.com/cloudwego/thriftgo v0.3.0
 	github.com/go-co-op/gocron v1.32.1
 	github.com/google/go-github/v53 v53.2.0
 	github.com/hashicorp/consul/api v1.25.1
@@ -16,6 +16,8 @@ require (
 	github.com/hertz-contrib/pprof v0.1.1
 	github.com/kitex-contrib/obs-opentelemetry v0.2.3
 	github.com/kitex-contrib/registry-consul v0.0.0-20230406075225-7d341f036654
+	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/redis/go-redis/v9 v9.2.1
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.3.2
 	github.com/xanzy/go-gitlab v0.90.0
@@ -28,7 +30,7 @@ require (
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
-	github.com/bytedance/sonic v1.9.1 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/chenzhuoyu/iasm v0.9.0 // indirect
 	github.com/choleraehyq/pid v0.0.17 // indirect
@@ -38,7 +40,9 @@ require (
 	github.com/cloudwego/frugal v0.1.7 // indirect
 	github.com/cloudwego/localsession v0.0.2 // indirect
 	github.com/cloudwego/netpoll v0.5.0 // indirect
+	github.com/cloudwego/thriftgo v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/fgprof v0.9.3 // indirect

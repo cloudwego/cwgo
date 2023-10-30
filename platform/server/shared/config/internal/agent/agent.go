@@ -21,6 +21,7 @@ package agent
 import (
 	"fmt"
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/limit"
@@ -38,13 +39,13 @@ type ConfigManager struct {
 	ServiceName           string
 }
 
-func NewConfigManager(config Config, registryConfig registryconfig.Config, serviceId string) *ConfigManager {
+func NewConfigManager(config Config, registryConfig registryconfig.Config, storeConfig store.Config, serviceId string) *ConfigManager {
 	var registryConfigManager registryconfig.IRegistryConfigManager
 	var err error
 
 	switch registryConfig.Type {
 	case consts.RegistryTypeBuiltin:
-		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin)
+		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin, storeConfig)
 		if err != nil {
 			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
 		}

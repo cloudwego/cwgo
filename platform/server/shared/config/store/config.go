@@ -19,8 +19,10 @@
 package store
 
 import (
+	"errors"
 	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -40,6 +42,28 @@ func (c Config) NewMysqlDB() (*gorm.DB, error) {
 	return gorm.Open(mysql.Open(c.Mysql.GetDsn()), &gorm.Config{
 		PrepareStmt: true,
 	})
+}
+
+func (c Config) NewRedisClient() (redis.UniversalClient, error) {
+	if c.Redis.StandAlone.Addr != "" {
+		return redis.NewClient(&redis.Options{
+			Addr:     c.Redis.StandAlone.Addr,
+			Password: c.Redis.StandAlone.Password,
+			DB:       c.Redis.StandAlone.Db,
+		}), nil
+	}
+	if c.Redis.Cluster.Addrs != nil {
+		addrs := make([]string, len(c.Redis.Cluster.Addrs))
+		for i, addr := range c.Redis.Cluster.Addrs {
+			addrs[i] = fmt.Sprintf("%s:%s", addr.Ip, addr.Port)
+		}
+		return redis.NewClusterClient(&redis.ClusterOptions{
+			Addrs:    addrs,
+			Password: c.Redis.Cluster.Password,
+		}), nil
+	}
+
+	return nil, errors.New("config not found")
 }
 
 type Mysql struct {
@@ -80,7 +104,6 @@ type Redis struct {
 
 type RedisStandAlone struct {
 	Addr     string `mapstructure:"addr"`
-	Port     string `mapstructure:"port"`
 	Password string `mapstructure:"password"`
 	Db       int    `mapstructure:"db"`
 }
