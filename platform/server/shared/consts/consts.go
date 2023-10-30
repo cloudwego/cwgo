@@ -23,6 +23,8 @@ const (
 
 	ServiceNameApi   = ProjectName + "-" + ServerTypeApi
 	ServiceNameAgent = ProjectName + "-" + ServerTypeAgent
+
+	AgentMetadataFile = ServiceNameAgent + ".yaml"
 )
 
 const (

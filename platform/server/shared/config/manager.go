@@ -27,6 +27,9 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
+	"io/ioutil"
+	"os"
 )
 
 type Manager struct {
@@ -89,9 +92,30 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 	}
 
-	serviceId, err := utils.NewServiceId()
-	if err != nil {
-		return err
+	// get service id
+	var serviceId string
+	_, err := os.Stat(consts.AgentMetadataFile)
+	if os.IsNotExist(err) {
+		// agent file not exist
+		// generate a new service id
+		serviceId, err = utils.NewServiceId()
+		if err != nil {
+			return err
+		}
+	} else {
+		// use exist service id
+		yamlFileBytes, err := ioutil.ReadFile("config.yaml")
+		if err != nil {
+			panic(fmt.Sprintf("read agent metadata file failed, err: %v", err))
+		}
+
+		var agentMetadata agent.Metadata
+		err = yaml.Unmarshal(yamlFileBytes, &agentMetadata)
+		if err != nil {
+			panic(fmt.Sprintf("unmarshal agent metadata file failed, err: %v", err))
+		}
+
+		serviceId = agentMetadata.ServiceId
 	}
 
 	switch serverType {
