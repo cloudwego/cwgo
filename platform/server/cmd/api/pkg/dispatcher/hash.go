@@ -124,7 +124,7 @@ func (c *ConsistentHashDispatcher) AddTask(task *model.Task) error {
 	return nil
 }
 
-func (c *ConsistentHashDispatcher) RemoveTask(taskId string) error {
+func (c *ConsistentHashDispatcher) DelTask(taskId string) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 

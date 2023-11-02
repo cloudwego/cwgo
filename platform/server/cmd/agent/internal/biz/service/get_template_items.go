@@ -35,8 +35,8 @@ func NewGetTemplateItemsService(ctx context.Context, svcCtx *svc.ServiceContext)
 	}
 }
 
-// Run create note info
-func (s *GetTemplateItemsService) Run(req *agent.GetTemplatesReq) (resp *agent.GetTemplateItemsRes, err error) {
+// Run create note infoaw
+func (s *GetTemplateItemsService) Run(req *agent.GetTemplateItemsReq) (resp *agent.GetTemplateItemsRes, err error) {
 	// Finish your business logic.
 
 	return

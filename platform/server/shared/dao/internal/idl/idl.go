@@ -46,8 +46,21 @@ func NewMysqlIDL(db *gorm.DB) *MysqlIDLManager {
 	}
 }
 
-func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) error {
+func (m *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) error {
 	timeNow := utils.GetCurrentTime()
+	// TODO: check repo id is exists
+	//err := m.db.Exec(
+	//	fmt.Sprintf(
+	//		"INSERT INTO `%s` (`repository_id`, `main_idl_path`, `service_name`, `last_sync_time`) "+
+	//			"SELECT %d,`%s`,`%s`,`%s` "+
+	//			"FROM `%s` "+
+	//			"WHERE `%s`.`id` = %d",
+	//		consts.TableNameIDL,
+	//		repoId, idlPath, serviceName, time.Now().Format(time.DateTime),
+	//		consts.TableNameRepository,
+	//		consts.TableNameRepository, repoId,
+	//	),
+	//)
 	idl := model.IDL{
 		RepositoryId: repoId,
 		MainIdlPath:  idlPath,
@@ -56,7 +69,7 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) erro
 		CreateTime:   timeNow,
 		UpdateTime:   timeNow,
 	}
-	res := r.db.
+	res := m.db.
 		Table(consts.TableNameIDL).
 		Create(&idl)
 	if res.Error != nil {
@@ -66,9 +79,9 @@ func (r *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) erro
 	return nil
 }
 
-func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
+func (m *MysqlIDLManager) DeleteIDLs(ids []int64) error {
 	var idl model.IDL
-	res := r.db.
+	res := m.db.
 		Table(consts.TableNameIDL).
 		Delete(&idl, ids)
 	if res.Error != nil {
@@ -78,9 +91,9 @@ func (r *MysqlIDLManager) DeleteIDLs(ids []int64) error {
 	return nil
 }
 
-func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
+func (m *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.
+	res := m.db.
 		Table(consts.TableNameIDL).
 		Where("id = ?", id).
 		Updates(
@@ -99,9 +112,9 @@ func (r *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName strin
 	return nil
 }
 
-func (r *MysqlIDLManager) GetIDL(id int64) (model.IDL, error) {
+func (m *MysqlIDLManager) GetIDL(id int64) (model.IDL, error) {
 	var idl model.IDL
-	res := r.db.
+	res := m.db.
 		Table(consts.TableNameIDL).
 		Where("id = ?", id).
 		First(&idl)
@@ -112,7 +125,7 @@ func (r *MysqlIDLManager) GetIDL(id int64) (model.IDL, error) {
 	return idl, nil
 }
 
-func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*model.IDL, error) {
+func (m *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*model.IDL, error) {
 	var IDLs []*model.IDL
 	offset := (page - 1) * limit
 
@@ -130,7 +143,7 @@ func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*
 		orderBy = orderBy + " " + consts.OrderInc
 	}
 
-	res := r.db.
+	res := m.db.
 		Table(consts.TableNameIDL).
 		Offset(int(offset)).
 		Limit(int(limit)).
@@ -143,9 +156,9 @@ func (r *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*
 	return IDLs, nil
 }
 
-func (r *MysqlIDLManager) SyncIDLContent(id int64, content string) error {
+func (m *MysqlIDLManager) SyncIDLContent(id int64, content string) error {
 	timeNow := utils.GetCurrentTime()
-	res := r.db.
+	res := m.db.
 		Table(consts.TableNameIDL).
 		Where("id = ?", id).
 		Updates(

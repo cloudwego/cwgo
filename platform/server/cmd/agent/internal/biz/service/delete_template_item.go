@@ -36,7 +36,7 @@ func NewDeleteTemplateItemService(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 // Run create note info
-func (s *DeleteTemplateItemService) Run(req *agent.DeleteTemplateItemReq) (resp *agent.DeleteTemplateRes, err error) {
+func (s *DeleteTemplateItemService) Run(req *agent.DeleteTemplateItemReq) (resp *agent.DeleteTemplateItemRes, err error) {
 	// Finish your business logic.
 
 	return
