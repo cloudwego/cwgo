@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"net/http"
 )
 
 type AddIDLService struct {
@@ -37,7 +38,16 @@ func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLSe
 
 // Run create note info
 func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
-	// Finish your business logic.
+	err = s.svcCtx.DaoManager.Idl.AddIDL(req.RepositoryId, req.MainIdlPath, req.ServiceName)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+		}, err
+	}
 
-	return
+	return &agent.AddIDLRes{
+		Code: 0,
+		Msg:  "add idl successfully",
+	}, nil
 }

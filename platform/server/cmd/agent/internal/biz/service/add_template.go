@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"net/http"
 )
 
 type AddTemplateService struct {
@@ -37,7 +38,16 @@ func NewAddTemplateService(ctx context.Context, svcCtx *svc.ServiceContext) *Add
 
 // Run create note info
 func (s *AddTemplateService) Run(req *agent.AddTemplateReq) (resp *agent.AddTemplateRes, err error) {
-	// Finish your business logic.
+	err = s.svcCtx.DaoManager.Template.AddTemplate(req.Name, req.Type)
+	if err != nil {
+		return &agent.AddTemplateRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+		}, err
+	}
 
-	return
+	return &agent.AddTemplateRes{
+		Code: 0,
+		Msg:  "add template successfully",
+	}, nil
 }

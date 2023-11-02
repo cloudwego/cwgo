@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"net/http"
 )
 
 type DeleteTemplateService struct {
@@ -37,7 +38,16 @@ func NewDeleteTemplateService(ctx context.Context, svcCtx *svc.ServiceContext) *
 
 // Run create note info
 func (s *DeleteTemplateService) Run(req *agent.DeleteTemplateReq) (resp *agent.DeleteTemplateRes, err error) {
-	// Finish your business logic.
+	err = s.svcCtx.DaoManager.Template.DeleteTemplate(req.Ids)
+	if err != nil {
+		return &agent.DeleteTemplateRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+		}, err
+	}
 
-	return
+	return &agent.DeleteTemplateRes{
+		Code: 0,
+		Msg:  "delete template successfully",
+	}, nil
 }

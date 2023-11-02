@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"net/http"
 )
 
 type GetRepositoriesService struct {
@@ -37,7 +38,20 @@ func NewGetRepositoriesService(ctx context.Context, svcCtx *svc.ServiceContext) 
 
 // Run create note info
 func (s *GetRepositoriesService) Run(req *agent.GetRepositoriesReq) (resp *agent.GetRepositoriesRes, err error) {
-	// Finish your business logic.
+	repos, err := s.svcCtx.DaoManager.Repository.GetRepositories(req.Page, req.Limit, req.Order, req.OrderBy)
+	if err != nil {
+		return &agent.GetRepositoriesRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+			Data: nil,
+		}, err
+	}
 
-	return
+	return &agent.GetRepositoriesRes{
+		Code: 0,
+		Msg:  "get repositories successfully",
+		Data: &agent.GetRepositoriesResData{
+			Repositories: repos,
+		},
+	}, nil
 }

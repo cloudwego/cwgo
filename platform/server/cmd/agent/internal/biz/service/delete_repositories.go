@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"net/http"
 )
 
 type DeleteRepositoriesService struct {
@@ -37,7 +38,16 @@ func NewDeleteRepositoriesService(ctx context.Context, svcCtx *svc.ServiceContex
 
 // Run create note info
 func (s *DeleteRepositoriesService) Run(req *agent.DeleteRepositoriesReq) (resp *agent.DeleteRepositoriesRes, err error) {
-	// Finish your business logic.
+	err = s.svcCtx.DaoManager.Repository.DeleteRepository(req.Ids)
+	if err != nil {
+		return &agent.DeleteRepositoriesRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+		}, err
+	}
 
-	return
+	return &agent.DeleteRepositoriesRes{
+		Code: 0,
+		Msg:  "delete repositories successfully",
+	}, nil
 }

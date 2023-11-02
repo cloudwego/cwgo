@@ -21,7 +21,9 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"net/http"
 )
 
 type AddRepositoryService struct {
@@ -37,7 +39,16 @@ func NewAddRepositoryService(ctx context.Context, svcCtx *svc.ServiceContext) *A
 
 // Run create note info
 func (s *AddRepositoryService) Run(req *agent.AddRepositoryReq) (resp *agent.AddRepositoryRes, err error) {
-	// Finish your business logic.
+	err = s.svcCtx.DaoManager.Repository.AddRepository(req.RepositoryUrl, req.Token, consts.RepositoryStatusActive, req.RepositoryType)
+	if err != nil {
+		return &agent.AddRepositoryRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+		}, err
+	}
 
-	return
+	return &agent.AddRepositoryRes{
+		Code: 0,
+		Msg:  "add repository successfully",
+	}, nil
 }
