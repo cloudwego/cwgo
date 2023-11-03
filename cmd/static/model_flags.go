@@ -42,6 +42,7 @@ func modelFlags() []cli.Flag {
 		&cli.StringFlag{Name: consts.OutDir, Usage: "Specify output directory", Value: consts.DefaultDbOutDir, DefaultText: consts.DefaultDbOutDir},
 		&cli.StringFlag{Name: consts.OutFile, Usage: "Specify output filename", Value: consts.DefaultDbOutFile, DefaultText: consts.DefaultDbOutFile},
 		&cli.StringSliceFlag{Name: consts.Tables, Usage: "Specify databases tables"},
+		&cli.StringSliceFlag{Name: consts.ExcludeTables, Usage: "Specify exclude tables"},
 		&cli.BoolFlag{Name: consts.UnitTest, Usage: "Specify generate unit test", Value: false, DefaultText: "false"},
 		&cli.BoolFlag{Name: consts.OnlyModel, Usage: "Specify only generate model code", Value: false, DefaultText: "false"},
 		&cli.StringFlag{Name: consts.ModelPkgName, Usage: "Specify model package name", Value: "", DefaultText: ""},

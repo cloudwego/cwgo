@@ -27,6 +27,7 @@ type ModelArgument struct {
 	DSN               string
 	Type              string
 	Tables            []string
+	ExcludeTables     []string
 	OnlyModel         bool
 	OutPath           string
 	OutFile           string
@@ -49,6 +50,7 @@ func (c *ModelArgument) ParseCli(ctx *cli.Context) error {
 	c.DSN = ctx.String(consts.DSN)
 	c.Type = strings.ToLower(ctx.String(consts.DBType))
 	c.Tables = ctx.StringSlice(consts.Tables)
+	c.ExcludeTables = ctx.StringSlice(consts.ExcludeTables)
 	c.OnlyModel = ctx.Bool(consts.OnlyModel)
 	c.OutPath = ctx.String(consts.OutDir)
 	c.OutFile = ctx.String(consts.OutFile)

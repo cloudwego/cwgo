@@ -75,9 +75,12 @@ func parsePass(da *config.ModelArgument, pass string) error {
 	f.BoolVar(&da.FieldWithIndexTag, consts.IndexTag, false, "")
 	var tables utils.FlagStringSlice
 	f.Var(&tables, consts.Tables, "")
+	var excludeTables utils.FlagStringSlice
+	f.Var(&excludeTables, consts.ExcludeTables, "")
 	if err := f.Parse(utils.StringSliceSpilt([]string{pass})); err != nil {
 		return err
 	}
 	da.Tables = tables
+	da.ExcludeTables = excludeTables
 	return nil
 }
