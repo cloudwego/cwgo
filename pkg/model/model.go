@@ -46,10 +46,8 @@ func Model(c *config.ModelArgument) error {
 
 	if len(c.ExcludeTables) > 0 || c.Type == string(consts.Sqlite) {
 		genConfig.WithTableNameStrategy(func(tableName string) (targetTableName string) {
-			if c.Type == string(consts.Sqlite) {
-				if strings.HasPrefix(tableName, "sqlite") {
-					return ""
-				}
+			if c.Type == string(consts.Sqlite) && strings.HasPrefix(tableName, "sqlite") {
+				return ""
 			}
 			if len(c.ExcludeTables) > 0 {
 				for _, table := range c.ExcludeTables {
