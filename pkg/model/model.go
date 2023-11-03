@@ -43,7 +43,6 @@ func Model(c *config.ModelArgument) error {
 		FieldSignable:     c.FieldSignable,
 		FieldWithIndexTag: c.FieldWithIndexTag,
 	}
-	fmt.Println(c.ExcludeTables)
 
 	if len(c.ExcludeTables) > 0 || c.Type == string(consts.Sqlite) {
 		genConfig.WithTableNameStrategy(func(tableName string) (targetTableName string) {
