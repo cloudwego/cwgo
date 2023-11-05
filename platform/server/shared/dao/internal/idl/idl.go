@@ -66,6 +66,7 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) error 
 
 	mainIdlEntity := entity.MysqlIDL{
 		RepositoryID: idlModel.RepositoryId,
+		IdlType:      idlModel.IdlType,
 		IdlPath:      idlModel.MainIdlPath,
 		CommitHash:   idlModel.CommitHash,
 		ServiceName:  idlModel.ServiceName,
@@ -85,6 +86,7 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) error 
 		importedIdlEntities[i] = &entity.MysqlIDL{
 			RepositoryID: idlModel.RepositoryId,
 			ParentIdlID:  mainIdlEntity.ID,
+			IdlType:      idlModel.IdlType,
 			IdlPath:      importIdl.IdlPath,
 			CommitHash:   importIdl.CommitHash,
 			ServiceName:  idlModel.ServiceName,
@@ -115,6 +117,7 @@ func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) err
 		ID:           idlModel.Id,
 		RepositoryID: idlModel.RepositoryId,
 		ParentIdlID:  0,
+		IdlType:      idlModel.IdlType,
 		IdlPath:      idlModel.MainIdlPath,
 		CommitHash:   idlModel.CommitHash,
 		ServiceName:  idlModel.ServiceName,
@@ -133,6 +136,7 @@ func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) err
 			importedIdlEntities[i] = &entity.MysqlIDL{
 				RepositoryID: idlModel.RepositoryId,
 				ParentIdlID:  mainIdlEntity.ID,
+				IdlType:      idlModel.IdlType,
 				IdlPath:      importIdl.IdlPath,
 				CommitHash:   importIdl.CommitHash,
 				ServiceName:  idlModel.ServiceName,
@@ -162,6 +166,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 		ID:           idlModel.Id,
 		RepositoryID: idlModel.RepositoryId,
 		ParentIdlID:  0,
+		IdlType:      idlModel.IdlType,
 		IdlPath:      idlModel.MainIdlPath,
 		CommitHash:   idlModel.CommitHash,
 		ServiceName:  idlModel.ServiceName,
@@ -181,6 +186,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 			importedIdlEntities[i] = &entity.MysqlIDL{
 				RepositoryID: idlModel.RepositoryId,
 				ParentIdlID:  mainIdlEntity.ID,
+				IdlType:      idlModel.IdlType,
 				IdlPath:      importIdl.IdlPath,
 				CommitHash:   importIdl.CommitHash,
 				ServiceName:  idlModel.ServiceName,
@@ -234,6 +240,7 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDL, err
 	return &model.IDL{
 		Id:           mainIdlEntity.ID,
 		RepositoryId: mainIdlEntity.RepositoryID,
+		IdlType:      mainIdlEntity.IdlType,
 		MainIdlPath:  mainIdlEntity.IdlPath,
 		CommitHash:   mainIdlEntity.CommitHash,
 		ImportIdls:   importIdlModels,
@@ -281,6 +288,7 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int
 		idlModels[i] = &model.IDL{
 			Id:           idl.ID,
 			RepositoryId: idl.RepositoryID,
+			IdlType:      idl.IdlType,
 			MainIdlPath:  idl.IdlPath,
 			CommitHash:   idl.CommitHash,
 			ImportIdls:   nil,

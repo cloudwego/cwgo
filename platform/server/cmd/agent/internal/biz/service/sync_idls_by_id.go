@@ -75,7 +75,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		file, err := client.GetFile(owner, repoName, idlPath, consts.MainRef)
+		_, err = client.GetFile(owner, repoName, idlPath, consts.MainRef)
 		if err != nil {
 			logger.Logger.Error("get repo file failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{

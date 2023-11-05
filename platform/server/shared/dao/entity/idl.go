@@ -31,6 +31,7 @@ type MysqlIDL struct {
 	ID           int64                 `gorm:"column:id;primaryKey;autoIncrement:true;comment:id" json:"id"`                                                // id
 	RepositoryID int64                 `gorm:"column:repository_id;not null;comment:repository id" json:"repository_id"`                                    // repository id
 	ParentIdlID  int64                 `gorm:"column:parent_idl_id;comment:null if main idl else import idl" json:"parent_idl_id"`                          // null if main idl else import idl
+	IdlType      int32                 `gorm:"column:idl_type;not null;comment:idl type (1: thrift, 2: proto)" json:"idl_type"`                             // idl type (1: thrift, 2: proto)
 	IdlPath      string                `gorm:"column:idl_path;not null;comment:idl path" json:"idl_path"`                                                   // idl path
 	CommitHash   string                `gorm:"column:commit_hash;not null;comment:idl file commit hash" json:"commit_hash"`                                 // idl file commit hash
 	ServiceName  string                `gorm:"column:service_name;not null;comment:service name" json:"service_name"`                                       // service name
