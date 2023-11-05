@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"net/http"
 )
 
@@ -38,7 +39,11 @@ func NewAddTemplateItemService(ctx context.Context, svcCtx *svc.ServiceContext) 
 
 // Run create note info
 func (s *AddTemplateItemService) Run(req *agent.AddTemplateItemReq) (resp *agent.AddTemplateItemRes, err error) {
-	err = s.svcCtx.DaoManager.Template.AddTemplateItem(req.TemplateId, req.Name, req.Content)
+	err = s.svcCtx.DaoManager.Template.AddTemplateItem(s.ctx, model.TemplateItem{
+		TemplateId: req.TemplateId,
+		Name:       req.Name,
+		Content:    req.Content,
+	})
 	if err != nil {
 		return &agent.AddTemplateItemRes{
 			Code: http.StatusBadRequest,

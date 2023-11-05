@@ -42,7 +42,7 @@ type ITemplateDaoManager interface {
 
 	UpdateTemplateItem(ctx context.Context, templateItemModel model.TemplateItem) error
 
-	GetTemplateItemList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.TemplateItem, error)
+	GetTemplateItemList(ctx context.Context, templateId int64, page, limit, order int32, orderBy string) ([]*model.TemplateItem, error)
 }
 
 type MysqlTemplateManager struct {
@@ -172,7 +172,7 @@ func (m *MysqlTemplateManager) UpdateTemplateItem(ctx context.Context, templateI
 	return err
 }
 
-func (m *MysqlTemplateManager) GetTemplateItemList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.TemplateItem, error) {
+func (m *MysqlTemplateManager) GetTemplateItemList(ctx context.Context, templateId int64, page, limit, order int32, orderBy string) ([]*model.TemplateItem, error) {
 	var templateItemEntities []*entity.MysqlTemplateItem
 
 	if page < 1 {
@@ -194,6 +194,7 @@ func (m *MysqlTemplateManager) GetTemplateItemList(ctx context.Context, page, li
 	}
 
 	err := m.db.WithContext(ctx).
+		Where("`template_id` = ?", templateId).
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).

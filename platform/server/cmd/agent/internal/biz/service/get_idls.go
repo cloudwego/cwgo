@@ -38,7 +38,7 @@ func NewGetIDLsService(ctx context.Context, svcCtx *svc.ServiceContext) *GetIDLs
 
 // Run create note info
 func (s *GetIDLsService) Run(req *agent.GetIDLsReq) (resp *agent.GetIDLsRes, err error) {
-	idls, err := s.svcCtx.DaoManager.Idl.GetIDLs(req.Page, req.Limit, req.Order, req.OrderBy)
+	idls, err := s.svcCtx.DaoManager.Idl.GetIDLList(s.ctx, req.Page, req.Limit, req.Order, req.OrderBy)
 	if err != nil {
 		return &agent.GetIDLsRes{
 			Code: http.StatusBadRequest,

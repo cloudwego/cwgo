@@ -38,7 +38,7 @@ func NewGetRepositoriesService(ctx context.Context, svcCtx *svc.ServiceContext) 
 
 // Run create note info
 func (s *GetRepositoriesService) Run(req *agent.GetRepositoriesReq) (resp *agent.GetRepositoriesRes, err error) {
-	repos, err := s.svcCtx.DaoManager.Repository.GetRepositories(req.Page, req.Limit, req.Order, req.OrderBy)
+	repos, err := s.svcCtx.DaoManager.Repository.GetRepositoryList(s.ctx, req.Page, req.Limit, req.Order, req.OrderBy)
 	if err != nil {
 		return &agent.GetRepositoriesRes{
 			Code: http.StatusBadRequest,

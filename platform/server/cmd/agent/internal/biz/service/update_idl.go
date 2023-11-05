@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"net/http"
 )
 
@@ -38,7 +39,12 @@ func NewUpdateIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *Updat
 
 // Run create note info
 func (s *UpdateIDLService) Run(req *agent.UpdateIDLReq) (resp *agent.UpdateIDLRes, err error) {
-	err = s.svcCtx.DaoManager.Idl.UpdateIDL(req.Id, req.RepositoryId, req.MainIdlPath, req.ServiceName)
+	err = s.svcCtx.DaoManager.Idl.UpdateIDL(s.ctx, model.IDL{
+		Id:           req.Id,
+		RepositoryId: req.RepositoryId,
+		MainIdlPath:  req.MainIdlPath,
+		ServiceName:  req.ServiceName,
+	})
 	if err != nil {
 		return &agent.UpdateIDLRes{
 			Code: http.StatusBadRequest,

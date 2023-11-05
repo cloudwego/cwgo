@@ -38,7 +38,7 @@ func NewDeleteIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *Delet
 
 // Run create note info
 func (s *DeleteIDLService) Run(req *agent.DeleteIDLsReq) (resp *agent.DeleteIDLsRes, err error) {
-	err = s.svcCtx.DaoManager.Idl.DeleteIDLs(req.Ids)
+	err = s.svcCtx.DaoManager.Idl.DeleteIDLs(s.ctx, req.Ids)
 	if err != nil {
 		return &agent.DeleteIDLsRes{
 			Code: http.StatusBadRequest,

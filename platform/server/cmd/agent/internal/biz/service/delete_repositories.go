@@ -38,7 +38,7 @@ func NewDeleteRepositoriesService(ctx context.Context, svcCtx *svc.ServiceContex
 
 // Run create note info
 func (s *DeleteRepositoriesService) Run(req *agent.DeleteRepositoriesReq) (resp *agent.DeleteRepositoriesRes, err error) {
-	err = s.svcCtx.DaoManager.Repository.DeleteRepository(req.Ids)
+	err = s.svcCtx.DaoManager.Repository.DeleteRepository(s.ctx, req.Ids)
 	if err != nil {
 		return &agent.DeleteRepositoriesRes{
 			Code: http.StatusBadRequest,

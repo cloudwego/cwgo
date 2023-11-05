@@ -38,7 +38,7 @@ func NewDeleteTemplateService(ctx context.Context, svcCtx *svc.ServiceContext) *
 
 // Run create note info
 func (s *DeleteTemplateService) Run(req *agent.DeleteTemplateReq) (resp *agent.DeleteTemplateRes, err error) {
-	err = s.svcCtx.DaoManager.Template.DeleteTemplate(req.Ids)
+	err = s.svcCtx.DaoManager.Template.DeleteTemplate(s.ctx, req.Ids)
 	if err != nil {
 		return &agent.DeleteTemplateRes{
 			Code: http.StatusBadRequest,
