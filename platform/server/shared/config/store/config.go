@@ -45,25 +45,26 @@ func (c Config) NewMysqlDB() (*gorm.DB, error) {
 }
 
 func (c Config) NewRedisClient() (redis.UniversalClient, error) {
-	if c.Redis.StandAlone.Addr != "" {
+	if c.Redis.Type == "standalone" {
 		return redis.NewClient(&redis.Options{
 			Addr:     c.Redis.StandAlone.Addr,
+			Username: c.Redis.StandAlone.Username,
 			Password: c.Redis.StandAlone.Password,
 			DB:       c.Redis.StandAlone.Db,
 		}), nil
-	}
-	if c.Redis.Cluster.Addrs != nil {
+	} else if c.Redis.Type == "cluster" || c.Redis.Type == "" {
 		addrs := make([]string, len(c.Redis.Cluster.Addrs))
 		for i, addr := range c.Redis.Cluster.Addrs {
 			addrs[i] = fmt.Sprintf("%s:%s", addr.Ip, addr.Port)
 		}
 		return redis.NewClusterClient(&redis.ClusterOptions{
 			Addrs:    addrs,
+			Username: c.Redis.Cluster.Username,
 			Password: c.Redis.Cluster.Password,
 		}), nil
 	}
 
-	return nil, errors.New("config not found")
+	return nil, errors.New("invalid redis type")
 }
 
 type Mysql struct {
@@ -98,12 +99,14 @@ func (m Mongo) GetAddr() string {
 }
 
 type Redis struct {
+	Type       string          `mapstructure:"type"`
 	StandAlone RedisStandAlone `mapstructure:"standalone"`
 	Cluster    RedisCluster    `mapstructure:"cluster"`
 }
 
 type RedisStandAlone struct {
 	Addr     string `mapstructure:"addr"`
+	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 	Db       int    `mapstructure:"db"`
 }
@@ -114,5 +117,6 @@ type RedisCluster struct {
 		Ip   string `mapstructure:"ip"`
 		Port string `mapstructure:"port"`
 	} `mapstructure:"addrs"`
+	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 }
