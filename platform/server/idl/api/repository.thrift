@@ -1,6 +1,6 @@
 namespace go repository
 
-include "../model/model.thrift"
+include "../model/repository.thrift"
 
 struct AddRepositoryReq{
     1: i32 repository_type (api.body="repository_type,required")
@@ -42,7 +42,7 @@ struct GetRepositoriesRes{
     3: GetRepositoriesResData data
 }
 struct GetRepositoriesResData{
-    1: list<model.Repository> repositories
+    1: list<repository.Repository> repositories
 }
 
 struct SyncRepositoryByIdReq{

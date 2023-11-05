@@ -50,7 +50,7 @@ func NewGenerateCodeService(ctx context.Context, svcCtx *svc.ServiceContext) *Ge
 // Run create note info
 func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.GenerateCodeRes, err error) {
 	// get idl info by idl id
-	idl, err := s.svcCtx.DaoManager.Idl.GetIDL(req.IdlId)
+	idl, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, req.IdlId)
 	if err != nil {
 		logger.Logger.Error("get idl info failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
@@ -60,7 +60,7 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	}
 
 	// get repository info by repository id
-	repo, err := s.svcCtx.DaoManager.Repository.GetRepository(idl.RepositoryId)
+	repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idl.RepositoryId)
 	if err != nil {
 		logger.Logger.Error("get repo info failed", zap.Error(err))
 		return &agent.GenerateCodeRes{

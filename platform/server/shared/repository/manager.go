@@ -56,7 +56,7 @@ func (rm *Manager) AddClient(repository *model.Repository) error {
 		gitlabClient, err := NewGitlabClient(repository.Token)
 		if err != nil {
 			if utils.IsTokenError(err) {
-				err = rm.daoManager.Repository.ChangeRepositoryStatus(repository.Id, consts.InvalidToken)
+				err = rm.daoManager.Repository.ChangeRepositoryStatus(context.Background(), repository.Id, consts.RepositoryStatusNumDisactive)
 				if err != nil {
 					return err
 				}
@@ -93,7 +93,7 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 	defer rm.RUnlock()
 
 	if clientIface, ok := rm.repositoryClientsCache.Get(strconv.FormatInt(repoId, 10)); !ok {
-		repo, err := rm.daoManager.Repository.GetRepository(repoId)
+		repo, err := rm.daoManager.Repository.GetRepository(context.Background(), repoId)
 		if err != nil {
 			return nil, err
 		}

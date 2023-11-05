@@ -124,6 +124,19 @@ func (c *ConsistentHashDispatcher) AddTask(task *model.Task) error {
 	return nil
 }
 
+func (c *ConsistentHashDispatcher) RemoveTask(taskId string) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	delete(c.Tasks, taskId)
+	m := c.hasher.LocateKey([]byte(taskId))
+	if m != nil {
+		delete(c.ServiceWithTasks[m.String()], taskId)
+	}
+
+	return nil
+}
+
 func (c *ConsistentHashDispatcher) DelTask(taskId string) error {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()

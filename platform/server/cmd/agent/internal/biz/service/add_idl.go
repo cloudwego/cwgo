@@ -23,6 +23,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"net/http"
 )
 
@@ -55,11 +56,15 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// TODO: get idl info
 
 	// add idl
-	err = s.svcCtx.DaoManager.Idl.AddIDL(req.RepositoryId, req.MainIdlPath, req.ServiceName)
+	err = s.svcCtx.DaoManager.Idl.AddIDL(s.ctx, model.IDL{
+		RepositoryId: req.RepositoryId,
+		MainIdlPath:  req.MainIdlPath,
+		ServiceName:  req.ServiceName,
+	})
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusInternalServerError,
-			Msg:  "",
+			Msg:  "internal err",
 		}, nil
 	}
 

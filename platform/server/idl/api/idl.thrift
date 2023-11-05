@@ -1,6 +1,6 @@
 namespace go idl
 
-include "../model/model.thrift"
+include "../model/idl.thrift"
 
 struct AddIDLReq{
     1: i64 repository_id (api.body="repository_id,required")
@@ -43,7 +43,7 @@ struct GetIDLsRes{
     3: GetIDLsResData data
 }
 struct GetIDLsResData{
-    1: list<model.IDL> idls
+    1: list<idl.IDL> idls
 }
 
 struct SyncIDLsByIdReq{

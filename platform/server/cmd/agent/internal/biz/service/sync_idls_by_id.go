@@ -23,6 +23,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
 	"net/http"
@@ -42,14 +43,14 @@ func NewSyncIDLsByIdService(ctx context.Context, svcCtx *svc.ServiceContext) *Sy
 // Run create note info
 func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncIDLsByIdRes, err error) {
 	for _, v := range req.Ids {
-		idl, err := s.svcCtx.DaoManager.Idl.GetIDL(v)
+		idl, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, v)
 		if err != nil {
 			resp.Code = 400
 			resp.Msg = err.Error()
 			return resp, err
 		}
 
-		repo, err := s.svcCtx.DaoManager.Repository.GetRepository(idl.RepositoryId)
+		repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idl.RepositoryId)
 		if err != nil {
 			resp.Code = 400
 			resp.Msg = err.Error()
@@ -83,7 +84,10 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		err = s.svcCtx.DaoManager.Idl.SyncIDLContent(idl.Id, string(file.Content))
+		// TODO: need sync import idl too
+		err = s.svcCtx.DaoManager.Idl.Sync(s.ctx, model.IDL{
+			Id: idl.Id,
+		})
 		if err != nil {
 			logger.Logger.Error("sync idl content to dao failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
