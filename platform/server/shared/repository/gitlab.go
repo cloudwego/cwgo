@@ -38,12 +38,13 @@ func NewGitLabApi(client *gitlab.Client) *GitLabApi {
 
 const (
 	gitlabURLPrefix = "https://gitlab.com/"
+	regGitLabURL    = `([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`
 )
 
 func (a *GitLabApi) ParseUrl(url string) (filePid, owner, repoName string, err error) {
 	var tempPath string
 
-	// Determine if it is a GitLab prefix
+	// determine if it is a GitLab prefix
 	if strings.HasPrefix(url, gitlabURLPrefix) {
 		tempPath = url[len(gitlabURLPrefix):]
 		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
@@ -51,14 +52,14 @@ func (a *GitLabApi) ParseUrl(url string) (filePid, owner, repoName string, err e
 			tempPath = tempPath[:lastQuestionMarkIndex]
 		}
 	} else {
-		return "", "", "", errors.New("idlPath format wrong,do not have prefix: " + gitlabURLPrefix)
+		return "", "", "", errors.New("idlPath format wrong, do not have prefix: " + gitlabURLPrefix)
 	}
 
-	// Using regular expressions to match fields
-	regex := regexp.MustCompile(`([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`)
+	// using regular expressions to match fields
+	regex := regexp.MustCompile(regGitLabURL)
 	matches := regex.FindStringSubmatch(tempPath)
 	if len(matches) != 5 {
-		return "", "", "", errors.New("idlPath format wrong,cannot parse gitlab URL")
+		return "", "", "", errors.New("idlPath format wrong, cannot parse gitlab URL")
 	}
 	owner = matches[1]
 	repoName = matches[2]
@@ -68,23 +69,23 @@ func (a *GitLabApi) ParseUrl(url string) (filePid, owner, repoName string, err e
 }
 
 func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
-	// Construct the project ID (pid) by combining owner and repoName
+	// construct the project ID (pid) by combining owner and repoName
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
 
-	// Retrieve the file content from GitLab repository
+	// retrieve the file content from GitLab repository
 	fileContent, _, err := a.client.RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
 
-	// Extract the file name from the file path
+	// extract the file name from the file path
 	name := filePath
 	index := strings.LastIndex(filePath, "/")
 	if index != -1 {
 		name = name[index+1:]
 	}
 
-	// Decode the base64 encoded file content
+	// decode the base64 encoded file content
 	decodedContent, err := base64.StdEncoding.DecodeString(fileContent.Content)
 	if err != nil {
 		return nil, err
@@ -97,7 +98,7 @@ func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error
 }
 
 func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
-	// PushFilesToRepository implementation for GitLab
+	// pushFilesToRepository implementation for GitLab
 	for filePath, content := range files {
 		contentStr := string(content)
 		opts := &gitlab.CreateFileOptions{
@@ -106,7 +107,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 			Content:       &contentStr,
 		}
 
-		// Create files in the repository
+		// create files in the repository
 		_, _, err := a.client.RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
 		if err != nil {
 			return err
@@ -117,18 +118,18 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 }
 
 func (a *GitLabApi) GetRepositoryArchive(owner, repoName, ref string) ([]byte, error) {
-	// Generate the project ID by combining owner and repoName
+	// generate the project ID by combining owner and repoName
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
 
-	// Specify the desired archive format
+	// specify the desired archive format
 	format := "tar"
 
-	// Set archive options
+	// set archive options
 	archiveOptions := &gitlab.ArchiveOptions{
 		Format: &format, // Choose the archive format
 	}
 
-	// Request the archive from the GitLab API
+	// request the archive from the GitLab API
 	fileData, _, err := a.client.Repositories.Archive(pid, archiveOptions)
 	if err != nil {
 		return nil, err
@@ -138,34 +139,34 @@ func (a *GitLabApi) GetRepositoryArchive(owner, repoName, ref string) ([]byte, e
 }
 
 func (a *GitLabApi) GetLatestCommitHash(owner, repoName, filePath, ref string) (string, error) {
-	// Generate the project ID by combining owner and repoName
+	// generate the project ID by combining owner and repoName
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
 
-	// Request the file content from the GitLab API
+	// request the file content from the GitLab API
 	fileContent, _, err := a.client.RepositoryFiles.GetFile(pid, filePath, &gitlab.GetFileOptions{Ref: &ref})
 	if err != nil {
 		return "", err
 	}
 
-	// Extract and return the last commit ID
+	// extract and return the last commit ID
 	return fileContent.LastCommitID, nil
 }
 
 func (a *GitLabApi) DeleteDirs(owner, repoName string, folderPaths ...string) error {
-	// Generate the project ID by combining owner and repoName
+	// generate the project ID by combining owner and repoName
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
 
-	// Iterate over the folder paths and delete each one
+	// iterate over the folder paths and delete each one
 	for _, folderPath := range folderPaths {
-		// Attempt to delete the specified folder
+		// attempt to delete the specified folder
 		_, err := a.client.RepositoryFiles.DeleteFile(pid, folderPath, &gitlab.DeleteFileOptions{
-			Branch:        gitlab.String("main"),             // Set the branch where the folder is located
-			AuthorEmail:   gitlab.String("test@example.com"), // Replace with your email
-			AuthorName:    gitlab.String("test"),             // Replace with your name
+			Branch:        gitlab.String("main"),             // set the branch where the folder is located
+			AuthorEmail:   gitlab.String("test@example.com"), // replace with your email
+			AuthorName:    gitlab.String("test"),             // replace with your name
 			CommitMessage: gitlab.String(fmt.Sprintf("Delete folder %s", folderPath)),
 		})
 
-		// Check for errors, but ignore if it's a "file not found" error
+		// check for errors, but ignore if it's a "file not found" error
 		if err != nil && !utils.IsFileNotFoundError(err) {
 			return err
 		}

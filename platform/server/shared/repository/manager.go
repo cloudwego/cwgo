@@ -68,12 +68,10 @@ func (rm *Manager) AddClient(repository *model.Repository) error {
 		}
 
 		rm.repositoryClientsCache.SetDefault(strconv.FormatInt(repository.Id, 10), NewGitLabApi(gitlabClient))
-		//rm.repositoryClients[repository.Id] = NewGitLabApi(gitlabClient)
 	case consts.RepositoryTypeNumGithub:
 		githubClient := NewGithubClient(repository.Token)
 
 		rm.repositoryClientsCache.SetDefault(strconv.FormatInt(repository.Id, 10), NewGitHubApi(githubClient))
-		//rm.repositoryClients[repository.Id] = NewGitHubApi(githubClient)
 	default:
 		return errors.New("invalid repository type")
 	}
@@ -97,10 +95,12 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		err = rm.AddClient(repo)
 		if err != nil {
 			return nil, err
 		}
+
 		return rm.GetClient(repoId)
 	} else {
 		return clientIface.(IRepository), nil

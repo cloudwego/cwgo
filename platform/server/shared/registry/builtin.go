@@ -35,6 +35,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"io/ioutil"
+	"math"
 	"net"
 	"net/http"
 	"strconv"
@@ -407,6 +408,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 		return errors.New(j.Msg)
 	}
 
+	logger.Logger.Info("start update service in registry")
 	go func() {
 		errNum := 0
 
@@ -414,17 +416,22 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 			if errNum == 0 {
 				time.Sleep(rc.updateInterval)
 			} else if errNum <= 6 {
-				time.Sleep(time.Second * 3)
+				time.Sleep(time.Duration(int(math.Pow(3, float64(errNum)))) * time.Second)
+			} else {
+				logger.Logger.Fatal("update service failed more than 6 times, connect to registry fail, stopping agent service")
 			}
 			select {
 			case <-rc.stopChan:
+				logger.Logger.Info("stop update service in registry")
 				return
 			default:
+				logger.Logger.Debug("updating service in registry")
 				err = rc.Update(serviceId)
 				if err != nil {
 					errNum++
 				}
 				errNum = 0
+				logger.Logger.Debug("update service in registry successfully")
 			}
 		}
 	}()
