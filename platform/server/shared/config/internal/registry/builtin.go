@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
@@ -59,7 +58,7 @@ func (cm *BuiltinRegistryConfigManager) GetRegistry() registry.IRegistry {
 		if err != nil {
 			panic(fmt.Sprintf("initialize redis client failed, err: %v", err))
 		}
-		cm.Registry = registry.NewBuiltinRegistry(rdb, logger.Logger)
+		cm.Registry = registry.NewBuiltinRegistry(rdb)
 	}
 
 	return cm.Registry
