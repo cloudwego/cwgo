@@ -3,7 +3,7 @@ namespace go model
 struct IDL{
     1: i64 id // idl record id
     2: i64 repository_id // repository id where stores the idl
-    3: i32 idl_type // idl type (1: thrift, 2: proto_
+    3: i32 idl_type // idl type (1: thrift, 2: proto)
     4: string main_idl_path // repo ref path of idl
     5: string commit_hash // idl file commit hash
     6: list<ImportIDL> import_idls
