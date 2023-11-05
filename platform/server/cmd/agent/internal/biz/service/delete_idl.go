@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"net/http"
 )
 
 type DeleteIDLService struct {
@@ -37,7 +38,16 @@ func NewDeleteIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *Delet
 
 // Run create note info
 func (s *DeleteIDLService) Run(req *agent.DeleteIDLsReq) (resp *agent.DeleteIDLsRes, err error) {
-	// Finish your business logic.
+	err = s.svcCtx.DaoManager.Idl.DeleteIDLs(s.ctx, req.Ids)
+	if err != nil {
+		return &agent.DeleteIDLsRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+		}, err
+	}
 
-	return
+	return &agent.DeleteIDLsRes{
+		Code: 0,
+		Msg:  "delete idl successfully",
+	}, nil
 }

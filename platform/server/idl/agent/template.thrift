@@ -72,7 +72,11 @@ struct UpdateTemplateItemRes{
 }
 
 struct GetTemplateItemsReq{
-    1: i32 id
+    1: i64 template_id
+    2: i32 page
+    3: i32 limit
+    4: i32 order
+    5: string order_by
 }
 struct GetTemplateItemsRes{
     1: i32 code

@@ -22,6 +22,8 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"net/http"
 )
 
 type UpdateRepositoryService struct {
@@ -37,7 +39,20 @@ func NewUpdateRepositoryService(ctx context.Context, svcCtx *svc.ServiceContext)
 
 // Run create note info
 func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *agent.UpdateRepositoryRes, err error) {
-	// Finish your business logic.
+	err = s.svcCtx.DaoManager.Repository.UpdateRepository(s.ctx, model.Repository{
+		Id:     req.Id,
+		Token:  req.Token,
+		Status: req.Status,
+	})
+	if err != nil {
+		return &agent.UpdateRepositoryRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+		}, err
+	}
 
-	return
+	return &agent.UpdateRepositoryRes{
+		Code: 0,
+		Msg:  "update repository successfully",
+	}, nil
 }

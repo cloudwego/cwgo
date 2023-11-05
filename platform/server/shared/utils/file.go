@@ -20,11 +20,14 @@ import (
 	"archive/tar"
 	"bytes"
 	"compress/gzip"
+	"errors"
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ...string) error {
@@ -162,4 +165,22 @@ func UnTar(archiveData []byte, tempDir string, IsTarball bool) (string, error) {
 		}
 	}
 	return rootDirName, nil
+}
+
+func DetermineIdlType(idlPid string) (int32, error) {
+	// Define regular expressions to match file extensions for Thrift and Proto files
+	thriftRegex := `(?i)\.thrift$` // Case-insensitive match for ".thrift" extension
+	protoRegex := `(?i)\.proto$`   // Case-insensitive match for ".proto" extension
+
+	// Check if the input string matches the Thrift or Proto file extensions
+	if matched, _ := regexp.MatchString(thriftRegex, idlPid); matched {
+		// Matched ".thrift" extension, indicating Thrift file
+		return consts.IdlTypeNumThrift, nil // You need to define ThriftIdlType as a constant or return a specific IDL type for Thrift
+	} else if matched, _ := regexp.MatchString(protoRegex, idlPid); matched {
+		// Matched ".proto" extension, indicating Proto file
+		return consts.IdlTypeNumProto, nil // You need to define ProtoIdlType as a constant or return a specific IDL type for Proto
+	}
+
+	// Return a default IDL type or error code if no match is found
+	return -1, errors.New("incorrect idl type") // You need to define DefaultIdlType as a constant or return an appropriate default value
 }

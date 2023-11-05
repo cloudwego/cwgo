@@ -6,6 +6,7 @@ struct AddRepositoryReq{
     1: i32 repository_type
     2: string repository_url
     3: string token
+    4: i32 store_type
 }
 struct AddRepositoryRes{
     1: i32 code
@@ -21,9 +22,9 @@ struct DeleteRepositoriesRes{
 }
 
 struct UpdateRepositoryReq{
-    1: string id
+    1: i64 id
     2: string token (api.body="token")
-    3: string status (api.body="status")
+    3: i32 status (api.body="status")
 }
 struct UpdateRepositoryRes{
     1: i32 code

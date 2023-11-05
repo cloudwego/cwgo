@@ -22,6 +22,8 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"net/http"
 )
 
 type UpdateTemplateService struct {
@@ -37,7 +39,19 @@ func NewUpdateTemplateService(ctx context.Context, svcCtx *svc.ServiceContext) *
 
 // Run create note info
 func (s *UpdateTemplateService) Run(req *agent.UpdateTemplateReq) (resp *agent.UpdateTemplateRes, err error) {
-	// Finish your business logic.
+	err = s.svcCtx.DaoManager.Template.UpdateTemplate(s.ctx, model.Template{
+		Id:   req.Id,
+		Name: req.Name,
+	})
+	if err != nil {
+		return &agent.UpdateTemplateRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+		}, err
+	}
 
-	return
+	return &agent.UpdateTemplateRes{
+		Code: 0,
+		Msg:  "update template successfully",
+	}, nil
 }

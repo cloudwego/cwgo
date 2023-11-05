@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"net/http"
 )
 
 type GetTemplateItemsService struct {
@@ -37,7 +38,20 @@ func NewGetTemplateItemsService(ctx context.Context, svcCtx *svc.ServiceContext)
 
 // Run create note infoaw
 func (s *GetTemplateItemsService) Run(req *agent.GetTemplateItemsReq) (resp *agent.GetTemplateItemsRes, err error) {
-	// Finish your business logic.
+	templateItems, err := s.svcCtx.DaoManager.Template.GetTemplateItemList(s.ctx, req.TemplateId, req.Page, req.Limit, req.Order, req.OrderBy)
+	if err != nil {
+		return &agent.GetTemplateItemsRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal error",
+			Data: nil,
+		}, err
+	}
 
-	return
+	return &agent.GetTemplateItemsRes{
+		Code: 0,
+		Msg:  "get template items successfully",
+		Data: &agent.GetTemplateItemsResData{
+			TemplateItems: templateItems,
+		},
+	}, nil
 }
