@@ -19,22 +19,30 @@
 package template
 
 import (
+	"context"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
+	"time"
 )
 
 type ITemplateDaoManager interface {
-	AddTemplate(name string, _type int32) error
-	DeleteTemplate(ids []int64) error
-	UpdateTemplate(id int64, name string) error
-	GetTemplates(page, limit, order int32, orderBy string) ([]*model.Template, error)
+	AddTemplate(ctx context.Context, templateModel model.Template) error
 
-	AddTemplateItem(templateId int64, name, content string) error
-	DeleteTemplateItem(ids []int64) error
-	UpdateTemplateItem(id int64, name, content string) error
-	GetTemplateItems(page, limit, order int32, orderBy string) ([]*model.TemplateItem, error)
+	DeleteTemplate(ctx context.Context, ids []int64) error
+
+	UpdateTemplate(ctx context.Context, templateModel model.Template) error
+
+	GetTemplateList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Template, error)
+
+	AddTemplateItem(ctx context.Context, templateItemModel model.TemplateItem) error
+
+	DeleteTemplateItem(ctx context.Context, ids []int64) error
+
+	UpdateTemplateItem(ctx context.Context, templateItemModel model.TemplateItem) error
+
+	GetTemplateItemList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.TemplateItem, error)
 }
 
 type MysqlTemplateManager struct {
@@ -49,59 +57,49 @@ func NewMysqlTemplate(db *gorm.DB) *MysqlTemplateManager {
 	}
 }
 
-func (r *MysqlTemplateManager) AddTemplate(name string, _type int32) error {
-	timeNow := utils.GetCurrentTime()
-	template := model.Template{
-		Name:       name,
-		Type:       _type,
-		CreateTime: timeNow,
-		UpdateTime: timeNow,
-	}
-	res := r.db.
-		Table(consts.TableNameTemplate).
-		Create(&template)
-	if res.Error != nil {
-		return res.Error
+func (m *MysqlTemplateManager) AddTemplate(ctx context.Context, templateModel model.Template) error {
+	templateEntity := entity.MysqlTemplate{
+		Name: templateModel.Name,
+		Type: templateModel.Type,
 	}
 
-	return nil
+	err := m.db.WithContext(ctx).
+		Create(&templateEntity).Error
+
+	return err
 }
 
-func (r *MysqlTemplateManager) DeleteTemplate(ids []int64) error {
-	var template model.Template
-	res := r.db.
-		Table(consts.TableNameTemplate).
-		Delete(&template, ids)
-	if res.Error != nil {
-		return res.Error
-	}
+func (m *MysqlTemplateManager) DeleteTemplate(ctx context.Context, ids []int64) error {
+	var templateEntity entity.MysqlTemplate
 
-	return nil
+	err := m.db.WithContext(ctx).
+		Delete(&templateEntity, ids).Error
+
+	return err
 }
 
-func (r *MysqlTemplateManager) UpdateTemplate(id int64, name string) error {
-	timeNow := utils.GetCurrentTime()
-	res := r.db.
-		Table(consts.TableNameTemplate).
-		Where("id = ?", id).
-		Updates(
-			model.Template{
-				Name:       name,
-				UpdateTime: timeNow,
-			},
-		)
-	if res.Error != nil {
-		return res.Error
+func (m *MysqlTemplateManager) UpdateTemplate(ctx context.Context, templateModel model.Template) error {
+	templateEntity := entity.MysqlTemplate{
+		ID:   templateModel.Id,
+		Name: templateModel.Name,
+		Type: templateModel.Type,
 	}
 
-	return nil
+	err := m.db.WithContext(ctx).
+		Model(&templateEntity).Updates(templateEntity).Error
+
+	return err
 }
 
-func (r *MysqlTemplateManager) GetTemplates(page, limit, order int32, orderBy string) ([]*model.Template, error) {
-	var templates []*model.Template
+func (m *MysqlTemplateManager) GetTemplateList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Template, error) {
+	var templateEntities []*entity.MysqlTemplate
+
+	if page < 1 {
+		page = 1
+	}
 	offset := (page - 1) * limit
 
-	// Default sort field to 'update_time' if not provided
+	// default sort field to 'update_time' if not provided
 	if orderBy == "" {
 		orderBy = consts.OrderByUpdateTime
 	}
@@ -111,78 +109,79 @@ func (r *MysqlTemplateManager) GetTemplates(page, limit, order int32, orderBy st
 		orderBy = orderBy + " " + consts.OrderInc
 	case consts.OrderNumDec:
 		orderBy = orderBy + " " + consts.OrderDec
-	default:
-		orderBy = orderBy + " " + consts.OrderInc
 	}
 
-	res := r.db.
-		Table(consts.TableNameTemplate).
+	err := m.db.WithContext(ctx).
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).
-		Find(&templates)
-	if res.Error != nil {
-		return nil, res.Error
+		Find(&templateEntities).Error
+	if err != nil {
+		return nil, err
 	}
 
-	return templates, nil
+	templateModels := make([]*model.Template, len(templateEntities))
+
+	for i, templateEntity := range templateEntities {
+		templateModels[i] = &model.Template{
+			Id:         templateEntity.ID,
+			Name:       templateEntity.Name,
+			Type:       templateEntity.Type,
+			IsDeleted:  false,
+			CreateTime: templateEntity.CreateTime.Format(time.DateTime),
+			UpdateTime: templateEntity.UpdateTime.Format(time.DateTime),
+		}
+	}
+
+	return templateModels, nil
 }
 
-func (r *MysqlTemplateManager) AddTemplateItem(templateId int64, name, content string) error {
-	timeNow := utils.GetCurrentTime()
-	templateItem := model.TemplateItem{
-		TemplateId: templateId,
-		Name:       name,
-		Content:    content,
-		CreateTime: timeNow,
-		UpdateTime: timeNow,
-	}
-	res := r.db.
-		Table(consts.TableNameTemplateItem).
-		Create(&templateItem)
-	if res.Error != nil {
-		return res.Error
+func (m *MysqlTemplateManager) AddTemplateItem(ctx context.Context, templateItemModel model.TemplateItem) error {
+	templateItemEntity := entity.MysqlTemplateItem{
+		TemplateID: templateItemModel.TemplateId,
+		Name:       templateItemModel.Name,
+		Content:    templateItemModel.Content,
 	}
 
-	return nil
+	err := m.db.WithContext(ctx).
+		Create(&templateItemEntity).Error
+
+	return err
 }
 
-func (r *MysqlTemplateManager) DeleteTemplateItem(ids []int64) error {
-	var template model.TemplateItem
-	res := r.db.
-		Table(consts.TableNameTemplateItem).
-		Delete(&template, ids)
-	if res.Error != nil {
-		return res.Error
-	}
+func (m *MysqlTemplateManager) DeleteTemplateItem(ctx context.Context, ids []int64) error {
+	var templateItemEntity entity.MysqlTemplateItem
 
-	return nil
+	err := m.db.WithContext(ctx).
+		Delete(&templateItemEntity, ids).Error
+
+	return err
 }
 
-func (r *MysqlTemplateManager) UpdateTemplateItem(id int64, name, content string) error {
-	timeNow := utils.GetCurrentTime()
-	res := r.db.
-		Table(consts.TableNameTemplateItem).
-		Where("id = ?", id).
-		Updates(
-			model.TemplateItem{
-				Name:       name,
-				Content:    content,
-				UpdateTime: timeNow,
-			},
-		)
-	if res.Error != nil {
-		return res.Error
+func (m *MysqlTemplateManager) UpdateTemplateItem(ctx context.Context, templateItemModel model.TemplateItem) error {
+	templateItemEntity := entity.MysqlTemplateItem{
+		ID:      templateItemModel.TemplateId,
+		Name:    templateItemModel.Name,
+		Content: templateItemModel.Content,
 	}
 
-	return nil
+	err := m.db.WithContext(ctx).
+		Model(&templateItemEntity).
+		Updates(templateItemEntity).Error
+
+	return err
 }
 
-func (r *MysqlTemplateManager) GetTemplateItems(page, limit, order int32, orderBy string) ([]*model.TemplateItem, error) {
-	var templateItems []*model.TemplateItem
+func (m *MysqlTemplateManager) GetTemplateItemList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.TemplateItem, error) {
+	var templateItemEntities []*entity.MysqlTemplateItem
+
+	if page < 1 {
+		page = 1
+	}
+
 	offset := (page - 1) * limit
 
-	// Default sort field to 'update_time' if not provided
+	// default sort field to 'update_time' if not provided
 	if orderBy == "" {
 		orderBy = consts.OrderByUpdateTime
 	}
@@ -192,19 +191,30 @@ func (r *MysqlTemplateManager) GetTemplateItems(page, limit, order int32, orderB
 		orderBy = orderBy + " " + consts.OrderInc
 	case consts.OrderNumDec:
 		orderBy = orderBy + " " + consts.OrderDec
-	default:
-		orderBy = orderBy + " " + consts.OrderInc
 	}
 
-	res := r.db.
-		Table(consts.TableNameTemplateItem).
+	err := m.db.WithContext(ctx).
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).
-		Find(&templateItems)
-	if res.Error != nil {
-		return nil, res.Error
+		Find(&templateItemEntities).Error
+	if err != nil {
+		return nil, err
 	}
 
-	return templateItems, nil
+	templateItemModels := make([]*model.TemplateItem, len(templateItemEntities))
+
+	for i, templateEntity := range templateItemEntities {
+		templateItemModels[i] = &model.TemplateItem{
+			Id:         templateEntity.ID,
+			TemplateId: templateEntity.TemplateID,
+			Name:       templateEntity.Name,
+			Content:    templateEntity.Content,
+			IsDeleted:  false,
+			CreateTime: templateEntity.CreateTime.Format(time.DateTime),
+			UpdateTime: templateEntity.UpdateTime.Format(time.DateTime),
+		}
+	}
+
+	return templateItemModels, nil
 }

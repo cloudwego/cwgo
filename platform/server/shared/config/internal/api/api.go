@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"github.com/bytedance/gopkg/util/gopool"
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	http2config "github.com/hertz-contrib/http2/config"
@@ -38,13 +39,13 @@ type ConfigManager struct {
 	ServiceName           string
 }
 
-func NewConfigManager(config Config, registryConfig registryconfig.Config, serviceId string) *ConfigManager {
+func NewConfigManager(config Config, registryConfig registryconfig.Config, storeConfig store.Config, serviceId string) *ConfigManager {
 	var registryConfigManager registryconfig.IRegistryConfigManager
 	var err error
 
 	switch registryConfig.Type {
 	case consts.RegistryTypeBuiltin:
-		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin)
+		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin, storeConfig)
 
 	case consts.RegistryTypeConsul:
 		registryConfigManager, err = registryconfig.NewConsulRegistryConfigManager(registryConfig.Consul)

@@ -23,8 +23,14 @@ const (
 
 	ServiceNameApi   = ProjectName + "-" + ServerTypeApi
 	ServiceNameAgent = ProjectName + "-" + ServerTypeAgent
+
+	AgentMetadataFile = ServiceNameAgent + ".yaml"
 )
 
 const (
 	DefaultLimit = 20
+)
+
+const (
+	RdbKeyRegistryService = ProjectName + ":" + "registry:service:%s"
 )

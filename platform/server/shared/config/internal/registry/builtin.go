@@ -20,7 +20,9 @@ package registry
 
 import (
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
@@ -33,13 +35,15 @@ type BuiltinRegistryConfig struct {
 
 type BuiltinRegistryConfigManager struct {
 	Config       BuiltinRegistryConfig
+	storeConfig  store.Config
 	RegistryType consts.RegistryType
 	Registry     *registry.BuiltinRegistry
 }
 
-func NewBuiltinRegistryConfigManager(config BuiltinRegistryConfig) (*BuiltinRegistryConfigManager, error) {
+func NewBuiltinRegistryConfigManager(config BuiltinRegistryConfig, storeConfig store.Config) (*BuiltinRegistryConfigManager, error) {
 	return &BuiltinRegistryConfigManager{
 		Config:       config,
+		storeConfig:  storeConfig,
 		RegistryType: consts.RegistryTypeNumBuiltin,
 		Registry:     nil,
 	}, nil
@@ -51,7 +55,11 @@ func (cm *BuiltinRegistryConfigManager) GetRegistryType() consts.RegistryType {
 
 func (cm *BuiltinRegistryConfigManager) GetRegistry() registry.IRegistry {
 	if cm.Registry == nil {
-		cm.Registry = registry.NewBuiltinRegistry()
+		rdb, err := cm.storeConfig.NewRedisClient()
+		if err != nil {
+			panic(fmt.Sprintf("initialize redis client failed, err: %v", err))
+		}
+		cm.Registry = registry.NewBuiltinRegistry(rdb, logger.Logger)
 	}
 
 	return cm.Registry

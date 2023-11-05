@@ -28,8 +28,8 @@ type Config struct {
 
 const (
 	defaultSyncAgentServiceInterval = 3 * time.Second
-	defaultSyncRepositoryInterval   = 10 * time.Second
-	defaultSyncIdlInterval          = 10 * time.Second
+	defaultSyncRepositoryInterval   = 3 * time.Minute
+	defaultSyncIdlInterval          = 3 * time.Minute
 )
 
 func (c Config) GetSyncAgentServiceInterval() time.Duration {

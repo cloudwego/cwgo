@@ -19,24 +19,29 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
+	"time"
 )
 
 type IRepositoryDaoManager interface {
-	GetTokenByID(id int64) (string, error)
-	GetRepoTypeByID(id int64) (int32, error)
-	GetRepository(id int64) (*model.Repository, error)
-	ChangeRepositoryStatus(id int64, status string) error
-	GetAllRepositories() ([]*model.Repository, error)
+	AddRepository(ctx context.Context, repoModel model.Repository) error
 
-	AddRepository(repoURL, token, status string, repoType int32) error
-	DeleteRepository(ids []string) error
-	UpdateRepository(id, token, status string) error
-	GetRepositories(page, limit, order int32, orderBy string) ([]*model.Repository, error)
+	DeleteRepository(ctx context.Context, ids []string) error
+
+	UpdateRepository(ctx context.Context, repoModel model.Repository) error
+	Sync(ctx context.Context, repoModel model.Repository) error
+	ChangeRepositoryStatus(ctx context.Context, id int64, status int32) error
+
+	GetRepository(ctx context.Context, id int64) (*model.Repository, error)
+	GetRepositoryList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Repository, error)
+	GetAllRepositories(ctx context.Context) ([]*model.Repository, error)
+	GetTokenByID(ctx context.Context, id int64) (string, error)
+	GetRepoTypeByID(ctx context.Context, id int64) (int32, error)
 }
 
 type MysqlRepositoryManager struct {
@@ -51,143 +56,134 @@ func NewMysqlRepository(db *gorm.DB) *MysqlRepositoryManager {
 	}
 }
 
-func (r *MysqlRepositoryManager) GetTokenByID(id int64) (string, error) {
-	var repo model.Repository
-	result := r.db.
-		Table(consts.TableNameRepository).
-		Model(&repo).
-		Where("id = ?", id).
-		Take(&repo)
-	if result.Error != nil {
-		return "", result.Error
+func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel model.Repository) error {
+	var lastUpdateTime time.Time
+	if repoModel.LastUpdateTime != "" {
+		lastUpdateTime, _ = time.Parse(time.DateTime, repoModel.LastUpdateTime)
 	}
 
-	return repo.Token, nil
+	repoEntity := entity.MysqlRepository{
+		RepositoryType: repoModel.RepositoryType,
+		StoreType:      repoModel.StoreType,
+		RepositoryURL:  repoModel.RepositoryUrl,
+		LastUpdateTime: lastUpdateTime,
+		LastSyncTime:   time.Now(),
+		Token:          repoModel.Token,
+		Status:         consts.RepositoryStatusNumActive,
+	}
+
+	err := m.db.WithContext(ctx).
+		Create(&repoEntity).Error
+
+	return err
 }
 
-func (r *MysqlRepositoryManager) GetRepoTypeByID(id int64) (int32, error) {
-	var repo model.Repository
-	result := r.db.
-		Table(consts.TableNameRepository).
-		Model(&repo).
-		Where("id = ?", id).
-		Take(&repo)
-	if result.Error != nil {
-		return 0, result.Error
-	}
+func (m *MysqlRepositoryManager) DeleteRepository(ctx context.Context, ids []string) error {
+	var repoEntity entity.MysqlRepository
 
-	return repo.RepositoryType, nil
+	err := m.db.WithContext(ctx).
+		Delete(&repoEntity, ids).Error
+
+	return err
 }
 
-func (r *MysqlRepositoryManager) GetRepository(id int64) (*model.Repository, error) {
-	var repo *model.Repository
-
-	result := r.db.
-		Table(consts.TableNameRepository).
-		Where("id = ?", id).
-		Find(&repo)
-	if result.Error != nil {
-		return nil, result.Error
+func (m *MysqlRepositoryManager) UpdateRepository(ctx context.Context, repoModel model.Repository) error {
+	if repoModel.Status != 0 {
+		if _, ok := consts.RepositoryStatusNumMap[int(repoModel.Status)]; !ok {
+			return errors.New("invalid status")
+		}
 	}
 
-	return repo, nil
+	repoEntity := entity.MysqlRepository{
+		ID:     repoModel.Id,
+		Token:  repoModel.Token,
+		Status: repoModel.Status,
+	}
+
+	err := m.db.WithContext(ctx).
+		Model(&repoEntity).
+		Updates(repoEntity).Error
+
+	return err
 }
 
-func (r *MysqlRepositoryManager) ChangeRepositoryStatus(id int64, status string) error {
-	if !utils.ValidStatus(status) {
-		return errors.New("invalid status")
+func (m *MysqlRepositoryManager) Sync(ctx context.Context, repoModel model.Repository) error {
+	var lastUpdateTime, lastSyncTime time.Time
+	if repoModel.LastUpdateTime != "" {
+		lastUpdateTime, _ = time.Parse(time.DateTime, repoModel.LastUpdateTime)
 	}
-	timeNow := utils.GetCurrentTime()
-	result := r.db.
-		Table(consts.TableNameRepository).
-		Model(&model.Repository{}).
-		Where("id = ?", id).
-		Updates(
-			model.Repository{
-				Status:     status,
-				UpdateTime: timeNow,
-			},
-		)
-	if result.Error != nil {
-		return result.Error
+	if repoModel.LastSyncTime != "" {
+		lastSyncTime, _ = time.Parse(time.DateTime, repoModel.LastSyncTime)
+	}
+
+	repoEntity := entity.MysqlRepository{
+		ID:             repoModel.Id,
+		LastUpdateTime: lastUpdateTime,
+		LastSyncTime:   lastSyncTime,
+	}
+
+	err := m.db.WithContext(ctx).
+		Model(&repoEntity).Updates(repoEntity).Error
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (r *MysqlRepositoryManager) GetAllRepositories() ([]*model.Repository, error) {
-	var repos []*model.Repository
-	result := r.db.
-		Table(consts.TableNameRepository).
-		Find(&repos)
-	if result.Error != nil {
-		return nil, result.Error
+func (m *MysqlRepositoryManager) ChangeRepositoryStatus(ctx context.Context, id int64, status int32) error {
+	if status != 0 {
+		if _, ok := consts.RepositoryStatusNumMap[int(status)]; !ok {
+			return errors.New("invalid status")
+		}
 	}
 
-	return repos, nil
+	repoEntity := entity.MysqlRepository{
+		ID:     id,
+		Status: status,
+	}
+
+	err := m.db.Where(ctx).
+		Model(&repoEntity).
+		Updates(repoEntity).Error
+
+	return err
 }
 
-func (r *MysqlRepositoryManager) AddRepository(repoURL, token, status string, repoType int32) error {
-	timeNow := utils.GetCurrentTime()
-	repo := model.Repository{
-		RepositoryUrl:  repoURL,
-		Token:          token,
-		Status:         status,
-		RepositoryType: repoType,
-		LastUpdateTime: "0",
-		LastSyncTime:   timeNow,
-		CreateTime:     timeNow,
-		UpdateTime:     timeNow,
-	}
-	result := r.db.
-		Table(consts.TableNameRepository).
-		Create(&repo)
-	if result.Error != nil {
-		return result.Error
+func (m *MysqlRepositoryManager) GetRepository(ctx context.Context, id int64) (*model.Repository, error) {
+	var repoEntity entity.MysqlRepository
+
+	err := m.db.Where(ctx).
+		Where("`id` = ?", id).
+		Take(&repoEntity).Error
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return &model.Repository{
+		Id:             repoEntity.ID,
+		RepositoryType: repoEntity.RepositoryType,
+		StoreType:      repoEntity.StoreType,
+		RepositoryUrl:  repoEntity.RepositoryURL,
+		Token:          repoEntity.Token,
+		Status:         repoEntity.Status,
+		LastUpdateTime: repoEntity.UpdateTime.Format(time.DateTime),
+		LastSyncTime:   repoEntity.LastSyncTime.Format(time.DateTime),
+		IsDeleted:      false,
+		CreateTime:     repoEntity.CreateTime.Format(time.DateTime),
+		UpdateTime:     repoEntity.UpdateTime.Format(time.DateTime),
+	}, nil
 }
 
-func (r *MysqlRepositoryManager) DeleteRepository(ids []string) error {
-	var repo model.Repository
-	result := r.db.
-		Table(consts.TableNameRepository).
-		Delete(&repo, ids)
-	if result.Error != nil {
-		return result.Error
+func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Repository, error) {
+	var repoEntities []*entity.MysqlRepository
+
+	if page < 1 {
+		page = 1
 	}
+	offset := (page - 1) * limit
 
-	return nil
-}
-
-func (r *MysqlRepositoryManager) UpdateRepository(id, token, status string) error {
-	if !utils.ValidStatus(status) {
-		return errors.New("invalid status")
-	}
-	timeNow := utils.GetCurrentTime()
-	result := r.db.
-		Table(consts.TableNameRepository).
-		Model(&model.Repository{}).
-		Where("id = ?", id).
-		Updates(
-			model.Repository{
-				Token:      token,
-				UpdateTime: timeNow,
-				Status:     status,
-			},
-		)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	return nil
-}
-
-func (r *MysqlRepositoryManager) GetRepositories(page, limit, order int32, orderBy string) ([]*model.Repository, error) {
-	var repos []*model.Repository
-
-	// Default sort field to 'update_time' if not provided
+	// default sort field to 'update_time' if not provided
 	if orderBy == "" {
 		orderBy = consts.OrderByUpdateTime
 	}
@@ -197,20 +193,88 @@ func (r *MysqlRepositoryManager) GetRepositories(page, limit, order int32, order
 		orderBy = orderBy + " " + consts.OrderInc
 	case consts.OrderNumDec:
 		orderBy = orderBy + " " + consts.OrderDec
-	default:
-		orderBy = orderBy + " " + consts.OrderInc
 	}
 
-	offset := (page - 1) * limit
-	result := r.db.
-		Table(consts.TableNameRepository).
+	err := m.db.WithContext(ctx).
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).
-		Find(&repos)
-	if result.Error != nil {
-		return nil, result.Error
+		Find(&repoEntities).Error
+	if err != nil {
+		return nil, err
 	}
 
-	return repos, nil
+	repoModels := make([]*model.Repository, len(repoEntities))
+
+	for i, repoEntity := range repoEntities {
+		repoModels[i] = &model.Repository{
+			Id:             repoEntity.ID,
+			RepositoryType: repoEntity.RepositoryType,
+			StoreType:      repoEntity.StoreType,
+			RepositoryUrl:  repoEntity.RepositoryURL,
+			Token:          repoEntity.Token,
+			Status:         repoEntity.Status,
+			LastUpdateTime: repoEntity.UpdateTime.Format(time.DateTime),
+			LastSyncTime:   repoEntity.LastSyncTime.Format(time.DateTime),
+			IsDeleted:      false,
+			CreateTime:     repoEntity.CreateTime.Format(time.DateTime),
+			UpdateTime:     repoEntity.UpdateTime.Format(time.DateTime),
+		}
+	}
+
+	return repoModels, nil
+}
+
+func (m *MysqlRepositoryManager) GetAllRepositories(ctx context.Context) ([]*model.Repository, error) {
+	var repoEntities []*entity.MysqlRepository
+
+	err := m.db.WithContext(ctx).
+		Find(&repoEntities).Error
+	if err != nil {
+		return nil, err
+	}
+
+	repoModels := make([]*model.Repository, len(repoEntities))
+
+	for i, repoEntity := range repoEntities {
+		repoModels[i] = &model.Repository{
+			Id:             repoEntity.ID,
+			RepositoryType: repoEntity.RepositoryType,
+			StoreType:      repoEntity.StoreType,
+			RepositoryUrl:  repoEntity.RepositoryURL,
+			Token:          repoEntity.Token,
+			Status:         repoEntity.Status,
+			LastUpdateTime: repoEntity.UpdateTime.Format(time.DateTime),
+			LastSyncTime:   repoEntity.LastSyncTime.Format(time.DateTime),
+			IsDeleted:      false,
+			CreateTime:     repoEntity.CreateTime.Format(time.DateTime),
+			UpdateTime:     repoEntity.UpdateTime.Format(time.DateTime),
+		}
+	}
+
+	return repoModels, nil
+}
+
+func (m *MysqlRepositoryManager) GetTokenByID(ctx context.Context, id int64) (string, error) {
+	var token string
+
+	err := m.db.WithContext(ctx).
+		Table(entity.TableNameMysqlRepository).
+		Select("`token`").
+		Where("`id = ?`", id).
+		Take(&token).Error
+
+	return token, err
+}
+
+func (m *MysqlRepositoryManager) GetRepoTypeByID(ctx context.Context, id int64) (int32, error) {
+	var repoType int32
+
+	err := m.db.WithContext(ctx).
+		Table(entity.TableNameMysqlRepository).
+		Select("`repo_type`").
+		Where("`id = ?`", id).
+		Take(&repoType).Error
+
+	return repoType, err
 }

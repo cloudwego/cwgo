@@ -24,6 +24,13 @@ const (
 )
 
 const (
-	RepositoryStatusActive    = "active"
-	RepositoryStatusDisactive = "disactive"
+	RepositoryStatusNumActive = iota + 1
+	RepositoryStatusNumDisactive
+)
+
+var (
+	RepositoryStatusNumMap = map[int]struct{}{
+		RepositoryStatusNumActive:    {},
+		RepositoryStatusNumDisactive: {},
+	}
 )

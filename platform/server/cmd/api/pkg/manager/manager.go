@@ -76,7 +76,7 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 		resolver:   resolver,
 	}
 
-	repos, err := daoManager.Repository.GetAllRepositories()
+	repos, err := daoManager.Repository.GetAllRepositories(context.Background())
 	if err != nil {
 		panic(fmt.Sprintf("get all repositories failed, err: %v", err))
 	}

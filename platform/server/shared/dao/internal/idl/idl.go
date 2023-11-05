@@ -19,19 +19,25 @@
 package idl
 
 import (
+	"context"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"gorm.io/gorm"
+	"sync"
+	"time"
 )
 
 type IIdlDaoManager interface {
-	AddIDL(repoId int64, idlPath, serviceName string) error
-	DeleteIDLs(ids []int64) error
-	UpdateIDL(id, repoId int64, idlPath, serviceName string) error
-	GetIDL(id int64) (model.IDL, error)
-	GetIDLs(page, limit, order int32, orderBy string) ([]*model.IDL, error)
-	SyncIDLContent(id int64, content string) error
+	AddIDL(ctx context.Context, idlModel model.IDL) error
+
+	DeleteIDLs(ctx context.Context, ids []int64) error
+
+	UpdateIDL(ctx context.Context, idlModel model.IDL) error
+	Sync(ctx context.Context, idlModel model.IDL) error
+
+	GetIDL(ctx context.Context, id int64) (*model.IDL, error)
+	GetIDLList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.IDL, error)
 }
 
 type MysqlIDLManager struct {
@@ -46,90 +52,208 @@ func NewMysqlIDL(db *gorm.DB) *MysqlIDLManager {
 	}
 }
 
-func (m *MysqlIDLManager) AddIDL(repoId int64, idlPath, serviceName string) error {
-	timeNow := utils.GetCurrentTime()
-	// TODO: check repo id is exists
-	//err := m.db.Exec(
-	//	fmt.Sprintf(
-	//		"INSERT INTO `%s` (`repository_id`, `main_idl_path`, `service_name`, `last_sync_time`) "+
-	//			"SELECT %d,`%s`,`%s`,`%s` "+
-	//			"FROM `%s` "+
-	//			"WHERE `%s`.`id` = %d",
-	//		consts.TableNameIDL,
-	//		repoId, idlPath, serviceName, time.Now().Format(time.DateTime),
-	//		consts.TableNameRepository,
-	//		consts.TableNameRepository, repoId,
-	//	),
-	//)
-	idl := model.IDL{
-		RepositoryId: repoId,
-		MainIdlPath:  idlPath,
-		ServiceName:  serviceName,
-		LastSyncTime: timeNow,
-		CreateTime:   timeNow,
-		UpdateTime:   timeNow,
-	}
-	res := m.db.
-		Table(consts.TableNameIDL).
-		Create(&idl)
-	if res.Error != nil {
-		return res.Error
+func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) error {
+	// check repo id is exists
+	var repo entity.MysqlRepository
+
+	err := m.db.WithContext(ctx).
+		Take(&repo, idlModel.RepositoryId).Error
+	if err != nil {
+		return err
 	}
 
-	return nil
-}
+	now := time.Now()
 
-func (m *MysqlIDLManager) DeleteIDLs(ids []int64) error {
-	var idl model.IDL
-	res := m.db.
-		Table(consts.TableNameIDL).
-		Delete(&idl, ids)
-	if res.Error != nil {
-		return res.Error
+	mainIdlEntity := entity.MysqlIDL{
+		RepositoryID: idlModel.RepositoryId,
+		IdlPath:      idlModel.MainIdlPath,
+		CommitHash:   idlModel.CommitHash,
+		ServiceName:  idlModel.ServiceName,
+		LastSyncTime: now,
 	}
 
-	return nil
-}
+	// insert main idlModel
+	err = m.db.WithContext(ctx).
+		Create(&mainIdlEntity).Error
+	if err != nil {
+		return err
+	}
 
-func (m *MysqlIDLManager) UpdateIDL(id, repoId int64, idlPath, serviceName string) error {
-	timeNow := utils.GetCurrentTime()
-	res := m.db.
-		Table(consts.TableNameIDL).
-		Where("id = ?", id).
-		Updates(
-			model.IDL{
-				Id:           id,
-				RepositoryId: repoId,
-				MainIdlPath:  idlPath,
-				ServiceName:  serviceName,
-				UpdateTime:   timeNow,
-			},
-		)
-	if res.Error != nil {
-		return res.Error
+	// insert import idls
+	importedIdlEntities := make([]*entity.MysqlIDL, len(idlModel.ImportIdls))
+	for i, importIdl := range idlModel.ImportIdls {
+		importedIdlEntities[i] = &entity.MysqlIDL{
+			RepositoryID: idlModel.RepositoryId,
+			ParentIdlID:  mainIdlEntity.ID,
+			IdlPath:      importIdl.IdlPath,
+			CommitHash:   importIdl.CommitHash,
+			ServiceName:  idlModel.ServiceName,
+			LastSyncTime: now,
+		}
+	}
+	err = m.db.WithContext(ctx).
+		Create(&importedIdlEntities).Error
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (m *MysqlIDLManager) GetIDL(id int64) (model.IDL, error) {
-	var idl model.IDL
-	res := m.db.
-		Table(consts.TableNameIDL).
-		Where("id = ?", id).
-		First(&idl)
-	if res.Error != nil {
-		return idl, res.Error
-	}
+func (m *MysqlIDLManager) DeleteIDLs(ctx context.Context, ids []int64) error {
+	var idl entity.MysqlIDL
 
-	return idl, nil
+	err := m.db.WithContext(ctx).
+		Delete(&idl, ids).Error
+
+	return err
 }
 
-func (m *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*model.IDL, error) {
-	var IDLs []*model.IDL
+func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) error {
+	// update main idlModel
+	mainIdlEntity := entity.MysqlIDL{
+		ID:           idlModel.Id,
+		RepositoryID: idlModel.RepositoryId,
+		ParentIdlID:  0,
+		IdlPath:      idlModel.MainIdlPath,
+		CommitHash:   idlModel.CommitHash,
+		ServiceName:  idlModel.ServiceName,
+	}
+
+	err := m.db.WithContext(ctx).
+		Model(&mainIdlEntity).Updates(mainIdlEntity).Error
+	if err != nil {
+		return err
+	}
+
+	// update import idls
+	if idlModel.ImportIdls != nil {
+		importedIdlEntities := make([]*entity.MysqlIDL, len(idlModel.ImportIdls))
+		for i, importIdl := range idlModel.ImportIdls {
+			importedIdlEntities[i] = &entity.MysqlIDL{
+				RepositoryID: idlModel.RepositoryId,
+				ParentIdlID:  mainIdlEntity.ID,
+				IdlPath:      importIdl.IdlPath,
+				CommitHash:   importIdl.CommitHash,
+				ServiceName:  idlModel.ServiceName,
+			}
+		}
+
+		err = m.db.WithContext(ctx).
+			Where("`parent_idl_id` = ?", idlModel.Id).
+			Delete(&idlModel).Error
+		if err != nil {
+			return err
+		}
+
+		err = m.db.Where(ctx).
+			Create(importedIdlEntities).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
+	// update main idlModel
+	mainIdlEntity := entity.MysqlIDL{
+		ID:           idlModel.Id,
+		RepositoryID: idlModel.RepositoryId,
+		ParentIdlID:  0,
+		IdlPath:      idlModel.MainIdlPath,
+		CommitHash:   idlModel.CommitHash,
+		ServiceName:  idlModel.ServiceName,
+		LastSyncTime: time.Now(),
+	}
+
+	err := m.db.WithContext(ctx).
+		Model(&mainIdlEntity).Updates(mainIdlEntity).Error
+	if err != nil {
+		return err
+	}
+
+	// update import idls
+	if idlModel.ImportIdls != nil {
+		importedIdlEntities := make([]*entity.MysqlIDL, len(idlModel.ImportIdls))
+		for i, importIdl := range idlModel.ImportIdls {
+			importedIdlEntities[i] = &entity.MysqlIDL{
+				RepositoryID: idlModel.RepositoryId,
+				ParentIdlID:  mainIdlEntity.ID,
+				IdlPath:      importIdl.IdlPath,
+				CommitHash:   importIdl.CommitHash,
+				ServiceName:  idlModel.ServiceName,
+			}
+		}
+
+		err = m.db.WithContext(ctx).
+			Where("`parent_idl_id` = ?", idlModel.Id).
+			Delete(&idlModel).Error
+		if err != nil {
+			return err
+		}
+
+		err = m.db.Where(ctx).
+			Create(importedIdlEntities).Error
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDL, error) {
+	var mainIdlEntity entity.MysqlIDL
+
+	err := m.db.WithContext(ctx).
+		Where("`id` = ?", id).
+		Take(&mainIdlEntity).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var importIdlEntities []*entity.MysqlIDL
+
+	err = m.db.WithContext(ctx).
+		Where("`parent_idl_id` = ?", id).
+		Find(&importIdlEntities).Error
+	if err != nil {
+		return nil, err
+	}
+
+	importIdlModels := make([]*model.ImportIDL, len(importIdlEntities))
+	for i, importIdl := range importIdlEntities {
+		importIdlModels[i] = &model.ImportIDL{
+			IdlPath:    importIdl.IdlPath,
+			CommitHash: importIdl.CommitHash,
+		}
+	}
+
+	return &model.IDL{
+		Id:           mainIdlEntity.ID,
+		RepositoryId: mainIdlEntity.RepositoryID,
+		MainIdlPath:  mainIdlEntity.IdlPath,
+		CommitHash:   mainIdlEntity.CommitHash,
+		ImportIdls:   importIdlModels,
+		ServiceName:  mainIdlEntity.ServiceName,
+		LastSyncTime: mainIdlEntity.LastSyncTime.Format(time.DateTime),
+		IsDeleted:    false,
+		CreateTime:   mainIdlEntity.CreateTime.Format(time.DateTime),
+		UpdateTime:   mainIdlEntity.UpdateTime.Format(time.DateTime),
+	}, nil
+}
+
+func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.IDL, error) {
+	var idlEntities []*entity.MysqlIDL
+
+	if page < 1 {
+		page = 1
+	}
 	offset := (page - 1) * limit
 
-	// Default sort field to 'update_time' if not provided
+	// default sort field to 'update_time' if not provided
 	if orderBy == "" {
 		orderBy = consts.OrderByUpdateTime
 	}
@@ -139,38 +263,54 @@ func (m *MysqlIDLManager) GetIDLs(page, limit, order int32, orderBy string) ([]*
 		orderBy = orderBy + " " + consts.OrderInc
 	case consts.OrderNumDec:
 		orderBy = orderBy + " " + consts.OrderDec
-	default:
-		orderBy = orderBy + " " + consts.OrderInc
 	}
 
-	res := m.db.
-		Table(consts.TableNameIDL).
+	err := m.db.WithContext(ctx).
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).
-		Find(&IDLs)
-	if res.Error != nil {
-		return nil, res.Error
+		Find(&idlEntities).Error
+	if err != nil {
+		return nil, err
 	}
 
-	return IDLs, nil
-}
+	var wg sync.WaitGroup
+	idlModels := make([]*model.IDL, len(idlEntities))
+	for i, idl := range idlEntities {
+		wg.Add(1)
+		idlModels[i] = &model.IDL{
+			Id:           idl.ID,
+			RepositoryId: idl.RepositoryID,
+			MainIdlPath:  idl.IdlPath,
+			CommitHash:   idl.CommitHash,
+			ImportIdls:   nil,
+			ServiceName:  idl.ServiceName,
+			LastSyncTime: idl.LastSyncTime.Format(time.DateTime),
+			IsDeleted:    false,
+			CreateTime:   idl.CreateTime.Format(time.DateTime),
+			UpdateTime:   idl.UpdateTime.Format(time.DateTime),
+		}
+		go func(i int, idl *entity.MysqlIDL) {
+			var importIdlEntities []*entity.MysqlIDL
+			err := m.db.WithContext(ctx).
+				Where("`parent_idl_id` = ?", idl.ID).
+				Find(&importIdlEntities).Error
+			if err != nil {
+				return
+			}
 
-func (m *MysqlIDLManager) SyncIDLContent(id int64, content string) error {
-	timeNow := utils.GetCurrentTime()
-	res := m.db.
-		Table(consts.TableNameIDL).
-		Where("id = ?", id).
-		Updates(
-			model.IDL{
-				Content:      content,
-				LastSyncTime: timeNow,
-				UpdateTime:   timeNow,
-			},
-		)
-	if res.Error != nil {
-		return res.Error
+			importIdlModels := make([]*model.ImportIDL, len(importIdlEntities))
+			for j, importIdl := range importIdlEntities {
+				importIdlModels[j] = &model.ImportIDL{
+					IdlPath:    importIdl.IdlPath,
+					CommitHash: importIdl.CommitHash,
+				}
+			}
+
+			idlModels[i].ImportIdls = importIdlModels
+		}(i, idl)
 	}
+	wg.Wait()
 
-	return nil
+	return idlModels, nil
 }

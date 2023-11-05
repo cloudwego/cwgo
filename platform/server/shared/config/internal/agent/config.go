@@ -23,3 +23,7 @@ type Config struct {
 	MaxConnections int64  `mapstructure:"maxConnections"`
 	MaxQPS         int64  `mapstructure:"maxQPS"`
 }
+
+type Metadata struct {
+	ServiceId string `yaml:"service_id"`
+}

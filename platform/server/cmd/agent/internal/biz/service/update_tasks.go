@@ -39,14 +39,14 @@ func NewUpdateTasksService(ctx context.Context, svcCtx *svc.ServiceContext) *Upd
 
 // Run create note info
 func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateTasksRes, err error) {
-	tasks := make([]*model.Task, 0, len(req.Tasks))
+	tasks := make([]model.Task, 0, len(req.Tasks))
 
 	for _, t := range req.Tasks {
 		switch t.Type {
 		case model.Type_sync_idl_data:
 			var data model.SyncIdlData
 
-			tasks = append(tasks, &model.Task{
+			tasks = append(tasks, model.Task{
 				Id:           t.Id,
 				Type:         t.Type,
 				ScheduleTime: t.ScheduleTime,
@@ -57,7 +57,7 @@ func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateT
 		case model.Type_sync_repo_data:
 			var data model.SyncRepoData
 
-			tasks = append(tasks, &model.Task{
+			tasks = append(tasks, model.Task{
 				Id:           t.Id,
 				Type:         t.Type,
 				ScheduleTime: t.ScheduleTime,
@@ -68,16 +68,7 @@ func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateT
 		}
 	}
 
-	cron.CronInstance.Stop()
-
-	cron.CronInstance.EmptyTask()
-	s.svcCtx.RepoManager.ClearClient()
-
-	for _, t := range tasks {
-		cron.CronInstance.AddTask(t)
-	}
-
-	cron.CronInstance.Start()
+	cron.CronInstance.UpdateTasks(tasks)
 
 	return &agent.UpdateTasksRes{
 		Code: 0,

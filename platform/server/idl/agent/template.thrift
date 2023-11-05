@@ -1,6 +1,6 @@
 namespace go agent
 
-include "../model/model.thrift"
+include "../model/template.thrift"
 
 struct AddTemplateReq{
     1: string name
@@ -40,7 +40,7 @@ struct GetTemplatesRes{
     3: GetTemplatesResData data
 }
 struct GetTemplatesResData{
-    1: list<model.Template> templates
+    1: list<template.Template> templates
 }
 
 struct AddTemplateItemReq{
@@ -80,5 +80,5 @@ struct GetTemplateItemsRes{
     3: GetTemplateItemsResData data
 }
 struct GetTemplateItemsResData{
-    1: list<model.TemplateItem> template_items
+    1: list<template.TemplateItem> template_items
 }
