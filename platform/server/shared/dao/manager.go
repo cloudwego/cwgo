@@ -25,6 +25,8 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/idl"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/template"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
 )
 
 type Manager struct {
@@ -36,10 +38,13 @@ type Manager struct {
 func NewDaoManager(conf store.Config) (*Manager, error) {
 	switch conf.GetStoreType() {
 	case consts.StoreTypeNumMysql:
+		logger.Logger.Info("initializing mysql")
 		mysqlDb, err := conf.NewMysqlDB()
 		if err != nil {
+			logger.Logger.Error("initializing mysql failed", zap.Error(err))
 			return nil, err
 		}
+		logger.Logger.Info("initialize mysql successfully")
 
 		idlDaoManager := idl.NewMysqlIDL(mysqlDb)
 		repositoryDaoManager := repository.NewMysqlRepository(mysqlDb)

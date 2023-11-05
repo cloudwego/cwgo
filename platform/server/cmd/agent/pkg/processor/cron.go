@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cron
+package processor
 
 import (
 	"context"
@@ -78,7 +78,7 @@ func (w Worker) Stop() {
 	w.stopChan <- struct{}{} // send exit signal
 }
 
-type Cron struct {
+type Processor struct {
 	service agent.AgentService // sync methods
 
 	taskList []model.Task // sync tasks
@@ -102,9 +102,9 @@ const (
 	adjustTimeDuration = 1 * time.Minute
 )
 
-var CronInstance *Cron
+var ProcessorInstance *Processor
 
-func InitCron(service agent.AgentService) {
+func InitProcessor(service agent.AgentService) {
 	// create worker pool
 	workerPool := make(chan chan model.Task, defaultWorkerNum)
 
@@ -116,7 +116,7 @@ func InitCron(service agent.AgentService) {
 		worker.Start()
 	}
 
-	CronInstance = &Cron{
+	ProcessorInstance = &Processor{
 		service:    service,
 		taskList:   nil,
 		workerPool: workerPool,
@@ -126,7 +126,7 @@ func InitCron(service agent.AgentService) {
 }
 
 // Start dispatch tasks from current task list
-func (c *Cron) Start() {
+func (c *Processor) Start() {
 	var startTime time.Time
 	var taskProcessedNum int64
 	go func() {
@@ -172,12 +172,12 @@ func (c *Cron) Start() {
 	}()
 }
 
-func (c *Cron) Stop() {
+func (c *Processor) Stop() {
 	// send exit signal
 	c.stopChan <- struct{}{}
 }
 
-func (c *Cron) UpdateTasks(tasks []model.Task) {
+func (c *Processor) UpdateTasks(tasks []model.Task) {
 	c.Stop()
 	c.taskList = tasks // replace task list
 	c.Start()

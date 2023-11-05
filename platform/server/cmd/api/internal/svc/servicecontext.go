@@ -38,14 +38,20 @@ type ServiceContext struct {
 var Svc *ServiceContext
 
 func InitServiceContext() {
+	// init dao manager
+	logger.Logger.Info("initializing dao manager")
 	daoManager, err := dao.NewDaoManager(config.GetManager().Config.Store)
 	if err != nil {
 		logger.Logger.Fatal("initialize dao manager failed", zap.Error(err))
 	}
+	logger.Logger.Info("initialize dao manager successfully")
+
+	logger.Logger.Info("initializing dao manager")
 	repoManager, err := repository.NewRepoManager(daoManager)
 	if err != nil {
 		logger.Logger.Fatal("initialize repository manager failed")
 	}
+	logger.Logger.Info("initialize dao manager successfully")
 
 	Svc = &ServiceContext{
 		DaoManager:      daoManager,

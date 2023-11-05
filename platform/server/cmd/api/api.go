@@ -110,7 +110,10 @@ func run(opts *setupOptions) error {
 	svc.InitServiceContext()
 
 	// start api service
+	logger.Logger.Info("register api service")
 	register(config.GetManager().ApiConfigManager.Server)
+
+	logger.Logger.Info("start running api service...")
 	config.GetManager().ApiConfigManager.Server.Spin()
 
 	return nil
