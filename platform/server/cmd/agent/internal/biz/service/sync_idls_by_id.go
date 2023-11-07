@@ -25,8 +25,11 @@ import (
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/parser"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
 	"net/http"
+	"path/filepath"
 )
 
 type SyncIDLsByIdService struct {
@@ -66,7 +69,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		owner, repoName, idlPath, err := client.ParseUrl(idl.MainIdlPath)
+		owner, repoName, idlPid, err := client.ParseUrl(idl.MainIdlPath)
 		if err != nil {
 			logger.Logger.Error("parse repo url failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
@@ -75,7 +78,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		_, err = client.GetFile(owner, repoName, idlPath, consts.MainRef)
+		_, err = client.GetFile(owner, repoName, idlPid, consts.MainRef)
 		if err != nil {
 			logger.Logger.Error("get repo file failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
@@ -84,9 +87,98 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		// TODO: need sync import idl too
+		// determine the idl type for subsequent calculations of different types
+		idlType, err := utils.DetermineIdlType(idlPid)
+		if err != nil {
+			return &agent.SyncIDLsByIdRes{
+				Code: http.StatusBadRequest,
+				Msg:  "incorrect idl type",
+			}, nil
+		}
+
+		// obtain dependent file paths
+		var importPath []string
+		switch idlType {
+		case consts.IdlTypeNumThrift:
+			thriftFile := &parser.ThriftFile{}
+			importPath, err = thriftFile.GetDependentFilePaths(idl.MainIdlPath)
+			if err != nil {
+				return &agent.SyncIDLsByIdRes{
+					Code: http.StatusBadRequest,
+					Msg:  "get dependent file paths error",
+				}, nil
+			}
+		case consts.IdlTypeNumProto:
+			protoFile := &parser.ProtoFile{}
+			importPath, err = protoFile.GetDependentFilePaths(idl.MainIdlPath)
+			return &agent.SyncIDLsByIdRes{
+				Code: http.StatusBadRequest,
+				Msg:  "get dependent file paths error",
+			}, nil
+		}
+
+		importIDLs := make([]*model.ImportIDL, 0)
+
+		// calculate the hash value and add it to the importIDLs slice
+		for _, path := range importPath {
+			calculatedPath := filepath.Join(idlPid, path)
+			commitHash, err := client.GetLatestCommitHash(owner, repoName, calculatedPath, consts.MainRef)
+			if err != nil {
+				return &agent.SyncIDLsByIdRes{
+					Code: http.StatusBadRequest,
+					Msg:  "cannot get depended idl latest commit hash",
+				}, nil
+			}
+
+			importIDL := &model.ImportIDL{
+				IdlPath:    path,
+				CommitHash: commitHash,
+			}
+
+			importIDLs = append(importIDLs, importIDL)
+		}
+
+		// use a bool value to judge whether to sync
+		needToSync := false
+		// create a map to find imports
+		existingImportIDLsMap := make(map[string]bool)
+		for _, importIDL := range importIDLs {
+			// use IdlPath as key
+			existingImportIDLsMap[importIDL.CommitHash] = true
+		}
+
+		// compare import idl
+		for _, dbImportIDL := range idl.ImportIdls {
+			if existingImportIDLsMap[dbImportIDL.CommitHash] {
+				// importIDL exist in importIDLs then continue
+				continue
+			} else {
+				needToSync = true
+				break
+			}
+		}
+
+		hash, err := client.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
+		if err != nil {
+			logger.Logger.Error("get latest commit hash failed", zap.Error(err))
+			return &agent.SyncIDLsByIdRes{
+				Code: http.StatusInternalServerError,
+				Msg:  "internal err",
+			}, nil
+		}
+
+		if hash != idl.CommitHash {
+			needToSync = true
+		}
+
+		if !needToSync {
+			continue
+		}
+
 		err = s.svcCtx.DaoManager.Idl.Sync(s.ctx, model.IDL{
-			Id: idl.Id,
+			Id:         idl.Id,
+			CommitHash: hash,
+			ImportIdls: importIDLs,
 		})
 		if err != nil {
 			logger.Logger.Error("sync idl content to dao failed", zap.Error(err))
