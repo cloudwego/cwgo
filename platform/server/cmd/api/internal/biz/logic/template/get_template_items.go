@@ -55,7 +55,7 @@ func (l *GetTemplateItemsLogic) GetTemplateItems(req *template.GetTemplateItemsR
 	}
 
 	rpcRes, err := client.GetTemplateItems(l.ctx, &agent.GetTemplateItemsReq{
-		Id: req.ID,
+		TemplateId: req.ID,
 	})
 	if err != nil {
 		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
