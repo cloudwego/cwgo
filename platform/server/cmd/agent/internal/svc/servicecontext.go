@@ -27,5 +27,5 @@ import (
 type ServiceContext struct {
 	DaoManager  *dao.Manager
 	RepoManager *repository.Manager
-	Generator   generator.CwgoGenerator
+	Generator   generator.Generator
 }

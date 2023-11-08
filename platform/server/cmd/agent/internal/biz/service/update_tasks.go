@@ -21,7 +21,7 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/cron"
+	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/processor"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 )
@@ -68,7 +68,7 @@ func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateT
 		}
 	}
 
-	cron.CronInstance.UpdateTasks(tasks)
+	processor.ProcessorInstance.UpdateTasks(tasks)
 
 	return &agent.UpdateTasksRes{
 		Code: 0,

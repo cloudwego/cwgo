@@ -93,13 +93,27 @@ func run(opts *setupOptions) error {
 	}
 
 	// init logger
-	logger.InitLogger()
+	loggerConfig := config.GetManager().Config.Logger
+	logger.InitLogger(
+		logger.Config{
+			SavePath:     loggerConfig.SavePath,
+			EncoderType:  loggerConfig.EncoderType,
+			EncodeLevel:  loggerConfig.EncodeLevel,
+			EncodeCaller: loggerConfig.EncodeCaller,
+		},
+		config.GetManager().ServerType,
+		config.GetManager().ServiceId,
+		config.GetManager().ServerMode,
+	)
 
 	// init service context
 	svc.InitServiceContext()
 
 	// start api service
+	logger.Logger.Info("register api service")
 	register(config.GetManager().ApiConfigManager.Server)
+
+	logger.Logger.Info("start running api service...")
 	config.GetManager().ApiConfigManager.Server.Spin()
 
 	return nil

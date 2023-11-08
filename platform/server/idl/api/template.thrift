@@ -72,7 +72,7 @@ struct UpdateTemplateItemRes{
 }
 
 struct GetTemplateItemsReq{
-    1: i32 id (api.query="page",api.vd="$>=0")
+    1: i64 id (api.query="page",api.vd="$>=0")
 }
 struct GetTemplateItemsRes{
     1: i32 code

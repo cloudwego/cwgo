@@ -764,16 +764,16 @@ func (p *DeleteRepositoriesRes) String() string {
 }
 
 type UpdateRepositoryReq struct {
-	ID     string `thrift:"id,1" form:"id" json:"id" query:"id"`
+	ID     int64  `thrift:"id,1" form:"id" json:"id" query:"id"`
 	Token  string `thrift:"token,2" form:"token" json:"token"`
-	Status string `thrift:"status,3" form:"status" json:"status"`
+	Status int32  `thrift:"status,3" form:"status" json:"status"`
 }
 
 func NewUpdateRepositoryReq() *UpdateRepositoryReq {
 	return &UpdateRepositoryReq{}
 }
 
-func (p *UpdateRepositoryReq) GetID() (v string) {
+func (p *UpdateRepositoryReq) GetID() (v int64) {
 	return p.ID
 }
 
@@ -781,7 +781,7 @@ func (p *UpdateRepositoryReq) GetToken() (v string) {
 	return p.Token
 }
 
-func (p *UpdateRepositoryReq) GetStatus() (v string) {
+func (p *UpdateRepositoryReq) GetStatus() (v int32) {
 	return p.Status
 }
 
@@ -811,7 +811,7 @@ func (p *UpdateRepositoryReq) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -831,7 +831,7 @@ func (p *UpdateRepositoryReq) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 3:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -871,7 +871,7 @@ ReadStructEndError:
 }
 
 func (p *UpdateRepositoryReq) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
 		p.ID = v
@@ -889,7 +889,7 @@ func (p *UpdateRepositoryReq) ReadField2(iprot thrift.TProtocol) error {
 }
 
 func (p *UpdateRepositoryReq) ReadField3(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		p.Status = v
@@ -935,10 +935,10 @@ WriteStructEndError:
 }
 
 func (p *UpdateRepositoryReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("id", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.ID); err != nil {
+	if err := oprot.WriteI64(p.ID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -969,10 +969,10 @@ WriteFieldEndError:
 }
 
 func (p *UpdateRepositoryReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Status); err != nil {
+	if err := oprot.WriteI32(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

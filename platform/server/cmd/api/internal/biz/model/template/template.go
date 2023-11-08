@@ -2917,14 +2917,14 @@ func (p *UpdateTemplateItemRes) String() string {
 }
 
 type GetTemplateItemsReq struct {
-	ID int32 `thrift:"id,1" json:"id" query:"page" vd:"$>=0"`
+	ID int64 `thrift:"id,1" json:"id" query:"page" vd:"$>=0"`
 }
 
 func NewGetTemplateItemsReq() *GetTemplateItemsReq {
 	return &GetTemplateItemsReq{}
 }
 
-func (p *GetTemplateItemsReq) GetID() (v int32) {
+func (p *GetTemplateItemsReq) GetID() (v int64) {
 	return p.ID
 }
 
@@ -2952,7 +2952,7 @@ func (p *GetTemplateItemsReq) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -2992,7 +2992,7 @@ ReadStructEndError:
 }
 
 func (p *GetTemplateItemsReq) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
+	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
 		p.ID = v
@@ -3030,10 +3030,10 @@ WriteStructEndError:
 }
 
 func (p *GetTemplateItemsReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("id", thrift.I32, 1); err != nil {
+	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.ID); err != nil {
+	if err := oprot.WriteI64(p.ID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

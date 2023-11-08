@@ -20,7 +20,6 @@ package logger
 
 import (
 	"fmt"
-	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
@@ -30,15 +29,20 @@ import (
 
 var Logger *zap.Logger
 
-func InitLogger() {
-	// create log save dir
-	loggerConfig := config.GetManager().Config.Logger
+type Config struct {
+	SavePath     string `mapstructure:"savePath"`
+	EncoderType  string `mapstructure:"encoderType"`
+	EncodeLevel  string `mapstructure:"encodeLevel"`
+	EncodeCaller string `mapstructure:"encodeCaller"`
+}
 
-	savePath := loggerConfig.SavePath
+func InitLogger(config Config, serverType consts.ServerType, serviceId string, serverMode consts.ServerMode) {
+	// create log save dir
+	savePath := config.SavePath
 	if savePath == "" {
 		savePath = fmt.Sprintf("%s-%s/log",
-			consts.ServerTypeMapToStr[config.GetManager().ServerType],
-			config.GetManager().ServiceId,
+			consts.ServerTypeMapToStr[serverType],
+			serviceId,
 		)
 	} else {
 
@@ -49,37 +53,35 @@ func InitLogger() {
 		panic(err)
 	}
 
-	switch loggerConfig.EncoderType {
+	switch config.EncoderType {
 	case JsonEncoder, ConsoleEncoder:
 	default:
-		loggerConfig.EncoderType = ConsoleEncoder
+		config.EncoderType = ConsoleEncoder
 	}
 
-	switch loggerConfig.EncodeLevel {
+	switch config.EncodeLevel {
 	case LowercaseLevelEncoder, LowercaseColorLevelEncoder, CapitalLevelEncoder, CapitalColorLevelEncoder:
 	default:
-		loggerConfig.EncodeLevel = CapitalLevelEncoder
+		config.EncodeLevel = CapitalLevelEncoder
 
 	}
 
-	switch loggerConfig.EncodeCaller {
+	switch config.EncodeCaller {
 	case ShortCallerEncoder, FullCallerEncoder:
 	default:
-		loggerConfig.EncodeCaller = FullCallerEncoder
+		config.EncodeCaller = FullCallerEncoder
 
 	}
 
 	encoder := getEncoder(EncoderOptions{
-		EncoderType:  loggerConfig.EncoderType,
-		EncodeLevel:  loggerConfig.EncodeLevel,
-		EncodeCaller: loggerConfig.EncodeCaller,
+		EncoderType:  config.EncoderType,
+		EncodeLevel:  config.EncodeLevel,
+		EncodeCaller: config.EncodeCaller,
 	})
 
 	dynamicLevel := zap.NewAtomicLevel()
 
-	mode := config.GetManager().ServerMode
-
-	switch mode {
+	switch serverMode {
 	case consts.ServerModeNumDev:
 		// set current log level to Debug
 		dynamicLevel.SetLevel(zap.DebugLevel)

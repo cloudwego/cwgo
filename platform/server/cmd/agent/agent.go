@@ -23,8 +23,8 @@ import (
 	"errors"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/handler"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/cron"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/generator"
+	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/processor"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
@@ -101,25 +101,44 @@ func run(opts *setupOptions) error {
 	}
 
 	// init logger
-	logger.InitLogger()
+	loggerConfig := config.GetManager().Config.Logger
+	logger.InitLogger(
+		logger.Config{
+			SavePath:     loggerConfig.SavePath,
+			EncoderType:  loggerConfig.EncoderType,
+			EncodeLevel:  loggerConfig.EncodeLevel,
+			EncodeCaller: loggerConfig.EncodeCaller,
+		},
+		config.GetManager().ServerType,
+		config.GetManager().ServiceId,
+		config.GetManager().ServerMode,
+	)
 
-	// init dao
+	// init dao manager
+	logger.Logger.Info("initializing dao manager")
 	daoManager, err := dao.NewDaoManager(config.GetManager().Config.Store)
 	if err != nil {
+		logger.Logger.Error("initialize dao manager failed", zap.Error(err))
 		return err
 	}
+	logger.Logger.Info("initialize dao manager successfully")
 
+	logger.Logger.Info("initializing dao manager")
 	repoManager, err := repository.NewRepoManager(daoManager)
 	if err != nil {
-		logger.Logger.Fatal("service initialize repository manager failed", zap.Error(err))
+		logger.Logger.Fatal("initialize repository manager failed", zap.Error(err))
 	}
+	logger.Logger.Info("initialize dao manager successfully")
 
 	ctx := context.Background()
 
 	// get server options
+	logger.Logger.Info("getting kitex server options")
 	kitexServerOptions := config.GetManager().AgentConfigManager.GetKitexServerOptions()
+	logger.Logger.Info("getting kitex server options successfully")
 
 	// init agent service
+	logger.Logger.Info("initializing agent service impl")
 	agentService := handler.NewAgentServiceImpl(
 		ctx,
 		&svc.ServiceContext{
@@ -128,16 +147,21 @@ func run(opts *setupOptions) error {
 			Generator:   generator.NewCwgoGenerator(),
 		},
 	)
+	logger.Logger.Info("initialize agent service impl successfully")
 
-	// init cron
-	cron.InitCron(agentService)
+	// init processor
+	logger.Logger.Info("initializing processor")
+	processor.InitProcessor(agentService)
+	logger.Logger.Info("initialize processor successfully")
 
 	// start service
+	logger.Logger.Info("register agent service")
 	svr := agentservice.NewServer(
 		agentService,
 		kitexServerOptions...,
 	)
 
+	logger.Logger.Info("start running agent service...")
 	err = svr.Run()
 	if err != nil {
 		logger.Logger.Error("kitex server run failed", zap.Error(err))

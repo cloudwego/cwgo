@@ -27,6 +27,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	kitexregistry "github.com/cloudwego/kitex/pkg/registry"
+	"go.uber.org/zap"
 )
 
 type BuiltinRegistryConfig struct {
@@ -55,11 +56,14 @@ func (cm *BuiltinRegistryConfigManager) GetRegistryType() consts.RegistryType {
 
 func (cm *BuiltinRegistryConfigManager) GetRegistry() registry.IRegistry {
 	if cm.Registry == nil {
+		logger.Logger.Info("initializing redis")
 		rdb, err := cm.storeConfig.NewRedisClient()
 		if err != nil {
-			panic(fmt.Sprintf("initialize redis client failed, err: %v", err))
+			logger.Logger.Fatal("initializing redis failed", zap.Error(err))
 		}
-		cm.Registry = registry.NewBuiltinRegistry(rdb, logger.Logger)
+		logger.Logger.Info("initializing redis successfully")
+
+		cm.Registry = registry.NewBuiltinRegistry(rdb)
 	}
 
 	return cm.Registry

@@ -23,12 +23,14 @@ import (
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/transmeta"
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
+	"go.uber.org/zap"
 	"net"
 )
 
@@ -72,7 +74,7 @@ func (cm *ConfigManager) GetKitexServerOptions() []server.Option {
 	var KitexServerOptions []server.Option
 	addr, err := net.ResolveTCPAddr("tcp", cm.config.Addr)
 	if err != nil {
-		panic(fmt.Sprintf("resolve tcp addr failed, err: %v, addr: %s", err, cm.config.Addr))
+		logger.Logger.Fatal("resolve tcp addr failed", zap.Error(err), zap.String("addr", cm.config.Addr))
 	} else {
 		KitexServerOptions = append(KitexServerOptions, server.WithServiceAddr(addr))
 	}

@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/service"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
@@ -34,6 +35,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 	"io/ioutil"
+	"math"
 	"net"
 	"net/http"
 	"strconv"
@@ -42,26 +44,25 @@ import (
 )
 
 type BuiltinRegistry struct {
-	cleanInterval time.Duration
-	agentCache    *cache.Cache
-	rdb           redis.UniversalClient
-	syncDuration  time.Duration
-	logger        *zap.Logger
+	agentCache   *cache.Cache
+	rdb          redis.UniversalClient
+	syncDuration time.Duration
 }
 
 var _ IRegistry = (*BuiltinRegistry)(nil)
 
 const (
-	minCleanInterval  = 100 * time.Millisecond
-	defaultExpiration = 60 * time.Second
+	minCleanInterval     = 100 * time.Millisecond
+	defaultCleanInternal = 3 * time.Second
+	defaultExpiration    = 60 * time.Second
+	defaultSyncDuration  = 30 * time.Second
 )
 
-func NewBuiltinRegistry(rdb redis.UniversalClient, logger *zap.Logger) *BuiltinRegistry {
+func NewBuiltinRegistry(rdb redis.UniversalClient) *BuiltinRegistry {
 	r := &BuiltinRegistry{
-		agentCache:   cache.New(defaultExpiration, 3*time.Second),
+		agentCache:   cache.New(defaultExpiration, defaultCleanInternal),
 		rdb:          rdb,
-		syncDuration: 3 * time.Second,
-		logger:       logger,
+		syncDuration: defaultSyncDuration,
 	}
 
 	go r.StartSync()
@@ -71,54 +72,96 @@ func NewBuiltinRegistry(rdb redis.UniversalClient, logger *zap.Logger) *BuiltinR
 
 func (r *BuiltinRegistry) StartSync() {
 	for {
-		time.Sleep(r.syncDuration)
+		time.Sleep(r.syncDuration) // sync every r.syncDuration
 
-		cursor := uint64(0)
-		var keys []string
-		var err error
-		var needUpdateServiceId []string
-		for {
-			keys, cursor, err = r.rdb.Scan(context.Background(), cursor, consts.RdbKeyRegistryService+"*", 10).Result()
-			if err != nil {
-				r.logger.Error("builtin registry sync agent info in redis failed", zap.Error(err))
-				break
-			}
+		logger.Logger.Debug("start sync agent services")
 
-			for _, key := range keys {
-				serviceId := strings.TrimLeft(key, consts.RdbKeyRegistryService)
-				isExist := r.ServiceExists(key)
-				if !isExist {
-					needUpdateServiceId = append(needUpdateServiceId, serviceId)
+		// get agent services info in redis
+		switch rdb := r.rdb.(type) {
+		case *redis.ClusterClient:
+			err := rdb.ForEachMaster(context.Background(), func(ctx context.Context, client *redis.Client) error {
+				err := r.scanServiceKeysAndUpdate(client)
+				if err != nil {
+					return err
 				}
+
+				return nil
+			})
+			if err != nil {
+				continue
+			}
+		case *redis.Client:
+			err := r.scanServiceKeysAndUpdate(rdb)
+			if err != nil {
+				continue
 			}
 		}
 
-		pipe := r.rdb.Pipeline()
+		logger.Logger.Debug("sync agent services finished")
+	}
+}
+
+func (r *BuiltinRegistry) scanServiceKeysAndUpdate(rdb *redis.Client) error {
+	var err error
+	var keys []string
+	var needUpdateServiceId []string
+	cursor := uint64(0)
+
+	for {
+		logger.Logger.Debug("scanning keys store agent services in redis", zap.Uint64("cursor", cursor))
+
+		// scan service keys in redis
+		keys, cursor, err = rdb.Scan(context.Background(), cursor, consts.RdbKeyRegistryService+"*", 100).Result()
+		if err != nil {
+			logger.Logger.Error("scanning keys store agent services in redis failed", zap.Error(err))
+			break
+		}
+
+		for _, key := range keys {
+			serviceId := strings.TrimLeft(key, consts.RdbKeyRegistryService)
+			// check where service in builtin registry
+			isExist := r.ServiceExists(key)
+			if !isExist {
+				// if not exist then need to update
+				needUpdateServiceId = append(needUpdateServiceId, serviceId)
+			}
+		}
+
+		if cursor == 0 {
+			break
+		}
+	}
+
+	if len(needUpdateServiceId) != 0 {
+		// get service info (ip and port)
+		pipe := rdb.Pipeline()
 		for _, key := range needUpdateServiceId {
 			pipe.Get(context.Background(), key)
 		}
 
+		logger.Logger.Debug("exec redis pipe command")
 		cmds, err := pipe.Exec(context.Background())
 		if err != nil {
-			r.logger.Error("exec redis pipe command failed", zap.Error(err))
-			continue
+			logger.Logger.Error("exec redis pipe command failed", zap.Error(err))
+			return err
 		}
 
 		for i, cmd := range cmds {
 			ipPort, err := cmd.(*redis.StringCmd).Result()
 			ip, port, err := net.SplitHostPort(ipPort)
 			if err != nil {
-				r.logger.Error("parse host port string failed", zap.Error(err), zap.String("val", ipPort))
+				logger.Logger.Error("parse host port string failed", zap.Error(err), zap.String("val", ipPort))
 			}
 
 			p, err := strconv.Atoi(port)
 			if err != nil {
-				r.logger.Error("parse port failed", zap.Error(err), zap.String("val", port))
+				logger.Logger.Error("parse port failed", zap.Error(err), zap.String("val", port))
 			}
 
+			// register service in builtin registry
 			err = r.Register(needUpdateServiceId[i], ip, p)
 			if err != nil {
-				r.logger.Error(
+				logger.Logger.Error(
 					"register services get by sync progress in redis failed",
 					zap.Error(err),
 					zap.String("service_id", needUpdateServiceId[i]),
@@ -128,6 +171,8 @@ func (r *BuiltinRegistry) StartSync() {
 			}
 		}
 	}
+
+	return nil
 }
 
 func (r *BuiltinRegistry) Register(serviceId string, host string, port int) error {
@@ -136,7 +181,9 @@ func (r *BuiltinRegistry) Register(serviceId string, host string, port int) erro
 		return err
 	}
 
-	r.agentCache.SetDefault(serviceId, agentService)
+	r.agentCache.SetDefault(serviceId, agentService) // register service in cache
+
+	// save service info in redis
 	err = r.rdb.Set(
 		context.Background(),
 		fmt.Sprintf(consts.RdbKeyRegistryService, serviceId),
@@ -144,7 +191,7 @@ func (r *BuiltinRegistry) Register(serviceId string, host string, port int) erro
 		defaultExpiration,
 	).Err()
 	if err != nil {
-		r.logger.Error(
+		logger.Logger.Error(
 			"register service in builtin registry failed",
 			zap.Error(err),
 			zap.String("service_id", serviceId),
@@ -153,22 +200,34 @@ func (r *BuiltinRegistry) Register(serviceId string, host string, port int) erro
 		)
 	}
 
+	logger.Logger.Debug("registered service in builtin registry",
+		zap.String("service_id", serviceId),
+		zap.String("host", host),
+		zap.Int("port", port),
+	)
+
 	return nil
 }
 
-func (r *BuiltinRegistry) Deregister(id string) error {
-	r.agentCache.Delete(id)
+func (r *BuiltinRegistry) Deregister(serviceId string) error {
+	r.agentCache.Delete(serviceId) // deregister service in cache
+
+	// del service info in redis
 	err := r.rdb.Del(
 		context.Background(),
-		fmt.Sprintf(consts.RdbKeyRegistryService, id),
+		fmt.Sprintf(consts.RdbKeyRegistryService, serviceId),
 	).Err()
 	if err != nil {
-		r.logger.Error(
+		logger.Logger.Error(
 			"deregister service in builtin registry failed",
 			zap.Error(err),
-			zap.String("service_id", id),
+			zap.String("service_id", serviceId),
 		)
 	}
+
+	logger.Logger.Debug("deregistered service in builtin registry",
+		zap.String("service_id", serviceId),
+	)
 
 	return nil
 }
@@ -179,7 +238,9 @@ func (r *BuiltinRegistry) Update(serviceId string) error {
 		return errors.New("service not found")
 	}
 
-	r.agentCache.SetDefault(serviceId, v.(*service.Service))
+	r.agentCache.SetDefault(serviceId, v.(*service.Service)) // update service in cache
+
+	// update service in redis
 	err := r.rdb.Expire(
 		context.Background(),
 		fmt.Sprintf(consts.RdbKeyRegistryService, serviceId),
@@ -189,12 +250,17 @@ func (r *BuiltinRegistry) Update(serviceId string) error {
 		if err == redis.Nil {
 			return errors.New("service not found")
 		}
-		r.logger.Error(
+		logger.Logger.Error(
 			"update service in builtin registry failed",
 			zap.Error(err),
 			zap.String("service_id", serviceId),
 		)
 	}
+
+	logger.Logger.Debug("update service in builtin registry",
+		zap.String("service_id", serviceId),
+	)
+
 	return nil
 }
 
@@ -342,6 +408,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 		return errors.New(j.Msg)
 	}
 
+	logger.Logger.Info("start update service in registry")
 	go func() {
 		errNum := 0
 
@@ -349,17 +416,22 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 			if errNum == 0 {
 				time.Sleep(rc.updateInterval)
 			} else if errNum <= 6 {
-				time.Sleep(time.Second * 3)
+				time.Sleep(time.Duration(int(math.Pow(3, float64(errNum)))) * time.Second)
+			} else {
+				logger.Logger.Fatal("update service failed more than 6 times, connect to registry fail, stopping agent service")
 			}
 			select {
 			case <-rc.stopChan:
+				logger.Logger.Info("stop update service in registry")
 				return
 			default:
+				logger.Logger.Debug("updating service in registry")
 				err = rc.Update(serviceId)
 				if err != nil {
 					errNum++
 				}
 				errNum = 0
+				logger.Logger.Debug("update service in registry successfully")
 			}
 		}
 	}()

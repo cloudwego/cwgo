@@ -56,7 +56,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	// Obtain the commit hash for the main IDL
+	// obtain the commit hash for the main IDL
 	mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
 	if err != nil {
 		return &agent.AddIDLRes{
@@ -65,7 +65,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	// Determine the idl type for subsequent calculations of different types
+	// determine the idl type for subsequent calculations of different types
 	idlType, err := utils.DetermineIdlType(idlPid)
 	if err != nil {
 		return &agent.AddIDLRes{
@@ -74,12 +74,12 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	// Obtain dependent file paths
-	var importPath []string
+	// obtain dependent file paths
+	var importPaths []string
 	switch idlType {
 	case consts.IdlTypeNumThrift:
 		thriftFile := &parser.ThriftFile{}
-		importPath, err = thriftFile.GetDependentFilePaths(req.MainIdlPath)
+		importPaths, err = thriftFile.GetDependentFilePaths(req.MainIdlPath)
 		if err != nil {
 			return &agent.AddIDLRes{
 				Code: http.StatusBadRequest,
@@ -88,17 +88,17 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}
 	case consts.IdlTypeNumProto:
 		protoFile := &parser.ProtoFile{}
-		importPath, err = protoFile.GetDependentFilePaths(req.MainIdlPath)
+		importPaths, err = protoFile.GetDependentFilePaths(req.MainIdlPath)
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
 			Msg:  "get dependent file paths error",
 		}, nil
 	}
-	importIDLs := make([]*model.ImportIDL, 0)
+	importIDLs := make([]*model.ImportIDL, len(importPaths))
 
-	// Calculate the hash value and add it to the importIDLs slice
-	for _, path := range importPath {
-		calculatedPath := filepath.Join(idlPid, path)
+	// calculate the hash value and add it to the importIDLs slice
+	for i, importPath := range importPaths {
+		calculatedPath := filepath.Join(idlPid, importPath)
 		commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, consts.MainRef)
 		if err != nil {
 			return &agent.AddIDLRes{
@@ -107,12 +107,10 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			}, nil
 		}
 
-		importIDL := &model.ImportIDL{
-			IdlPath:    path,
+		importIDLs[i] = &model.ImportIDL{
+			IdlPath:    importPath,
 			CommitHash: commitHash,
 		}
-
-		importIDLs = append(importIDLs, importIDL)
 	}
 
 	// add idl

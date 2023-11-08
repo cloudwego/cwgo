@@ -19,10 +19,13 @@
 package store
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -39,31 +42,61 @@ func (c Config) GetStoreType() consts.StoreType {
 }
 
 func (c Config) NewMysqlDB() (*gorm.DB, error) {
-	return gorm.Open(mysql.Open(c.Mysql.GetDsn()), &gorm.Config{
+	logger.Logger.Info("connecting mysql", zap.Reflect("dsn", c.Mysql.GetDsn()))
+	db, err := gorm.Open(mysql.Open(c.Mysql.GetDsn()), &gorm.Config{
 		PrepareStmt: true,
 	})
+	if err != nil {
+		logger.Logger.Error("connect mysql failed", zap.Error(err))
+		return nil, err
+	}
+
+	return db, err
 }
 
 func (c Config) NewRedisClient() (redis.UniversalClient, error) {
-	if c.Redis.StandAlone.Addr != "" {
-		return redis.NewClient(&redis.Options{
+	var rdb redis.UniversalClient
+
+	if c.Redis.Type == "standalone" {
+		logger.Logger.Info("connecting redis",
+			zap.String("type", c.Redis.Type),
+			zap.Reflect("config", c.Redis.StandAlone),
+		)
+
+		rdb = redis.NewClient(&redis.Options{
 			Addr:     c.Redis.StandAlone.Addr,
+			Username: c.Redis.StandAlone.Username,
 			Password: c.Redis.StandAlone.Password,
 			DB:       c.Redis.StandAlone.Db,
-		}), nil
-	}
-	if c.Redis.Cluster.Addrs != nil {
+		})
+	} else if c.Redis.Type == "cluster" || c.Redis.Type == "" {
+		logger.Logger.Info("connecting redis",
+			zap.String("type", c.Redis.Type),
+			zap.Reflect("config", c.Redis.Cluster),
+		)
+
 		addrs := make([]string, len(c.Redis.Cluster.Addrs))
 		for i, addr := range c.Redis.Cluster.Addrs {
 			addrs[i] = fmt.Sprintf("%s:%s", addr.Ip, addr.Port)
 		}
-		return redis.NewClusterClient(&redis.ClusterOptions{
+
+		rdb = redis.NewClusterClient(&redis.ClusterOptions{
 			Addrs:    addrs,
+			Username: c.Redis.Cluster.Username,
 			Password: c.Redis.Cluster.Password,
-		}), nil
+		})
+	} else {
+		logger.Logger.Error("invalid redis type", zap.String("type", c.Redis.Type))
+		return nil, errors.New("invalid redis type")
 	}
 
-	return nil, errors.New("config not found")
+	err := rdb.Ping(context.Background()).Err()
+	if err != nil {
+		logger.Logger.Error("ping redis failed", zap.Error(err))
+		return nil, err
+	}
+
+	return rdb, nil
 }
 
 type Mysql struct {
@@ -98,12 +131,14 @@ func (m Mongo) GetAddr() string {
 }
 
 type Redis struct {
+	Type       string          `mapstructure:"type"`
 	StandAlone RedisStandAlone `mapstructure:"standalone"`
 	Cluster    RedisCluster    `mapstructure:"cluster"`
 }
 
 type RedisStandAlone struct {
 	Addr     string `mapstructure:"addr"`
+	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 	Db       int    `mapstructure:"db"`
 }
@@ -114,5 +149,6 @@ type RedisCluster struct {
 		Ip   string `mapstructure:"ip"`
 		Port string `mapstructure:"port"`
 	} `mapstructure:"addrs"`
+	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 }
