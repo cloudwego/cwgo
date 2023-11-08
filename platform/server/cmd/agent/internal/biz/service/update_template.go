@@ -45,9 +45,9 @@ func (s *UpdateTemplateService) Run(req *agent.UpdateTemplateReq) (resp *agent.U
 	})
 	if err != nil {
 		return &agent.UpdateTemplateRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal error",
-		}, err
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
 	}
 
 	return &agent.UpdateTemplateRes{

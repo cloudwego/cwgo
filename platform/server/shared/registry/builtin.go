@@ -43,6 +43,10 @@ import (
 	"time"
 )
 
+var (
+	ErrServiceNotFound = errors.New("service not found")
+)
+
 type BuiltinRegistry struct {
 	agentCache   *cache.Cache
 	rdb          redis.UniversalClient
@@ -235,7 +239,7 @@ func (r *BuiltinRegistry) Deregister(serviceId string) error {
 func (r *BuiltinRegistry) Update(serviceId string) error {
 	v, ok := r.agentCache.Get(serviceId)
 	if !ok {
-		return errors.New("service not found")
+		return ErrServiceNotFound
 	}
 
 	r.agentCache.SetDefault(serviceId, v.(*service.Service)) // update service in cache
@@ -373,14 +377,7 @@ func NewBuiltinKitexRegistryClient(addr string) (*BuiltinKitexRegistryClient, er
 	}, nil
 }
 
-func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
-	serviceId, ok := info.Tags["service_id"]
-	if !ok {
-		return errors.New("service_id not found")
-	}
-
-	host, port, _ := utils.ParseAddr(info.Addr)
-
+func (rc *BuiltinKitexRegistryClient) registry(serviceId, host string, port int) error {
 	httpRes, err := http.Get(fmt.Sprintf("http://%s/api/registry/register?service_id=%s&host=%s&port=%d",
 		rc.addr,
 		serviceId,
@@ -408,6 +405,22 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 		return errors.New(j.Msg)
 	}
 
+	return nil
+}
+
+func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
+	serviceId, ok := info.Tags["service_id"]
+	if !ok {
+		return ErrServiceNotFound
+	}
+
+	host, port, _ := utils.ParseAddr(info.Addr)
+
+	err := rc.registry(serviceId, host, port)
+	if err != nil {
+		return err
+	}
+
 	logger.Logger.Info("start update service in registry")
 	go func() {
 		errNum := 0
@@ -428,9 +441,19 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 				logger.Logger.Debug("updating service in registry")
 				err = rc.Update(serviceId)
 				if err != nil {
-					errNum++
+					if err == ErrServiceNotFound {
+						err = rc.registry(serviceId, host, port)
+						if err != nil {
+							errNum++
+						} else {
+							errNum = 0
+						}
+					} else {
+						errNum++
+					}
+				} else {
+					errNum = 0
 				}
-				errNum = 0
 				logger.Logger.Debug("update service in registry successfully")
 			}
 		}
@@ -442,7 +465,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 func (rc *BuiltinKitexRegistryClient) Deregister(info *kitexregistry.Info) error {
 	serviceId, ok := info.Tags["service_id"]
 	if !ok {
-		return errors.New("service_id not found")
+		return ErrServiceNotFound
 	}
 
 	rc.stopChan <- struct{}{}
@@ -473,7 +496,6 @@ func (rc *BuiltinKitexRegistryClient) Deregister(info *kitexregistry.Info) error
 }
 
 func (rc *BuiltinKitexRegistryClient) Update(serviceId string) error {
-
 	httpRes, err := http.Get(fmt.Sprintf("http://%s/api/registry/update?service_id=%s", rc.addr, serviceId))
 	if err != nil {
 		return err
@@ -493,6 +515,9 @@ func (rc *BuiltinKitexRegistryClient) Update(serviceId string) error {
 	}
 
 	if j.Code != 0 {
+		if j.Msg == ErrServiceNotFound.Error() {
+			return ErrServiceNotFound
+		}
 		return errors.New(j.Msg)
 	}
 

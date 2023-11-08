@@ -46,9 +46,9 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 	})
 	if err != nil {
 		return &agent.UpdateRepositoryRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal error",
-		}, err
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
 	}
 
 	return &agent.UpdateRepositoryRes{

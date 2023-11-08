@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -11,10 +12,13 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
-	"github.com/google/go-github/v53/github"
+	"github.com/google/go-github/v56/github"
 	"github.com/patrickmn/go-cache"
 	"github.com/xanzy/go-gitlab"
-	"golang.org/x/oauth2"
+)
+
+var (
+	ErrTokenInvalid = errors.New("token is invalid")
 )
 
 type Manager struct {
@@ -43,10 +47,6 @@ func NewRepoManager(daoManager *dao.Manager) (*Manager, error) {
 	return manager, nil
 }
 
-func (rm *Manager) ClearClient() {
-	rm.repositoryClients = make(map[int64]IRepository)
-}
-
 func (rm *Manager) AddClient(repository *model.Repository) error {
 	rm.Lock()
 	defer rm.Unlock()
@@ -55,12 +55,7 @@ func (rm *Manager) AddClient(repository *model.Repository) error {
 	case consts.RepositoryTypeNumGitLab:
 		gitlabClient, err := NewGitlabClient(repository.Token)
 		if err != nil {
-			if utils.IsTokenError(err) {
-				err = rm.daoManager.Repository.ChangeRepositoryStatus(context.Background(), repository.Id, consts.RepositoryStatusNumDisactive)
-				if err != nil {
-					return err
-				}
-			} else if utils.IsNetworkError(err) {
+			if utils.IsNetworkError(err) {
 				return errors.New("client initialization request timeout")
 			} else {
 				return errors.New("client initialization request unknown error")
@@ -69,7 +64,10 @@ func (rm *Manager) AddClient(repository *model.Repository) error {
 
 		rm.repositoryClientsCache.SetDefault(strconv.FormatInt(repository.Id, 10), NewGitLabApi(gitlabClient))
 	case consts.RepositoryTypeNumGithub:
-		githubClient := NewGithubClient(repository.Token)
+		githubClient, err := NewGithubClient(repository.Token)
+		if err != nil {
+			return err
+		}
 
 		rm.repositoryClientsCache.SetDefault(strconv.FormatInt(repository.Id, 10), NewGitHubApi(githubClient))
 	default:
@@ -98,6 +96,14 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 
 		err = rm.AddClient(repo)
 		if err != nil {
+			if err == ErrTokenInvalid {
+				// exist token is invalid (expired maybe)
+				// change repo status to inactive
+				err = rm.daoManager.Repository.ChangeRepositoryStatus(context.Background(), repo.Id, consts.RepositoryStatusNumInactive)
+				if err != nil {
+					return nil, err
+				}
+			}
 			return nil, err
 		}
 
@@ -110,18 +116,29 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 func NewGitlabClient(token string) (*gitlab.Client, error) {
 	client, err := gitlab.NewClient(token)
 	if err != nil {
+		if strings.Contains(err.Error(), "401 Unauthorized") {
+			return nil, ErrTokenInvalid
+		}
+
 		return nil, err
 	}
 
 	return client, nil
 }
 
-func NewGithubClient(token string) *github.Client {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
+func NewGithubClient(token string) (*github.Client, error) {
+	client := github.NewClient(nil).WithAuthToken(token)
 
-	return github.NewClient(tc)
+	_, _, err := client.Meta.Get(context.Background())
+	if err != nil {
+		if githubErr, ok := err.(*github.ErrorResponse); ok {
+			if githubErr.Message == "Bad credentials" {
+				return nil, ErrTokenInvalid
+			}
+		}
+
+		return nil, err
+	}
+
+	return client, nil
 }

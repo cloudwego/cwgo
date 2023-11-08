@@ -41,9 +41,9 @@ func (s *DeleteTemplateItemService) Run(req *agent.DeleteTemplateItemReq) (resp 
 	err = s.svcCtx.DaoManager.Template.DeleteTemplateItem(context.Background(), req.Ids)
 	if err != nil {
 		return &agent.DeleteTemplateItemRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal error",
-		}, err
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
 	}
 
 	return &agent.DeleteTemplateItemRes{

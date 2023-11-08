@@ -28,3 +28,6 @@ output/*
 # Vscode files
 .vscode
 
+/platform/server/config-pro.yaml
+/platform/server/log/
+/platform/server/config-dev.yaml

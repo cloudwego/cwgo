@@ -19,18 +19,18 @@ var (
 )
 
 const (
-	RepositoryStoreTypeNumIdl     = iota + 1
-	RepositoryStoreTypeNumService = iota + 1
+	RepositoryStoreTypeNumIdl = iota + 1
+	RepositoryStoreTypeNumService
 )
 
 const (
 	RepositoryStatusNumActive = iota + 1
-	RepositoryStatusNumDisactive
+	RepositoryStatusNumInactive
 )
 
 var (
 	RepositoryStatusNumMap = map[int]struct{}{
-		RepositoryStatusNumActive:    {},
-		RepositoryStatusNumDisactive: {},
+		RepositoryStatusNumActive:   {},
+		RepositoryStatusNumInactive: {},
 	}
 )

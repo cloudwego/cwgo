@@ -47,9 +47,9 @@ func (s *UpdateIDLService) Run(req *agent.UpdateIDLReq) (resp *agent.UpdateIDLRe
 	})
 	if err != nil {
 		return &agent.UpdateIDLRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal error",
-		}, err
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
 	}
 
 	return &agent.UpdateIDLRes{

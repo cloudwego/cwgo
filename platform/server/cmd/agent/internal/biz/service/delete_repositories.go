@@ -41,9 +41,9 @@ func (s *DeleteRepositoriesService) Run(req *agent.DeleteRepositoriesReq) (resp 
 	err = s.svcCtx.DaoManager.Repository.DeleteRepository(s.ctx, req.Ids)
 	if err != nil {
 		return &agent.DeleteRepositoriesRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal error",
-		}, err
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
 	}
 
 	return &agent.DeleteRepositoriesRes{
