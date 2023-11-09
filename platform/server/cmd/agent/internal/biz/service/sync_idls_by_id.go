@@ -50,14 +50,14 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		if err != nil {
 			resp.Code = 400
 			resp.Msg = err.Error()
-			return resp, err
+			return resp, nil
 		}
 
 		repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idl.RepositoryId)
 		if err != nil {
 			resp.Code = 400
 			resp.Msg = err.Error()
-			return resp, err
+			return resp, nil
 		}
 
 		client, err := s.svcCtx.RepoManager.GetClient(repo.Id)

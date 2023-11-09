@@ -11,9 +11,10 @@ import (
 )
 
 type AddIDLReq struct {
-	RepositoryID int64  `thrift:"repository_id,1" form:"repository_id,required" json:"repository_id,required"`
-	MainIdlPath  string `thrift:"main_idl_path,2" form:"main_idl_path,required" json:"main_idl_path,required" vd:"len($)>0"`
-	ServiceName  string `thrift:"service_name,3" form:"service_name,required" json:"service_name,required" vd:"len($)>0"`
+	RepositoryID          int64  `thrift:"repository_id,1" form:"repository_id,required" json:"repository_id,required"`
+	MainIdlPath           string `thrift:"main_idl_path,2" form:"main_idl_path,required" json:"main_idl_path,required" vd:"len($)>0"`
+	ServiceName           string `thrift:"service_name,3" form:"service_name,required" json:"service_name,required" vd:"len($)>0"`
+	ServiceRepositoryName string `thrift:"service_repository_name,4" form:"service_repository_name" json:"service_repository_name"`
 }
 
 func NewAddIDLReq() *AddIDLReq {
@@ -32,10 +33,15 @@ func (p *AddIDLReq) GetServiceName() (v string) {
 	return p.ServiceName
 }
 
+func (p *AddIDLReq) GetServiceRepositoryName() (v string) {
+	return p.ServiceRepositoryName
+}
+
 var fieldIDToName_AddIDLReq = map[int16]string{
 	1: "repository_id",
 	2: "main_idl_path",
 	3: "service_name",
+	4: "service_repository_name",
 }
 
 func (p *AddIDLReq) Read(iprot thrift.TProtocol) (err error) {
@@ -80,6 +86,16 @@ func (p *AddIDLReq) Read(iprot thrift.TProtocol) (err error) {
 		case 3:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -144,6 +160,15 @@ func (p *AddIDLReq) ReadField3(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *AddIDLReq) ReadField4(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.ServiceRepositoryName = v
+	}
+	return nil
+}
+
 func (p *AddIDLReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("AddIDLReq"); err != nil {
@@ -160,6 +185,10 @@ func (p *AddIDLReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField3(oprot); err != nil {
 			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
 			goto WriteFieldError
 		}
 
@@ -230,6 +259,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *AddIDLReq) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_repository_name", thrift.STRING, 4); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.ServiceRepositoryName); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
 func (p *AddIDLReq) String() string {

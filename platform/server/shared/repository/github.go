@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
-	"github.com/google/go-github/v53/github"
+	"github.com/google/go-github/v56/github"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -134,11 +134,17 @@ func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	}
 
 	// create a new commit object, using the new tree as its foundation
-	newCommit, _, err := a.client.Git.CreateCommit(context.Background(), owner, repoName, &github.Commit{
-		Message: github.String(commitMessage),
-		Tree:    newTree,
-		Parents: []*github.Commit{{SHA: ref.Object.SHA}},
-	})
+	newCommit, _, err := a.client.Git.CreateCommit(
+		context.Background(),
+		owner,
+		repoName,
+		&github.Commit{
+			Message: github.String(commitMessage),
+			Tree:    newTree,
+			Parents: []*github.Commit{{SHA: ref.Object.SHA}},
+		},
+		&github.CreateCommitOptions{},
+	)
 	if err != nil {
 		return err
 	}
@@ -168,7 +174,14 @@ func (a *GitHubApi) GetRepositoryArchive(owner, repoName, ref string) ([]byte, e
 	format := "tarball"
 
 	// get the archive link from the GitHub repository.
-	archiveLink, _, err := a.client.Repositories.GetArchiveLink(context.Background(), owner, repoName, github.ArchiveFormat(format), opts, false)
+	archiveLink, _, err := a.client.Repositories.GetArchiveLink(
+		context.Background(),
+		owner,
+		repoName,
+		github.ArchiveFormat(format),
+		opts,
+		3,
+	)
 	if err != nil {
 		return nil, err
 	}

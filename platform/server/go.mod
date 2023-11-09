@@ -9,6 +9,7 @@ require (
 	github.com/cloudwego/hertz v0.7.0
 	github.com/cloudwego/kitex v0.7.0
 	github.com/google/go-github/v53 v53.2.0
+	github.com/google/go-github/v56 v56.0.0
 	github.com/hashicorp/consul/api v1.25.1
 	github.com/hertz-contrib/http2 v0.1.8
 	github.com/hertz-contrib/pprof v0.1.1

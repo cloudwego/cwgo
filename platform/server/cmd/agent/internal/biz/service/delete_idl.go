@@ -41,9 +41,9 @@ func (s *DeleteIDLService) Run(req *agent.DeleteIDLsReq) (resp *agent.DeleteIDLs
 	err = s.svcCtx.DaoManager.Idl.DeleteIDLs(s.ctx, req.Ids)
 	if err != nil {
 		return &agent.DeleteIDLsRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal error",
-		}, err
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
 	}
 
 	return &agent.DeleteIDLsRes{

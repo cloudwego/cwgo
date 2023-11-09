@@ -6,6 +6,7 @@ struct AddIDLReq{
     1: i64 repository_id (api.body="repository_id,required")
     2: string main_idl_path (api.body="main_idl_path,required",api.vd="len($)>0")
     3: string service_name (api.body="service_name,required",api.vd="len($)>0")
+    4: string service_repository_name (api.body='service_repository_name')
 }
 struct AddIDLRes{
     1: i32 code
