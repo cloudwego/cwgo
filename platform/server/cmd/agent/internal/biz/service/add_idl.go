@@ -147,7 +147,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	// add idl
 	err = s.svcCtx.DaoManager.Idl.AddIDL(s.ctx, model.IDL{
-		RepositoryId:        req.RepositoryId,
+		IdlRepositoryId:     req.RepositoryId,
 		ServiceRepositoryId: serviceRepoId,
 		MainIdlPath:         req.MainIdlPath,
 		ServiceName:         req.ServiceName,

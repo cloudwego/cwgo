@@ -19,9 +19,8 @@
 package idl
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler/idl"
 	"github.com/cloudwego/hertz/pkg/app/server"
-
-	template "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler/template"
 )
 
 /*
@@ -34,10 +33,10 @@ import (
 func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
-	root.POST("/idl", append(_idlMw(), template.AddIDL)...)
+	root.POST("/idl", append(_idlMw(), idl.AddIDL)...)
 	_idl := root.Group("/idl", _idlMw()...)
-	_idl.POST("/sync", append(_syncidlsMw(), template.SyncIDLs)...)
-	root.DELETE("/idl", append(_deleteidlMw(), template.DeleteIDL)...)
-	root.PATCH("/idl", append(_updateidlMw(), template.UpdateIDL)...)
-	root.GET("/idl", append(_getidlsMw(), template.GetIDLs)...)
+	_idl.POST("/sync", append(_syncidlsMw(), idl.SyncIDLs)...)
+	root.DELETE("/idl", append(_deleteidlMw(), idl.DeleteIDL)...)
+	root.PATCH("/idl", append(_updateidlMw(), idl.UpdateIDL)...)
+	root.GET("/idl", append(_getidlsMw(), idl.GetIDLs)...)
 }

@@ -53,7 +53,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			return resp, nil
 		}
 
-		repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idl.RepositoryId)
+		repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idl.IdlRepositoryId)
 		if err != nil {
 			resp.Code = 400
 			resp.Msg = err.Error()

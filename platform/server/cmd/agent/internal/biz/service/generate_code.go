@@ -60,7 +60,7 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	}
 
 	// get repository info by repository id
-	repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idl.RepositoryId)
+	repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idl.IdlRepositoryId)
 	if err != nil {
 		logger.Logger.Error("get repo info failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
