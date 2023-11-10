@@ -64,7 +64,7 @@ func (s *AddRepositoryService) Run(req *agent.AddRepositoryReq) (resp *agent.Add
 	}
 
 	// save repo info to db
-	_, err = s.svcCtx.DaoManager.Repository.AddRepository(s.ctx, repo)
+	err = s.svcCtx.DaoManager.Repository.AddRepository(s.ctx, repo)
 	if err != nil {
 		return &agent.AddRepositoryRes{
 			Code: http.StatusInternalServerError,

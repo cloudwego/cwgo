@@ -29,7 +29,7 @@ import (
 )
 
 type IRepositoryDaoManager interface {
-	AddRepository(ctx context.Context, repoModel model.Repository) (int64, error)
+	AddRepository(ctx context.Context, repoModel model.Repository) error
 
 	DeleteRepository(ctx context.Context, ids []string) error
 
@@ -56,12 +56,12 @@ func NewMysqlRepository(db *gorm.DB) *MysqlRepositoryManager {
 	}
 }
 
-func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel model.Repository) (int64, error) {
+func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel model.Repository) error {
 	var lastUpdateTime time.Time
 	if repoModel.LastUpdateTime != "" {
 		lastUpdateTime, _ = time.Parse(time.DateTime, repoModel.LastUpdateTime)
 	} else {
-		lastUpdateTime = time.Now()
+		repoModel.LastUpdateTime = time.Now().Format(time.DateTime)
 	}
 
 	repoEntity := entity.MysqlRepository{
@@ -77,7 +77,7 @@ func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel mo
 	err := m.db.WithContext(ctx).
 		Create(&repoEntity).Error
 
-	return repoEntity.ID, err
+	return err
 }
 
 func (m *MysqlRepositoryManager) DeleteRepository(ctx context.Context, ids []string) error {

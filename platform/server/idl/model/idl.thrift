@@ -2,7 +2,7 @@ namespace go model
 
 struct IDL{
     1: i64 id // idl record id
-    2: i64 repository_id // repository id where stores the idl
+    2: i64 idl_repository_id // repository id where stores the idl
     3: i64 service_repository_id // repository id where stores the service
     4: string main_idl_path // repo ref path of idl
     5: string commit_hash // idl file commit hash
