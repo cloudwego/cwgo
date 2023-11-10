@@ -26,7 +26,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `user_id` bigint(20) NOT NULL COMMENT 'user id',
   `name` varchar(255) NOT NULL COMMENT 'user name',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is deleted',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'is deleted',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
   PRIMARY KEY (`user_id`)
