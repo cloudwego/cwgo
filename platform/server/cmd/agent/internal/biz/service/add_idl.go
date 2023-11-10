@@ -46,8 +46,20 @@ func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLSe
 func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
 	// check main idl path
 	repoClient, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "can not get the client",
+		}, nil
+	}
 
 	idlPid, owner, repoName, err := repoClient.ParseIdlUrl(req.MainIdlPath)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "can not parse the IDL url",
+		}, nil
+	}
 
 	_, err = repoClient.GetFile(owner, repoName, idlPid, consts.MainRef)
 	if err != nil {

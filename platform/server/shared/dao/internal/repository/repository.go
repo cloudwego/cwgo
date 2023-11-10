@@ -145,7 +145,7 @@ func (m *MysqlRepositoryManager) ChangeRepositoryStatus(ctx context.Context, id 
 		Status: status,
 	}
 
-	err := m.db.Where(ctx).
+	err := m.db.WithContext(ctx).
 		Model(&repoEntity).
 		Updates(repoEntity).Error
 
@@ -155,7 +155,7 @@ func (m *MysqlRepositoryManager) ChangeRepositoryStatus(ctx context.Context, id 
 func (m *MysqlRepositoryManager) GetRepository(ctx context.Context, id int64) (*model.Repository, error) {
 	var repoEntity entity.MysqlRepository
 
-	err := m.db.Where(ctx).
+	err := m.db.WithContext(ctx).
 		Where("`id` = ?", id).
 		Take(&repoEntity).Error
 	if err != nil {
