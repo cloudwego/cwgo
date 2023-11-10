@@ -61,7 +61,7 @@ func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel mo
 	if repoModel.LastUpdateTime != "" {
 		lastUpdateTime, _ = time.Parse(time.DateTime, repoModel.LastUpdateTime)
 	} else {
-		repoModel.LastUpdateTime = time.Now().Format(time.DateTime)
+		lastUpdateTime = time.Now()
 	}
 
 	repoEntity := entity.MysqlRepository{

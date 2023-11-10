@@ -28,6 +28,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"net/http"
 	"path/filepath"
+	"strings"
 )
 
 type AddIDLService struct {
@@ -139,6 +140,12 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		Token:          repo.Token,
 	})
 	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return &agent.AddIDLRes{
+				Code: http.StatusBadRequest,
+				Msg:  "repository is already exist",
+			}, nil
+		}
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
 			Msg:  "internal err",

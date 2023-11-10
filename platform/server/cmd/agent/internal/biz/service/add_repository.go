@@ -25,6 +25,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"net/http"
+	"strings"
 )
 
 type AddRepositoryService struct {
@@ -66,6 +67,12 @@ func (s *AddRepositoryService) Run(req *agent.AddRepositoryReq) (resp *agent.Add
 	// save repo info to db
 	_, err = s.svcCtx.DaoManager.Repository.AddRepository(s.ctx, repo)
 	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return &agent.AddRepositoryRes{
+				Code: http.StatusBadRequest,
+				Msg:  "repository is already exist",
+			}, nil
+		}
 		return &agent.AddRepositoryRes{
 			Code: http.StatusInternalServerError,
 			Msg:  "internal err",
