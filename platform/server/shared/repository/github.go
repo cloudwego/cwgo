@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
-	"github.com/google/go-github/v53/github"
+	"github.com/google/go-github/v56/github"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -39,11 +39,12 @@ func NewGitHubApi(client *github.Client) *GitHubApi {
 }
 
 const (
-	githubURLPrefix = "https://github.com/"
-	regGitHubURL    = `([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
+	githubURLPrefix  = "https://github.com/"
+	regGitHubURL     = `([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
+	regGithubRepoURL = `https://github.com/([^/]+)/([^/]+)"`
 )
 
-func (a *GitHubApi) ParseUrl(url string) (filePid, owner, repoName string, err error) {
+func (a *GitHubApi) ParseIdlUrl(url string) (filePid, owner, repoName string, err error) {
 	var tempPath string
 
 	// check if the URL has the GitHub prefix.
@@ -74,6 +75,19 @@ func (a *GitHubApi) ParseUrl(url string) (filePid, owner, repoName string, err e
 	filePid = matches[4]
 
 	return filePid, owner, repoName, nil
+}
+
+func (a *GitHubApi) ParseRepoUrl(url string) (owner, repoName string, err error) {
+	// verification format
+	if !strings.HasPrefix(url, githubURLPrefix) {
+		return "", "", errors.New("IDL path format is incorrect; it does not have the expected prefix: " + githubURLPrefix)
+	}
+
+	// extracting information using regular expressions
+	r := regexp.MustCompile(regGithubRepoURL)
+	matches := r.FindStringSubmatch(url)
+
+	return matches[1], matches[2], nil
 }
 
 func (a *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
@@ -134,11 +148,17 @@ func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	}
 
 	// create a new commit object, using the new tree as its foundation
-	newCommit, _, err := a.client.Git.CreateCommit(context.Background(), owner, repoName, &github.Commit{
-		Message: github.String(commitMessage),
-		Tree:    newTree,
-		Parents: []*github.Commit{{SHA: ref.Object.SHA}},
-	})
+	newCommit, _, err := a.client.Git.CreateCommit(
+		context.Background(),
+		owner,
+		repoName,
+		&github.Commit{
+			Message: github.String(commitMessage),
+			Tree:    newTree,
+			Parents: []*github.Commit{{SHA: ref.Object.SHA}},
+		},
+		&github.CreateCommitOptions{},
+	)
 	if err != nil {
 		return err
 	}
@@ -168,7 +188,14 @@ func (a *GitHubApi) GetRepositoryArchive(owner, repoName, ref string) ([]byte, e
 	format := "tarball"
 
 	// get the archive link from the GitHub repository.
-	archiveLink, _, err := a.client.Repositories.GetArchiveLink(context.Background(), owner, repoName, github.ArchiveFormat(format), opts, false)
+	archiveLink, _, err := a.client.Repositories.GetArchiveLink(
+		context.Background(),
+		owner,
+		repoName,
+		github.ArchiveFormat(format),
+		opts,
+		3,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -231,4 +258,29 @@ func (a *GitHubApi) DeleteDirs(owner, repoName string, folderPaths ...string) er
 	}
 
 	return nil
+}
+
+func (a *GitHubApi) AutoCreateRepository(owner, repoName string) (string, error) {
+	ctx := context.Background()
+	// new repository's URL
+	newRepoURL := githubURLPrefix + owner + "/" + repoName
+	_, _, err := a.client.Repositories.Get(ctx, owner, repoName)
+	if err != nil {
+		// if the error is caused by the inability to find a repository with the name, create the repository
+		if _, ok := err.(*github.ErrorResponse); ok {
+			newRepo := &github.Repository{
+				Name:        github.String(repoName),
+				Description: github.String("generate by cwgo"),
+			}
+
+			_, _, err := a.client.Repositories.Create(ctx, "", newRepo)
+			if err != nil {
+				return "", err
+			}
+			return newRepoURL, nil
+		}
+		return "", err
+	}
+
+	return newRepoURL, nil
 }

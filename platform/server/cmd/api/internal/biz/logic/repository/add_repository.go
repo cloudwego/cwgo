@@ -25,6 +25,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	repositorymodel "github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"go.uber.org/zap"
 	"net/http"
 	"net/url"
@@ -84,9 +85,16 @@ func (l *AddRepositoryLogic) AddRepository(req *repository.AddRepositoryReq) (re
 		}
 	}
 	if rpcRes.Code != 0 {
+		if rpcRes.Msg == repositorymodel.ErrTokenInvalid.Error() {
+			return &repository.AddRepositoryRes{
+				Code: http.StatusBadRequest,
+				Msg:  rpcRes.Msg,
+			}
+		}
+
 		return &repository.AddRepositoryRes{
-			Code: http.StatusBadRequest,
-			Msg:  rpcRes.Msg,
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 

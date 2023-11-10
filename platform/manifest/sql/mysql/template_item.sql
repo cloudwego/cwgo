@@ -20,16 +20,18 @@ SET FOREIGN_KEY_CHECKS = 0;
  */
 
 -- ----------------------------
--- Table structure for user
+-- Table structure for template_item
 -- ----------------------------
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE `user` (
-  `user_id` bigint(20) NOT NULL COMMENT 'user id',
-  `name` varchar(255) NOT NULL COMMENT 'user name',
+DROP TABLE IF EXISTS `template_item`;
+CREATE TABLE `template_item` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'template item id',
+  `template_id` bigint(20) NOT NULL COMMENT 'template id',
+  `name` varchar(255) NOT NULL COMMENT 'template item name',
+  `content` text COMMENT 'template content',
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is deleted',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='user table';
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='template item table';
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -10,9 +10,10 @@ import (
 )
 
 type AddIDLReq struct {
-	RepositoryId int64  `thrift:"repository_id,1" frugal:"1,default,i64" json:"repository_id"`
-	MainIdlPath  string `thrift:"main_idl_path,2" frugal:"2,default,string" json:"main_idl_path"`
-	ServiceName  string `thrift:"service_name,3" frugal:"3,default,string" json:"service_name"`
+	RepositoryId          int64  `thrift:"repository_id,1" frugal:"1,default,i64" json:"repository_id"`
+	MainIdlPath           string `thrift:"main_idl_path,2" frugal:"2,default,string" json:"main_idl_path"`
+	ServiceName           string `thrift:"service_name,3" frugal:"3,default,string" json:"service_name"`
+	ServiceRepositoryName string `thrift:"service_repository_name,4" frugal:"4,default,string" json:"service_repository_name"`
 }
 
 func NewAddIDLReq() *AddIDLReq {
@@ -34,6 +35,10 @@ func (p *AddIDLReq) GetMainIdlPath() (v string) {
 func (p *AddIDLReq) GetServiceName() (v string) {
 	return p.ServiceName
 }
+
+func (p *AddIDLReq) GetServiceRepositoryName() (v string) {
+	return p.ServiceRepositoryName
+}
 func (p *AddIDLReq) SetRepositoryId(val int64) {
 	p.RepositoryId = val
 }
@@ -43,11 +48,15 @@ func (p *AddIDLReq) SetMainIdlPath(val string) {
 func (p *AddIDLReq) SetServiceName(val string) {
 	p.ServiceName = val
 }
+func (p *AddIDLReq) SetServiceRepositoryName(val string) {
+	p.ServiceRepositoryName = val
+}
 
 var fieldIDToName_AddIDLReq = map[int16]string{
 	1: "repository_id",
 	2: "main_idl_path",
 	3: "service_name",
+	4: "service_repository_name",
 }
 
 func (p *AddIDLReq) Read(iprot thrift.TProtocol) (err error) {
@@ -92,6 +101,16 @@ func (p *AddIDLReq) Read(iprot thrift.TProtocol) (err error) {
 		case 3:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -156,6 +175,15 @@ func (p *AddIDLReq) ReadField3(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *AddIDLReq) ReadField4(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.ServiceRepositoryName = v
+	}
+	return nil
+}
+
 func (p *AddIDLReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("AddIDLReq"); err != nil {
@@ -172,6 +200,10 @@ func (p *AddIDLReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField3(oprot); err != nil {
 			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
 			goto WriteFieldError
 		}
 
@@ -244,6 +276,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
+func (p *AddIDLReq) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_repository_name", thrift.STRING, 4); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.ServiceRepositoryName); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
 func (p *AddIDLReq) String() string {
 	if p == nil {
 		return "<nil>"
@@ -266,6 +315,9 @@ func (p *AddIDLReq) DeepEqual(ano *AddIDLReq) bool {
 	if !p.Field3DeepEqual(ano.ServiceName) {
 		return false
 	}
+	if !p.Field4DeepEqual(ano.ServiceRepositoryName) {
+		return false
+	}
 	return true
 }
 
@@ -286,6 +338,13 @@ func (p *AddIDLReq) Field2DeepEqual(src string) bool {
 func (p *AddIDLReq) Field3DeepEqual(src string) bool {
 
 	if strings.Compare(p.ServiceName, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddIDLReq) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.ServiceRepositoryName, src) != 0 {
 		return false
 	}
 	return true

@@ -23,6 +23,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"net/http"
 )
 
@@ -39,17 +40,36 @@ func NewAddRepositoryService(ctx context.Context, svcCtx *svc.ServiceContext) *A
 
 // Run create note info
 func (s *AddRepositoryService) Run(req *agent.AddRepositoryReq) (resp *agent.AddRepositoryRes, err error) {
-	err = s.svcCtx.DaoManager.Repository.AddRepository(s.ctx, model.Repository{
+	repo := model.Repository{
 		RepositoryType: req.RepositoryType,
 		StoreType:      req.StoreType,
 		RepositoryUrl:  req.RepositoryUrl,
 		Token:          req.Token,
-	})
+	}
+
+	// validate repo info add repo to memory
+	err = s.svcCtx.RepoManager.AddClient(&repo)
+	if err != nil {
+		if err == repository.ErrTokenInvalid {
+			return &agent.AddRepositoryRes{
+				Code: http.StatusBadRequest,
+				Msg:  err.Error(),
+			}, nil
+		}
+
+		return &agent.AddRepositoryRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
+	}
+
+	// save repo info to db
+	_, err = s.svcCtx.DaoManager.Repository.AddRepository(s.ctx, repo)
 	if err != nil {
 		return &agent.AddRepositoryRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal error",
-		}, err
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
 	}
 
 	return &agent.AddRepositoryRes{

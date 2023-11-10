@@ -37,11 +37,12 @@ func NewGitLabApi(client *gitlab.Client) *GitLabApi {
 }
 
 const (
-	gitlabURLPrefix = "https://gitlab.com/"
-	regGitLabURL    = `([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`
+	gitlabURLPrefix  = "https://gitlab.com/"
+	regGitLabURL     = `([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`
+	regGitLabRepoURL = `/gitlab.com/([^/]+)/([^/]+)"`
 )
 
-func (a *GitLabApi) ParseUrl(url string) (filePid, owner, repoName string, err error) {
+func (a *GitLabApi) ParseIdlUrl(url string) (filePid, owner, repoName string, err error) {
 	var tempPath string
 
 	// determine if it is a GitLab prefix
@@ -66,6 +67,19 @@ func (a *GitLabApi) ParseUrl(url string) (filePid, owner, repoName string, err e
 	filePid = matches[4]
 
 	return filePid, owner, repoName, nil
+}
+
+func (a *GitLabApi) ParseRepoUrl(url string) (owner, repoName string, err error) {
+	// verification format
+	if !strings.HasPrefix(url, gitlabURLPrefix) {
+		return "", "", errors.New("IDL path format is incorrect; it does not have the expected prefix: " + gitlabURLPrefix)
+	}
+
+	// Extracting information using regular expressions
+	r := regexp.MustCompile(regGithubRepoURL)
+	matches := r.FindStringSubmatch(url)
+
+	return matches[1], matches[2], nil
 }
 
 func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
@@ -173,4 +187,27 @@ func (a *GitLabApi) DeleteDirs(owner, repoName string, folderPaths ...string) er
 	}
 
 	return nil
+}
+
+func (a *GitLabApi) AutoCreateRepository(owner, repoName string) (string, error) {
+	// new repository's path in gitlab
+	repoPid := owner + "/" + repoName
+	// new repository's URL
+	newRepoURL := gitlabURLPrefix + owner + "/" + repoName
+	_, _, err := a.client.Projects.GetProject(repoPid, nil)
+	if err != nil {
+		// if the error is caused by the inability to find a repository with the name, create the repository
+		if strings.Contains(err.Error(), "404 Project Not Found") {
+			_, _, err := a.client.Projects.CreateProject(&gitlab.CreateProjectOptions{
+				Name:        gitlab.String(repoName),
+				Description: gitlab.String("generate by cwgo"),
+			})
+			if err != nil {
+				return "", err
+			}
+			return newRepoURL, nil
+		}
+		return "", err
+	}
+	return newRepoURL, nil
 }

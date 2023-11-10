@@ -46,9 +46,9 @@ func (s *AddTemplateItemService) Run(req *agent.AddTemplateItemReq) (resp *agent
 	})
 	if err != nil {
 		return &agent.AddTemplateItemRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal error",
-		}, err
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
 	}
 
 	return &agent.AddTemplateItemRes{

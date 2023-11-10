@@ -41,10 +41,10 @@ func (s *GetTemplatesService) Run(req *agent.GetTemplatesReq) (resp *agent.GetTe
 	templates, err := s.svcCtx.DaoManager.Template.GetTemplateList(s.ctx, req.Page, req.Limit, req.Order, req.OrderBy)
 	if err != nil {
 		return &agent.GetTemplatesRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal error",
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 			Data: nil,
-		}, err
+		}, nil
 	}
 
 	return &agent.GetTemplatesRes{

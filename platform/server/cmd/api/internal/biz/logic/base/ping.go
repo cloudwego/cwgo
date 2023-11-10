@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	successMsgPing = "" // TODO: to be filled...
+	successMsgPing = "ping successfully"
 )
 
 type PingLogic struct {
@@ -41,8 +41,6 @@ func NewPingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PingLogic {
 }
 
 func (l *PingLogic) Ping(req *base.PingReq) (res *base.PingRes) {
-	// TODO: to be filled...
-
 	return &base.PingRes{
 		Code: 0,
 		Msg:  successMsgPing,

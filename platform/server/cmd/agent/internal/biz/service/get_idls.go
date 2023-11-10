@@ -42,7 +42,7 @@ func (s *GetIDLsService) Run(req *agent.GetIDLsReq) (resp *agent.GetIDLsRes, err
 	if err != nil {
 		return &agent.GetIDLsRes{
 			Code: http.StatusBadRequest,
-			Msg:  "internal error",
+			Msg:  "internal err",
 			Data: nil,
 		}, err
 	}

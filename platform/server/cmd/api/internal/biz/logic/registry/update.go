@@ -23,6 +23,7 @@ import (
 	registry "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/registry"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	registrymodel "github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -46,10 +47,15 @@ func NewUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateLogi
 func (l *UpdateLogic) Update(req *registry.UpdateReq) (res *registry.UpdateRes) {
 	err := l.svcCtx.BuiltinRegistry.Update(req.ServiceID)
 	if err != nil {
-		// TODO: agent is stable while registry restarted
+		if err == registrymodel.ErrServiceNotFound {
+			return &registry.UpdateRes{
+				Code: http.StatusBadRequest,
+				Msg:  "service not found",
+			}
+		}
 		logger.Logger.Error("update service failed", zap.Error(err))
 		return &registry.UpdateRes{
-			Code: http.StatusBadRequest,
+			Code: http.StatusInternalServerError,
 			Msg:  "internal err",
 		}
 	}

@@ -17,12 +17,14 @@
 package repository
 
 type IRepository interface {
-	ParseUrl(url string) (filePid, owner, repoName string, err error)                                   //parse URL to the key message
+	ParseIdlUrl(url string) (filePid, owner, repoName string, err error)                                // parse IDL URL to the key message
+	ParseRepoUrl(url string) (owner, repoName string, err error)                                        // parse Repository to the key message
 	GetFile(owner, repoName, filePid, ref string) (*File, error)                                        // get a file from a repository
 	PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error // push files to the repository
-	GetRepositoryArchive(owner, repoName, ref string) ([]byte, error)                                   //Obtain the byte of the compressed package, gitlab could not specify ref
-	GetLatestCommitHash(owner, repoName, filePid, ref string) (string, error)                           //Get the latest commit hash for the specified file
-	DeleteDirs(owner, repoName string, folderPaths ...string) error                                     //Delete root dirs
+	GetRepositoryArchive(owner, repoName, ref string) ([]byte, error)                                   // obtain the byte of the compressed package, gitlab could not specify ref
+	GetLatestCommitHash(owner, repoName, filePid, ref string) (string, error)                           // get the latest commit hash for the specified file
+	DeleteDirs(owner, repoName string, folderPaths ...string) error                                     // delete root dirs
+	AutoCreateRepository(owner, repoName string) (string, error)                                        // automatically create repository and return new repository's URL
 }
 
 type File struct {
