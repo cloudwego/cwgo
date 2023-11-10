@@ -6,6 +6,7 @@ struct AddIDLReq{
     1: i64 repository_id
     2: string main_idl_path
     3: string service_name
+    4: string service_repository_name
 }
 struct AddIDLRes{
     1: i32 code

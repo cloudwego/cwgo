@@ -28,6 +28,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"net/http"
 	"path/filepath"
+	"strings"
 )
 
 type AddIDLService struct {
@@ -45,8 +46,20 @@ func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLSe
 func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
 	// check main idl path
 	repoClient, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "can not get the client",
+		}, nil
+	}
 
-	idlPid, owner, repoName, err := repoClient.ParseUrl(req.MainIdlPath)
+	idlPid, owner, repoName, err := repoClient.ParseIdlUrl(req.MainIdlPath)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "can not parse the IDL url",
+		}, nil
+	}
 
 	_, err = repoClient.GetFile(owner, repoName, idlPid, consts.MainRef)
 	if err != nil {
@@ -112,14 +125,53 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			CommitHash: commitHash,
 		}
 	}
+	repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.RepositoryId)
+
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal err",
+		}, nil
+	}
+
+	if req.ServiceRepositoryName == "" {
+		req.ServiceRepositoryName = "cwgo_" + repoName
+	}
+	serviceRepoURL, err := repoClient.AutoCreateRepository(owner, req.ServiceRepositoryName)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal err",
+		}, nil
+	}
+
+	serviceRepoId, err := s.svcCtx.DaoManager.Repository.AddRepository(s.ctx, model.Repository{
+		RepositoryType: repo.RepositoryType,
+		StoreType:      consts.RepositoryStoreTypeNumService,
+		RepositoryUrl:  serviceRepoURL,
+		Token:          repo.Token,
+	})
+	if err != nil {
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			return &agent.AddIDLRes{
+				Code: http.StatusBadRequest,
+				Msg:  "repository is already exist",
+			}, nil
+		}
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal err",
+		}, nil
+	}
 
 	// add idl
 	err = s.svcCtx.DaoManager.Idl.AddIDL(s.ctx, model.IDL{
-		RepositoryId: req.RepositoryId,
-		MainIdlPath:  req.MainIdlPath,
-		ServiceName:  req.ServiceName,
-		ImportIdls:   importIDLs,
-		CommitHash:   mainIdlHash,
+		IdlRepositoryId:     req.RepositoryId,
+		ServiceRepositoryId: serviceRepoId,
+		MainIdlPath:         req.MainIdlPath,
+		ServiceName:         req.ServiceName,
+		ImportIdls:          importIDLs,
+		CommitHash:          mainIdlHash,
 	})
 	if err != nil {
 		return &agent.AddIDLRes{

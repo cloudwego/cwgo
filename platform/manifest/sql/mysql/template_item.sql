@@ -20,22 +20,18 @@ SET FOREIGN_KEY_CHECKS = 0;
  */
 
 -- ----------------------------
--- Table structure for idl
+-- Table structure for template_item
 -- ----------------------------
-DROP TABLE IF EXISTS `idl`;
-CREATE TABLE `idl` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `repository_id` bigint(20) NOT NULL COMMENT 'repository id',
-  `parent_idl_id` bigint(20) DEFAULT NULL COMMENT 'null if main idl else import idl',
-  `idl_type` tinyint(4) NOT NULL COMMENT 'idl type (1: thrift, 2: proto)',
-  `idl_path` varchar(255) NOT NULL COMMENT 'idl path',
-  `commit_hash` char(40) NOT NULL COMMENT 'idl file commit hash',
-  `service_name` varchar(255) NOT NULL COMMENT 'service name',
-  `last_sync_time` datetime NOT NULL COMMENT 'last update time',
+DROP TABLE IF EXISTS `template_item`;
+CREATE TABLE `template_item` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'template item id',
+  `template_id` bigint(20) NOT NULL COMMENT 'template id',
+  `name` varchar(255) NOT NULL COMMENT 'template item name',
+  `content` text COMMENT 'template content',
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is deleted',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COMMENT='IDL table';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='template item table';
 
 SET FOREIGN_KEY_CHECKS = 1;

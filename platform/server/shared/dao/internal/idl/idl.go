@@ -57,7 +57,7 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) error 
 	var repo entity.MysqlRepository
 
 	err := m.db.WithContext(ctx).
-		Take(&repo, idlModel.RepositoryId).Error
+		Take(&repo, idlModel.IdlRepositoryId).Error
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) error 
 	now := time.Now()
 
 	mainIdlEntity := entity.MysqlIDL{
-		RepositoryID: idlModel.RepositoryId,
+		RepositoryID: idlModel.IdlRepositoryId,
 		IdlPath:      idlModel.MainIdlPath,
 		CommitHash:   idlModel.CommitHash,
 		ServiceName:  idlModel.ServiceName,
@@ -83,7 +83,7 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) error 
 	importedIdlEntities := make([]*entity.MysqlIDL, len(idlModel.ImportIdls))
 	for i, importIdl := range idlModel.ImportIdls {
 		importedIdlEntities[i] = &entity.MysqlIDL{
-			RepositoryID: idlModel.RepositoryId,
+			RepositoryID: idlModel.IdlRepositoryId,
 			ParentIdlID:  mainIdlEntity.ID,
 			IdlPath:      importIdl.IdlPath,
 			CommitHash:   importIdl.CommitHash,
@@ -113,7 +113,7 @@ func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) err
 	// update main idlModel
 	mainIdlEntity := entity.MysqlIDL{
 		ID:           idlModel.Id,
-		RepositoryID: idlModel.RepositoryId,
+		RepositoryID: idlModel.IdlRepositoryId,
 		ParentIdlID:  0,
 		IdlPath:      idlModel.MainIdlPath,
 		CommitHash:   idlModel.CommitHash,
@@ -131,7 +131,7 @@ func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) err
 		importedIdlEntities := make([]*entity.MysqlIDL, len(idlModel.ImportIdls))
 		for i, importIdl := range idlModel.ImportIdls {
 			importedIdlEntities[i] = &entity.MysqlIDL{
-				RepositoryID: idlModel.RepositoryId,
+				RepositoryID: idlModel.IdlRepositoryId,
 				ParentIdlID:  mainIdlEntity.ID,
 				IdlPath:      importIdl.IdlPath,
 				CommitHash:   importIdl.CommitHash,
@@ -160,7 +160,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 	// update main idlModel
 	mainIdlEntity := entity.MysqlIDL{
 		ID:           idlModel.Id,
-		RepositoryID: idlModel.RepositoryId,
+		RepositoryID: idlModel.IdlRepositoryId,
 		ParentIdlID:  0,
 		IdlPath:      idlModel.MainIdlPath,
 		CommitHash:   idlModel.CommitHash,
@@ -179,7 +179,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 		importedIdlEntities := make([]*entity.MysqlIDL, len(idlModel.ImportIdls))
 		for i, importIdl := range idlModel.ImportIdls {
 			importedIdlEntities[i] = &entity.MysqlIDL{
-				RepositoryID: idlModel.RepositoryId,
+				RepositoryID: idlModel.IdlRepositoryId,
 				ParentIdlID:  mainIdlEntity.ID,
 				IdlPath:      importIdl.IdlPath,
 				CommitHash:   importIdl.CommitHash,
@@ -232,16 +232,16 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDL, err
 	}
 
 	return &model.IDL{
-		Id:           mainIdlEntity.ID,
-		RepositoryId: mainIdlEntity.RepositoryID,
-		MainIdlPath:  mainIdlEntity.IdlPath,
-		CommitHash:   mainIdlEntity.CommitHash,
-		ImportIdls:   importIdlModels,
-		ServiceName:  mainIdlEntity.ServiceName,
-		LastSyncTime: mainIdlEntity.LastSyncTime.Format(time.DateTime),
-		IsDeleted:    false,
-		CreateTime:   mainIdlEntity.CreateTime.Format(time.DateTime),
-		UpdateTime:   mainIdlEntity.UpdateTime.Format(time.DateTime),
+		Id:              mainIdlEntity.ID,
+		IdlRepositoryId: mainIdlEntity.RepositoryID,
+		MainIdlPath:     mainIdlEntity.IdlPath,
+		CommitHash:      mainIdlEntity.CommitHash,
+		ImportIdls:      importIdlModels,
+		ServiceName:     mainIdlEntity.ServiceName,
+		LastSyncTime:    mainIdlEntity.LastSyncTime.Format(time.DateTime),
+		IsDeleted:       false,
+		CreateTime:      mainIdlEntity.CreateTime.Format(time.DateTime),
+		UpdateTime:      mainIdlEntity.UpdateTime.Format(time.DateTime),
 	}, nil
 }
 
@@ -279,16 +279,16 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int
 	for i, idl := range idlEntities {
 		wg.Add(1)
 		idlModels[i] = &model.IDL{
-			Id:           idl.ID,
-			RepositoryId: idl.RepositoryID,
-			MainIdlPath:  idl.IdlPath,
-			CommitHash:   idl.CommitHash,
-			ImportIdls:   nil,
-			ServiceName:  idl.ServiceName,
-			LastSyncTime: idl.LastSyncTime.Format(time.DateTime),
-			IsDeleted:    false,
-			CreateTime:   idl.CreateTime.Format(time.DateTime),
-			UpdateTime:   idl.UpdateTime.Format(time.DateTime),
+			Id:              idl.ID,
+			IdlRepositoryId: idl.RepositoryID,
+			MainIdlPath:     idl.IdlPath,
+			CommitHash:      idl.CommitHash,
+			ImportIdls:      nil,
+			ServiceName:     idl.ServiceName,
+			LastSyncTime:    idl.LastSyncTime.Format(time.DateTime),
+			IsDeleted:       false,
+			CreateTime:      idl.CreateTime.Format(time.DateTime),
+			UpdateTime:      idl.UpdateTime.Format(time.DateTime),
 		}
 		go func(i int, idl *entity.MysqlIDL) {
 			var importIdlEntities []*entity.MysqlIDL

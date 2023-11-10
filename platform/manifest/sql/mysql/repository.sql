@@ -24,18 +24,19 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `repository`;
 CREATE TABLE `repository` (
-  `id` bigint(20) NOT NULL COMMENT 'repository id',
-  `repository_type` tinyint(4) NOT NULL COMMENT 'repository type',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'repository id',
+  `repository_type` tinyint(4) NOT NULL COMMENT 'repo type',
   `store_type` tinyint(4) NOT NULL COMMENT 'store type',
-  `repository_url` varchar(1024) NOT NULL COMMENT 'repository URL',
+  `repository_url` varchar(768) NOT NULL COMMENT 'repository URL',
   `last_update_time` datetime DEFAULT NULL COMMENT 'last update time',
   `last_sync_time` datetime DEFAULT NULL COMMENT 'last sync time',
   `token` varchar(1024) DEFAULT '' COMMENT 'repository token',
-  `status` varchar(20) DEFAULT 'active' COMMENT 'status',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'is deleted',
+  `status` tinyint(4) DEFAULT '1' COMMENT 'status',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is deleted',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='repository table';
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `repository_url` (`repository_url`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='repository table';
 
 SET FOREIGN_KEY_CHECKS = 1;

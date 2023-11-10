@@ -40,10 +40,10 @@ func NewUpdateIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *Updat
 // Run create note info
 func (s *UpdateIDLService) Run(req *agent.UpdateIDLReq) (resp *agent.UpdateIDLRes, err error) {
 	err = s.svcCtx.DaoManager.Idl.UpdateIDL(s.ctx, model.IDL{
-		Id:           req.Id,
-		RepositoryId: req.RepositoryId,
-		MainIdlPath:  req.MainIdlPath,
-		ServiceName:  req.ServiceName,
+		Id:              req.Id,
+		IdlRepositoryId: req.RepositoryId,
+		MainIdlPath:     req.MainIdlPath,
+		ServiceName:     req.ServiceName,
 	})
 	if err != nil {
 		return &agent.UpdateIDLRes{

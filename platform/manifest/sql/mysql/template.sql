@@ -27,7 +27,7 @@ CREATE TABLE `template` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'template id',
   `name` varchar(255) NOT NULL COMMENT 'template name',
   `type` tinyint(4) NOT NULL COMMENT 'template type',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'is deleted',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is deleted',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
   PRIMARY KEY (`id`)

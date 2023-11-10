@@ -39,11 +39,12 @@ func NewGitHubApi(client *github.Client) *GitHubApi {
 }
 
 const (
-	githubURLPrefix = "https://github.com/"
-	regGitHubURL    = `([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
+	githubURLPrefix  = "https://github.com/"
+	regGitHubURL     = `([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
+	regGithubRepoURL = `https://github.com/([^/]+)/([^/]+)"`
 )
 
-func (a *GitHubApi) ParseUrl(url string) (filePid, owner, repoName string, err error) {
+func (a *GitHubApi) ParseIdlUrl(url string) (filePid, owner, repoName string, err error) {
 	var tempPath string
 
 	// check if the URL has the GitHub prefix.
@@ -74,6 +75,19 @@ func (a *GitHubApi) ParseUrl(url string) (filePid, owner, repoName string, err e
 	filePid = matches[4]
 
 	return filePid, owner, repoName, nil
+}
+
+func (a *GitHubApi) ParseRepoUrl(url string) (owner, repoName string, err error) {
+	// verification format
+	if !strings.HasPrefix(url, githubURLPrefix) {
+		return "", "", errors.New("IDL path format is incorrect; it does not have the expected prefix: " + githubURLPrefix)
+	}
+
+	// extracting information using regular expressions
+	r := regexp.MustCompile(regGithubRepoURL)
+	matches := r.FindStringSubmatch(url)
+
+	return matches[1], matches[2], nil
 }
 
 func (a *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {
@@ -244,4 +258,29 @@ func (a *GitHubApi) DeleteDirs(owner, repoName string, folderPaths ...string) er
 	}
 
 	return nil
+}
+
+func (a *GitHubApi) AutoCreateRepository(owner, repoName string) (string, error) {
+	ctx := context.Background()
+	// new repository's URL
+	newRepoURL := githubURLPrefix + owner + "/" + repoName
+	_, _, err := a.client.Repositories.Get(ctx, owner, repoName)
+	if err != nil {
+		// if the error is caused by the inability to find a repository with the name, create the repository
+		if _, ok := err.(*github.ErrorResponse); ok {
+			newRepo := &github.Repository{
+				Name:        github.String(repoName),
+				Description: github.String("generate by cwgo"),
+			}
+
+			_, _, err := a.client.Repositories.Create(ctx, "", newRepo)
+			if err != nil {
+				return "", err
+			}
+			return newRepoURL, nil
+		}
+		return "", err
+	}
+
+	return newRepoURL, nil
 }

@@ -53,7 +53,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			return resp, nil
 		}
 
-		repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idl.RepositoryId)
+		repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idl.IdlRepositoryId)
 		if err != nil {
 			resp.Code = 400
 			resp.Msg = err.Error()
@@ -69,7 +69,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		owner, repoName, idlPid, err := client.ParseUrl(idl.MainIdlPath)
+		owner, repoName, idlPid, err := client.ParseIdlUrl(idl.MainIdlPath)
 		if err != nil {
 			logger.Logger.Error("parse repo url failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
