@@ -5,15 +5,15 @@ package repository
 import (
 	"context"
 	"fmt"
-
 	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/model"
 )
 
 type AddRepositoryReq struct {
 	RepositoryType int32  `thrift:"repository_type,1" form:"repository_type,required" json:"repository_type,required"`
 	RepositoryURL  string `thrift:"repository_url,2" form:"repository_url,required" json:"repository_url,required" vd:"len($)>0"`
-	Token          string `thrift:"token,3" form:"token" json:"token"`
+	StoreType      int32  `thrift:"store_type,3" form:"store_type,required" json:"store_type,required"`
+	Token          string `thrift:"token,4" form:"token" json:"token"`
 }
 
 func NewAddRepositoryReq() *AddRepositoryReq {
@@ -28,6 +28,10 @@ func (p *AddRepositoryReq) GetRepositoryURL() (v string) {
 	return p.RepositoryURL
 }
 
+func (p *AddRepositoryReq) GetStoreType() (v int32) {
+	return p.StoreType
+}
+
 func (p *AddRepositoryReq) GetToken() (v string) {
 	return p.Token
 }
@@ -35,7 +39,8 @@ func (p *AddRepositoryReq) GetToken() (v string) {
 var fieldIDToName_AddRepositoryReq = map[int16]string{
 	1: "repository_type",
 	2: "repository_url",
-	3: "token",
+	3: "store_type",
+	4: "token",
 }
 
 func (p *AddRepositoryReq) Read(iprot thrift.TProtocol) (err error) {
@@ -78,8 +83,18 @@ func (p *AddRepositoryReq) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 3:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -136,6 +151,15 @@ func (p *AddRepositoryReq) ReadField2(iprot thrift.TProtocol) error {
 }
 
 func (p *AddRepositoryReq) ReadField3(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.StoreType = v
+	}
+	return nil
+}
+
+func (p *AddRepositoryReq) ReadField4(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -160,6 +184,10 @@ func (p *AddRepositoryReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField3(oprot); err != nil {
 			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
 			goto WriteFieldError
 		}
 
@@ -216,10 +244,10 @@ WriteFieldEndError:
 }
 
 func (p *AddRepositoryReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("token", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("store_type", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Token); err != nil {
+	if err := oprot.WriteI32(p.StoreType); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -230,6 +258,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *AddRepositoryReq) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("token", thrift.STRING, 4); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Token); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
 func (p *AddRepositoryReq) String() string {
