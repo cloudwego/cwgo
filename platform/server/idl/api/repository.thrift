@@ -5,7 +5,8 @@ include "../model/repository.thrift"
 struct AddRepositoryReq{
     1: i32 repository_type (api.body="repository_type,required")
     2: string repository_url (api.body="repository_url,required",api.vd="len($)>0")
-    3: string token (api.body="token")
+    3: i32 store_type (api.body="store_type,required")
+    4: string token (api.body="token")
 }
 struct AddRepositoryRes{
     1: i32 code

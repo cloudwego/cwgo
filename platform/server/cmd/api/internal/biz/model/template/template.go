@@ -5,9 +5,8 @@ package template
 import (
 	"context"
 	"fmt"
-
 	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/model"
 )
 
 type AddTemplateReq struct {
@@ -2917,7 +2916,7 @@ func (p *UpdateTemplateItemRes) String() string {
 }
 
 type GetTemplateItemsReq struct {
-	ID int64 `thrift:"id,1" json:"id" query:"page" vd:"$>=0"`
+	ID int64 `thrift:"id,1" json:"id" query:"id" vd:"$>=0"`
 }
 
 func NewGetTemplateItemsReq() *GetTemplateItemsReq {
