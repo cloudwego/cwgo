@@ -5,8 +5,9 @@ package repository
 import (
 	"context"
 	"fmt"
+
 	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/model"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 )
 
 type AddRepositoryReq struct {
