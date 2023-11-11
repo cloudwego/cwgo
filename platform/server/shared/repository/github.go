@@ -260,7 +260,7 @@ func (a *GitHubApi) DeleteDirs(owner, repoName string, folderPaths ...string) er
 	return nil
 }
 
-func (a *GitHubApi) AutoCreateRepository(owner, repoName string) (string, error) {
+func (a *GitHubApi) AutoCreateRepository(owner, repoName string, isPrivate bool) (string, error) {
 	ctx := context.Background()
 	// new repository's URL
 	newRepoURL := githubURLPrefix + owner + "/" + repoName
@@ -270,6 +270,7 @@ func (a *GitHubApi) AutoCreateRepository(owner, repoName string) (string, error)
 		if _, ok := err.(*github.ErrorResponse); ok {
 			newRepo := &github.Repository{
 				Name:        github.String(repoName),
+				Private:     &isPrivate,
 				Description: github.String("generate by cwgo"),
 			}
 
@@ -283,4 +284,14 @@ func (a *GitHubApi) AutoCreateRepository(owner, repoName string) (string, error)
 	}
 
 	return newRepoURL, nil
+}
+
+func (a *GitHubApi) GetRepositoryPrivacy(owner, repoName string) (bool, error) {
+	ctx := context.Background()
+	repo, _, err := a.client.Repositories.Get(ctx, owner, repoName)
+	if err != nil {
+		return false, err
+	}
+
+	return repo.GetPrivate(), err
 }

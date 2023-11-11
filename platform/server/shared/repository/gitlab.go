@@ -189,7 +189,7 @@ func (a *GitLabApi) DeleteDirs(owner, repoName string, folderPaths ...string) er
 	return nil
 }
 
-func (a *GitLabApi) AutoCreateRepository(owner, repoName string) (string, error) {
+func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool) (string, error) {
 	// new repository's path in gitlab
 	repoPid := owner + "/" + repoName
 	// new repository's URL
@@ -198,8 +198,15 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string) (string, error)
 	if err != nil {
 		// if the error is caused by the inability to find a repository with the name, create the repository
 		if strings.Contains(err.Error(), "404 Project Not Found") {
+			var v gitlab.VisibilityValue
+			if isPrivate {
+				v = gitlab.PrivateVisibility
+			} else {
+				v = gitlab.PublicVisibility
+			}
 			_, _, err := a.client.Projects.CreateProject(&gitlab.CreateProjectOptions{
 				Name:        gitlab.String(repoName),
+				Visibility:  &v,
 				Description: gitlab.String("generate by cwgo"),
 			})
 			if err != nil {
@@ -210,4 +217,17 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string) (string, error)
 		return "", err
 	}
 	return newRepoURL, nil
+}
+
+func (a *GitLabApi) GetRepositoryPrivacy(owner, repoName string) (bool, error) {
+	repoPid := owner + repoName
+	project, _, err := a.client.Projects.GetProject(repoPid, nil)
+	if err != nil {
+		return false, err
+	}
+	if project.Visibility == gitlab.PrivateVisibility {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }

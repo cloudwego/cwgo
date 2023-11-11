@@ -24,7 +24,8 @@ type IRepository interface {
 	GetRepositoryArchive(owner, repoName, ref string) ([]byte, error)                                   // obtain the byte of the compressed package, gitlab could not specify ref
 	GetLatestCommitHash(owner, repoName, filePid, ref string) (string, error)                           // get the latest commit hash for the specified file
 	DeleteDirs(owner, repoName string, folderPaths ...string) error                                     // delete root dirs
-	AutoCreateRepository(owner, repoName string) (string, error)                                        // automatically create repository and return new repository's URL
+	AutoCreateRepository(owner, repoName string, isPrivate bool) (string, error)                        // automatically create repository and return new repository's URL
+	GetRepositoryPrivacy(owner, repoName string) (bool, error)                                          // determine if the repository is private
 }
 
 type File struct {
