@@ -574,7 +574,7 @@ func (p *AddRepositoryRes) Field2DeepEqual(src string) bool {
 }
 
 type DeleteRepositoriesReq struct {
-	Ids []string `thrift:"ids,1" frugal:"1,default,list<string>" json:"ids"`
+	Ids []int64 `thrift:"ids,1" frugal:"1,default,list<i64>" json:"ids"`
 }
 
 func NewDeleteRepositoriesReq() *DeleteRepositoriesReq {
@@ -585,10 +585,10 @@ func (p *DeleteRepositoriesReq) InitDefault() {
 	*p = DeleteRepositoriesReq{}
 }
 
-func (p *DeleteRepositoriesReq) GetIds() (v []string) {
+func (p *DeleteRepositoriesReq) GetIds() (v []int64) {
 	return p.Ids
 }
-func (p *DeleteRepositoriesReq) SetIds(val []string) {
+func (p *DeleteRepositoriesReq) SetIds(val []int64) {
 	p.Ids = val
 }
 
@@ -660,10 +660,10 @@ func (p *DeleteRepositoriesReq) ReadField1(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	p.Ids = make([]string, 0, size)
+	p.Ids = make([]int64, 0, size)
 	for i := 0; i < size; i++ {
-		var _elem string
-		if v, err := iprot.ReadString(); err != nil {
+		var _elem int64
+		if v, err := iprot.ReadI64(); err != nil {
 			return err
 		} else {
 			_elem = v
@@ -710,11 +710,11 @@ func (p *DeleteRepositoriesReq) writeField1(oprot thrift.TProtocol) (err error) 
 	if err = oprot.WriteFieldBegin("ids", thrift.LIST, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteListBegin(thrift.STRING, len(p.Ids)); err != nil {
+	if err := oprot.WriteListBegin(thrift.I64, len(p.Ids)); err != nil {
 		return err
 	}
 	for _, v := range p.Ids {
-		if err := oprot.WriteString(v); err != nil {
+		if err := oprot.WriteI64(v); err != nil {
 			return err
 		}
 	}
@@ -750,14 +750,14 @@ func (p *DeleteRepositoriesReq) DeepEqual(ano *DeleteRepositoriesReq) bool {
 	return true
 }
 
-func (p *DeleteRepositoriesReq) Field1DeepEqual(src []string) bool {
+func (p *DeleteRepositoriesReq) Field1DeepEqual(src []int64) bool {
 
 	if len(p.Ids) != len(src) {
 		return false
 	}
 	for i, v := range p.Ids {
 		_src := src[i]
-		if strings.Compare(v, _src) != 0 {
+		if v != _src {
 			return false
 		}
 	}

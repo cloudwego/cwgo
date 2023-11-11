@@ -67,9 +67,15 @@ func (l *UpdateRepositoryLogic) UpdateRepository(req *repository.UpdateRepositor
 		}
 	}
 	if rpcRes.Code != 0 {
+		if rpcRes.Code == http.StatusBadRequest {
+			return &repository.UpdateRepositoryRes{
+				Code: http.StatusBadRequest,
+				Msg:  rpcRes.Msg,
+			}
+		}
 		return &repository.UpdateRepositoryRes{
-			Code: http.StatusBadRequest,
-			Msg:  rpcRes.Msg,
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 

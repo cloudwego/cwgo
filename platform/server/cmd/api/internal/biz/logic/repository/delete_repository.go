@@ -65,6 +65,12 @@ func (l *DeleteRepositoryLogic) DeleteRepository(req *repository.DeleteRepositor
 		}
 	}
 	if rpcRes.Code != 0 {
+		if rpcRes.Code == http.StatusBadRequest {
+			return &repository.DeleteRepositoriesRes{
+				Code: http.StatusBadRequest,
+				Msg:  rpcRes.Msg,
+			}
+		}
 		return &repository.DeleteRepositoriesRes{
 			Code: http.StatusBadRequest,
 			Msg:  rpcRes.Msg,

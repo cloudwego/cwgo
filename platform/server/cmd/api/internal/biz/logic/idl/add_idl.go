@@ -76,9 +76,15 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 		}
 	}
 	if rpcRes.Code != 0 {
+		if rpcRes.Code == http.StatusBadRequest {
+			return &idl.AddIDLRes{
+				Code: http.StatusBadRequest,
+				Msg:  rpcRes.Msg,
+			}
+		}
 		return &idl.AddIDLRes{
-			Code: http.StatusBadRequest,
-			Msg:  rpcRes.Msg,
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 

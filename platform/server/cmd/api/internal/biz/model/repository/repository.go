@@ -469,14 +469,14 @@ func (p *AddRepositoryRes) String() string {
 }
 
 type DeleteRepositoriesReq struct {
-	Ids []string `thrift:"ids,1" form:"ids,required" json:"ids,required" vd:"len($)>0"`
+	Ids []int64 `thrift:"ids,1" form:"ids,required" json:"ids,required" vd:"len($)>0"`
 }
 
 func NewDeleteRepositoriesReq() *DeleteRepositoriesReq {
 	return &DeleteRepositoriesReq{}
 }
 
-func (p *DeleteRepositoriesReq) GetIds() (v []string) {
+func (p *DeleteRepositoriesReq) GetIds() (v []int64) {
 	return p.Ids
 }
 
@@ -548,10 +548,10 @@ func (p *DeleteRepositoriesReq) ReadField1(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	p.Ids = make([]string, 0, size)
+	p.Ids = make([]int64, 0, size)
 	for i := 0; i < size; i++ {
-		var _elem string
-		if v, err := iprot.ReadString(); err != nil {
+		var _elem int64
+		if v, err := iprot.ReadI64(); err != nil {
 			return err
 		} else {
 			_elem = v
@@ -598,11 +598,11 @@ func (p *DeleteRepositoriesReq) writeField1(oprot thrift.TProtocol) (err error) 
 	if err = oprot.WriteFieldBegin("ids", thrift.LIST, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteListBegin(thrift.STRING, len(p.Ids)); err != nil {
+	if err := oprot.WriteListBegin(thrift.I64, len(p.Ids)); err != nil {
 		return err
 	}
 	for _, v := range p.Ids {
-		if err := oprot.WriteString(v); err != nil {
+		if err := oprot.WriteI64(v); err != nil {
 			return err
 		}
 	}

@@ -36,7 +36,7 @@ CREATE TABLE `repository` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `repository_url` (`repository_url`) USING BTREE
+  UNIQUE KEY `repository_url, store_type` (`repository_url`,`store_type`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='repository table';
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -556,10 +556,10 @@ func (p *DeleteRepositoriesReq) FastReadField1(buf []byte) (int, error) {
 	if err != nil {
 		return offset, err
 	}
-	p.Ids = make([]string, 0, size)
+	p.Ids = make([]int64, 0, size)
 	for i := 0; i < size; i++ {
-		var _elem string
-		if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		var _elem int64
+		if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
 			return offset, err
 		} else {
 			offset += l
@@ -609,14 +609,14 @@ func (p *DeleteRepositoriesReq) fastWriteField1(buf []byte, binaryWriter bthrift
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "ids", thrift.LIST, 1)
 	listBeginOffset := offset
-	offset += bthrift.Binary.ListBeginLength(thrift.STRING, 0)
+	offset += bthrift.Binary.ListBeginLength(thrift.I64, 0)
 	var length int
 	for _, v := range p.Ids {
 		length++
-		offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, v)
+		offset += bthrift.Binary.WriteI64(buf[offset:], v)
 
 	}
-	bthrift.Binary.WriteListBegin(buf[listBeginOffset:], thrift.STRING, length)
+	bthrift.Binary.WriteListBegin(buf[listBeginOffset:], thrift.I64, length)
 	offset += bthrift.Binary.WriteListEnd(buf[offset:])
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -625,11 +625,9 @@ func (p *DeleteRepositoriesReq) fastWriteField1(buf []byte, binaryWriter bthrift
 func (p *DeleteRepositoriesReq) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("ids", thrift.LIST, 1)
-	l += bthrift.Binary.ListBeginLength(thrift.STRING, len(p.Ids))
-	for _, v := range p.Ids {
-		l += bthrift.Binary.StringLengthNocopy(v)
-
-	}
+	l += bthrift.Binary.ListBeginLength(thrift.I64, len(p.Ids))
+	var tmpV int64
+	l += bthrift.Binary.I64Length(int64(tmpV)) * len(p.Ids)
 	l += bthrift.Binary.ListEndLength()
 	l += bthrift.Binary.FieldEndLength()
 	return l

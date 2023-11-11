@@ -55,13 +55,7 @@ func (l *GetRepositoriesLogic) GetRepositories(req *repository.GetRepositoriesRe
 	}
 
 	switch req.OrderBy {
-	case "last_update_time":
-
-	case "last_sync_time":
-
-	case "create_time":
-
-	case "update_time":
+	case "last_update_time", "last_sync_time", "create_time", "update_time", "":
 
 	default:
 		return &repository.GetRepositoriesRes{
@@ -71,10 +65,10 @@ func (l *GetRepositoriesLogic) GetRepositories(req *repository.GetRepositoriesRe
 		}
 	}
 
-	if req.Page == 0 {
+	if req.Page <= 0 {
 		req.Page = 1
 	}
-	if req.Limit == 0 {
+	if req.Limit <= 0 {
 		req.Limit = consts.DefaultLimit
 	}
 
