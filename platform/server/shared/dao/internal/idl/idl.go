@@ -103,10 +103,17 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) error 
 func (m *MysqlIDLManager) DeleteIDLs(ctx context.Context, ids []int64) error {
 	var idl entity.MysqlIDL
 
-	err := m.db.WithContext(ctx).
-		Delete(&idl, ids).Error
+	res := m.db.WithContext(ctx).
+		Delete(&idl, ids)
+	if res.Error != nil {
+		return res.Error
+	}
 
-	return err
+	if res.RowsAffected == 0 {
+		return consts.ErrRecordNotFound
+	}
+
+	return nil
 }
 
 func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) error {

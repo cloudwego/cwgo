@@ -90,7 +90,7 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	}
 
 	// create temp dir
-	tempDir, err := ioutil.TempDir("", strconv.FormatInt(repo.Id, 64))
+	tempDir, err := ioutil.TempDir("", strconv.FormatInt(repo.Id, 10))
 	if err != nil {
 		logger.Logger.Error("create temp dir failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
@@ -112,7 +112,7 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 
 	// the archive type of GitHub is tarball instead of tar
 	isTarBall := false
-	if repo.StoreType == consts.RepositoryTypeNumGithub {
+	if repo.RepositoryType == consts.RepositoryTypeNumGithub {
 		isTarBall = true
 	}
 

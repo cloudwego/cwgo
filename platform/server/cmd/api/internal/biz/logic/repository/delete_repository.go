@@ -72,8 +72,8 @@ func (l *DeleteRepositoryLogic) DeleteRepository(req *repository.DeleteRepositor
 			}
 		}
 		return &repository.DeleteRepositoriesRes{
-			Code: http.StatusBadRequest,
-			Msg:  rpcRes.Msg,
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 

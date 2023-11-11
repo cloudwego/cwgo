@@ -69,10 +69,10 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 		}
 	}
 
-	if req.Page == 0 {
+	if req.Page <= 0 {
 		req.Page = 1
 	}
-	if req.Limit == 0 {
+	if req.Limit <= 0 {
 		req.Limit = consts.DefaultLimit
 	}
 
@@ -99,9 +99,15 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 		}
 	}
 	if rpcRes.Code != 0 {
+		if rpcRes.Code == http.StatusBadRequest {
+			return &idl.GetIDLsRes{
+				Code: http.StatusBadRequest,
+				Msg:  rpcRes.Msg,
+			}
+		}
 		return &idl.GetIDLsRes{
-			Code: http.StatusBadRequest,
-			Msg:  rpcRes.Msg,
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 

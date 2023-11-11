@@ -51,7 +51,7 @@ func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLSe
 // Run create note info
 func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
 	// check main idl path
-	client, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
+	repoClient, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
 	if err != nil {
 		if err == repository.ErrTokenInvalid {
 			// repo token is invalid or expired
@@ -67,7 +67,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	idlPid, owner, repoName, err := client.ParseIdlUrl(req.MainIdlPath)
+	idlPid, owner, repoName, err := repoClient.ParseIdlUrl(req.MainIdlPath)
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
@@ -75,7 +75,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	_, err = client.GetFile(owner, repoName, idlPid, consts.MainRef)
+	_, err = repoClient.GetFile(owner, repoName, idlPid, consts.MainRef)
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
@@ -84,7 +84,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	// obtain the commit hash for the main IDL
-	mainIdlHash, err := client.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
+	mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
@@ -111,7 +111,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	// create temp dir
-	tempDir, err := ioutil.TempDir("", strconv.FormatInt(repo.Id, 64))
+	tempDir, err := ioutil.TempDir("", strconv.FormatInt(repo.Id, 10))
 	if err != nil {
 		logger.Logger.Error("create temp dir failed", zap.Error(err))
 		return &agent.AddIDLRes{
@@ -122,7 +122,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	defer os.RemoveAll(tempDir)
 
 	// get the entire repository archive
-	archiveData, err := client.GetRepositoryArchive(owner, repoName, consts.MainRef)
+	archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, consts.MainRef)
 	if err != nil {
 		logger.Logger.Error("get archive failed", zap.Error(err))
 		return &agent.AddIDLRes{
@@ -133,7 +133,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	// the archive type of GitHub is tarball instead of tar
 	isTarBall := false
-	if repo.StoreType == consts.RepositoryTypeNumGithub {
+	if repo.RepositoryType == consts.RepositoryTypeNumGithub {
 		isTarBall = true
 	}
 
@@ -152,7 +152,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	switch idlType {
 	case consts.IdlTypeNumThrift:
 		thriftFile := &parser.ThriftFile{}
-		importPaths, err = thriftFile.GetDependentFilePaths(archiveName + idlPid)
+		importPaths, err = thriftFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
 		if err != nil {
 			return &agent.AddIDLRes{
 				Code: http.StatusBadRequest,
@@ -161,7 +161,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}
 	case consts.IdlTypeNumProto:
 		protoFile := &parser.ProtoFile{}
-		importPaths, err = protoFile.GetDependentFilePaths(archiveName + idlPid)
+		importPaths, err = protoFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
 			Msg:  "get dependent file paths error",
@@ -169,10 +169,11 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 	importIDLs := make([]*model.ImportIDL, len(importPaths))
 
+	mainIdlDir := filepath.Dir(idlPid)
 	// calculate the hash value and add it to the importIDLs slice
 	for i, importPath := range importPaths {
-		calculatedPath := filepath.Join(idlPid, importPath)
-		commitHash, err := client.GetLatestCommitHash(owner, repoName, calculatedPath, consts.MainRef)
+		calculatedPath := filepath.ToSlash(filepath.Join(mainIdlDir, importPath))
+		commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, consts.MainRef)
 		if err != nil {
 			return &agent.AddIDLRes{
 				Code: http.StatusBadRequest,
@@ -189,7 +190,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	if req.ServiceRepositoryName == "" {
 		req.ServiceRepositoryName = "cwgo_" + repoName
 	}
-	serviceRepoURL, err := client.AutoCreateRepository(owner, req.ServiceRepositoryName)
+	serviceRepoURL, err := repoClient.AutoCreateRepository(owner, req.ServiceRepositoryName)
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
@@ -211,7 +212,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			}, nil
 		}
 		return &agent.AddIDLRes{
-			Code: http.StatusBadRequest,
+			Code: http.StatusInternalServerError,
 			Msg:  "internal err",
 		}, nil
 	}
