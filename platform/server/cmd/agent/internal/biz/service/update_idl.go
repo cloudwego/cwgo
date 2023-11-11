@@ -23,6 +23,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -46,6 +47,12 @@ func (s *UpdateIDLService) Run(req *agent.UpdateIDLReq) (resp *agent.UpdateIDLRe
 		ServiceName:     req.ServiceName,
 	})
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &agent.UpdateIDLRes{
+				Code: http.StatusBadRequest,
+				Msg:  "idl id not exist",
+			}, nil
+		}
 		return &agent.UpdateIDLRes{
 			Code: http.StatusInternalServerError,
 			Msg:  "internal err",

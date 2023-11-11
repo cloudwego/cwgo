@@ -100,7 +100,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		}
 
 		// create temp dir
-		tempDir, err := ioutil.TempDir("", strconv.FormatInt(repo.Id, 64))
+		tempDir, err := ioutil.TempDir("", strconv.FormatInt(repo.Id, 10))
 		if err != nil {
 			logger.Logger.Error("create temp dir failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
@@ -122,7 +122,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 
 		// the archive type of GitHub is tarball instead of tar
 		isTarBall := false
-		if repo.StoreType == consts.RepositoryTypeNumGithub {
+		if repo.RepositoryType == consts.RepositoryTypeNumGithub {
 			isTarBall = true
 		}
 

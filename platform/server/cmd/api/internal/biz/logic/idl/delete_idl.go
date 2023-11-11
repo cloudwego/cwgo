@@ -65,6 +65,12 @@ func (l *DeleteIDLLogic) DeleteIDL(req *idl.DeleteIDLsReq) (res *idl.DeleteIDLsR
 		}
 	}
 	if rpcRes.Code != 0 {
+		if rpcRes.Code == http.StatusBadRequest {
+			return &idl.DeleteIDLsRes{
+				Code: http.StatusBadRequest,
+				Msg:  rpcRes.Msg,
+			}
+		}
 		return &idl.DeleteIDLsRes{
 			Code: http.StatusBadRequest,
 			Msg:  rpcRes.Msg,
