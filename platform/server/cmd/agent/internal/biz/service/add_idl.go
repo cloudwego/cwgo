@@ -24,11 +24,16 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/parser"
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
+	"go.uber.org/zap"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -46,7 +51,7 @@ func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLSe
 // Run create note info
 func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
 	// check main idl path
-	repoClient, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
+	client, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
 	if err != nil {
 		if err == repository.ErrTokenInvalid {
 			// repo token is invalid or expired
@@ -62,7 +67,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	idlPid, owner, repoName, err := repoClient.ParseIdlUrl(req.MainIdlPath)
+	idlPid, owner, repoName, err := client.ParseIdlUrl(req.MainIdlPath)
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
@@ -70,7 +75,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	_, err = repoClient.GetFile(owner, repoName, idlPid, consts.MainRef)
+	_, err = client.GetFile(owner, repoName, idlPid, consts.MainRef)
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
@@ -79,7 +84,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	// obtain the commit hash for the main IDL
-	mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
+	mainIdlHash, err := client.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
@@ -96,12 +101,58 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
+	repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.RepositoryId)
+	if err != nil {
+		logger.Logger.Error("get repository failed", zap.Error(err))
+		return &agent.AddIDLRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
+	}
+
+	// create temp dir
+	tempDir, err := ioutil.TempDir("", strconv.FormatInt(repo.Id, 64))
+	if err != nil {
+		logger.Logger.Error("create temp dir failed", zap.Error(err))
+		return &agent.AddIDLRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
+	}
+	defer os.RemoveAll(tempDir)
+
+	// get the entire repository archive
+	archiveData, err := client.GetRepositoryArchive(owner, repoName, consts.MainRef)
+	if err != nil {
+		logger.Logger.Error("get archive failed", zap.Error(err))
+		return &agent.AddIDLRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
+	}
+
+	// the archive type of GitHub is tarball instead of tar
+	isTarBall := false
+	if repo.StoreType == consts.RepositoryTypeNumGithub {
+		isTarBall = true
+	}
+
+	// extract the tar package and persist it to a temporary file
+	archiveName, err := utils.UnTar(archiveData, tempDir, isTarBall)
+	if err != nil {
+		logger.Logger.Error("parse archive failed", zap.Error(err))
+		return &agent.AddIDLRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
+	}
+
 	// obtain dependent file paths
 	var importPaths []string
 	switch idlType {
 	case consts.IdlTypeNumThrift:
 		thriftFile := &parser.ThriftFile{}
-		importPaths, err = thriftFile.GetDependentFilePaths(req.MainIdlPath)
+		importPaths, err = thriftFile.GetDependentFilePaths(archiveName + idlPid)
 		if err != nil {
 			return &agent.AddIDLRes{
 				Code: http.StatusBadRequest,
@@ -110,7 +161,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}
 	case consts.IdlTypeNumProto:
 		protoFile := &parser.ProtoFile{}
-		importPaths, err = protoFile.GetDependentFilePaths(req.MainIdlPath)
+		importPaths, err = protoFile.GetDependentFilePaths(archiveName + idlPid)
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
 			Msg:  "get dependent file paths error",
@@ -121,7 +172,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// calculate the hash value and add it to the importIDLs slice
 	for i, importPath := range importPaths {
 		calculatedPath := filepath.Join(idlPid, importPath)
-		commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, consts.MainRef)
+		commitHash, err := client.GetLatestCommitHash(owner, repoName, calculatedPath, consts.MainRef)
 		if err != nil {
 			return &agent.AddIDLRes{
 				Code: http.StatusBadRequest,
@@ -134,19 +185,11 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			CommitHash: commitHash,
 		}
 	}
-	repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.RepositoryId)
-
-	if err != nil {
-		return &agent.AddIDLRes{
-			Code: http.StatusBadRequest,
-			Msg:  "internal err",
-		}, nil
-	}
 
 	if req.ServiceRepositoryName == "" {
 		req.ServiceRepositoryName = "cwgo_" + repoName
 	}
-	serviceRepoURL, err := repoClient.AutoCreateRepository(owner, req.ServiceRepositoryName)
+	serviceRepoURL, err := client.AutoCreateRepository(owner, req.ServiceRepositoryName)
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,

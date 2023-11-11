@@ -28,8 +28,11 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/parser"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
+	"strconv"
 )
 
 type SyncIDLsByIdService struct {
@@ -96,12 +99,49 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
+		// create temp dir
+		tempDir, err := ioutil.TempDir("", strconv.FormatInt(repo.Id, 64))
+		if err != nil {
+			logger.Logger.Error("create temp dir failed", zap.Error(err))
+			return &agent.SyncIDLsByIdRes{
+				Code: http.StatusInternalServerError,
+				Msg:  "internal err",
+			}, nil
+		}
+		defer os.RemoveAll(tempDir)
+
+		// get the entire repository archive
+		archiveData, err := client.GetRepositoryArchive(owner, repoName, consts.MainRef)
+		if err != nil {
+			logger.Logger.Error("get archive failed", zap.Error(err))
+			return &agent.SyncIDLsByIdRes{
+				Code: http.StatusInternalServerError,
+				Msg:  "internal err",
+			}, nil
+		}
+
+		// the archive type of GitHub is tarball instead of tar
+		isTarBall := false
+		if repo.StoreType == consts.RepositoryTypeNumGithub {
+			isTarBall = true
+		}
+
+		// extract the tar package and persist it to a temporary file
+		archiveName, err := utils.UnTar(archiveData, tempDir, isTarBall)
+		if err != nil {
+			logger.Logger.Error("parse archive failed", zap.Error(err))
+			return &agent.SyncIDLsByIdRes{
+				Code: http.StatusInternalServerError,
+				Msg:  "internal err",
+			}, nil
+		}
+
 		// obtain dependent file paths
 		var importPath []string
 		switch idlType {
 		case consts.IdlTypeNumThrift:
 			thriftFile := &parser.ThriftFile{}
-			importPath, err = thriftFile.GetDependentFilePaths(idl.MainIdlPath)
+			importPath, err = thriftFile.GetDependentFilePaths(archiveName + idlPid)
 			if err != nil {
 				return &agent.SyncIDLsByIdRes{
 					Code: http.StatusBadRequest,
@@ -110,7 +150,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}
 		case consts.IdlTypeNumProto:
 			protoFile := &parser.ProtoFile{}
-			importPath, err = protoFile.GetDependentFilePaths(idl.MainIdlPath)
+			importPath, err = protoFile.GetDependentFilePaths(archiveName + idlPid)
 			return &agent.SyncIDLsByIdRes{
 				Code: http.StatusBadRequest,
 				Msg:  "get dependent file paths error",
