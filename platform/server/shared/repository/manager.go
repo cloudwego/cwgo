@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
+	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"sync"
@@ -48,8 +50,6 @@ func NewRepoManager(daoManager *dao.Manager) (*Manager, error) {
 }
 
 func (rm *Manager) AddClient(repository *model.Repository) error {
-	rm.Lock()
-	defer rm.Unlock()
 
 	switch repository.RepositoryType {
 	case consts.RepositoryTypeNumGitLab:
@@ -62,14 +62,18 @@ func (rm *Manager) AddClient(repository *model.Repository) error {
 			}
 		}
 
+		rm.Lock()
 		rm.repositoryClientsCache.SetDefault(strconv.FormatInt(repository.Id, 10), NewGitLabApi(gitlabClient))
+		rm.Unlock()
 	case consts.RepositoryTypeNumGithub:
 		githubClient, err := NewGithubClient(repository.Token)
 		if err != nil {
 			return err
 		}
 
+		rm.Lock()
 		rm.repositoryClientsCache.SetDefault(strconv.FormatInt(repository.Id, 10), NewGitHubApi(githubClient))
+		rm.Unlock()
 	default:
 		return errors.New("invalid repository type")
 	}
@@ -86,9 +90,8 @@ func (rm *Manager) DelClient(repository *model.Repository) {
 
 func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 	rm.RLock()
-	defer rm.RUnlock()
-
 	if clientIface, ok := rm.repositoryClientsCache.Get(strconv.FormatInt(repoId, 10)); !ok {
+		rm.RUnlock()
 		repo, err := rm.daoManager.Repository.GetRepository(context.Background(), repoId)
 		if err != nil {
 			return nil, err
@@ -109,12 +112,23 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 
 		return rm.GetClient(repoId)
 	} else {
+		rm.RUnlock()
 		return clientIface.(IRepository), nil
 	}
 }
 
 func NewGitlabClient(token string) (*gitlab.Client, error) {
-	client, err := gitlab.NewClient(token)
+	var client *gitlab.Client
+	var err error
+
+	if consts.ProxyUrl != "" {
+		proxyUrl, _ := url.Parse(consts.ProxyUrl)
+		httpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+		client, err = gitlab.NewClient(token, gitlab.WithHTTPClient(httpClient))
+	} else {
+		client, err = gitlab.NewClient(token)
+	}
+
 	if err != nil {
 		if strings.Contains(err.Error(), "401 Unauthorized") {
 			return nil, ErrTokenInvalid
@@ -127,7 +141,14 @@ func NewGitlabClient(token string) (*gitlab.Client, error) {
 }
 
 func NewGithubClient(token string) (*github.Client, error) {
-	client := github.NewClient(nil).WithAuthToken(token)
+	var httpClient *http.Client
+
+	if consts.ProxyUrl != "" {
+		proxyUrl, _ := url.Parse(consts.ProxyUrl)
+		httpClient = &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+	}
+
+	client := github.NewClient(httpClient).WithAuthToken(token)
 
 	_, _, err := client.Meta.Get(context.Background())
 	if err != nil {

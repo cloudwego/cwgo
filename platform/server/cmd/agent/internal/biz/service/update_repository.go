@@ -23,6 +23,8 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"github.com/cloudwego/cwgo/platform/server/shared/repository"
+	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -39,12 +41,52 @@ func NewUpdateRepositoryService(ctx context.Context, svcCtx *svc.ServiceContext)
 
 // Run create note info
 func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *agent.UpdateRepositoryRes, err error) {
+	// validate repo info
+	repoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.Id)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &agent.UpdateRepositoryRes{
+				Code: http.StatusBadRequest,
+				Msg:  "repo id not exist",
+			}, nil
+		}
+	}
+
+	repoModel.Status = req.Status
+
+	if req.Token != "" {
+		// check token if valid
+		repoModel.Token = req.Token
+
+		err = s.svcCtx.RepoManager.AddClient(repoModel)
+		if err != nil {
+			if err == repository.ErrTokenInvalid {
+				return &agent.UpdateRepositoryRes{
+					Code: http.StatusBadRequest,
+					Msg:  err.Error(),
+				}, nil
+			}
+
+			return &agent.UpdateRepositoryRes{
+				Code: http.StatusInternalServerError,
+				Msg:  "internal err",
+			}, nil
+		}
+	}
+
+	// update repo info
 	err = s.svcCtx.DaoManager.Repository.UpdateRepository(s.ctx, model.Repository{
 		Id:     req.Id,
 		Token:  req.Token,
 		Status: req.Status,
 	})
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &agent.UpdateRepositoryRes{
+				Code: http.StatusBadRequest,
+				Msg:  "repo id not exist",
+			}, nil
+		}
 		return &agent.UpdateRepositoryRes{
 			Code: http.StatusInternalServerError,
 			Msg:  "internal err",

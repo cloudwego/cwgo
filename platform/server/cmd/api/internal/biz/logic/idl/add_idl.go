@@ -64,9 +64,10 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 	}
 
 	rpcRes, err := client.AddIDL(l.ctx, &agent.AddIDLReq{
-		RepositoryId: req.RepositoryID,
-		MainIdlPath:  req.MainIdlPath,
-		ServiceName:  req.ServiceName,
+		RepositoryId:          req.RepositoryID,
+		MainIdlPath:           req.MainIdlPath,
+		ServiceName:           req.ServiceName,
+		ServiceRepositoryName: req.ServiceRepositoryName,
 	})
 	if err != nil {
 		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
@@ -76,9 +77,15 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 		}
 	}
 	if rpcRes.Code != 0 {
+		if rpcRes.Code == http.StatusBadRequest {
+			return &idl.AddIDLRes{
+				Code: http.StatusBadRequest,
+				Msg:  rpcRes.Msg,
+			}
+		}
 		return &idl.AddIDLRes{
-			Code: http.StatusBadRequest,
-			Msg:  rpcRes.Msg,
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 

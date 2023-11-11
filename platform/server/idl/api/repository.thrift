@@ -14,7 +14,7 @@ struct AddRepositoryRes{
 }
 
 struct DeleteRepositoriesReq{
-    1: list<string> ids (api.body="ids,required",api.vd="len($)>0")
+    1: list<i64> ids (api.body="ids,required",api.vd="len($)>0")
 }
 struct DeleteRepositoriesRes{
     1: i32 code
@@ -22,7 +22,7 @@ struct DeleteRepositoriesRes{
 }
 
 struct UpdateRepositoryReq{
-    1: i64 id
+    1: i64 id (api.body="id")
     2: string token (api.body="token")
     3: i32 status (api.body="status")
 }

@@ -21,6 +21,7 @@ package app
 import "time"
 
 type Config struct {
+	ProxyUrl                 string `mapstructure:"proxyUrl"`
 	SyncAgentServiceInterval string `mapstructure:"syncAgentServiceInterval"`
 	SyncRepositoryInterval   string `mapstructure:"syncRepositoryInterval"`
 	SyncIdlInterval          string `mapstructure:"syncIdlInterval"`

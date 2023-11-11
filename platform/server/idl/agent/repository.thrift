@@ -14,7 +14,7 @@ struct AddRepositoryRes{
 }
 
 struct DeleteRepositoriesReq{
-    1: list<string> ids
+    1: list<i64> ids
 }
 struct DeleteRepositoriesRes{
     1: i32 code

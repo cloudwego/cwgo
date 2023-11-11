@@ -65,9 +65,15 @@ func (l *SyncRepositoryLogic) SyncRepository(req *repository.SyncRepositoryByIdR
 		}
 	}
 	if rpcRes.Code != 0 {
+		if rpcRes.Code == http.StatusBadRequest {
+			return &repository.SyncRepositoryByIdRes{
+				Code: http.StatusBadRequest,
+				Msg:  rpcRes.Msg,
+			}
+		}
 		return &repository.SyncRepositoryByIdRes{
-			Code: http.StatusBadRequest,
-			Msg:  rpcRes.Msg,
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}
 	}
 

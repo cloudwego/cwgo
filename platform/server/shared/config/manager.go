@@ -92,6 +92,9 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 	}
 
+	// init consts in config
+	consts.ProxyUrl = config.App.ProxyUrl
+
 	// get service id
 	var serviceId string
 	_, err := os.Stat(consts.AgentMetadataFile)

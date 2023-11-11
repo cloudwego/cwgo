@@ -25,13 +25,14 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"time"
 )
 
 type IRepositoryDaoManager interface {
 	AddRepository(ctx context.Context, repoModel model.Repository) (int64, error)
 
-	DeleteRepository(ctx context.Context, ids []string) error
+	DeleteRepository(ctx context.Context, ids []int64) error
 
 	UpdateRepository(ctx context.Context, repoModel model.Repository) error
 	Sync(ctx context.Context, repoModel model.Repository) error
@@ -64,7 +65,23 @@ func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel mo
 		lastUpdateTime = time.Now()
 	}
 
-	repoEntity := entity.MysqlRepository{
+	var repoEntity entity.MysqlRepository
+
+	// check if repo exists
+	err := m.db.WithContext(ctx).
+		Where("`repository_url` = ? AND `store_type` = ? AND `is_deleted` = 0").
+		Take(&repoEntity).Error
+	if err != nil {
+		if err != gorm.ErrRecordNotFound {
+			return -1, err
+		}
+	} else {
+		// repo exists
+		return repoEntity.ID, consts.ErrDuplicateRecord
+	}
+
+	// create repo if record is not exist or record's `is_deleted` = 1
+	repoEntity = entity.MysqlRepository{
 		RepositoryType: repoModel.RepositoryType,
 		StoreType:      repoModel.StoreType,
 		RepositoryURL:  repoModel.RepositoryUrl,
@@ -72,21 +89,34 @@ func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel mo
 		LastSyncTime:   time.Now(),
 		Token:          repoModel.Token,
 		Status:         consts.RepositoryStatusNumActive,
+		IsDeleted:      0,
 	}
-
-	err := m.db.WithContext(ctx).
+	err = m.db.WithContext(ctx).
+		Clauses(
+			clause.OnConflict{
+				Columns:   []clause.Column{{Name: "repository_url"}, {Name: "store_type"}},
+				UpdateAll: true,
+			},
+		).
 		Create(&repoEntity).Error
 
 	return repoEntity.ID, err
 }
 
-func (m *MysqlRepositoryManager) DeleteRepository(ctx context.Context, ids []string) error {
+func (m *MysqlRepositoryManager) DeleteRepository(ctx context.Context, ids []int64) error {
 	var repoEntity entity.MysqlRepository
 
-	err := m.db.WithContext(ctx).
-		Delete(&repoEntity, ids).Error
+	res := m.db.WithContext(ctx).Debug().
+		Delete(&repoEntity, ids)
+	if res.Error != nil {
+		return res.Error
+	}
 
-	return err
+	if res.RowsAffected == 0 {
+		return consts.ErrRecordNotFound
+	}
+
+	return nil
 }
 
 func (m *MysqlRepositoryManager) UpdateRepository(ctx context.Context, repoModel model.Repository) error {

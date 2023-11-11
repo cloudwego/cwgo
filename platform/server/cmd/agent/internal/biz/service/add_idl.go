@@ -25,6 +25,7 @@ import (
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/parser"
+	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"net/http"
 	"path/filepath"
@@ -47,6 +48,14 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// check main idl path
 	repoClient, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
 	if err != nil {
+		if err == repository.ErrTokenInvalid {
+			// repo token is invalid or expired
+			return &agent.AddIDLRes{
+				Code: http.StatusBadRequest,
+				Msg:  err.Error(),
+			}, nil
+		}
+
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
 			Msg:  "can not get the client",

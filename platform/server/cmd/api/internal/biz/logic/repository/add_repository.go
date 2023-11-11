@@ -25,7 +25,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
-	repositorymodel "github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"go.uber.org/zap"
 	"net/http"
 	"net/url"
@@ -75,6 +74,7 @@ func (l *AddRepositoryLogic) AddRepository(req *repository.AddRepositoryReq) (re
 	rpcRes, err := client.AddRepository(l.ctx, &agent.AddRepositoryReq{
 		RepositoryType: req.RepositoryType,
 		RepositoryUrl:  req.RepositoryURL,
+		StoreType:      req.StoreType,
 		Token:          req.Token,
 	})
 	if err != nil {
@@ -85,7 +85,7 @@ func (l *AddRepositoryLogic) AddRepository(req *repository.AddRepositoryReq) (re
 		}
 	}
 	if rpcRes.Code != 0 {
-		if rpcRes.Msg == repositorymodel.ErrTokenInvalid.Error() {
+		if rpcRes.Code == http.StatusBadRequest {
 			return &repository.AddRepositoryRes{
 				Code: http.StatusBadRequest,
 				Msg:  rpcRes.Msg,
