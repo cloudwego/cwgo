@@ -190,7 +190,16 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	if req.ServiceRepositoryName == "" {
 		req.ServiceRepositoryName = "cwgo_" + repoName
 	}
-	serviceRepoURL, err := repoClient.AutoCreateRepository(owner, req.ServiceRepositoryName)
+
+	isPrivacy, err := repoClient.GetRepositoryPrivacy(owner, repoName)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "internal err",
+		}, nil
+	}
+
+	serviceRepoURL, err := repoClient.AutoCreateRepository(owner, req.ServiceRepositoryName, isPrivacy)
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
