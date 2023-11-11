@@ -64,9 +64,10 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 	}
 
 	rpcRes, err := client.AddIDL(l.ctx, &agent.AddIDLReq{
-		RepositoryId: req.RepositoryID,
-		MainIdlPath:  req.MainIdlPath,
-		ServiceName:  req.ServiceName,
+		RepositoryId:          req.RepositoryID,
+		MainIdlPath:           req.MainIdlPath,
+		ServiceName:           req.ServiceName,
+		ServiceRepositoryName: req.ServiceRepositoryName,
 	})
 	if err != nil {
 		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
