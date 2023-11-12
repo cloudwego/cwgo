@@ -260,6 +260,25 @@ func (a *GitHubApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 			if err != nil {
 				return "", err
 			}
+			// after create, create default main branch
+			branch, _, err := a.client.Repositories.GetBranch(ctx, owner, repoName, "master", 0)
+			if err != nil {
+				return "", err
+			}
+
+			// after create, create default main branch
+			ref := &github.Reference{
+				Ref: github.String("refs/heads/main"),
+				Object: &github.GitObject{
+					Type: github.String("branch"),
+					SHA:  branch.Commit.SHA,
+				},
+			}
+			_, _, err = a.client.Git.CreateRef(ctx, owner, repoName, ref)
+			if err != nil {
+				return "", err
+			}
+
 			return newRepoURL, nil
 		}
 		return "", err

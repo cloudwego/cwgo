@@ -196,6 +196,16 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 			if err != nil {
 				return "", err
 			}
+			branch := "main"
+			ref := "refs/heads/main"
+			branchOpts := &gitlab.CreateBranchOptions{
+				Branch: &branch,
+				Ref:    &ref,
+			}
+			_, _, err = a.client.Branches.CreateBranch(repoPid, branchOpts, nil)
+			if err != nil {
+				return "", err
+			}
 			return repo.WebURL, nil
 		}
 		return "", err
