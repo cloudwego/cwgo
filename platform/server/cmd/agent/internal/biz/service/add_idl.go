@@ -83,15 +83,6 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	// obtain the commit hash for the main IDL
-	mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
-	if err != nil {
-		return &agent.AddIDLRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid main idl path",
-		}, nil
-	}
-
 	// determine the idl type for subsequent calculations of different types
 	idlType, err := utils.DetermineIdlType(idlPid)
 	if err != nil {
@@ -233,7 +224,6 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		MainIdlPath:         req.MainIdlPath,
 		ServiceName:         req.ServiceName,
 		ImportIdls:          importIDLs,
-		CommitHash:          mainIdlHash,
 	})
 	if err != nil {
 		return &agent.AddIDLRes{
