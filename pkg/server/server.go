@@ -120,6 +120,9 @@ func Server(c *config.ServerArgument) error {
 				if err != nil {
 					err = cli.Exit(fmt.Errorf("persist manifest failed: %v", err), meta.PersistError)
 				}
+				if !args.NeedGoMod && args.IsNew() {
+					log.Warn(meta.AddThriftReplace)
+				}
 			}()
 		} else {
 			args.CmdType = meta.CmdUpdate
