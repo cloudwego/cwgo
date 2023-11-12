@@ -37,47 +37,33 @@ func NewGitLabApi(client *gitlab.Client) *GitLabApi {
 }
 
 const (
-	gitlabURLPrefix  = "https://gitlab.com/"
-	regGitLabURL     = `([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`
-	regGitLabRepoURL = `/gitlab.com/([^/]+)/([^/]+)"`
+	regGitLabURL     = `https?://[^/]+/([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`
+	regGitLabRepoURL = `https?://[^/]+/([^/]+)/([^/]+)`
 )
 
 func (a *GitLabApi) ParseIdlUrl(url string) (filePid, owner, repoName string, err error) {
-	var tempPath string
-
-	// determine if it is a GitLab prefix
-	if strings.HasPrefix(url, gitlabURLPrefix) {
-		tempPath = url[len(gitlabURLPrefix):]
-		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
-		if lastQuestionMarkIndex != -1 {
-			tempPath = tempPath[:lastQuestionMarkIndex]
-		}
-	} else {
-		return "", "", "", errors.New("idlPath format wrong, do not have prefix: " + gitlabURLPrefix)
-	}
-
 	// using regular expressions to match fields
 	regex := regexp.MustCompile(regGitLabURL)
-	matches := regex.FindStringSubmatch(tempPath)
+	matches := regex.FindStringSubmatch(url)
 	if len(matches) != 5 {
 		return "", "", "", errors.New("idlPath format wrong, cannot parse gitlab URL")
 	}
+
 	owner = matches[1]
 	repoName = matches[2]
-	filePid = matches[4]
+	filePid = strings.Split(matches[4], "?")[0]
 
 	return filePid, owner, repoName, nil
 }
 
 func (a *GitLabApi) ParseRepoUrl(url string) (owner, repoName string, err error) {
-	// verification format
-	if !strings.HasPrefix(url, gitlabURLPrefix) {
-		return "", "", errors.New("IDL path format is incorrect; it does not have the expected prefix: " + gitlabURLPrefix)
-	}
-
 	// Extracting information using regular expressions
-	r := regexp.MustCompile(regGithubRepoURL)
+	r := regexp.MustCompile(regGitLabRepoURL)
 	matches := r.FindStringSubmatch(url)
+
+	if len(matches) != 3 {
+		return "", "", errors.New("repoPath format wrong, cannot parse gitlab repository URL")
+	}
 
 	return matches[1], matches[2], nil
 }
@@ -192,9 +178,7 @@ func (a *GitLabApi) DeleteDirs(owner, repoName string, folderPaths ...string) er
 func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool) (string, error) {
 	// new repository's path in gitlab
 	repoPid := owner + "/" + repoName
-	// new repository's URL
-	newRepoURL := gitlabURLPrefix + owner + "/" + repoName
-	_, _, err := a.client.Projects.GetProject(repoPid, nil)
+	repo, _, err := a.client.Projects.GetProject(repoPid, nil)
 	if err != nil {
 		// if the error is caused by the inability to find a repository with the name, create the repository
 		if strings.Contains(err.Error(), "404 Project Not Found") {
@@ -204,7 +188,7 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 			} else {
 				v = gitlab.PublicVisibility
 			}
-			_, _, err := a.client.Projects.CreateProject(&gitlab.CreateProjectOptions{
+			repo, _, err = a.client.Projects.CreateProject(&gitlab.CreateProjectOptions{
 				Name:        gitlab.String(repoName),
 				Visibility:  &v,
 				Description: gitlab.String("generate by cwgo"),
@@ -212,11 +196,11 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 			if err != nil {
 				return "", err
 			}
-			return newRepoURL, nil
+			return repo.WebURL, nil
 		}
 		return "", err
 	}
-	return newRepoURL, nil
+	return repo.WebURL, nil
 }
 
 func (a *GitLabApi) GetRepositoryPrivacy(owner, repoName string) (bool, error) {

@@ -25,7 +25,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
-	"strings"
 )
 
 type GitHubApi struct {
@@ -40,31 +39,16 @@ func NewGitHubApi(client *github.Client) *GitHubApi {
 
 const (
 	githubURLPrefix  = "https://github.com/"
-	regGitHubURL     = `([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
-	regGithubRepoURL = `https://github.com/([^/]+)/([^/]+)"`
+	regGitHubURL     = `https://github.com/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
+	regGithubRepoURL = `https://github.com/([^\/]+)\/([^\/]+)`
 )
 
 func (a *GitHubApi) ParseIdlUrl(url string) (filePid, owner, repoName string, err error) {
-	var tempPath string
-
-	// check if the URL has the GitHub prefix.
-	if strings.HasPrefix(url, githubURLPrefix) {
-		tempPath = url[len(githubURLPrefix):]
-
-		// remove any query parameters from the URL.
-		lastQuestionMarkIndex := strings.LastIndex(tempPath, "?")
-		if lastQuestionMarkIndex != -1 {
-			tempPath = tempPath[:lastQuestionMarkIndex]
-		}
-	} else {
-		return "", "", "", errors.New("IDL path format is incorrect; it does not have the expected prefix: " + githubURLPrefix)
-	}
-
 	// define a regular expression to parse the GitHub URL.
 	regex := regexp.MustCompile(regGitHubURL)
 
 	// use the regular expression to extract relevant components from the URL.
-	matches := regex.FindStringSubmatch(tempPath)
+	matches := regex.FindStringSubmatch(url)
 	if len(matches) != 5 {
 		return "", "", "", errors.New("IDL path format is incorrect; unable to parse the GitHub URL")
 	}
@@ -78,14 +62,12 @@ func (a *GitHubApi) ParseIdlUrl(url string) (filePid, owner, repoName string, er
 }
 
 func (a *GitHubApi) ParseRepoUrl(url string) (owner, repoName string, err error) {
-	// verification format
-	if !strings.HasPrefix(url, githubURLPrefix) {
-		return "", "", errors.New("IDL path format is incorrect; it does not have the expected prefix: " + githubURLPrefix)
-	}
-
 	// extracting information using regular expressions
 	r := regexp.MustCompile(regGithubRepoURL)
 	matches := r.FindStringSubmatch(url)
+	if len(matches) != 3 {
+		return "", "", errors.New("repository path format is incorrect; unable to parse the GitHub URL")
+	}
 
 	return matches[1], matches[2], nil
 }
