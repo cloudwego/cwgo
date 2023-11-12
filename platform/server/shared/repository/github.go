@@ -251,30 +251,14 @@ func (a *GitHubApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 		// if the error is caused by the inability to find a repository with the name, create the repository
 		if _, ok := err.(*github.ErrorResponse); ok {
 			newRepo := &github.Repository{
-				Name:        github.String(repoName),
-				Private:     &isPrivate,
-				Description: github.String("generate by cwgo"),
+				Name:            github.String(repoName),
+				Private:         &isPrivate,
+				Description:     github.String("generate by cwgo"),
+				AutoInit:        github.Bool(true),
+				LicenseTemplate: github.String("mit"),
 			}
 
 			_, _, err := a.client.Repositories.Create(ctx, "", newRepo)
-			if err != nil {
-				return "", err
-			}
-			// after create, create default main branch
-			branch, _, err := a.client.Repositories.GetBranch(ctx, owner, repoName, "master", 0)
-			if err != nil {
-				return "", err
-			}
-
-			// after create, create default main branch
-			ref := &github.Reference{
-				Ref: github.String("refs/heads/main"),
-				Object: &github.GitObject{
-					Type: github.String("branch"),
-					SHA:  branch.Commit.SHA,
-				},
-			}
-			_, _, err = a.client.Git.CreateRef(ctx, owner, repoName, ref)
 			if err != nil {
 				return "", err
 			}
