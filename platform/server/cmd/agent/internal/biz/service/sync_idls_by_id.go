@@ -141,7 +141,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		switch idlType {
 		case consts.IdlTypeNumThrift:
 			thriftFile := &parser.ThriftFile{}
-			importPath, err = thriftFile.GetDependentFilePaths(archiveName + idlPid)
+			importPath, err = thriftFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
 			if err != nil {
 				return &agent.SyncIDLsByIdRes{
 					Code: http.StatusBadRequest,
@@ -150,7 +150,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}
 		case consts.IdlTypeNumProto:
 			protoFile := &parser.ProtoFile{}
-			importPath, err = protoFile.GetDependentFilePaths(archiveName + idlPid)
+			importPath, err = protoFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
 			return &agent.SyncIDLsByIdRes{
 				Code: http.StatusBadRequest,
 				Msg:  "get dependent file paths error",
@@ -180,24 +180,27 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 
 		// use a bool value to judge whether to sync
 		needToSync := false
-		// create a map to find imports
-		existingImportIDLsMap := make(map[string]bool)
-		for _, importIDL := range importIDLs {
-			// use IdlPath as key
-			existingImportIDLsMap[importIDL.CommitHash] = true
-		}
+		if len(importIDLs) != len(idl.ImportIdls) {
+			needToSync = true
+		} else {
+			// create a map to find imports
+			existingImportIDLsMap := make(map[string]bool)
+			for _, dbImportIDL := range idl.ImportIdls {
+				// use IdlPath as key
+				existingImportIDLsMap[dbImportIDL.CommitHash] = true
+			}
 
-		// compare import idl
-		for _, dbImportIDL := range idl.ImportIdls {
-			if existingImportIDLsMap[dbImportIDL.CommitHash] {
-				// importIDL exist in importIDLs then continue
-				continue
-			} else {
-				needToSync = true
-				break
+			// compare import idl
+			for _, importIdl := range importIDLs {
+				if existingImportIDLsMap[importIdl.CommitHash] {
+					// importIDL exist in importIDLs then continue
+					continue
+				} else {
+					needToSync = true
+					break
+				}
 			}
 		}
-
 		hash, err := client.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
 		if err != nil {
 			logger.Logger.Error("get latest commit hash failed", zap.Error(err))
