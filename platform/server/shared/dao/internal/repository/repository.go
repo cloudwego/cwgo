@@ -69,7 +69,10 @@ func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel mo
 
 	// check if repo exists
 	err := m.db.WithContext(ctx).
-		Where("`repository_url` = ? AND `store_type` = ? AND `is_deleted` = 0").
+		Where("`repository_url` = ? AND `store_type` = ? AND `is_deleted` = 0",
+			repoModel.RepositoryUrl,
+			repoModel.StoreType,
+		).
 		Take(&repoEntity).Error
 	if err != nil {
 		if err != gorm.ErrRecordNotFound {

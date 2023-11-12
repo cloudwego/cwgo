@@ -45,6 +45,7 @@ func NewSyncRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Sy
 }
 
 func (l *SyncRepositoryLogic) SyncRepository(req *repository.SyncRepositoryByIdReq) (res *repository.SyncRepositoryByIdRes) {
+	// TODO: get certain agent by repo id
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
 		logger.Logger.Error("get rpc client failed", zap.Error(err))

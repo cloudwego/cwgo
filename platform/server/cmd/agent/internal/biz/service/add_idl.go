@@ -34,17 +34,18 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 )
 
 type AddIDLService struct {
-	ctx    context.Context
-	svcCtx *svc.ServiceContext
+	ctx          context.Context
+	svcCtx       *svc.ServiceContext
+	agentService agent.AgentService
 } // NewAddIDLService new AddIDLService
-func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLService {
+func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext, agentService agent.AgentService) *AddIDLService {
 	return &AddIDLService{
-		ctx:    ctx,
-		svcCtx: svcCtx,
+		ctx:          ctx,
+		svcCtx:       svcCtx,
+		agentService: agentService,
 	}
 }
 
@@ -62,8 +63,8 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}
 
 		return &agent.AddIDLRes{
-			Code: http.StatusBadRequest,
-			Msg:  "can not get the client",
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
 		}, nil
 	}
 
@@ -72,6 +73,20 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
 			Msg:  "can not parse the IDL url",
+		}, nil
+	}
+
+	isExist, err := s.svcCtx.DaoManager.Idl.CheckMainIdlIfExist(s.ctx, req.RepositoryId, idlPid)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
+	}
+	if isExist {
+		return &agent.AddIDLRes{
+			Code: http.StatusBadRequest,
+			Msg:  "idl is already exist",
 		}, nil
 	}
 
@@ -101,7 +116,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	repo, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.RepositoryId)
+	idlRepoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.RepositoryId)
 	if err != nil {
 		logger.Logger.Error("get repository failed", zap.Error(err))
 		return &agent.AddIDLRes{
@@ -111,7 +126,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	// create temp dir
-	tempDir, err := ioutil.TempDir("", strconv.FormatInt(repo.Id, 10))
+	tempDir, err := ioutil.TempDir("", strconv.FormatInt(idlRepoModel.Id, 10))
 	if err != nil {
 		logger.Logger.Error("create temp dir failed", zap.Error(err))
 		return &agent.AddIDLRes{
@@ -133,7 +148,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	// the archive type of GitHub is tarball instead of tar
 	isTarBall := false
-	if repo.RepositoryType == consts.RepositoryTypeNumGithub {
+	if idlRepoModel.RepositoryType == consts.RepositoryTypeNumGithub {
 		isTarBall = true
 	}
 
@@ -182,7 +197,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}
 
 		importIDLs[i] = &model.ImportIDL{
-			IdlPath:    importPath,
+			IdlPath:    calculatedPath,
 			CommitHash: commitHash,
 		}
 	}
@@ -208,13 +223,13 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	serviceRepoId, err := s.svcCtx.DaoManager.Repository.AddRepository(s.ctx, model.Repository{
-		RepositoryType: repo.RepositoryType,
+		RepositoryType: idlRepoModel.RepositoryType,
 		StoreType:      consts.RepositoryStoreTypeNumService,
 		RepositoryUrl:  serviceRepoURL,
-		Token:          repo.Token,
+		Token:          idlRepoModel.Token,
 	})
 	if err != nil {
-		if strings.Contains(err.Error(), "Duplicate entry") {
+		if err == consts.ErrDuplicateRecord {
 			return &agent.AddIDLRes{
 				Code: http.StatusBadRequest,
 				Msg:  "repository is already exist",
@@ -227,10 +242,10 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	// add idl
-	err = s.svcCtx.DaoManager.Idl.AddIDL(s.ctx, model.IDL{
+	mainIdlId, err := s.svcCtx.DaoManager.Idl.AddIDL(s.ctx, model.IDL{
 		IdlRepositoryId:     req.RepositoryId,
 		ServiceRepositoryId: serviceRepoId,
-		MainIdlPath:         req.MainIdlPath,
+		MainIdlPath:         idlPid,
 		ServiceName:         req.ServiceName,
 		ImportIdls:          importIDLs,
 		CommitHash:          mainIdlHash,
@@ -242,5 +257,18 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	return
+	res, err := s.agentService.GenerateCode(s.ctx, &agent.GenerateCodeReq{
+		IdlId: mainIdlId,
+	})
+	if res.Code != 0 {
+		return &agent.AddIDLRes{
+			Code: res.Code,
+			Msg:  res.Msg,
+		}, nil
+	}
+
+	return &agent.AddIDLRes{
+		Code: 0,
+		Msg:  "add idl successfully",
+	}, nil
 }

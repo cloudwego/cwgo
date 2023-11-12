@@ -45,6 +45,7 @@ func NewSyncIDLsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SyncIDLs
 }
 
 func (l *SyncIDLsLogic) SyncIDLs(req *idl.SyncIDLsByIdReq) (res *idl.SyncIDLsByIdRes) {
+	// TODO: get certain agent by idl id
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
 		logger.Logger.Error("get rpc client failed", zap.Error(err))

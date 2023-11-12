@@ -72,7 +72,8 @@ func (*ThriftFile) GetDependentFilePaths(mainIdlPath string) ([]string, error) {
 	mainIdlDir := filepath.Dir(mainIdlPath)
 	relativePaths := make([]string, len(resultPaths))
 	for i, path := range resultPaths {
-		relativePaths[i], _ = filepath.Rel(mainIdlDir, path)
+		relativePath, _ := filepath.Rel(mainIdlDir, path)
+		relativePaths[i] = filepath.ToSlash(relativePath)
 	}
 
 	return relativePaths, nil

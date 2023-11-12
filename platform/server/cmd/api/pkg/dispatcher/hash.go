@@ -102,10 +102,12 @@ func (c *ConsistentHashDispatcher) DelService(serviceId string) error {
 	c.hasher.Remove(serviceId)
 
 	for taskId, t := range c.ServiceWithTasks[serviceId] {
-		m := c.hasher.LocateKey([]byte(taskId)).String()
-		_, ok := c.ServiceWithTasks[m]
-		if ok {
-			c.ServiceWithTasks[m][taskId] = t
+		m := c.hasher.LocateKey([]byte(taskId))
+		if m != nil {
+			_, ok := c.ServiceWithTasks[m.String()]
+			if ok {
+				c.ServiceWithTasks[m.String()][taskId] = t
+			}
 		}
 	}
 

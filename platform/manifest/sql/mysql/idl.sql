@@ -25,9 +25,9 @@ SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `idl`;
 CREATE TABLE `idl` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `repository_id` bigint(20) NOT NULL COMMENT 'repository id',
+  `idl_repository_id` bigint(20) NOT NULL COMMENT 'idl_repository id',
+  `service_repository_id` bigint(20) NOT NULL COMMENT 'service_repository id',
   `parent_idl_id` bigint(20) DEFAULT NULL COMMENT 'null if main idl else import idl',
-  `idl_type` tinyint(4) NOT NULL COMMENT 'idl type (1: thrift, 2: proto)',
   `idl_path` varchar(255) NOT NULL COMMENT 'idl path',
   `commit_hash` char(40) NOT NULL COMMENT 'idl file commit hash',
   `service_name` varchar(255) NOT NULL COMMENT 'service name',
