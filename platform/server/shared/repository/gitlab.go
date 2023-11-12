@@ -189,23 +189,15 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 				v = gitlab.PublicVisibility
 			}
 			repo, _, err = a.client.Projects.CreateProject(&gitlab.CreateProjectOptions{
-				Name:        gitlab.String(repoName),
-				Visibility:  &v,
-				Description: gitlab.String("generate by cwgo"),
+				Name:                 gitlab.String(repoName),
+				Visibility:           &v,
+				Description:          gitlab.String("generate by cwgo"),
+				InitializeWithReadme: gitlab.Bool(true),
 			})
 			if err != nil {
 				return "", err
 			}
-			branch := "main"
-			ref := "refs/heads/main"
-			branchOpts := &gitlab.CreateBranchOptions{
-				Branch: &branch,
-				Ref:    &ref,
-			}
-			_, _, err = a.client.Branches.CreateBranch(repoPid, branchOpts, nil)
-			if err != nil {
-				return "", err
-			}
+
 			return repo.WebURL, nil
 		}
 		return "", err
