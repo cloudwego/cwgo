@@ -39,7 +39,7 @@ type IRepositoryDaoManager interface {
 	ChangeRepositoryStatus(ctx context.Context, id int64, status int32) error
 
 	GetRepository(ctx context.Context, id int64) (*model.Repository, error)
-	GetRepositoryList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Repository, error)
+	GetRepositoryList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Repository, int64, error)
 	GetAllRepositories(ctx context.Context) ([]*model.Repository, error)
 	GetTokenByID(ctx context.Context, id int64) (string, error)
 	GetRepoTypeByID(ctx context.Context, id int64) (int32, error)
@@ -210,13 +210,26 @@ func (m *MysqlRepositoryManager) GetRepository(ctx context.Context, id int64) (*
 	}, nil
 }
 
-func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Repository, error) {
-	var repoEntities []*entity.MysqlRepository
-
+func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Repository, int64, error) {
 	if page < 1 {
 		page = 1
 	}
 	offset := (page - 1) * limit
+
+	var total int64
+
+	err := m.db.WithContext(ctx).
+		Model(&entity.MysqlRepository{}).
+		Count(&total).Error
+	if err != nil {
+		return nil, -1, err
+	}
+
+	if int64(offset) >= total {
+		return nil, total, nil
+	}
+
+	var repoEntities []*entity.MysqlRepository
 
 	// default sort field to 'update_time' if not provided
 	if orderBy == "" {
@@ -230,13 +243,13 @@ func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, page, li
 		orderBy = orderBy + " " + consts.OrderDec
 	}
 
-	err := m.db.WithContext(ctx).
+	err = m.db.WithContext(ctx).
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).
 		Find(&repoEntities).Error
 	if err != nil {
-		return nil, err
+		return nil, -1, err
 	}
 
 	repoModels := make([]*model.Repository, len(repoEntities))
@@ -257,7 +270,7 @@ func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, page, li
 		}
 	}
 
-	return repoModels, nil
+	return repoModels, total, nil
 }
 
 func (m *MysqlRepositoryManager) GetAllRepositories(ctx context.Context) ([]*model.Repository, error) {

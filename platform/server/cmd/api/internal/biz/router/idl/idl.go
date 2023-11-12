@@ -19,8 +19,9 @@
 package idl
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler/idl"
 	"github.com/cloudwego/hertz/pkg/app/server"
+
+	idl "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler/idl"
 )
 
 /*

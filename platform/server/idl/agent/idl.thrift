@@ -45,6 +45,7 @@ struct GetIDLsRes{
 }
 struct GetIDLsResData{
     1: list<idl.IDL> idls
+    2: i32 total
 }
 
 struct SyncIDLsByIdReq{

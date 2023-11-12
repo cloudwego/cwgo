@@ -2183,7 +2183,8 @@ func (p *GetIDLsRes) Field3DeepEqual(src *GetIDLsResData) bool {
 }
 
 type GetIDLsResData struct {
-	Idls []*model.IDL `thrift:"idls,1" frugal:"1,default,list<model.IDL>" json:"idls"`
+	Idls  []*model.IDL `thrift:"idls,1" frugal:"1,default,list<model.IDL>" json:"idls"`
+	Total int32        `thrift:"total,2" frugal:"2,default,i32" json:"total"`
 }
 
 func NewGetIDLsResData() *GetIDLsResData {
@@ -2197,12 +2198,20 @@ func (p *GetIDLsResData) InitDefault() {
 func (p *GetIDLsResData) GetIdls() (v []*model.IDL) {
 	return p.Idls
 }
+
+func (p *GetIDLsResData) GetTotal() (v int32) {
+	return p.Total
+}
 func (p *GetIDLsResData) SetIdls(val []*model.IDL) {
 	p.Idls = val
+}
+func (p *GetIDLsResData) SetTotal(val int32) {
+	p.Total = val
 }
 
 var fieldIDToName_GetIDLsResData = map[int16]string{
 	1: "idls",
+	2: "total",
 }
 
 func (p *GetIDLsResData) Read(iprot thrift.TProtocol) (err error) {
@@ -2227,6 +2236,16 @@ func (p *GetIDLsResData) Read(iprot thrift.TProtocol) (err error) {
 		case 1:
 			if fieldTypeId == thrift.LIST {
 				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -2284,6 +2303,15 @@ func (p *GetIDLsResData) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *GetIDLsResData) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.Total = v
+	}
+	return nil
+}
+
 func (p *GetIDLsResData) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("GetIDLsResData"); err != nil {
@@ -2292,6 +2320,10 @@ func (p *GetIDLsResData) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -2338,6 +2370,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
+func (p *GetIDLsResData) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("total", thrift.I32, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Total); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
 func (p *GetIDLsResData) String() string {
 	if p == nil {
 		return "<nil>"
@@ -2354,6 +2403,9 @@ func (p *GetIDLsResData) DeepEqual(ano *GetIDLsResData) bool {
 	if !p.Field1DeepEqual(ano.Idls) {
 		return false
 	}
+	if !p.Field2DeepEqual(ano.Total) {
+		return false
+	}
 	return true
 }
 
@@ -2367,6 +2419,13 @@ func (p *GetIDLsResData) Field1DeepEqual(src []*model.IDL) bool {
 		if !v.DeepEqual(_src) {
 			return false
 		}
+	}
+	return true
+}
+func (p *GetIDLsResData) Field2DeepEqual(src int32) bool {
+
+	if p.Total != src {
+		return false
 	}
 	return true
 }

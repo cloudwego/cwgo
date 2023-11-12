@@ -46,5 +46,5 @@ const (
 )
 
 const (
-	ConfigDefaultPath = "config.yaml"
+	ConfigDefaultPath = ""
 )

@@ -1748,6 +1748,20 @@ func (p *GetRepositoriesResData) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.I32 {
+				l, err = p.FastReadField2(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -1810,6 +1824,20 @@ func (p *GetRepositoriesResData) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *GetRepositoriesResData) FastReadField2(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.Total = v
+
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *GetRepositoriesResData) FastWrite(buf []byte) int {
 	return 0
@@ -1819,6 +1847,7 @@ func (p *GetRepositoriesResData) FastWriteNocopy(buf []byte, binaryWriter bthrif
 	offset := 0
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetRepositoriesResData")
 	if p != nil {
+		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
@@ -1831,6 +1860,7 @@ func (p *GetRepositoriesResData) BLength() int {
 	l += bthrift.Binary.StructBeginLength("GetRepositoriesResData")
 	if p != nil {
 		l += p.field1Length()
+		l += p.field2Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -1853,6 +1883,15 @@ func (p *GetRepositoriesResData) fastWriteField1(buf []byte, binaryWriter bthrif
 	return offset
 }
 
+func (p *GetRepositoriesResData) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "total", thrift.I32, 2)
+	offset += bthrift.Binary.WriteI32(buf[offset:], p.Total)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
 func (p *GetRepositoriesResData) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("repositories", thrift.LIST, 1)
@@ -1861,6 +1900,15 @@ func (p *GetRepositoriesResData) field1Length() int {
 		l += v.BLength()
 	}
 	l += bthrift.Binary.ListEndLength()
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *GetRepositoriesResData) field2Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("total", thrift.I32, 2)
+	l += bthrift.Binary.I32Length(p.Total)
+
 	l += bthrift.Binary.FieldEndLength()
 	return l
 }

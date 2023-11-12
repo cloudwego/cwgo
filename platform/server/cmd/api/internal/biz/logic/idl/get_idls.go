@@ -110,6 +110,9 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 	return &idl.GetIDLsRes{
 		Code: 0,
 		Msg:  successMsgGetIDLs,
-		Data: &idl.GetIDLsResData{Idls: rpcRes.Data.Idls},
+		Data: &idl.GetIDLsResData{
+			Idls:  rpcRes.Data.Idls,
+			Total: rpcRes.Data.Total,
+		},
 	}
 }

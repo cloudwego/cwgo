@@ -38,7 +38,7 @@ type IIdlDaoManager interface {
 	Sync(ctx context.Context, idlModel model.IDL) error
 
 	GetIDL(ctx context.Context, id int64) (*model.IDL, error)
-	GetIDLList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.IDL, error)
+	GetIDLList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.IDL, int64, error)
 	CheckMainIdlIfExist(ctx context.Context, repositoryId int64, mainIdlPath string) (bool, error)
 }
 
@@ -303,13 +303,26 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDL, err
 	}, nil
 }
 
-func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.IDL, error) {
-	var idlEntities []*entity.MysqlIDL
-
+func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.IDL, int64, error) {
 	if page < 1 {
 		page = 1
 	}
 	offset := (page - 1) * limit
+
+	var total int64
+
+	err := m.db.WithContext(ctx).
+		Model(&entity.MysqlIDL{}).
+		Count(&total).Error
+	if err != nil {
+		return nil, -1, err
+	}
+
+	if int64(offset) >= total {
+		return nil, total, nil
+	}
+
+	var idlEntities []*entity.MysqlIDL
 
 	// default sort field to 'update_time' if not provided
 	if orderBy == "" {
@@ -323,13 +336,13 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int
 		orderBy = orderBy + " " + consts.OrderDec
 	}
 
-	err := m.db.WithContext(ctx).
+	err = m.db.WithContext(ctx).
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).
 		Find(&idlEntities).Error
 	if err != nil {
-		return nil, err
+		return nil, -1, err
 	}
 
 	var wg sync.WaitGroup
@@ -373,7 +386,7 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int
 	}
 	wg.Wait()
 
-	return idlModels, nil
+	return idlModels, total, nil
 }
 
 func (m *MysqlIDLManager) CheckMainIdlIfExist(ctx context.Context, repositoryId int64, mainIdlPath string) (bool, error) {

@@ -44,6 +44,7 @@ struct GetRepositoriesRes{
 }
 struct GetRepositoriesResData{
     1: list<repository.Repository> repositories
+    2: i32 total
 }
 
 struct SyncRepositoryByIdReq{
