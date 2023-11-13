@@ -242,7 +242,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 
 				err = tx.
 					Where("`parent_idl_id` = ?", idlModel.Id).
-					Delete(&idlModel).Error
+					Delete(&entity.MysqlIDL{}).Error
 				if err != nil {
 					return err
 				}
