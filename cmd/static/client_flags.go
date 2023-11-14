@@ -30,9 +30,11 @@ func clientFlags() []cli.Flag {
 		&cli.StringFlag{Name: consts.Module, Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ClientArgument.GoMod},
 		&cli.StringFlag{Name: consts.IDLPath, Usage: "Specify the IDL file path. (.thrift or .proto)", Destination: &globalArgs.ClientArgument.IdlPath},
 		&cli.StringFlag{Name: consts.Template, Usage: "Specify the template path. Currently cwgo supports git templates, such as `--template https://github.com/***/cwgo_template.git`", Destination: &globalArgs.ClientArgument.Template},
-		&cli.StringFlag{Name: consts.Registry, Usage: "Specify the registry, default is None"},
+		&cli.StringFlag{Name: consts.CustomExtension, Usage: "Specify the custom extension file path, default is None."},
+		&cli.StringFlag{Name: consts.Resolver, Usage: "Specify the resolver, default is None"},
 		&cli.StringSliceFlag{Name: consts.ProtoSearchPath, Aliases: []string{"I"}, Usage: "Add an IDL search path for includes. (Valid only if idl is protobuf)"},
 		&cli.StringSliceFlag{Name: consts.Pass, Usage: "pass param to hz or kitex"},
 		&cli.BoolFlag{Name: consts.Verbose, Usage: "Turn on verbose mode."},
+		&cli.StringSliceFlag{Name: consts.SnakeServiceName, Usage: "Specify the snake service names in the thrift or protobuf file."},
 	}
 }

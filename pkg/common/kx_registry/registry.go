@@ -36,7 +36,7 @@ func HandleRegistry(ca *config.CommonParam, dir string) {
 
 	importPath := []string{ca.GoMod + "/conf", "github.com/cloudwego/kitex/pkg/klog"}
 
-	switch ca.Registry {
+	switch "" {
 	case consts.Etcd:
 		te.Dependencies["github.com/kitex-contrib/registry-etcd"] = "etcd"
 		te.ExtendServer = &generator.APIExtension{

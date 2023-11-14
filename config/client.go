@@ -35,6 +35,9 @@ type ClientArgument struct {
 	GoSrc    string
 	GoPkg    string
 	GoPath   string
+
+	Resolver          string
+	SnakeServiceNames []string
 }
 
 func NewClientArgument() *ClientArgument {
@@ -46,9 +49,11 @@ func NewClientArgument() *ClientArgument {
 
 func (c *ClientArgument) ParseCli(ctx *cli.Context) error {
 	c.Type = strings.ToUpper(ctx.String(consts.ServiceType))
-	c.Registry = strings.ToUpper(ctx.String(consts.Registry))
+	c.Resolver = strings.ToUpper(ctx.String(consts.Resolver))
 	c.Verbose = ctx.Bool(consts.Verbose)
 	c.SliceParam.ProtoSearchPath = ctx.StringSlice(consts.ProtoSearchPath)
 	c.SliceParam.Pass = ctx.StringSlice(consts.Pass)
+	c.SnakeServiceNames = ctx.StringSlice(consts.SnakeServiceName)
+	c.CustomExtension = ctx.String(consts.CustomExtension)
 	return nil
 }

@@ -18,10 +18,10 @@ package client
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 
-	"github.com/cloudwego/cwgo/pkg/common/kx_registry"
 	"github.com/cloudwego/cwgo/pkg/consts"
 
 	"github.com/cloudwego/cwgo/pkg/common/utils"
@@ -33,6 +33,7 @@ import (
 
 	"github.com/cloudwego/cwgo/config"
 
+	"github.com/cloudwego/cwgo/pkg/generator"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
@@ -54,8 +55,20 @@ func Client(c *config.ClientArgument) error {
 			return err
 		}
 
-		kx_registry.HandleRegistry(c.CommonParam, args.TemplateDir)
-		defer kx_registry.RemoveExtension()
+		// initialize cwgo side generator parameters
+		clientGen, err := generator.NewClientGenerator(consts.RPC)
+		if err != nil {
+			return err
+		}
+		if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
+			return err
+		}
+		defer utils.RemoveKitexExtension()
+
+		// generate cwgo side files
+		if err = generator.GenerateClient(clientGen); err != nil {
+			return cli.Exit(err, consts.GenerateCwgoError)
+		}
 
 		out := new(bytes.Buffer)
 		cmd := args.BuildCmd(out)
@@ -77,6 +90,37 @@ func Client(c *config.ClientArgument) error {
 		if err != nil {
 			return err
 		}
+
+		// initialize cwgo side generator parameters
+		clientGen, err := generator.NewClientGenerator(consts.HTTP)
+		if err != nil {
+			return err
+		}
+		if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
+			return err
+		}
+
+		module, path, ok := utils.SearchGoMod(consts.CurrentDir, false)
+		if ok {
+			// go.mod exists
+			if module != c.GoMod {
+				return fmt.Errorf("module name given by the '-module' option ('%s') is not consist with the name defined in go.mod ('%s' from %s)", c.GoMod, module, path)
+			}
+			c.GoMod = module
+		} else {
+			// generate go.mod file
+			if err = utils.InitGoMod(c.GoMod); err != nil {
+				return fmt.Errorf("init go mod failed: %s", err.Error())
+			}
+		}
+
+		utils.ReplaceThriftVersion(args.IdlType)
+
+		// generate cwgo side files
+		if err = generator.GenerateClient(clientGen); err != nil {
+			return cli.Exit(err, consts.GenerateCwgoError)
+		}
+
 		args.CmdType = meta.CmdClient
 		logs.Debugf("Args: %#v\n", args)
 		err = app.TriggerPlugin(args)

@@ -18,6 +18,8 @@ package utils
 
 import (
 	"fmt"
+	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/cwgo/tpl"
 	"os"
 	"path/filepath"
 
@@ -55,4 +57,9 @@ func GetIdlType(path string, pbName ...string) (string, error) {
 	default:
 		return "", fmt.Errorf("IDL type %s is not supported", ext)
 	}
+}
+
+func RemoveKitexExtension() {
+	extensionYamlPath := tpl.KitexDir + consts.KitexExtensionYaml
+	os.RemoveAll(extensionYamlPath)
 }

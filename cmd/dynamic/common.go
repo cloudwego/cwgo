@@ -100,3 +100,16 @@ func registryConfig() []*survey.Question {
 		},
 	}
 }
+
+func resolverConfig() []*survey.Question {
+	return []*survey.Question{
+		{
+			Name: consts.Resolver,
+			Prompt: &survey.Select{
+				Message: "Please select a resolver",
+				Options: []string{consts.Zk, consts.Polaris, consts.Etcd, consts.Nacos},
+			},
+			Validate: survey.Required,
+		},
+	}
+}

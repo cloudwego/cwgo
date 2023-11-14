@@ -36,15 +36,18 @@ type ServerArgument struct {
 	GoSrc  string
 	GoPkg  string
 	GoPath string
+
+	Registry string
 }
 
 type CommonParam struct {
-	Service  string // service name
-	Type     string // GenerateType: RPC or HTTP
-	GoMod    string // Go Mod name
-	IdlPath  string
-	OutDir   string // output path
-	Registry string
+	Service         string // service name
+	Type            string // GenerateType: RPC or HTTP
+	GoMod           string // Go Mod name
+	IdlPath         string
+	OutDir          string // output path
+	TemplateDir     string // for generating kitex extensions.yaml
+	CustomExtension string
 }
 
 func NewServerArgument() *ServerArgument {
@@ -60,6 +63,7 @@ func (s *ServerArgument) ParseCli(ctx *cli.Context) error {
 	s.Verbose = ctx.Bool(consts.Verbose)
 	s.SliceParam.ProtoSearchPath = ctx.StringSlice(consts.ProtoSearchPath)
 	s.SliceParam.Pass = ctx.StringSlice(consts.Pass)
+	s.CustomExtension = ctx.String(consts.CustomExtension)
 	return nil
 }
 

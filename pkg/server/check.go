@@ -45,6 +45,12 @@ func check(sa *config.ServerArgument) error {
 		return errors.New("must specify service name")
 	}
 
+	if sa.CustomExtension != "" {
+		if isExist, _ := utils.PathExist(sa.CustomExtension); isExist == false {
+			return errors.New("must specify correct custom extension file path")
+		}
+	}
+
 	// handle cwd and output dir
 	dir, err := os.Getwd()
 	if err != nil {

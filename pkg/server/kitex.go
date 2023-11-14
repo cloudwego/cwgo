@@ -118,6 +118,8 @@ Flags:
 		}
 	}
 
+	sa.TemplateDir = kitexArgument.TemplateDir
+
 	kitexArgument.GenerateMain = false
 
 	return checkKitexArgs(kitexArgument)

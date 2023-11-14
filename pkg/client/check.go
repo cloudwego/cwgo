@@ -33,16 +33,26 @@ func check(ca *config.ClientArgument) error {
 		return errors.New("generate type not supported")
 	}
 
-	if ca.Registry != "" &&
-		ca.Registry != consts.Zk &&
-		ca.Registry != consts.Nacos &&
-		ca.Registry != consts.Etcd &&
-		ca.Registry != consts.Polaris {
-		return errors.New("unsupported registry")
+	if ca.Resolver != "" &&
+		ca.Resolver != consts.Zk &&
+		ca.Resolver != consts.Nacos &&
+		ca.Resolver != consts.Etcd &&
+		ca.Resolver != consts.Polaris {
+		return errors.New("unsupported resolver")
 	}
 
 	if ca.Service == "" {
-		return errors.New("must specify service name when use registry")
+		return errors.New("must specify service name when using resolver")
+	}
+
+	if ca.Type == consts.HTTP && ca.SnakeServiceNames == nil {
+		return errors.New("must specify snake service names in idl file")
+	}
+
+	if ca.CustomExtension != "" {
+		if isExist, _ := utils.PathExist(ca.CustomExtension); isExist == false {
+			return errors.New("must specify correct custom extension file path")
+		}
 	}
 
 	// handle cwd and output dir

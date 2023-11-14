@@ -24,9 +24,9 @@ import (
 	"strings"
 
 	"github.com/cloudwego/cwgo/config"
-	"github.com/cloudwego/cwgo/pkg/common/kx_registry"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/cwgo/pkg/generator"
 	"github.com/cloudwego/hertz/cmd/hz/app"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
@@ -51,8 +51,21 @@ func Server(c *config.ServerArgument) error {
 		if err != nil {
 			return err
 		}
-		kx_registry.HandleRegistry(c.CommonParam, args.TemplateDir)
-		defer kx_registry.RemoveExtension()
+
+		// initialize cwgo side generator parameters
+		serverGen, err := generator.NewServerGenerator(consts.RPC)
+		if err != nil {
+			return err
+		}
+		if err = generator.ConvertServerGenerator(serverGen, c); err != nil {
+			return err
+		}
+		defer utils.RemoveKitexExtension()
+
+		// generate cwgo side files
+		if err = generator.GenerateServer(serverGen); err != nil {
+			return cli.Exit(err, consts.GenerateCwgoError)
+		}
 
 		out := new(bytes.Buffer)
 		cmd := args.BuildCmd(out)
@@ -93,6 +106,15 @@ func Server(c *config.ServerArgument) error {
 			return err
 		}
 
+		// initialize cwgo side generator parameters
+		serverGen, err := generator.NewServerGenerator(consts.HTTP)
+		if err != nil {
+			return err
+		}
+		if err = generator.ConvertServerGenerator(serverGen, c); err != nil {
+			return err
+		}
+
 		if utils.IsHzNew(c.OutDir) {
 			args.CmdType = meta.CmdNew
 			if c.GoMod == "" {
@@ -111,6 +133,11 @@ func Server(c *config.ServerArgument) error {
 			err = app.GenerateLayout(args)
 			if err != nil {
 				return cli.Exit(err, meta.GenerateLayoutError)
+			}
+
+			// generate cwgo side files
+			if err = generator.GenerateServer(serverGen); err != nil {
+				return cli.Exit(err, consts.GenerateCwgoError)
 			}
 			defer func() {
 				// ".hz" file converges to the hz tool
@@ -142,6 +169,11 @@ func Server(c *config.ServerArgument) error {
 					return fmt.Errorf(err.Error())
 				}
 				return fmt.Errorf("go.mod not found in %s", workPath)
+			}
+
+			// generate cwgo side files
+			if err = generator.GenerateServer(serverGen); err != nil {
+				return cli.Exit(err, consts.GenerateCwgoError)
 			}
 
 			// update argument by ".hz", can automatically get "handler_dir"/"model_dir"/"router_dir"

@@ -5,10 +5,7 @@ body: |-
   package main
 
   import (
-    "net"
-
     "github.com/cloudwego/kitex/pkg/klog"
-    "github.com/cloudwego/kitex/pkg/rpcinfo"
     {{- if eq .Codec "thrift"}}
     "github.com/cloudwego/kitex/pkg/transmeta"
     {{- end }}
@@ -31,18 +28,6 @@ body: |-
   }
 
   func kitexInit() (opts []server.Option) {
-    // address
-    addr, err := net.ResolveTCPAddr("tcp", conf.GetConf().Kitex.Address)
-    if err != nil {
-      panic(err)
-    }
-    opts = append(opts, server.WithServiceAddr(addr))
-
-    // service info
-    	opts = append(opts, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-    		ServiceName: conf.GetConf().Kitex.Service,
-    	}))
-
     {{- if eq .Codec "thrift"}}
      // thrift meta handler
      opts = append(opts, server.WithMetaHandler(transmeta.ServerTTHeaderHandler))
@@ -53,10 +38,10 @@ body: |-
     klog.SetLogger(logger)
     klog.SetLevel(conf.LogLevel())
     klog.SetOutput(&lumberjack.Logger{
-          		Filename:   conf.GetConf().Kitex.LogFileName,
-          		MaxSize:    conf.GetConf().Kitex.LogMaxSize,
-          		MaxBackups: conf.GetConf().Kitex.LogMaxBackups,
-          		MaxAge:     conf.GetConf().Kitex.LogMaxAge,
+          		Filename:   conf.GetConf().Log.LogFileName,
+          		MaxSize:    conf.GetConf().Log.LogMaxSize,
+          		MaxBackups: conf.GetConf().Log.LogMaxBackups,
+          		MaxAge:     conf.GetConf().Log.LogMaxAge,
           	})
     return
   }

@@ -112,6 +112,8 @@ Flags:
 		}
 	}
 
+	sa.TemplateDir = kitexArgument.TemplateDir
+
 	return checkKitexArgs(kitexArgument)
 }
 
