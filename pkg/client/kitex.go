@@ -190,5 +190,6 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 		a.PackagePrefix = a.Use
 	}
 	a.OutputPath = curpath
+	a.PackagePrefix = strings.ReplaceAll(a.PackagePrefix, consts.BackSlash, consts.Slash)
 	return nil
 }
