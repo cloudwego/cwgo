@@ -19,7 +19,6 @@
 package entity
 
 import (
-	"gorm.io/gorm"
 	"gorm.io/plugin/soft_delete"
 	"time"
 )
@@ -28,27 +27,20 @@ const TableNameMysqlIDL = "idl"
 
 // MysqlIDL mapped from table <idl>
 type MysqlIDL struct {
-	ID           int64                 `gorm:"column:id;primaryKey;autoIncrement:true;comment:id" json:"id"`                                                // id
-	RepositoryID int64                 `gorm:"column:repository_id;not null;comment:repository id" json:"repository_id"`                                    // repository id
-	ParentIdlID  int64                 `gorm:"column:parent_idl_id;comment:null if main idl else import idl" json:"parent_idl_id"`                          // null if main idl else import idl
-	IdlType      int32                 `gorm:"column:idl_type;not null;comment:idl type (1: thrift, 2: proto)" json:"idl_type"`                             // idl type (1: thrift, 2: proto)
-	IdlPath      string                `gorm:"column:idl_path;not null;comment:idl path" json:"idl_path"`                                                   // idl path
-	CommitHash   string                `gorm:"column:commit_hash;not null;comment:idl file commit hash" json:"commit_hash"`                                 // idl file commit hash
-	ServiceName  string                `gorm:"column:service_name;not null;comment:service name" json:"service_name"`                                       // service name
-	LastSyncTime time.Time             `gorm:"column:last_sync_time;not null;default:CURRENT_TIMESTAMP;comment:last update time" json:"last_sync_time"`     // last update time
-	IsDeleted    soft_delete.DeletedAt `gorm:"column:is_deleted;softDelete:flag;not null;comment:is deleted" json:"is_deleted"`                             // is deleted
-	CreateTime   time.Time             `gorm:"column:create_time;autoCreateTime;not null;default:CURRENT_TIMESTAMP;comment:create time" json:"create_time"` // create time
-	UpdateTime   time.Time             `gorm:"column:update_time;autoUpdateTime;not null;default:CURRENT_TIMESTAMP;comment:update time" json:"update_time"` // update time
+	ID                  int64                 `gorm:"column:id;primaryKey;autoIncrement:true;comment:id" json:"id"`                                                // id
+	IdlRepositoryID     int64                 `gorm:"column:idl_repository_id;not null;comment:repository id" json:"idl_repository_id"`                            // idl repository id
+	ServiceRepositoryID int64                 `gorm:"column:service_repository_id;not null;comment:repository id" json:"service_repository_id"`                    // service repository id
+	ParentIdlID         int64                 `gorm:"column:parent_idl_id;comment:null if main idl else import idl" json:"parent_idl_id"`                          // null if main idl else import idl
+	IdlPath             string                `gorm:"column:idl_path;not null;comment:idl path" json:"idl_path"`                                                   // idl path
+	CommitHash          string                `gorm:"column:commit_hash;not null;comment:idl file commit hash" json:"commit_hash"`                                 // idl file commit hash
+	ServiceName         string                `gorm:"column:service_name;not null;comment:service name" json:"service_name"`                                       // service name
+	LastSyncTime        time.Time             `gorm:"column:last_sync_time;not null;default:CURRENT_TIMESTAMP;comment:last update time" json:"last_sync_time"`     // last update time
+	IsDeleted           soft_delete.DeletedAt `gorm:"column:is_deleted;softDelete:flag;not null;comment:is deleted" json:"is_deleted"`                             // is deleted
+	CreateTime          time.Time             `gorm:"column:create_time;autoCreateTime;not null;default:CURRENT_TIMESTAMP;comment:create time" json:"create_time"` // create time
+	UpdateTime          time.Time             `gorm:"column:update_time;autoUpdateTime;not null;default:CURRENT_TIMESTAMP;comment:update time" json:"update_time"` // update time
 }
 
 // TableName MysqlIDL's table name
 func (*MysqlIDL) TableName() string {
 	return TableNameMysqlIDL
-}
-
-func (idl *MysqlIDL) AfterDelete(tx *gorm.DB) (err error) {
-	err = tx.
-		Where("`parent_idl_id` = ?", idl.ParentIdlID).
-		Delete(idl).Error
-	return err
 }

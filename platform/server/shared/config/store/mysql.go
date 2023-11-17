@@ -19,15 +19,48 @@
 package store
 
 import (
+	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-type MysqlConfig struct {
+type Mysql struct {
+	Addr     string `mapstructure:"addr"`
+	Port     string `mapstructure:"port"`
+	Db       string `mapstructure:"db"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	Charset  string `mapstructure:"charset"`
 }
 
-func initMysqlDB(dsn string) (*gorm.DB, error) {
-	return gorm.Open(mysql.Open(dsn), &gorm.Config{
+func (m Mysql) GetDsn() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Asia%%2FShanghai",
+		m.Username,
+		m.Password,
+		m.Addr,
+		m.Port,
+		m.Db,
+		m.Charset)
+}
+
+func (c Config) NewMysqlDB() (*gorm.DB, error) {
+	logger.Logger.Info("connecting mysql", zap.Reflect("dsn", c.Mysql.GetDsn()))
+
+	gormLogger, err := logger.GetGormZapWriter(logger.GetGormLoggerConfig())
+	if err != nil {
+		return nil, err
+	}
+
+	db, err := gorm.Open(mysql.Open(c.Mysql.GetDsn()), &gorm.Config{
+		Logger:      gormLogger,
 		PrepareStmt: true,
 	})
+	if err != nil {
+		logger.Logger.Error("connect mysql failed", zap.Error(err))
+		return nil, err
+	}
+
+	return db, err
 }

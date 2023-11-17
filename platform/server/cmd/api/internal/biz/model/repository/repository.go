@@ -810,7 +810,7 @@ func (p *DeleteRepositoriesRes) String() string {
 }
 
 type UpdateRepositoryReq struct {
-	ID     int64  `thrift:"id,1" form:"id" json:"id" query:"id"`
+	ID     int64  `thrift:"id,1" form:"id" json:"id"`
 	Token  string `thrift:"token,2" form:"token" json:"token"`
 	Status int32  `thrift:"status,3" form:"status" json:"status"`
 }
@@ -1735,6 +1735,7 @@ func (p *GetRepositoriesRes) String() string {
 
 type GetRepositoriesResData struct {
 	Repositories []*model.Repository `thrift:"repositories,1" form:"repositories" json:"repositories" query:"repositories"`
+	Total        int32               `thrift:"total,2" form:"total" json:"total" query:"total"`
 }
 
 func NewGetRepositoriesResData() *GetRepositoriesResData {
@@ -1745,8 +1746,13 @@ func (p *GetRepositoriesResData) GetRepositories() (v []*model.Repository) {
 	return p.Repositories
 }
 
+func (p *GetRepositoriesResData) GetTotal() (v int32) {
+	return p.Total
+}
+
 var fieldIDToName_GetRepositoriesResData = map[int16]string{
 	1: "repositories",
+	2: "total",
 }
 
 func (p *GetRepositoriesResData) Read(iprot thrift.TProtocol) (err error) {
@@ -1771,6 +1777,16 @@ func (p *GetRepositoriesResData) Read(iprot thrift.TProtocol) (err error) {
 		case 1:
 			if fieldTypeId == thrift.LIST {
 				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1828,6 +1844,15 @@ func (p *GetRepositoriesResData) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *GetRepositoriesResData) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.Total = v
+	}
+	return nil
+}
+
 func (p *GetRepositoriesResData) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("GetRepositoriesResData"); err != nil {
@@ -1836,6 +1861,10 @@ func (p *GetRepositoriesResData) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -1880,6 +1909,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *GetRepositoriesResData) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("total", thrift.I32, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Total); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *GetRepositoriesResData) String() string {

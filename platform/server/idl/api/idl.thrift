@@ -23,9 +23,7 @@ struct DeleteIDLsRes{
 
 struct UpdateIDLReq{
     1: i64 id (api.body="id,required")
-    2: i64 repository_id (api.body="repository_id")
-    3: string main_idl_path (api.body="main_idl_path")
-    4: string service_name (api.body="service_name")
+    2: string service_name (api.body="service_name")
 }
 struct UpdateIDLRes{
     1: i32 code
@@ -45,6 +43,7 @@ struct GetIDLsRes{
 }
 struct GetIDLsResData{
     1: list<idl.IDL> idls
+    2: i32 total
 }
 
 struct SyncIDLsByIdReq{

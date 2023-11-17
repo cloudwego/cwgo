@@ -39,8 +39,8 @@ func NewGitHubApi(client *github.Client) *GitHubApi {
 
 const (
 	githubURLPrefix  = "https://github.com/"
-	regGitHubURL     = `https://github.com/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
-	regGithubRepoURL = `https://github.com/([^\/]+)\/([^\/]+)`
+	regGitHubURL     = `https://github\.com/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
+	regGithubRepoURL = `https://github\.com/([^\/]+)\/([^\/]+)`
 )
 
 func (a *GitHubApi) ParseIdlUrl(url string) (filePid, owner, repoName string, err error) {
@@ -251,11 +251,10 @@ func (a *GitHubApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 		// if the error is caused by the inability to find a repository with the name, create the repository
 		if _, ok := err.(*github.ErrorResponse); ok {
 			newRepo := &github.Repository{
-				Name:            github.String(repoName),
-				Private:         &isPrivate,
-				Description:     github.String("generate by cwgo"),
-				AutoInit:        github.Bool(true),
-				LicenseTemplate: github.String("mit"),
+				Name:        github.String(repoName),
+				Private:     &isPrivate,
+				Description: github.String("generate by cwgo"),
+				AutoInit:    github.Bool(true),
 			}
 
 			_, _, err := a.client.Repositories.Create(ctx, "", newRepo)

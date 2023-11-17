@@ -26,7 +26,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
 	"net/http"
-	"net/url"
 )
 
 const (
@@ -46,14 +45,6 @@ func NewUpdateIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateI
 }
 
 func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes) {
-	_, err := url.Parse(req.MainIdlPath)
-	if err != nil {
-		return &idl.UpdateIDLRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid main idl path",
-		}
-	}
-
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
 		logger.Logger.Error("get rpc client failed", zap.Error(err))
@@ -64,8 +55,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 	}
 
 	rpcRes, err := client.UpdateIDL(l.ctx, &agent.UpdateIDLReq{
-		RepositoryId: req.RepositoryID,
-		MainIdlPath:  req.MainIdlPath,
+		RepositoryId: req.ID,
 		ServiceName:  req.ServiceName,
 	})
 	if err != nil {

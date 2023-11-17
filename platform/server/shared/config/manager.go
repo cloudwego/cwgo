@@ -30,6 +30,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 type Manager struct {
@@ -69,7 +70,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 			}
 		}
 
-		configPath = fmt.Sprintf("config-%s.yaml", consts.ServerModeMapToStr[serverMode])
+		configPath = filepath.ToSlash(filepath.Join(configPath, fmt.Sprintf("config-%s.yaml", consts.ServerModeMapToStr[serverMode])))
 
 		fmt.Printf("get config path: %s\n", configPath)
 

@@ -18,17 +18,16 @@
 
 package store
 
-import (
-	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-)
+import "fmt"
 
-type Config struct {
-	Type  string `mapstructure:"type"`
-	Mysql Mysql  `mapstructure:"mysql"`
-	Mongo Mongo  `mapstructure:"mongo"`
-	Redis Redis  `mapstructure:"redis"`
+type Mongo struct {
+	Addr         string `mapstructure:"addr"`
+	Port         string `mapstructure:"port"`
+	DatabaseName string `mapstructure:"databaseName"`
+	Username     string `mapstructure:"username"`
+	Password     string `mapstructure:"password"`
 }
 
-func (c Config) GetStoreType() consts.StoreType {
-	return consts.StoreTypeMapToNum[c.Type]
+func (m Mongo) GetAddr() string {
+	return fmt.Sprintf("mongodb://%s:%s", m.Addr, m.Port)
 }

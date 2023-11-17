@@ -110,6 +110,9 @@ func (l *GetRepositoriesLogic) GetRepositories(req *repository.GetRepositoriesRe
 	return &repository.GetRepositoriesRes{
 		Code: 0,
 		Msg:  successMsgGetRepositories,
-		Data: &repository.GetRepositoriesResData{Repositories: rpcRes.Data.Repositories},
+		Data: &repository.GetRepositoriesResData{
+			Repositories: rpcRes.Data.Repositories,
+			Total:        rpcRes.Data.Total,
+		},
 	}
 }

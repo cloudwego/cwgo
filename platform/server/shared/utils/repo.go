@@ -16,19 +16,28 @@
  *
  */
 
-package store
+package utils
 
 import (
+	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 )
 
-type Config struct {
-	Type  string `mapstructure:"type"`
-	Mysql Mysql  `mapstructure:"mysql"`
-	Mongo Mongo  `mapstructure:"mongo"`
-	Redis Redis  `mapstructure:"redis"`
+func GetRepoFullUrl(repoType int32, repoUrl, ref, filePid string) string {
+	switch repoType {
+	case consts.RepositoryTypeNumGitLab:
+		return GetRepoFullUrlGitLab(repoUrl, ref, filePid)
+	case consts.RepositoryTypeNumGithub:
+		return GetRepoFullUrlGitHub(repoUrl, ref, filePid)
+	default:
+		return ""
+	}
 }
 
-func (c Config) GetStoreType() consts.StoreType {
-	return consts.StoreTypeMapToNum[c.Type]
+func GetRepoFullUrlGitLab(repoUrl, ref, filePid string) string {
+	return fmt.Sprintf("%s/blob/%s/%s", repoUrl, ref, filePid)
+}
+
+func GetRepoFullUrlGitHub(repoUrl, ref, filePid string) string {
+	return fmt.Sprintf("%s/blob/%s/%s", repoUrl, ref, filePid)
 }

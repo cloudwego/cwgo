@@ -55,11 +55,7 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 	}
 
 	switch req.OrderBy {
-	case "last_sync_time":
-
-	case "create_time":
-
-	case "update_time":
+	case "last_sync_time", "create_time", "update_time", "":
 
 	default:
 		return &idl.GetIDLsRes{
@@ -114,6 +110,9 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 	return &idl.GetIDLsRes{
 		Code: 0,
 		Msg:  successMsgGetIDLs,
-		Data: &idl.GetIDLsResData{Idls: rpcRes.Data.Idls},
+		Data: &idl.GetIDLsResData{
+			Idls:  rpcRes.Data.Idls,
+			Total: rpcRes.Data.Total,
+		},
 	}
 }
