@@ -18,6 +18,11 @@
 
 package consts
 
+import (
+	"os"
+	"path/filepath"
+)
+
 const (
 	ProjectName = "cwgo"
 
@@ -34,3 +39,11 @@ const (
 const (
 	RdbKeyRegistryService = ProjectName + ":" + "registry:service:%s"
 )
+
+var (
+	TempDir string
+)
+
+func init() {
+	TempDir = filepath.Join(os.TempDir(), ProjectName)
+}

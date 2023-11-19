@@ -125,7 +125,7 @@ func NewGitlabClient(token string) (*gitlab.Client, error) {
 
 	if consts.ProxyUrl != "" {
 		proxyUrl, _ := url.Parse(consts.ProxyUrl)
-		httpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+		httpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}, Timeout: 5 * time.Second}
 		client, err = gitlab.NewClient(token, gitlab.WithHTTPClient(httpClient))
 	} else {
 		client, err = gitlab.NewClient(token)
@@ -147,7 +147,7 @@ func NewGithubClient(token string) (*github.Client, error) {
 
 	if consts.ProxyUrl != "" {
 		proxyUrl, _ := url.Parse(consts.ProxyUrl)
-		httpClient = &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}}
+		httpClient = &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}, Timeout: 5 * time.Second}
 	}
 
 	client := github.NewClient(httpClient).WithAuthToken(token)

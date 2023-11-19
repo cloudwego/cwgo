@@ -30,7 +30,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -132,13 +131,33 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		}
 
 		// create temp dir
-		tempDir, err := ioutil.TempDir("", strconv.FormatInt(repoModel.Id, 10))
+		tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
 		if err != nil {
-			logger.Logger.Error("create temp dir failed", zap.Error(err))
-			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
-			}, nil
+			if os.IsNotExist(err) {
+				err = os.Mkdir(consts.TempDir, 0700)
+				if err != nil {
+					logger.Logger.Error("create temp dir failed", zap.Error(err))
+					return &agent.SyncIDLsByIdRes{
+						Code: http.StatusInternalServerError,
+						Msg:  "internal err",
+					}, nil
+				}
+
+				tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
+				if err != nil {
+					logger.Logger.Error("create temp dir failed", zap.Error(err))
+					return &agent.SyncIDLsByIdRes{
+						Code: http.StatusInternalServerError,
+						Msg:  "internal err",
+					}, nil
+				}
+			} else {
+				logger.Logger.Error("create temp dir failed", zap.Error(err))
+				return &agent.SyncIDLsByIdRes{
+					Code: http.StatusInternalServerError,
+					Msg:  "internal err",
+				}, nil
+			}
 		}
 		defer os.RemoveAll(tempDir)
 

@@ -27,7 +27,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -105,13 +104,33 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	}
 
 	// create temp dir
-	tempDir, err := ioutil.TempDir("", strconv.FormatInt(repoModel.Id, 10))
+	tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
 	if err != nil {
-		logger.Logger.Error("create temp dir failed", zap.Error(err))
-		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
-		}, nil
+		if os.IsNotExist(err) {
+			err = os.Mkdir(consts.TempDir, 0700)
+			if err != nil {
+				logger.Logger.Error("create temp dir failed", zap.Error(err))
+				return &agent.GenerateCodeRes{
+					Code: http.StatusInternalServerError,
+					Msg:  "internal err",
+				}, nil
+			}
+
+			tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
+			if err != nil {
+				logger.Logger.Error("create temp dir failed", zap.Error(err))
+				return &agent.GenerateCodeRes{
+					Code: http.StatusInternalServerError,
+					Msg:  "internal err",
+				}, nil
+			}
+		} else {
+			logger.Logger.Error("create temp dir failed", zap.Error(err))
+			return &agent.GenerateCodeRes{
+				Code: http.StatusInternalServerError,
+				Msg:  "internal err",
+			}, nil
+		}
 	}
 	defer os.RemoveAll(tempDir)
 

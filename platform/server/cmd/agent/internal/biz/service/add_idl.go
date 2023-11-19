@@ -29,7 +29,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -135,7 +134,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	// create temp dir
-	tempDir, err := ioutil.TempDir("", strconv.FormatInt(idlRepoModel.Id, 10))
+	tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
 	if err != nil {
 		logger.Logger.Error("create temp dir failed", zap.Error(err))
 		return &agent.AddIDLRes{

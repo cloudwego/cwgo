@@ -250,9 +250,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 					return err
 				}
 
-				err = tx.
-					Where(ctx).
-					Create(importedIdlEntities).Error
+				err = tx.Create(importedIdlEntities).Error
 				if err != nil {
 					return err
 				}
