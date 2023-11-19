@@ -1,275 +1,273 @@
-import { getIDLsRes } from "./api";
+import { deleteIdl, getIdl, updateIdl } from "./api";
 import { useState, useEffect } from "react";
 import {
 	Button,
 	ConfigProvider,
-	Input,
 	Modal,
 	Space,
 	Table,
-	Tag,
-	Toast
+	Toast,
+	// Toast,
+	Tooltip
 } from "@douyinfe/semi-ui";
-import { IconInfoCircle, IconSearch } from "@douyinfe/semi-icons";
-import { IdlRes } from "../../types";
-import AllInfoBox from "../../components/AllInfoBox";
+import { Dropdown } from "@douyinfe/semi-ui";
 import styles from "./index.module.scss";
-import en_GB from "@douyinfe/semi-ui/lib/es/locale/source/en_GB";
 import { ModalReactProps } from "@douyinfe/semi-ui/lib/es/modal";
+import { Data } from "@douyinfe/semi-ui/lib/es/table";
+import { IconInfoCircle } from "@douyinfe/semi-icons";
+import ContextHolder from "./contextHolder";
 
-const pageSize = 10;
+interface Idls {
+	commit_hash: string;
+	idl_path: string;
+}
 
-const columns = [
-	{
-		title: "PSM",
-		dataIndex: "service_name",
-		width: "10rem",
-		render: (value: string) => {
-			return <div>{value}</div>;
-		}
-	},
-	{
-		title: "主 IDL 文件路径",
-		dataIndex: "main_idl_path",
-		width: "15rem",
-		render: (value: string) => {
-			return <a href="#">{value}</a>;
-		}
-	},
-	{
-		title: "创建时间",
-		dataIndex: "create_time",
-		width: "12.5rem",
-		render: (value: string) => {
-			return <div>{value}</div>;
-		}
-	},
-	{
-		title: "更新时间",
-		dataIndex: "update_time",
-		width: "12.5rem",
-		render: (value: string) => {
-			return <div>{value}</div>;
-		}
-	},
-	{
-		title: "最近一次同步时间",
-		dataIndex: "last_sync_time",
-		width: "10rem",
-		render: (value: string) => {
-			return <div>{value}</div>;
-		}
-	},
-	{
-		title: "状态",
-		dataIndex: "status",
-		width: "5rem",
-		render: (value: string) => {
-			return value ? (
-				<Tag color="green" size="large">
-					OK
-				</Tag>
-			) : (
-				<Tag color="red" size="large">
-					ERROR
-				</Tag>
-			);
-		}
-	},
-	{
-		title: "操作",
-		render: (value: string) => {
-			console.log("value", value);
-			return (
-				<Space>
-					<Button type="warning">强制同步 IDL 信息</Button>
-					<Button>分支生成</Button>
-					<Button type="danger">删除 IDL</Button>
-				</Space>
-			);
-		}
-	}
-];
-
-export default function IdlPage() {
-	const data = getIDLsRes();
-	const [dataSource, setData] = useState<IdlRes[]>([]);
+export default function RepositoryPage() {
+	const [dataSource, setData] = useState<unknown>([]);
 	const [loading, setLoading] = useState(false);
 	const [currentPage, setPage] = useState(1);
 	const [modal, contextHolder] = Modal.useModal();
-	const config = {
-		size: "medium",
-		title: "添加 IDL",
-		content: (
-			<Space vertical>
-				<Space
-					style={{
-						display: "flex",
-						justifyContent: "space-between",
-						width: "100%"
-					}}
-				>
-					<div
-						style={{
-							width: "8rem"
-						}}
-					>
-						IDL 仓库 ID
-					</div>
-					<Input
-						style={{
-							width: "25rem"
-						}}
-						showClear
-					></Input>
-				</Space>
-				<Space
-					style={{
-						display: "flex",
-						justifyContent: "space-between",
-						width: "100%"
-					}}
-				>
-					<div
-						style={{
-							width: "8rem"
-						}}
-					>
-						主 IDL 文件路径
-					</div>
-					<Input
-						style={{
-							width: "25rem"
-						}}
-						showClear
-					></Input>
-				</Space>
-				<Space
-					style={{
-						display: "flex",
-						justifyContent: "space-between",
-						width: "100%"
-					}}
-				>
-					<div
-						style={{
-							width: "8rem"
-						}}
-					>
-						服务名
-					</div>
-					<Input
-						style={{
-							width: "25rem"
-						}}
-						showClear
-					></Input>
-				</Space>
-			</Space>
-		),
-		cancelText: "取消",
-		okText: "确定",
-		icon: <IconInfoCircle />,
-		onOk: () => {
-			// 返回一个延时的 Promise
-			return new Promise((resolve, reject) => {
-				setTimeout(
-					Math.random() > 0.5
-						? () => {
-								Toast.success("添加成功！");
-								resolve(true);
-						  }
-						: () => {
-								Toast.error("Oops errors!");
-								reject(false);
-						  },
-					1000
-				);
-			}).catch(() => console.log("Oops errors!"));
-		}
-	} as ModalReactProps;
+	const [total, setTotal] = useState(0);
+	const pageSize = 10;
+	let destroyFn = () => {};
 
+	function InnerIdls({ data }: { data: Idls[] }) {
+		return (
+			<div>
+				{data.map((item, index) => {
+					return (
+						<div>
+							<Dropdown.Title>idl {index + 1}</Dropdown.Title>
+							<Dropdown.Item
+								type="primary"
+								style={{
+									marginRight: "0.5rem",
+									overflow: "hidden",
+									textOverflow: "ellipsis",
+									whiteSpace: "nowrap"
+								}}
+								onClick={() => {
+									navigator.clipboard.writeText(item.commit_hash);
+									Toast.success({
+										content: "已复制到剪贴板"
+									});
+								}}
+							>
+								{item.commit_hash}
+							</Dropdown.Item>
+							<Dropdown.Item
+								type="primary"
+								onClick={() => {
+									navigator.clipboard.writeText(item.idl_path);
+									Toast.success({
+										content: "已复制到剪贴板"
+									});
+								}}
+							>
+								{item.idl_path}
+							</Dropdown.Item>
+						</div>
+					);
+				})}
+			</div>
+		);
+	}
+
+	/**
+	 * 更新数据
+	 * @param currentPage 当前页码
+	 */
 	const fetchData = async (currentPage = 1) => {
 		setLoading(true);
 		setPage(currentPage);
-		const curDataSource: IdlRes[] = await new Promise((res) => {
-			setTimeout(() => {
-				const data = getIDLsRes();
-				const dataSource = data.slice(
-					(currentPage - 1) * pageSize,
-					currentPage * pageSize
-				);
-				res(dataSource);
-			}, 300);
+		const curDataSource = await new Promise((res) => {
+			getIdl(currentPage, pageSize).then((data) => {
+				res(data);
+				setTotal(data.total);
+			});
 		});
-		setLoading(false);
+		console.log(curDataSource);
 		setData(curDataSource);
-	};
-
-	const handlePageChange = (page: number) => {
-		fetchData(page);
+		setLoading(false);
+		destroyFn();
 	};
 
 	useEffect(() => {
 		fetchData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	return (
-		<ConfigProvider locale={en_GB}>
-			<div>
-				<AllInfoBox type={"idl"} />
-				<div
-					style={{
-						padding: "1rem 0"
-					}}
-				>
-					<Space
-						style={{
-							display: "flex",
-							justifyContent: "space-between"
-						}}
+	// 列表项
+	const columns = [
+		{
+			title: "服务名",
+			dataIndex: "service_name",
+			width: 100,
+			render: (value: string) => {
+				return <div>{value}</div>;
+			}
+		},
+		{
+			title: "主 idl 路径",
+			dataIndex: "main_idl_path",
+			width: 150,
+			render: (value: string) => {
+				return <div>{value}</div>;
+			}
+		},
+		{
+			title: "快捷命令",
+			render: ({ commit_hash }: { commit_hash: string }) => {
+				return (
+					<Space>
+						<Tooltip content={commit_hash}>
+							<Button>查看 commit_hash</Button>
+						</Tooltip>
+					</Space>
+				);
+			}
+		},
+		{
+			title: "idl 最后同步时间",
+			dataIndex: "last_sync_time",
+			width: 150,
+			render: (value: string) => {
+				return <div>{value}</div>;
+			}
+		},
+		{
+			title: "import idls",
+			dataIndex: "import_idls",
+			width: 150,
+			render: (value: []) => {
+				console.log(value);
+				return value.length ? (
+					<Dropdown
+						trigger={"hover"}
+						showTick
+						position={"bottomLeft"}
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						render={<Dropdown.Menu children={<InnerIdls data={value} />} />}
 					>
-						<Space>
-							<Input
-								style={{
-									width: "20rem"
-								}}
-								prefix={<IconSearch />}
-								showClear
-							></Input>
-							<Button type="primary" htmlType="submit">
-								提交
-							</Button>
-							<div
-								style={{
-									color: "var(--semi-color-text-2)"
-								}}
-							>
-								（最多显示 10 条数据）
-							</div>
-						</Space>
+						<Button>查看 import idls</Button>
+					</Dropdown>
+				) : (
+					<div>无 import idls</div>
+				);
+			}
+		},
+		{
+			title: "操作",
+			render: ({ id, service_name }: { id: number; service_name: string }) => {
+				return (
+					<Space>
 						<Button
-							style={{
-								width: "10rem"
-							}}
+							type="warning"
 							onClick={() => {
-								console.log("modal", modal);
-								modal.confirm(config);
+								const toast = Toast.info({
+									content: "正在同步 idl",
+									duration: 0
+								});
+								updateIdl(id, service_name)
+									.then((res) => {
+										Toast.success(res);
+										fetchData(currentPage);
+									})
+									.catch((err) => {
+										Toast.error({
+											content: err.response.data.msg
+										});
+									})
+									.finally(() => {
+										Toast.close(toast);
+									});
 							}}
 						>
-							添加 IDL
+							同步 idl
+						</Button>
+						<Button
+							type="danger"
+							onClick={() => {
+								const toast = Toast.info({
+									content: "正在删除 idl",
+									duration: 0
+								});
+								deleteIdl(id)
+									.then((res) => {
+										Toast.success(res);
+										fetchData(currentPage);
+									})
+									.catch((err) => {
+										Toast.error(err);
+									})
+									.finally(() => {
+										Toast.close(toast);
+									});
+							}}
+						>
+							删除 idl
 						</Button>
 					</Space>
+				);
+			}
+		},
+		{
+			title: "记录更新时间",
+			dataIndex: "update_time",
+			width: 150,
+			render: (value: string) => {
+				return <div>{value}</div>;
+			}
+		},
+		{
+			title: "创建时间",
+			dataIndex: "create_time",
+			width: 150,
+			render: (value: string) => {
+				return <div>{value}</div>;
+			}
+		}
+	];
+
+	// 添加仓库弹窗配置
+	const config = {
+		size: "medium",
+		title: "添加 idl",
+		content: <ContextHolder update={fetchData} />,
+		icon: <IconInfoCircle />,
+		footer: null
+	} as ModalReactProps;
+
+	return (
+		<ConfigProvider>
+			<div>
+				<div
+					style={{
+						paddingBottom: "1rem"
+					}}
+				>
+					<Button
+						style={{
+							width: "100%"
+						}}
+						onClick={() => {
+							const temp = modal.confirm(config);
+							destroyFn = temp.destroy;
+						}}
+					>
+						添加 idl
+					</Button>
 				</div>
 				<div className={styles["content"]}>
 					<Table
 						columns={columns}
-						dataSource={dataSource}
+						dataSource={dataSource as Data[]}
 						pagination={{
 							currentPage,
-							pageSize: 10,
-							total: data.length,
-							onPageChange: handlePageChange
+							onPageChange: fetchData,
+							pageSize,
+							total: total
 						}}
 						loading={loading}
 					/>

@@ -1,5 +1,5 @@
 import { Layout, Nav, Breadcrumb, Skeleton } from "@douyinfe/semi-ui";
-import { IconCode, IconGitlabLogo, IconFolderOpen } from "@douyinfe/semi-icons";
+import { IconCode, IconGitlabLogo } from "@douyinfe/semi-icons";
 import { Outlet, useNavigate } from "react-router-dom";
 import styles from "./App.module.scss";
 import { useEffect, useState } from "react";
@@ -19,12 +19,13 @@ export default function App() {
 			itemKey: "repository",
 			text: "仓库信息管理",
 			icon: <IconGitlabLogo size="large" />
-		},
-		{
-			itemKey: "template",
-			text: "模版管理",
-			icon: <IconFolderOpen size="large" />
 		}
+		// ,
+		// {
+		// 	itemKey: "template",
+		// 	text: "模版管理",
+		// 	icon: <IconFolderOpen size="large" />
+		// }
 	];
 
 	// 主题模式

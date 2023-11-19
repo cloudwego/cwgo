@@ -1,6 +1,6 @@
 import { Layout } from "@douyinfe/semi-ui";
 import styles from "./index.module.scss";
-import logo from "../../../public/favicon.ico";
+import logo from "../../assets/favicon.ico";
 
 export default function Footer() {
 	const { Footer } = Layout;
