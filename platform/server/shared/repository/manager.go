@@ -92,20 +92,22 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 	rm.RLock()
 	if clientIface, ok := rm.repositoryClientsCache.Get(strconv.FormatInt(repoId, 10)); !ok {
 		rm.RUnlock()
-		repo, err := rm.daoManager.Repository.GetRepository(context.Background(), repoId)
+		repoModel, err := rm.daoManager.Repository.GetRepository(context.Background(), repoId)
 		if err != nil {
 			return nil, err
 		}
 
-		err = rm.AddClient(repo)
+		err = rm.AddClient(repoModel)
 		if err != nil {
 			if err == ErrTokenInvalid {
 				// exist token is invalid (expired maybe)
 				// change repo status to inactive
-				err = rm.daoManager.Repository.ChangeRepositoryStatus(context.Background(), repo.Id, consts.RepositoryStatusNumInactive)
+				err = rm.daoManager.Repository.ChangeRepositoryStatus(context.Background(), repoModel.Id, consts.RepositoryStatusNumInactive)
 				if err != nil {
 					return nil, err
 				}
+
+				return nil, ErrTokenInvalid
 			}
 			return nil, err
 		}

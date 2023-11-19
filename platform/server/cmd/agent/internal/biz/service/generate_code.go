@@ -24,6 +24,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
 	"io/ioutil"
@@ -72,6 +73,13 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	// get repo client
 	client, err := s.svcCtx.RepoManager.GetClient(repoModel.Id)
 	if err != nil {
+		if err == repository.ErrTokenInvalid {
+			// repo token is invalid or expired
+			return &agent.GenerateCodeRes{
+				Code: http.StatusBadRequest,
+				Msg:  err.Error(),
+			}, nil
+		}
 		logger.Logger.Error("get repo client failed", zap.Error(err), zap.Int64("repo_id", repoModel.Id))
 		return &agent.GenerateCodeRes{
 			Code: http.StatusInternalServerError,

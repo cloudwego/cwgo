@@ -26,6 +26,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/parser"
+	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -82,6 +83,13 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 
 		repoClient, err := s.svcCtx.RepoManager.GetClient(repoModel.Id)
 		if err != nil {
+			if err == repository.ErrTokenInvalid {
+				// repo token is invalid or expired
+				return &agent.SyncIDLsByIdRes{
+					Code: http.StatusBadRequest,
+					Msg:  err.Error(),
+				}, nil
+			}
 			logger.Logger.Error("get repo client failed", zap.Error(err), zap.Int64("repo_id", repoModel.Id))
 			return &agent.SyncIDLsByIdRes{
 				Code: http.StatusInternalServerError,
@@ -227,6 +235,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			needToSync = true
 		}
 
+		// compare main idl
 		hash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
 		if err != nil {
 			logger.Logger.Error("get latest commit hash failed", zap.Error(err))
@@ -239,6 +248,8 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		if hash != idlModel.CommitHash {
 			needToSync = true
 		}
+
+		needToSync = true // TODO: delete
 
 		if !needToSync {
 			continue

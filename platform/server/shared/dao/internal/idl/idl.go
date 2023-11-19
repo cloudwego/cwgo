@@ -223,7 +223,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 
 	err := m.db.WithContext(ctx).Transaction(
 		func(tx *gorm.DB) error {
-			err := tx.Model(&mainIdlEntity).Updates(mainIdlEntity).Error
+			err := tx.Model(&mainIdlEntity).Updates(&mainIdlEntity).Error
 			if err != nil {
 				return err
 			}
@@ -238,7 +238,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 						ParentIdlID:         mainIdlEntity.ID,
 						IdlPath:             importIdl.IdlPath,
 						CommitHash:          importIdl.CommitHash,
-						ServiceName:         idlModel.ServiceName,
+						ServiceName:         mainIdlEntity.ServiceName,
 						LastSyncTime:        time.Now(),
 					}
 				}
