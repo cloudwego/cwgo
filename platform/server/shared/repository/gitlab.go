@@ -206,7 +206,7 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 }
 
 func (a *GitLabApi) GetRepositoryPrivacy(owner, repoName string) (bool, error) {
-	repoPid := owner + repoName
+	repoPid := owner + "/" + repoName
 	project, _, err := a.client.Projects.GetProject(repoPid, nil)
 	if err != nil {
 		return false, err

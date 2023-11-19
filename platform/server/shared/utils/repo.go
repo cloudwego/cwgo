@@ -35,7 +35,7 @@ func GetRepoFullUrl(repoType int32, repoUrl, ref, filePid string) string {
 }
 
 func GetRepoFullUrlGitLab(repoUrl, ref, filePid string) string {
-	return fmt.Sprintf("%s/blob/%s/%s", repoUrl, ref, filePid)
+	return fmt.Sprintf("%s/-/blob/%s/%s?ref_type=heads", repoUrl, ref, filePid)
 }
 
 func GetRepoFullUrlGitHub(repoUrl, ref, filePid string) string {
