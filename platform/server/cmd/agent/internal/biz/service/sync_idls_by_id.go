@@ -37,13 +37,15 @@ import (
 )
 
 type SyncIDLsByIdService struct {
-	ctx    context.Context
-	svcCtx *svc.ServiceContext
+	ctx          context.Context
+	svcCtx       *svc.ServiceContext
+	agentService agent.AgentService
 } // NewSyncIDLsByIdService new SyncIDLsByIdService
-func NewSyncIDLsByIdService(ctx context.Context, svcCtx *svc.ServiceContext) *SyncIDLsByIdService {
+func NewSyncIDLsByIdService(ctx context.Context, svcCtx *svc.ServiceContext, agentService agent.AgentService) *SyncIDLsByIdService {
 	return &SyncIDLsByIdService{
-		ctx:    ctx,
-		svcCtx: svcCtx,
+		ctx:          ctx,
+		svcCtx:       svcCtx,
+		agentService: agentService,
 	}
 }
 
@@ -254,6 +256,17 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 				Msg:  "internal err",
 			}, nil
 		}
+
+		res, err := s.agentService.GenerateCode(s.ctx, &agent.GenerateCodeReq{
+			IdlId: v,
+		})
+		if res.Code != 0 {
+			return &agent.SyncIDLsByIdRes{
+				Code: res.Code,
+				Msg:  res.Msg,
+			}, nil
+		}
+
 	}
 
 	return &agent.SyncIDLsByIdRes{

@@ -91,6 +91,9 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) (int64
 			if err != nil {
 				return err
 			}
+			if len(idlModel.ImportIdls) == 0 {
+				return nil
+			}
 			importedIdlEntities := make([]*entity.MysqlIDL, len(idlModel.ImportIdls))
 			for i, importIdl := range idlModel.ImportIdls {
 				importedIdlEntities[i] = &entity.MysqlIDL{
@@ -226,7 +229,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 			}
 
 			// update import idls
-			if idlModel.ImportIdls != nil {
+			if len(idlModel.ImportIdls) != 0 {
 				importedIdlEntities := make([]*entity.MysqlIDL, len(idlModel.ImportIdls))
 				for i, importIdl := range idlModel.ImportIdls {
 					importedIdlEntities[i] = &entity.MysqlIDL{

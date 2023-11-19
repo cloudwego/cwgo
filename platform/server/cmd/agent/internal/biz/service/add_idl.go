@@ -34,6 +34,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 type AddIDLService struct {
@@ -68,7 +69,15 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: http.StatusInternalServerError,
+			Msg:  "internal err",
+		}, nil
+	}
+
 	idlPid, owner, repoName, err := repoClient.ParseIdlUrl(req.MainIdlPath)
+
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: http.StatusBadRequest,
@@ -229,16 +238,12 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		Token:          idlRepoModel.Token,
 	})
 	if err != nil {
-		if err == consts.ErrDuplicateRecord {
+		if !strings.Contains(err.Error(), consts.ErrDuplicateRecordString) {
 			return &agent.AddIDLRes{
-				Code: http.StatusBadRequest,
-				Msg:  "repository is already exist",
+				Code: http.StatusInternalServerError,
+				Msg:  "internal err",
 			}, nil
 		}
-		return &agent.AddIDLRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
-		}, nil
 	}
 
 	// add idl

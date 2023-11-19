@@ -61,7 +61,7 @@ func (s *AgentServiceImpl) AddIDL(ctx context.Context, req *agent.AddIDLReq) (re
 
 // SyncIDLsById implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq) (resp *agent.SyncIDLsByIdRes, err error) {
-	resp, err = service.NewSyncIDLsByIdService(ctx, s.svcCtx).Run(req)
+	resp, err = service.NewSyncIDLsByIdService(ctx, s.svcCtx, s).Run(req)
 
 	return resp, err
 }

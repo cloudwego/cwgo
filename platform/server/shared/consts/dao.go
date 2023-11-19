@@ -21,6 +21,7 @@ package consts
 import "errors"
 
 var (
-	ErrDuplicateRecord = errors.New("duplicate record")
-	ErrRecordNotFound  = errors.New("record not found")
+	ErrDuplicateRecord       = errors.New("duplicate record")
+	ErrDuplicateRecordString = "duplicate record"
+	ErrRecordNotFound        = errors.New("record not found")
 )
