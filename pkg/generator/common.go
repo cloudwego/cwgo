@@ -29,4 +29,6 @@ type CommonGenerator struct {
 
 	isNew    bool
 	manifest *meta.Manifest
+
+	CustomExtensionFile string
 }

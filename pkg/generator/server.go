@@ -54,10 +54,11 @@ type ServerExtension struct {
 }
 
 type Registry struct {
-	// todo docker 内容和 imports 内容
-	RegistryName        string `yaml:"registry_name,omitempty"`
-	RegistryBody        string `yaml:"registry_body,omitempty"`
-	DefaultRegistryPort string `yaml:"default_registry_port,omitempty"`
+	RegistryName           string   `yaml:"registry_name,omitempty"`
+	RegistryImports        []string `yaml:"registry_imports,omitempty"`
+	RegistryBody           string   `yaml:"registry_body,omitempty"`
+	DefaultRegistryAddress []string `yaml:"default_registry_address,omitempty"`
+	RegistryDocker         string   `yaml:"registry_docker"`
 }
 
 func NewServerGenerator(types string) (*ServerGenerator, error) {
@@ -111,13 +112,15 @@ func ConvertServerGenerator(serverGen *ServerGenerator, args *config.ServerArgum
 	}
 
 	// registry information
-	if err = serverGen.handleRegistry(); err != nil {
+	if err = serverGen.handleRegistry(args.Registry); err != nil {
 		return err
 	}
 
 	// if serverGen.isNew == false, update manifest
 	if !serverGen.isNew {
 		serverGen.updateManifest()
+	} else {
+		serverGen.initManifest(consts.Server)
 	}
 
 	return nil
@@ -151,14 +154,13 @@ func (serverGen *ServerGenerator) setKitexExtension(key, extendOption string) (e
 func (serverGen *ServerGenerator) handleInitArguments(args *config.ServerArgument) (err error) {
 	serverGen.GoModule = args.GoMod
 	serverGen.ServiceName = args.Service
-	serverGen.RegistryName = args.Registry
 	serverGen.communicationType = args.Type
+	serverGen.CustomExtensionFile = args.CustomExtension
 
 	// handle manifest
 	isNew := utils.IsCwgoNew(args.OutDir)
 	if isNew {
 		serverGen.isNew = true
-		serverGen.initManifest(consts.Server)
 	} else {
 		if err = serverGen.manifest.InitAndValidate(args.OutDir); err != nil {
 			return err
@@ -166,14 +168,21 @@ func (serverGen *ServerGenerator) handleInitArguments(args *config.ServerArgumen
 
 		if !(serverGen.manifest.CommandType == consts.Server && serverGen.manifest.CommunicationType == serverGen.communicationType) {
 			serverGen.isNew = true
-			serverGen.initManifest(consts.Server)
 		}
 	}
 
 	// handle custom extension
-	if args.CustomExtension != "" {
-		if err = serverGen.ServerExtension.fromYAMLFile(args.CustomExtension); err != nil {
+	if serverGen.CustomExtensionFile != "" {
+		if err = serverGen.fromYAMLFile(serverGen.CustomExtensionFile); err != nil {
 			return err
+		}
+	}
+	if !serverGen.isNew && serverGen.CustomExtensionFile == "" {
+		serverGen.CustomExtensionFile = serverGen.manifest.CustomExtensionFile
+		if serverGen.CustomExtensionFile != "" {
+			if err = serverGen.fromYAMLFile(serverGen.CustomExtensionFile); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -231,7 +240,37 @@ func (serverGen *ServerGenerator) handleInitImports() (err error) {
 	return
 }
 
-func (serverGen *ServerGenerator) handleRegistry() (err error) {
+func (serverGen *ServerGenerator) handleRegistry(registryName string) (err error) {
+	// custom server registry
+	if serverGen.CustomExtensionFile != "" && serverGen.RegistryName != "" {
+		switch serverGen.communicationType {
+		case consts.RPC:
+			if err = serverGen.GoFileImports.appendImports(consts.KitexExtensionServer, serverGen.RegistryImports); err != nil {
+				return
+			}
+			if err = serverGen.setKitexExtension(consts.KitexExtensionServer, serverGen.RegistryBody); err != nil {
+				return
+			}
+
+			p := path.Join(serverGen.templateDir, consts.KitexExtensionYaml)
+			if err = serverGen.kitexExtension.ToYAMLFile(p); err != nil {
+				return
+			}
+
+		case consts.HTTP:
+			if err = serverGen.GoFileImports.appendImports(consts.Main, serverGen.RegistryImports); err != nil {
+				return
+			}
+
+		default:
+			return typeInputErr
+		}
+
+		return
+	}
+
+	serverGen.RegistryName = registryName
+
 	if !serverGen.isNew && serverGen.RegistryName == "" {
 		serverGen.RegistryName = serverGen.manifest.Registry
 	}
@@ -239,16 +278,34 @@ func (serverGen *ServerGenerator) handleRegistry() (err error) {
 	switch serverGen.communicationType {
 	case consts.RPC:
 		switch serverGen.RegistryName {
+		case consts.Nacos:
+			if err = serverGen.handleRPCRegistry(kitexNacosServer, kitexNacosDocker, nacosServerAddr, kitexNacosServerImports); err != nil {
+				return
+			}
+		case consts.Consul:
+			if err = serverGen.handleRPCRegistry(kitexConsulServer, kitexConsulDocker, consulServerAddr, kitexConsulServerImports); err != nil {
+				return
+			}
 		case consts.Etcd:
-			serverGen.DefaultRegistryPort = consts.EtcdPort
-
-			if err = serverGen.GoFileImports.appendImports(consts.KitexExtensionServer, kitexEtcdServerImports); err != nil {
+			if err = serverGen.handleRPCRegistry(kitexEtcdServer, kitexEtcdDocker, etcdServerAddr, kitexEtcdServerImports); err != nil {
 				return
 			}
-			if err = serverGen.setKitexExtension(consts.KitexExtensionServer, kitexEtcdServer); err != nil {
+		case consts.Eureka:
+			if err = serverGen.handleRPCRegistry(kitexEurekaServer, kitexEurekaDocker, eurekaServerAddr, kitexEurekaServerImports); err != nil {
 				return
 			}
-		// todo 其他注册中心
+		case consts.Polaris:
+			if err = serverGen.handleRPCRegistry(kitexPolarisServer, kitexPolarisDocker, polarisServerAddr, kitexPolarisServerImports); err != nil {
+				return
+			}
+		case consts.ServiceComb:
+			if err = serverGen.handleRPCRegistry(kitexServiceCombServer, kitexServiceCombDocker, serviceCombServerAddr, kitexServiceCombServerImports); err != nil {
+				return
+			}
+		case consts.Zk:
+			if err = serverGen.handleRPCRegistry(kitexZKServer, kitexZKDocker, zkServerAddr, kitexZKServerImports); err != nil {
+				return
+			}
 		default:
 			utils.RemoveKitexExtension()
 			return
@@ -261,19 +318,65 @@ func (serverGen *ServerGenerator) handleRegistry() (err error) {
 
 	case consts.HTTP:
 		switch serverGen.RegistryName {
-		case consts.Etcd:
-			serverGen.RegistryBody = hzEtcdServer
-			serverGen.DefaultRegistryPort = consts.EtcdPort
-
-			if err = serverGen.GoFileImports.appendImports(consts.Main, hzEtcdServerImports); err != nil {
+		case consts.Nacos:
+			if err = serverGen.handleHTTPRegistry(hzNacosServer, hzNacosDocker, nacosServerAddr, hzNacosServerImports); err != nil {
 				return
 			}
-		// todo 其他注册中心
+		case consts.Consul:
+			if err = serverGen.handleHTTPRegistry(hzConsulServer, hzConsulDocker, consulServerAddr, hzConsulServerImports); err != nil {
+				return
+			}
+		case consts.Etcd:
+			if err = serverGen.handleHTTPRegistry(hzEtcdServer, hzEtcdDocker, etcdServerAddr, hzEtcdServerImports); err != nil {
+				return
+			}
+		case consts.Eureka:
+			if err = serverGen.handleHTTPRegistry(hzEurekaServer, hzEurekaDocker, eurekaServerAddr, hzEurekaServerImports); err != nil {
+				return
+			}
+		case consts.Polaris:
+			if err = serverGen.handleHTTPRegistry(hzPolarisServer, hzPolarisDocker, polarisServerAddr, hzPolarisServerImports); err != nil {
+				return
+			}
+		case consts.ServiceComb:
+			if err = serverGen.handleHTTPRegistry(hzServiceCombServer, hzServiceCombDocker, serviceCombServerAddr, hzServiceCombServerImports); err != nil {
+				return
+			}
+		case consts.Zk:
+			if err = serverGen.handleHTTPRegistry(hzZKServer, hzZKDocker, zkServerAddr, hzZKServerImports); err != nil {
+				return
+			}
 		default:
 		}
 
 	default:
 		return typeInputErr
+	}
+
+	return
+}
+
+func (serverGen *ServerGenerator) handleRPCRegistry(body, docker string, addr, imports []string) (err error) {
+	serverGen.DefaultRegistryAddress = addr
+	serverGen.RegistryDocker = docker
+
+	if err = serverGen.GoFileImports.appendImports(consts.KitexExtensionServer, imports); err != nil {
+		return
+	}
+	if err = serverGen.setKitexExtension(consts.KitexExtensionServer, body); err != nil {
+		return
+	}
+
+	return
+}
+
+func (serverGen *ServerGenerator) handleHTTPRegistry(body, docker string, addr, imports []string) (err error) {
+	serverGen.RegistryBody = body
+	serverGen.DefaultRegistryAddress = addr
+	serverGen.RegistryDocker = docker
+
+	if err = serverGen.GoFileImports.appendImports(consts.Main, imports); err != nil {
+		return
 	}
 
 	return
@@ -295,8 +398,10 @@ func (serverGen *ServerGenerator) initManifest(commandType string) {
 	serverGen.manifest.CommandType = commandType
 	serverGen.manifest.CommunicationType = serverGen.communicationType
 	serverGen.manifest.Registry = serverGen.RegistryName
+	serverGen.manifest.CustomExtensionFile = serverGen.CustomExtensionFile
 }
 
 func (serverGen *ServerGenerator) updateManifest() {
 	serverGen.manifest.Registry = serverGen.RegistryName
+	serverGen.manifest.CustomExtensionFile = serverGen.CustomExtensionFile
 }

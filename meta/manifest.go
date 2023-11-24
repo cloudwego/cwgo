@@ -28,11 +28,12 @@ import (
 )
 
 type Manifest struct {
-	Version           string `yaml:"cwgo version"`      // cwgo version
-	CommandType       string `yaml:"commandType"`       // client or server
-	CommunicationType string `yaml:"communicationType"` // http or rpc
-	Registry          string `yaml:"registry"`
-	Resolver          string `yaml:"resolver"`
+	Version             string `yaml:"cwgo version"`      // cwgo version
+	CommandType         string `yaml:"commandType"`       // client or server
+	CommunicationType   string `yaml:"communicationType"` // http or rpc
+	Registry            string `yaml:"registry"`
+	Resolver            string `yaml:"resolver"`
+	CustomExtensionFile string `yaml:"customExtensionFile"`
 }
 
 var GoVersion *gv.Version

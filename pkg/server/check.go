@@ -65,6 +65,12 @@ func check(sa *config.ServerArgument) error {
 		sa.OutDir = ap
 	}
 
+	if sa.CustomExtension != "" {
+		if !filepath.IsAbs(sa.CustomExtension) {
+			sa.CustomExtension = filepath.Join(sa.Cwd, sa.CustomExtension)
+		}
+	}
+
 	gopath, err := utils.GetGOPATH()
 	if err != nil {
 		return fmt.Errorf("get gopath failed: %s", err)

@@ -93,12 +93,13 @@ const (
 
 // Registration Center
 const (
-	Zk      = "ZK"
-	Nacos   = "NACOS"
-	Etcd    = "ETCD"
-	Polaris = "POLARIS"
-
-	EtcdPort = "2379"
+	Zk          = "ZK"
+	Nacos       = "NACOS"
+	Etcd        = "ETCD"
+	Polaris     = "POLARIS"
+	Consul      = "CONSUL"
+	Eureka      = "EUREKA"
+	ServiceComb = "SERVICECOMB"
 )
 
 type DataBaseType string
@@ -117,6 +118,7 @@ type ToolType string
 const (
 	Hz        ToolType = "hz"
 	KitexTool ToolType = "kitex"
+	Gofumpt            = "gofumpt"
 )
 
 const (

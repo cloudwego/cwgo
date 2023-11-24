@@ -43,6 +43,11 @@ func Server(c *config.ServerArgument) error {
 		return err
 	}
 
+	// check and install tools
+	if _, err = utils.LookupTool(consts.Gofumpt); err != nil {
+		return err
+	}
+
 	switch c.Type {
 	case consts.RPC:
 		var args kargs.Arguments
@@ -52,19 +57,21 @@ func Server(c *config.ServerArgument) error {
 			return err
 		}
 
-		// initialize cwgo side generator parameters
-		serverGen, err := generator.NewServerGenerator(consts.RPC)
-		if err != nil {
-			return err
-		}
-		if err = generator.ConvertServerGenerator(serverGen, c); err != nil {
-			return err
-		}
-		defer utils.RemoveKitexExtension()
+		if args.TemplateDir == "" {
+			// initialize cwgo side generator parameters
+			serverGen, err := generator.NewServerGenerator(consts.RPC)
+			if err != nil {
+				return err
+			}
+			if err = generator.ConvertServerGenerator(serverGen, c); err != nil {
+				return err
+			}
+			defer utils.RemoveKitexExtension()
 
-		// generate cwgo side files
-		if err = generator.GenerateServer(serverGen); err != nil {
-			return cli.Exit(err, consts.GenerateCwgoError)
+			// generate cwgo side files
+			if err = generator.GenerateServer(serverGen); err != nil {
+				return cli.Exit(err, consts.GenerateCwgoError)
+			}
 		}
 
 		out := new(bytes.Buffer)
@@ -74,7 +81,7 @@ func Server(c *config.ServerArgument) error {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
 				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
-					utils.ReplaceThriftVersion(args.IDLType)
+					utils.ReplaceThriftVersion()
 				}
 			}
 			os.Exit(1)
@@ -97,7 +104,7 @@ func Server(c *config.ServerArgument) error {
 				log.Warn("please add \"opts = append(opts,server.WithTransHandlerFactory(&mixTransHandlerFactory{nil}))\", to your kitex options")
 			}
 		}
-		utils.ReplaceThriftVersion(args.IDLType)
+		utils.ReplaceThriftVersion()
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)
@@ -106,13 +113,16 @@ func Server(c *config.ServerArgument) error {
 			return err
 		}
 
-		// initialize cwgo side generator parameters
-		serverGen, err := generator.NewServerGenerator(consts.HTTP)
-		if err != nil {
-			return err
-		}
-		if err = generator.ConvertServerGenerator(serverGen, c); err != nil {
-			return err
+		var serverGen *generator.ServerGenerator
+		if args.CustomizeLayout == "" && args.CustomizePackage == "" && args.CustomizeLayoutData == "" {
+			// initialize cwgo side generator parameters
+			serverGen, err = generator.NewServerGenerator(consts.HTTP)
+			if err != nil {
+				return err
+			}
+			if err = generator.ConvertServerGenerator(serverGen, c); err != nil {
+				return err
+			}
 		}
 
 		if utils.IsHzNew(c.OutDir) {
@@ -135,10 +145,13 @@ func Server(c *config.ServerArgument) error {
 				return cli.Exit(err, meta.GenerateLayoutError)
 			}
 
-			// generate cwgo side files
-			if err = generator.GenerateServer(serverGen); err != nil {
-				return cli.Exit(err, consts.GenerateCwgoError)
+			if args.CustomizeLayout == "" && args.CustomizePackage == "" && args.CustomizeLayoutData == "" {
+				// generate cwgo side files
+				if err = generator.GenerateServer(serverGen); err != nil {
+					return cli.Exit(err, consts.GenerateCwgoError)
+				}
 			}
+
 			defer func() {
 				// ".hz" file converges to the hz tool
 				manifest := new(meta.Manifest)
@@ -171,9 +184,11 @@ func Server(c *config.ServerArgument) error {
 				return fmt.Errorf("go.mod not found in %s", workPath)
 			}
 
-			// generate cwgo side files
-			if err = generator.GenerateServer(serverGen); err != nil {
-				return cli.Exit(err, consts.GenerateCwgoError)
+			if args.CustomizeLayout == "" && args.CustomizePackage == "" && args.CustomizeLayoutData == "" {
+				// generate cwgo side files
+				if err = generator.GenerateServer(serverGen); err != nil {
+					return cli.Exit(err, consts.GenerateCwgoError)
+				}
 			}
 
 			// update argument by ".hz", can automatically get "handler_dir"/"model_dir"/"router_dir"
@@ -193,6 +208,7 @@ func Server(c *config.ServerArgument) error {
 		if err != nil {
 			return cli.Exit(err, meta.PluginError)
 		}
+		utils.ReplaceThriftVersion()
 	}
 
 	return nil

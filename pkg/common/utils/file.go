@@ -18,11 +18,14 @@ package utils
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/tpl"
-	"os"
-	"path/filepath"
-
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 )
 
@@ -62,4 +65,37 @@ func GetIdlType(path string, pbName ...string) (string, error) {
 func RemoveKitexExtension() {
 	extensionYamlPath := tpl.KitexDir + consts.KitexExtensionYaml
 	os.RemoveAll(extensionYamlPath)
+}
+
+func FormatGoFile(filePath string) error {
+	path, err := LookupTool(consts.Gofumpt)
+	if err != nil {
+		return err
+	}
+
+	var buf strings.Builder
+	cmd := &exec.Cmd{
+		Path: path,
+		Args: []string{
+			"gofumpt", "-w", filePath,
+		},
+		Stdin:  os.Stdin,
+		Stdout: &buf,
+		Stderr: &buf,
+	}
+
+	done := make(chan error)
+	go func() {
+		done <- cmd.Run()
+	}()
+	select {
+	case err = <-done:
+		if err != nil {
+			return fmt.Errorf("can not format go file, err: %v", cmd.Stderr)
+		}
+	case <-time.After(time.Minute):
+		return fmt.Errorf("format go file time out")
+	}
+
+	return nil
 }

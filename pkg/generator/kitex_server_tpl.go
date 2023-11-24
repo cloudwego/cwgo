@@ -41,13 +41,121 @@ var (
 
 // related to service registration
 var (
+	kitexCommonRegisterBody = `options = append(options, server.WithRegistry(r))`
+
 	kitexEtcdServerImports = []string{"github.com/kitex-contrib/registry-etcd"}
 
-	kitexEtcdServer = `r, err := etcd.NewEtcdRegistry([]string{conf.GetConf().Registry.Address})
+	kitexEtcdServer = `r, err := etcd.NewEtcdRegistry(conf.GetConf().Registry.Address)
+	if err != nil {
+		klog.Fatal(err)
+	}` + consts.LineBreak + kitexCommonRegisterBody
+
+	kitexEtcdDocker = `Etcd:
+    image: 'bitnami/etcd:latest'
+    ports:
+      - "2379:2379"
+      - "2380:2380"	`
+
+	kitexZKServerImports = []string{
+		"github.com/kitex-contrib/registry-zookeeper/registry",
+		"time",
+	}
+
+	kitexZKServer = `r, err := registry.NewZookeeperRegistry(conf.GetConf().Registry.Address, 40*time.Second)
+    if err != nil{
+        klog.Fatal(err)
+    }` + consts.LineBreak + kitexCommonRegisterBody
+
+	kitexZKDocker = `zookeeper:
+    image: zookeeper
+    ports:
+      - "2181:2181"`
+
+	kitexNacosServerImports = []string{"github.com/kitex-contrib/registry-nacos/registry"}
+
+	kitexNacosServer = `r, err := registry.NewDefaultNacosRegistry()
+	if err != nil {
+		klog.Fatal(err)
+	}` + consts.LineBreak + kitexCommonRegisterBody
+
+	kitexNacosDocker = `nacos:
+    image: nacos/nacos-server:latest
+    ports:
+      - "8848:8848"`
+
+	kitexPolarisServerImports = []string{
+		"github.com/kitex-contrib/polaris",
+		"github.com/cloudwego/kitex/pkg/registry",
+	}
+
+	kitexPolarisServer = `r, err := polaris.NewPolarisRegistry()
 	if err != nil {
 		klog.Fatal(err)
 	}
-    options = append(options, server.WithRegistry(r))`
+	info := &registry.Info{
+		ServiceName: conf.GetConf().Kitex.ServiceName,
+		Tags: map[string]string{
+			"namespace": "Polaris",
+		},
+	}
+	options = append(options, server.WithRegistry(r), server.WithRegistryInfo(info))`
+
+	kitexPolarisDocker = `polaris:
+    image: polarismesh/polaris-server:latest
+    ports:
+      - "8090:8090"`
+
+	kitexEurekaServerImports = []string{
+		"github.com/kitex-contrib/registry-eureka/registry",
+		"time",
+	}
+
+	kitexEurekaServer = `r := euregistry.NewEurekaRegistry(conf.GetConf().Registry.Address, 15*time.Second)` +
+		consts.LineBreak + kitexCommonRegisterBody
+
+	kitexEurekaDocker = `eureka:
+    image: 'xdockerh/eureka-server:latest'
+    ports:
+      - 8761:8761`
+
+	kitexConsulServerImports = []string{"github.com/kitex-contrib/registry-consul"}
+
+	kitexConsulServer = `r, err := consul.NewConsulRegister("127.0.0.1:8500")
+	if err != nil {
+		klog.Fatal(err)
+	}
+	info := &registry.Info{
+		ServiceName: conf.GetConf().Kitex.ServiceName,
+		Weight:      1, // weights must be greater than 0 in consul,else received error and exit.
+	}
+	options = append(options, server.WithRegistry(r), server.WithRegistryInfo(info))`
+
+	kitexConsulDocker = `consul:
+    image: consul:latest
+    ports:
+      - "8500:8500"`
+
+	kitexServiceCombServerImports = []string{"github.com/kitex-contrib/registry-servicecomb/registry"}
+
+	kitexServiceCombServer = `r, err := registry.NewDefaultSCRegistry()
+    if err != nil {
+        klog.Fatal(err)
+    }` + consts.LineBreak + kitexCommonRegisterBody
+
+	kitexServiceCombDocker = `service-center:
+    image: 'servicecomb/service-center:latest'
+    ports:
+      - "30100:30100"`
+)
+
+var (
+	etcdServerAddr        = []string{"127.0.0.1:2379"}
+	nacosServerAddr       = []string{"127.0.0.1:8848"}
+	consulServerAddr      = []string{"127.0.0.1:8500"}
+	eurekaServerAddr      = []string{"http://127.0.0.1:8761/eureka"}
+	polarisServerAddr     = []string{"127.0.0.1:8090"}
+	serviceCombServerAddr = []string{"127.0.0.1:30100"}
+	zkServerAddr          = []string{"127.0.0.1:2181"}
 )
 
 var kitexServerMVCTemplates = []Template{
@@ -75,7 +183,8 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: "127.0.0.1:{{.DefaultRegistryPort}}"
+  address: {{range .DefaultRegistryAddress}}
+	- {{.}}{{end}}
 {{end}}
 `,
 	},
@@ -104,7 +213,8 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: "127.0.0.1:{{.DefaultRegistryPort}}"
+  address: {{range .DefaultRegistryAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -132,7 +242,8 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: "127.0.0.1:{{.DefaultRegistryPort}}"
+  address: {{range .DefaultRegistryAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -190,7 +301,7 @@ registry:
   }
   {{if ne .RegistryName ""}}
   type Registry struct {
-    Address string  ` + "`yaml:\"address\"`" + `
+    Address []string  ` + "`yaml:\"address\"`" + `
   }   
   {{end}}
 
@@ -294,15 +405,7 @@ services:
     image: 'redis:latest'
     ports:
       - 6379:6379
-  {{if eq .RegistryName "ETCD"}}
-  Etcd:
-    image: 'bitnami/etcd:latest'
-    environment:
-      - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
-    ports:
-      - "2379:2379"
-      - "2380:2380"	
-  {{end}}`,
+  {{.RegistryDocker}}
+`,
 	},
 }

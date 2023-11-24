@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/cloudwego/cwgo/pkg/common/utils"
@@ -204,6 +205,13 @@ func (tg *TemplateGenerator) persist() error {
 		}()
 		if err != nil {
 			return err
+		}
+
+		name := filepath.Base(data.Path)
+		if strings.HasSuffix(name, ".go") {
+			if err = utils.FormatGoFile(abPath); err != nil {
+				return err
+			}
 		}
 	}
 

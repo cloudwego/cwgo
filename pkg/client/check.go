@@ -73,6 +73,12 @@ func check(ca *config.ClientArgument) error {
 		ca.OutDir = ap
 	}
 
+	if ca.CustomExtension != "" {
+		if !filepath.IsAbs(ca.CustomExtension) {
+			ca.CustomExtension = filepath.Join(ca.Cwd, ca.CustomExtension)
+		}
+	}
+
 	gopath, err := utils.GetGOPATH()
 	if err != nil {
 		return fmt.Errorf("get gopath failed: %s", err)

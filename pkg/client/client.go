@@ -46,6 +46,12 @@ func Client(c *config.ClientArgument) error {
 	if err != nil {
 		return err
 	}
+
+	// check and install tools
+	if _, err = utils.LookupTool(consts.Gofumpt); err != nil {
+		return err
+	}
+
 	switch c.Type {
 	case consts.RPC:
 		var args kargs.Arguments
@@ -55,19 +61,21 @@ func Client(c *config.ClientArgument) error {
 			return err
 		}
 
-		// initialize cwgo side generator parameters
-		clientGen, err := generator.NewClientGenerator(consts.RPC)
-		if err != nil {
-			return err
-		}
-		if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
-			return err
-		}
-		defer utils.RemoveKitexExtension()
+		if args.TemplateDir == "" {
+			// initialize cwgo side generator parameters
+			clientGen, err := generator.NewClientGenerator(consts.RPC)
+			if err != nil {
+				return err
+			}
+			if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
+				return err
+			}
+			defer utils.RemoveKitexExtension()
 
-		// generate cwgo side files
-		if err = generator.GenerateClient(clientGen); err != nil {
-			return cli.Exit(err, consts.GenerateCwgoError)
+			// generate cwgo side files
+			if err = generator.GenerateClient(clientGen); err != nil {
+				return cli.Exit(err, consts.GenerateCwgoError)
+			}
 		}
 
 		out := new(bytes.Buffer)
@@ -77,12 +85,12 @@ func Client(c *config.ClientArgument) error {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
 				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
-					utils.ReplaceThriftVersion(args.IDLType)
+					utils.ReplaceThriftVersion()
 				}
 			}
 			os.Exit(1)
 		}
-		utils.ReplaceThriftVersion(args.IDLType)
+		utils.ReplaceThriftVersion()
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)
@@ -91,13 +99,16 @@ func Client(c *config.ClientArgument) error {
 			return err
 		}
 
-		// initialize cwgo side generator parameters
-		clientGen, err := generator.NewClientGenerator(consts.HTTP)
-		if err != nil {
-			return err
-		}
-		if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
-			return err
+		var clientGen *generator.ClientGenerator
+		if args.CustomizePackage == "" {
+			// initialize cwgo side generator parameters
+			clientGen, err = generator.NewClientGenerator(consts.HTTP)
+			if err != nil {
+				return err
+			}
+			if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
+				return err
+			}
 		}
 
 		module, path, ok := utils.SearchGoMod(consts.CurrentDir, false)
@@ -114,11 +125,13 @@ func Client(c *config.ClientArgument) error {
 			}
 		}
 
-		utils.ReplaceThriftVersion(args.IdlType)
+		utils.ReplaceThriftVersion()
 
-		// generate cwgo side files
-		if err = generator.GenerateClient(clientGen); err != nil {
-			return cli.Exit(err, consts.GenerateCwgoError)
+		if args.CustomizePackage == "" {
+			// generate cwgo side files
+			if err = generator.GenerateClient(clientGen); err != nil {
+				return cli.Exit(err, consts.GenerateCwgoError)
+			}
 		}
 
 		args.CmdType = meta.CmdClient

@@ -20,16 +20,83 @@ import "github.com/cloudwego/cwgo/pkg/consts"
 
 // related to service resolver
 var (
+	hzCommonResolverImport = "github.com/cloudwego/hertz/pkg/app/middlewares/client/sd"
+
+	hzCommonResolverBody = `ops = append(ops, WithHertzClientMiddleware(sd.Discovery(r)))`
+
 	hzEtcdClientImports = []string{
-		"github.com/cloudwego/hertz/pkg/app/middlewares/client/sd",
+		hzCommonResolverImport,
 		"github.com/hertz-contrib/registry/etcd",
 	}
 
-	hzEtcdClient = `r, err := etcd.NewEtcdResolver([]string{conf.GetConf().Resolver.Address})
+	hzEtcdClient = `r, err := etcd.NewEtcdResolver(conf.GetConf().Resolver.Address)
 	if err != nil {
 		return nil, err
+	}` + consts.LineBreak + hzCommonResolverBody
+
+	hzNacosClientImports = []string{
+		hzCommonResolverImport,
+		"github.com/hertz-contrib/registry/nacos",
 	}
-	ops = append(ops, WithHertzClientMiddleware(sd.Discovery(r)))`
+
+	hzNacosClient = `r, err := nacos.NewDefaultNacosResolver()
+	if err != nil {
+		return nil, err
+	}` + consts.LineBreak + hzCommonResolverBody
+
+	hzConsulClientImports = []string{
+		hzCommonResolverImport,
+		"github.com/hashicorp/consul/api",
+		"github.com/hertz-contrib/registry/consul",
+	}
+
+	hzConsulClient = `consulConfig := api.DefaultConfig()
+    consulConfig.Address = conf.GetConf().Resolver.Address[0]
+    consulClient, err := api.NewClient(consulConfig)
+    if err != nil {
+        return nil, err
+    }
+    
+    r := consul.NewConsulResolver(consulClient)` + consts.LineBreak + hzCommonResolverBody
+
+	hzEurekaClientImports = []string{
+		hzCommonResolverImport,
+		"github.com/hertz-contrib/registry/eureka",
+	}
+
+	hzEurekaClient = `r := eureka.NewEurekaResolver(conf.GetConf().Resolver.Address)` +
+		consts.LineBreak + hzCommonResolverBody
+
+	hzPolarisClientImports = []string{
+		hzCommonResolverImport,
+		"github.com/hertz-contrib/registry/polaris",
+	}
+
+	hzPolarisClient = `r, err := polaris.NewPolarisResolver()
+    if err != nil {
+        return nil, err
+    }` + consts.LineBreak + hzCommonResolverBody
+
+	hzServiceCombClientImports = []string{
+		hzCommonResolverImport,
+		"github.com/hertz-contrib/registry/servicecomb",
+	}
+
+	hzServiceCombClient = `r, err := servicecomb.NewDefaultSCResolver(conf.GetConf().Resolver.Address)
+    if err != nil {
+        return nil, err
+    }` + consts.LineBreak + hzCommonResolverBody
+
+	hzZKClientImports = []string{
+		hzCommonResolverImport,
+		"github.com/hertz-contrib/registry/servicecomb",
+		"time",
+	}
+
+	hzZKClient = `r, err := zookeeper.NewZookeeperResolver(conf.GetConf().Resolver.Address, 40*time.Second)
+    if err != nil {
+        return nil, err
+    }` + consts.LineBreak + hzCommonResolverBody
 )
 
 var hzClientTemplates = []Template{
@@ -61,7 +128,8 @@ var hzClientTemplates = []Template{
   host_url: "127.0.0.1:8080"
 {{if ne .ResolverName ""}}
 resolver:
-  address: "127.0.0.1:{{.DefaultResolverPort}}"
+  address: {{range .DefaultResolverAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -72,7 +140,8 @@ resolver:
   host_url: "127.0.0.1:8080"
 {{if ne .ResolverName ""}}
 resolver:
-  address: "127.0.0.1:{{.DefaultResolverPort}}"
+  address: {{range .DefaultResolverAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -83,7 +152,8 @@ resolver:
   host_url: "127.0.0.1:8080"
 {{if ne .ResolverName ""}}
 resolver:
-  address: "127.0.0.1:{{.DefaultResolverPort}}"
+  address: {{range .DefaultResolverAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -117,7 +187,7 @@ resolver:
       }
 	  {{if ne .ResolverName ""}}
       type Resolver struct {
-		Address string  ` + "`yaml:\"address\"`" + `
+		Address []string  ` + "`yaml:\"address\"`" + `
       }   
 	  {{end}}
 

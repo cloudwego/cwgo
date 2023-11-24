@@ -20,22 +20,133 @@ import "github.com/cloudwego/cwgo/pkg/consts"
 
 // related to service registration
 var (
-	hzEtcdServerImports = []string{
-		"github.com/cloudwego/hertz/pkg/app/server/registry",
-		"github.com/hertz-contrib/registry/etcd",
-	}
-
-	hzEtcdServer = `r, err := etcd.NewEtcdRegistry([]string{conf.GetConf().Registry.Address})
-	if err != nil {
-		panic(err)
-	}
-
-	opts = append(opts, server.WithRegistry(r, &registry.Info{
+	hzCommonRegistryBody = `opts = append(opts, server.WithRegistry(r, &registry.Info{
 		ServiceName: conf.GetConf().Hertz.ServiceName,
 		Addr:        utils.NewNetAddr("tcp", conf.GetConf().Hertz.Address),
 		Weight:      10,
 		Tags:        nil,
 	}))`
+
+	hzCommonRegistyImport = "github.com/cloudwego/hertz/pkg/app/server/registry"
+
+	hzEtcdServerImports = []string{
+		hzCommonRegistyImport,
+		"github.com/hertz-contrib/registry/etcd",
+	}
+
+	hzEtcdServer = `r, err := etcd.NewEtcdRegistry(conf.GetConf().Registry.Address)
+	if err != nil {
+		panic(err)
+	}` + consts.LineBreak + hzCommonRegistryBody
+
+	hzEtcdDocker = `Etcd:
+    image: 'bitnami/etcd:latest'
+    ports:
+      - "2379:2379"
+      - "2380:2380"`
+
+	hzNacosServerImports = []string{
+		hzCommonRegistyImport,
+		"github.com/hertz-contrib/registry/nacos",
+	}
+
+	hzNacosServer = `r, err := nacos.NewDefaultNacosRegistry()
+    if err != nil {
+        panic(err)
+    }` + consts.LineBreak + hzCommonRegistryBody
+
+	hzNacosDocker = `nacos:
+    image: nacos/nacos-server:latest
+    ports:
+      - "8848:8848"`
+
+	hzConsulServerImports = []string{
+		hzCommonRegistyImport,
+		"github.com/hashicorp/consul/api",
+		"github.com/hertz-contrib/registry/consul",
+	}
+
+	hzConsulServer = `config := api.DefaultConfig()
+    config.Address = conf.GetConf().Registry.Address[0]
+    consulClient, err := api.NewClient(config)
+    if err != nil {
+        panic(err)
+    }
+    
+    r := consul.NewConsulRegister(consulClient)` + consts.LineBreak + hzCommonRegistryBody
+
+	hzConsulDocker = `consul:
+    image: consul:latest
+    ports:
+      - "8500:8500"`
+
+	hzEurekaServerImports = []string{
+		hzCommonRegistyImport,
+		"github.com/hertz-contrib/registry/eureka",
+		"time",
+	}
+
+	hzEurekaServer = `r := eureka.NewEurekaRegistry(conf.GetConf().Registry.Address, 40*time.Second)` +
+		consts.LineBreak + hzCommonRegistryBody
+
+	hzEurekaDocker = `eureka:
+    image: 'xdockerh/eureka-server:latest'
+    ports:
+      - 8761:8761`
+
+	hzPolarisServerImports = []string{
+		hzCommonRegistyImport,
+		"github.com/hertz-contrib/registry/polaris",
+	}
+
+	hzPolarisServer = `r, err := polaris.NewPolarisRegistry()
+    if err != nil {
+        panic(err)
+    }
+
+	opts = append(opts, server.WithRegistry(r, &registry.Info{
+		ServiceName: conf.GetConf().Hertz.ServiceName,
+		Addr:        utils.NewNetAddr("tcp", conf.GetConf().Hertz.Address),
+		Tags: map[string]string{
+            "namespace": "Polaris",
+        },
+	}))`
+
+	hzPolarisDocker = `polaris:
+    image: polarismesh/polaris-server:latest
+    ports:
+      - "8090:8090"`
+
+	hzServiceCombServerImports = []string{
+		hzCommonRegistyImport,
+		"github.com/hertz-contrib/registry/servicecomb",
+	}
+
+	hzServiceCombServer = `r, err := servicecomb.NewDefaultSCRegistry(conf.GetConf().Registry.Address)
+    if err != nil {
+        panic(err)
+    }` + consts.LineBreak + hzCommonRegistryBody
+
+	hzServiceCombDocker = `service-center:
+    image: 'servicecomb/service-center:latest'
+    ports:
+      - "30100:30100"`
+
+	hzZKServerImports = []string{
+		hzCommonRegistyImport,
+		"github.com/hertz-contrib/registry/zookeeper",
+		"time",
+	}
+
+	hzZKServer = `r, err := zookeeper.NewZookeeperRegistry(conf.GetConf().Registry.Address, 40*time.Second)
+    if err != nil {
+        panic(err)
+    }` + consts.LineBreak + hzCommonRegistryBody
+
+	hzZKDocker = `zookeeper:
+    image: zookeeper
+    ports:
+      - "2181:2181"`
 )
 
 var hzServerMVCTemplates = []Template{
@@ -68,7 +179,8 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: "127.0.0.1:{{.DefaultRegistryPort}}"
+  address: {{range .DefaultRegistryAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -101,7 +213,8 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: "127.0.0.1:{{.DefaultRegistryPort}}"
+  address: {{range .DefaultRegistryAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -134,7 +247,8 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: "127.0.0.1:{{.DefaultRegistryPort}}"
+  address: {{range .DefaultRegistryAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -198,7 +312,7 @@ registry:
 	  }
 	  {{if ne .RegistryName ""}}
       type Registry struct {
-		Address string  ` + "`yaml:\"address\"`" + `
+		Address []string  ` + "`yaml:\"address\"`" + `
       }   
 	  {{end}}
 
@@ -379,16 +493,7 @@ services:
     image: 'redis:latest'
     ports:
       - 6379:6379
-  {{if eq .RegistryName "ETCD"}}
-  Etcd:
-    image: 'bitnami/etcd:latest'
-    environment:
-      - ALLOW_NONE_AUTHENTICATION=yes
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
-    ports:
-      - "2379:2379"
-      - "2380:2380"	
-  {{end}}
+  {{.RegistryDocker}}
 `,
 	},
 }

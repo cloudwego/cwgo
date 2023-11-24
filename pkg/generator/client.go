@@ -18,6 +18,7 @@ package generator
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -28,6 +29,7 @@ import (
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/kitex/tool/internal_pkg/generator"
+	"gopkg.in/yaml.v2"
 )
 
 type ClientGenerator struct {
@@ -51,13 +53,14 @@ type ClientRender struct {
 }
 
 type ClientExtension struct {
-	Resolver
+	Resolver `yaml:"resolver,omitempty"`
 }
 
 type Resolver struct {
-	ResolverName        string
-	ResolverBody        string
-	DefaultResolverPort string
+	ResolverName           string   `yaml:"resolver_name,omitempty"`
+	ResolverImports        []string `yaml:"resolver_imports,omitempty"`
+	ResolverBody           string   `yaml:"resolver_body,omitempty"`
+	DefaultResolverAddress []string `yaml:"default_resolver_address,omitempty"`
 }
 
 func NewClientGenerator(types string) (*ClientGenerator, error) {
@@ -113,13 +116,15 @@ func ConvertClientGenerator(clientGen *ClientGenerator, args *config.ClientArgum
 	}
 
 	// handle resolve information
-	if err = clientGen.handleResolver(); err != nil {
+	if err = clientGen.handleResolver(args.Resolver); err != nil {
 		return err
 	}
 
 	// if clientGen.isNew == false, update manifest
 	if !clientGen.isNew {
 		clientGen.updateManifest()
+	} else {
+		clientGen.initManifest(consts.Client)
 	}
 
 	return nil
@@ -154,13 +159,12 @@ func (clientGen *ClientGenerator) handleInitArguments(args *config.ClientArgumen
 	clientGen.GoModule = args.GoMod
 	clientGen.ServiceName = args.Service
 	clientGen.communicationType = args.Type
-	clientGen.ResolverName = args.Resolver
+	clientGen.CustomExtensionFile = args.CustomExtension
 
 	// handle manifest
 	isNew := utils.IsCwgoNew(args.OutDir)
 	if isNew {
 		clientGen.isNew = true
-		clientGen.initManifest(consts.Client)
 	} else {
 		if err = clientGen.manifest.InitAndValidate(args.OutDir); err != nil {
 			return err
@@ -168,7 +172,21 @@ func (clientGen *ClientGenerator) handleInitArguments(args *config.ClientArgumen
 
 		if !(clientGen.manifest.CommandType == consts.Client && clientGen.manifest.CommunicationType == clientGen.communicationType) {
 			clientGen.isNew = true
-			clientGen.initManifest(consts.Client)
+		}
+	}
+
+	// handle custom extension
+	if clientGen.CustomExtensionFile != "" {
+		if err = clientGen.fromYAMLFile(clientGen.CustomExtensionFile); err != nil {
+			return err
+		}
+	}
+	if !clientGen.isNew && clientGen.CustomExtensionFile == "" {
+		clientGen.CustomExtensionFile = clientGen.manifest.CustomExtensionFile
+		if clientGen.CustomExtensionFile != "" {
+			if err = clientGen.fromYAMLFile(clientGen.CustomExtensionFile); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -253,7 +271,37 @@ func (clientGen *ClientGenerator) handleInitImports() (err error) {
 	return
 }
 
-func (clientGen *ClientGenerator) handleResolver() (err error) {
+func (clientGen *ClientGenerator) handleResolver(resolverName string) (err error) {
+	// custom server registry
+	if clientGen.CustomExtensionFile != "" && clientGen.ResolverName != "" {
+		switch clientGen.communicationType {
+		case consts.RPC:
+			if err = clientGen.GoFileImports.appendImports(consts.KitexExtensionClient, clientGen.ResolverImports); err != nil {
+				return
+			}
+			if err = clientGen.setKitexExtension(consts.KitexExtensionClient, clientGen.ResolverBody); err != nil {
+				return
+			}
+
+			p := path.Join(clientGen.templateDir, consts.KitexExtensionYaml)
+			if err = clientGen.kitexExtension.ToYAMLFile(p); err != nil {
+				return
+			}
+
+		case consts.HTTP:
+			if err = clientGen.GoFileImports.appendImports(consts.InitGo, clientGen.ResolverImports); err != nil {
+				return
+			}
+
+		default:
+			return typeInputErr
+		}
+
+		return
+	}
+
+	clientGen.ResolverName = resolverName
+
 	if !clientGen.isNew && clientGen.ResolverName == "" {
 		clientGen.ResolverName = clientGen.manifest.Resolver
 	}
@@ -261,16 +309,34 @@ func (clientGen *ClientGenerator) handleResolver() (err error) {
 	switch clientGen.communicationType {
 	case consts.RPC:
 		switch clientGen.ResolverName {
+		case consts.Nacos:
+			if err = clientGen.handleRPCResolver(kitexNacosClient, nacosServerAddr, kitexNacosClientImports); err != nil {
+				return
+			}
+		case consts.Consul:
+			if err = clientGen.handleRPCResolver(kitexConsulClient, consulServerAddr, kitexConsulClientImports); err != nil {
+				return
+			}
 		case consts.Etcd:
-			clientGen.DefaultResolverPort = consts.EtcdPort
-
-			if err = clientGen.GoFileImports.appendImports(consts.KitexExtensionClient, kitexEtcdClientImports); err != nil {
+			if err = clientGen.handleRPCResolver(kitexEtcdClient, etcdServerAddr, kitexEtcdClientImports); err != nil {
 				return
 			}
-			if err = clientGen.setKitexExtension(consts.KitexExtensionClient, kitexEtcdClient); err != nil {
+		case consts.Eureka:
+			if err = clientGen.handleRPCResolver(kitexEurekaClient, eurekaServerAddr, kitexEurekaClientImports); err != nil {
 				return
 			}
-		// todo 其他注册中心
+		case consts.Polaris:
+			if err = clientGen.handleRPCResolver(kitexPolarisClient, polarisServerAddr, kitexPolarisClientImports); err != nil {
+				return
+			}
+		case consts.ServiceComb:
+			if err = clientGen.handleRPCResolver(kitexServiceCombClient, serviceCombServerAddr, kitexServiceCombClientImports); err != nil {
+				return
+			}
+		case consts.Zk:
+			if err = clientGen.handleRPCResolver(kitexZKClient, zkServerAddr, kitexZKClientImports); err != nil {
+				return
+			}
 		default:
 			utils.RemoveKitexExtension()
 			return
@@ -283,15 +349,34 @@ func (clientGen *ClientGenerator) handleResolver() (err error) {
 
 	case consts.HTTP:
 		switch clientGen.ResolverName {
-		case consts.Etcd:
-			clientGen.ResolverBody = hzEtcdClient
-			clientGen.DefaultResolverPort = consts.EtcdPort
-
-			hzEtcdClientImports = append(hzEtcdClientImports, clientGen.GoModule+"/conf")
-			if err = clientGen.GoFileImports.appendImports(consts.InitGo, hzEtcdClientImports); err != nil {
+		case consts.Nacos:
+			if err = clientGen.handleHTTPResolver(hzNacosClient, nacosServerAddr, hzNacosClientImports); err != nil {
 				return
 			}
-		// todo 其他注册中心
+		case consts.Consul:
+			if err = clientGen.handleHTTPResolver(hzConsulClient, consulServerAddr, hzConsulClientImports); err != nil {
+				return
+			}
+		case consts.Etcd:
+			if err = clientGen.handleHTTPResolver(hzEtcdClient, etcdServerAddr, hzEtcdClientImports); err != nil {
+				return
+			}
+		case consts.Eureka:
+			if err = clientGen.handleHTTPResolver(hzEurekaClient, eurekaServerAddr, hzEurekaClientImports); err != nil {
+				return
+			}
+		case consts.Polaris:
+			if err = clientGen.handleHTTPResolver(hzPolarisClient, polarisServerAddr, hzPolarisClientImports); err != nil {
+				return
+			}
+		case consts.ServiceComb:
+			if err = clientGen.handleHTTPResolver(hzServiceCombClient, serviceCombServerAddr, hzServiceCombClientImports); err != nil {
+				return
+			}
+		case consts.Zk:
+			if err = clientGen.handleHTTPResolver(hzZKClient, zkServerAddr, hzZKClientImports); err != nil {
+				return
+			}
 		default:
 		}
 	default:
@@ -301,13 +386,51 @@ func (clientGen *ClientGenerator) handleResolver() (err error) {
 	return
 }
 
+func (clientGen *ClientGenerator) handleRPCResolver(body string, addr, imports []string) (err error) {
+	clientGen.DefaultResolverAddress = addr
+
+	if err = clientGen.GoFileImports.appendImports(consts.KitexExtensionClient, imports); err != nil {
+		return
+	}
+	if err = clientGen.setKitexExtension(consts.KitexExtensionClient, body); err != nil {
+		return
+	}
+
+	return
+}
+
+func (clientGen *ClientGenerator) handleHTTPResolver(body string, addr, imports []string) (err error) {
+	clientGen.ResolverBody = body
+	clientGen.DefaultResolverAddress = addr
+
+	imports = append(imports, clientGen.GoModule+"/conf")
+	if err = clientGen.GoFileImports.appendImports(consts.InitGo, imports); err != nil {
+		return
+	}
+
+	return
+}
+
+func (c *ClientExtension) fromYAMLFile(filename string) error {
+	if c == nil {
+		return nil
+	}
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	return yaml.Unmarshal(data, c)
+}
+
 func (clientGen *ClientGenerator) initManifest(commandType string) {
 	clientGen.manifest.Version = meta.Version
 	clientGen.manifest.CommandType = commandType
 	clientGen.manifest.CommunicationType = clientGen.communicationType
 	clientGen.manifest.Resolver = clientGen.ResolverName
+	clientGen.manifest.CustomExtensionFile = clientGen.CustomExtensionFile
 }
 
 func (clientGen *ClientGenerator) updateManifest() {
 	clientGen.manifest.Resolver = clientGen.ResolverName
+	clientGen.manifest.CustomExtensionFile = clientGen.CustomExtensionFile
 }

@@ -31,13 +31,56 @@ var (
 
 // related to service resolver
 var (
+	kitexCommonResolverBody = `options = append(options, client.WithResolver(r))`
+
 	kitexEtcdClientImports = []string{"github.com/kitex-contrib/registry-etcd"}
 
-	kitexEtcdClient = `r, err := etcd.NewEtcdResolver([]string{conf.GetConf().Resolver.Address})
+	kitexEtcdClient = `r, err := etcd.NewEtcdResolver(conf.GetConf().Resolver.Address)
 	if err != nil {
 		klog.Fatal(err)
+	}` + consts.LineBreak + kitexCommonResolverBody
+
+	kitexZKClientImports = []string{
+		"github.com/kitex-contrib/registry-zookeeper/resolver",
+		"time",
 	}
-	options = append(options, client.WithResolver(r))`
+
+	kitexZKClient = `r, err := resolver.NewZookeeperResolver(conf.GetConf().Registry.Address, 40*time.Second)
+    if err != nil {
+		klog.Fatal(err)
+    }` + consts.LineBreak + kitexCommonResolverBody
+
+	kitexNacosClientImports = []string{"github.com/kitex-contrib/registry-nacos/resolver"}
+
+	kitexNacosClient = `r, err := resolver.NewDefaultNacosResolver()
+	if err != nil {
+		klog.Fatal(err)
+	}` + consts.LineBreak + kitexCommonResolverBody
+
+	kitexPolarisClientImports = []string{
+		"github.com/kitex-contrib/registry-polaris",
+	}
+
+	kitexPolarisClient = `options = append(options, client.WithSuite(polaris.NewDefaultClientSuite()))`
+
+	kitexEurekaClientImports = []string{"github.com/kitex-contrib/registry-eureka/resolver"}
+
+	kitexEurekaClient = `r := resolver.NewEurekaResolver(conf.GetConf().Registry.Address)` +
+		consts.LineBreak + kitexCommonResolverBody
+
+	kitexConsulClientImports = []string{"github.com/kitex-contrib/registry-consul"}
+
+	kitexConsulClient = `r, err := consul.NewConsulResolver("127.0.0.1:8500")
+	if err != nil {
+		klog.Fatal(err)
+	}` + consts.LineBreak + kitexCommonResolverBody
+
+	kitexServiceCombClientImports = []string{"github.com/kitex-contrib/registry-servicecomb/resolver"}
+
+	kitexServiceCombClient = `r, err := resolver.NewDefaultSCResolver()
+    if err != nil {
+        klog.Fatal(err)
+    }` + consts.LineBreak + kitexCommonResolverBody
 )
 
 var kitexClientMVCTemplates = []Template{
@@ -48,7 +91,8 @@ var kitexClientMVCTemplates = []Template{
   service_name: "{{.ServiceName}}"
 {{if ne .ResolverName ""}}
 resolver:
-  address: "127.0.0.1:{{.DefaultResolverPort}}"
+  address: {{range .DefaultResolverAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -59,7 +103,8 @@ resolver:
   service_name: "{{.ServiceName}}"
 {{if ne .ResolverName ""}}
 resolver:
-  address: "127.0.0.1:{{.DefaultResolverPort}}"
+  address: {{range .DefaultResolverAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -70,7 +115,8 @@ resolver:
   service_name: "{{.ServiceName}}"
 {{if ne .ResolverName ""}}
 resolver:
-  address: "127.0.0.1:{{.DefaultResolverPort}}"
+  address: {{range .DefaultResolverAddress}}
+	- {{.}}{{end}}
 {{end}}`,
 	},
 
@@ -105,7 +151,7 @@ resolver:
       }
 	  {{if ne .ResolverName ""}}
       type Resolver struct {
-		Address string  ` + "`yaml:\"address\"`" + `
+		Address []string  ` + "`yaml:\"address\"`" + `
       }   
 	  {{end}}
 
