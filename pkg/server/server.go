@@ -61,7 +61,7 @@ func Server(c *config.ServerArgument) error {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
 				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
-					utils.ReplaceThriftVersion(args.IDLType)
+					utils.ReplaceThriftVersion()
 				}
 			}
 			os.Exit(1)
@@ -84,7 +84,7 @@ func Server(c *config.ServerArgument) error {
 				log.Warn("please add \"opts = append(opts,server.WithTransHandlerFactory(&mixTransHandlerFactory{nil}))\", to your kitex options")
 			}
 		}
-		utils.ReplaceThriftVersion(args.IDLType)
+		utils.ReplaceThriftVersion()
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)
@@ -164,6 +164,7 @@ func Server(c *config.ServerArgument) error {
 		if err != nil {
 			return cli.Exit(err, meta.PluginError)
 		}
+		utils.ReplaceThriftVersion()
 	}
 
 	return nil
