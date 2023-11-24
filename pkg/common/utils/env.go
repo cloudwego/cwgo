@@ -139,16 +139,14 @@ func IsWindows() bool {
 	return consts.SysType == consts.WindowsOS
 }
 
-func ReplaceThriftVersion(idlType string) {
-	if idlType == consts.Thrift {
-		cmd := "go mod edit -replace github.com/apache/thrift=github.com/apache/thrift@v0.13.0"
-		argv := strings.Split(cmd, consts.BlackSpace)
-		err := exec.Command(argv[0], argv[1:]...).Run()
+func ReplaceThriftVersion() {
+	cmd := "go mod edit -replace github.com/apache/thrift=github.com/apache/thrift@v0.13.0"
+	argv := strings.Split(cmd, consts.BlackSpace)
+	err := exec.Command(argv[0], argv[1:]...).Run()
 
-		res := "Done"
-		if err != nil {
-			res = err.Error()
-		}
-		log.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
+	res := "Done"
+	if err != nil {
+		res = err.Error()
 	}
+	log.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
 }
