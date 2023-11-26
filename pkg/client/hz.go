@@ -53,6 +53,7 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 			hzArgument.CustomizePackage = path.Join(ca.Template, consts.PackageLayoutFile)
 		} else {
 			hzArgument.CustomizePackage = path.Join(tpl.HertzDir, consts.Client, consts.Standard, consts.PackageLayoutFile)
+			ca.DefaultCwgoGenerate = true
 		}
 	}
 

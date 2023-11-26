@@ -279,31 +279,31 @@ func (serverGen *ServerGenerator) handleRegistry(registryName string) (err error
 	case consts.RPC:
 		switch serverGen.RegistryName {
 		case consts.Nacos:
-			if err = serverGen.handleRPCRegistry(kitexNacosServer, kitexNacosDocker, nacosServerAddr, kitexNacosServerImports); err != nil {
+			if err = serverGen.handleRPCRegistry(kitexNacosServer, nacosDocker, nacosServerAddr, kitexNacosServerImports); err != nil {
 				return
 			}
 		case consts.Consul:
-			if err = serverGen.handleRPCRegistry(kitexConsulServer, kitexConsulDocker, consulServerAddr, kitexConsulServerImports); err != nil {
+			if err = serverGen.handleRPCRegistry(kitexConsulServer, consulDocker, consulServerAddr, kitexConsulServerImports); err != nil {
 				return
 			}
 		case consts.Etcd:
-			if err = serverGen.handleRPCRegistry(kitexEtcdServer, kitexEtcdDocker, etcdServerAddr, kitexEtcdServerImports); err != nil {
+			if err = serverGen.handleRPCRegistry(kitexEtcdServer, etcdDocker, etcdServerAddr, kitexEtcdServerImports); err != nil {
 				return
 			}
 		case consts.Eureka:
-			if err = serverGen.handleRPCRegistry(kitexEurekaServer, kitexEurekaDocker, eurekaServerAddr, kitexEurekaServerImports); err != nil {
+			if err = serverGen.handleRPCRegistry(kitexEurekaServer, eurekaDocker, eurekaServerAddr, kitexEurekaServerImports); err != nil {
 				return
 			}
 		case consts.Polaris:
-			if err = serverGen.handleRPCRegistry(kitexPolarisServer, kitexPolarisDocker, polarisServerAddr, kitexPolarisServerImports); err != nil {
+			if err = serverGen.handleRPCRegistry(kitexPolarisServer, polarisDocker, polarisServerAddr, kitexPolarisServerImports); err != nil {
 				return
 			}
 		case consts.ServiceComb:
-			if err = serverGen.handleRPCRegistry(kitexServiceCombServer, kitexServiceCombDocker, serviceCombServerAddr, kitexServiceCombServerImports); err != nil {
+			if err = serverGen.handleRPCRegistry(kitexServiceCombServer, serviceCombDocker, serviceCombServerAddr, kitexServiceCombServerImports); err != nil {
 				return
 			}
 		case consts.Zk:
-			if err = serverGen.handleRPCRegistry(kitexZKServer, kitexZKDocker, zkServerAddr, kitexZKServerImports); err != nil {
+			if err = serverGen.handleRPCRegistry(kitexZKServer, zkDocker, zkServerAddr, kitexZKServerImports); err != nil {
 				return
 			}
 		default:
@@ -319,31 +319,31 @@ func (serverGen *ServerGenerator) handleRegistry(registryName string) (err error
 	case consts.HTTP:
 		switch serverGen.RegistryName {
 		case consts.Nacos:
-			if err = serverGen.handleHTTPRegistry(hzNacosServer, hzNacosDocker, nacosServerAddr, hzNacosServerImports); err != nil {
+			if err = serverGen.handleHTTPRegistry(hzNacosServer, nacosDocker, nacosServerAddr, hzNacosServerImports); err != nil {
 				return
 			}
 		case consts.Consul:
-			if err = serverGen.handleHTTPRegistry(hzConsulServer, hzConsulDocker, consulServerAddr, hzConsulServerImports); err != nil {
+			if err = serverGen.handleHTTPRegistry(hzConsulServer, consulDocker, consulServerAddr, hzConsulServerImports); err != nil {
 				return
 			}
 		case consts.Etcd:
-			if err = serverGen.handleHTTPRegistry(hzEtcdServer, hzEtcdDocker, etcdServerAddr, hzEtcdServerImports); err != nil {
+			if err = serverGen.handleHTTPRegistry(hzEtcdServer, etcdDocker, etcdServerAddr, hzEtcdServerImports); err != nil {
 				return
 			}
 		case consts.Eureka:
-			if err = serverGen.handleHTTPRegistry(hzEurekaServer, hzEurekaDocker, eurekaServerAddr, hzEurekaServerImports); err != nil {
+			if err = serverGen.handleHTTPRegistry(hzEurekaServer, eurekaDocker, eurekaServerAddr, hzEurekaServerImports); err != nil {
 				return
 			}
 		case consts.Polaris:
-			if err = serverGen.handleHTTPRegistry(hzPolarisServer, hzPolarisDocker, polarisServerAddr, hzPolarisServerImports); err != nil {
+			if err = serverGen.handleHTTPRegistry(hzPolarisServer, polarisDocker, polarisServerAddr, hzPolarisServerImports); err != nil {
 				return
 			}
 		case consts.ServiceComb:
-			if err = serverGen.handleHTTPRegistry(hzServiceCombServer, hzServiceCombDocker, serviceCombServerAddr, hzServiceCombServerImports); err != nil {
+			if err = serverGen.handleHTTPRegistry(hzServiceCombServer, serviceCombDocker, serviceCombServerAddr, hzServiceCombServerImports); err != nil {
 				return
 			}
 		case consts.Zk:
-			if err = serverGen.handleHTTPRegistry(hzZKServer, hzZKDocker, zkServerAddr, hzZKServerImports); err != nil {
+			if err = serverGen.handleHTTPRegistry(hzZKServer, zkDocker, zkServerAddr, hzZKServerImports); err != nil {
 				return
 			}
 		default:

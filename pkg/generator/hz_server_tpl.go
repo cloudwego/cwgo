@@ -39,12 +39,6 @@ var (
 		panic(err)
 	}` + consts.LineBreak + hzCommonRegistryBody
 
-	hzEtcdDocker = `Etcd:
-    image: 'bitnami/etcd:latest'
-    ports:
-      - "2379:2379"
-      - "2380:2380"`
-
 	hzNacosServerImports = []string{
 		hzCommonRegistyImport,
 		"github.com/hertz-contrib/registry/nacos",
@@ -55,30 +49,20 @@ var (
         panic(err)
     }` + consts.LineBreak + hzCommonRegistryBody
 
-	hzNacosDocker = `nacos:
-    image: nacos/nacos-server:latest
-    ports:
-      - "8848:8848"`
-
 	hzConsulServerImports = []string{
 		hzCommonRegistyImport,
 		"github.com/hashicorp/consul/api",
 		"github.com/hertz-contrib/registry/consul",
 	}
 
-	hzConsulServer = `config := api.DefaultConfig()
-    config.Address = conf.GetConf().Registry.Address[0]
-    consulClient, err := api.NewClient(config)
+	hzConsulServer = `consulConfig := api.DefaultConfig()
+    consulConfig.Address = conf.GetConf().Registry.Address[0]
+    consulClient, err := api.NewClient(consulConfig)
     if err != nil {
         panic(err)
     }
     
     r := consul.NewConsulRegister(consulClient)` + consts.LineBreak + hzCommonRegistryBody
-
-	hzConsulDocker = `consul:
-    image: consul:latest
-    ports:
-      - "8500:8500"`
 
 	hzEurekaServerImports = []string{
 		hzCommonRegistyImport,
@@ -89,11 +73,6 @@ var (
 	hzEurekaServer = `r := eureka.NewEurekaRegistry(conf.GetConf().Registry.Address, 40*time.Second)` +
 		consts.LineBreak + hzCommonRegistryBody
 
-	hzEurekaDocker = `eureka:
-    image: 'xdockerh/eureka-server:latest'
-    ports:
-      - 8761:8761`
-
 	hzPolarisServerImports = []string{
 		hzCommonRegistyImport,
 		"github.com/hertz-contrib/registry/polaris",
@@ -103,7 +82,6 @@ var (
     if err != nil {
         panic(err)
     }
-
 	opts = append(opts, server.WithRegistry(r, &registry.Info{
 		ServiceName: conf.GetConf().Hertz.ServiceName,
 		Addr:        utils.NewNetAddr("tcp", conf.GetConf().Hertz.Address),
@@ -111,11 +89,6 @@ var (
             "namespace": "Polaris",
         },
 	}))`
-
-	hzPolarisDocker = `polaris:
-    image: polarismesh/polaris-server:latest
-    ports:
-      - "8090:8090"`
 
 	hzServiceCombServerImports = []string{
 		hzCommonRegistyImport,
@@ -127,11 +100,6 @@ var (
         panic(err)
     }` + consts.LineBreak + hzCommonRegistryBody
 
-	hzServiceCombDocker = `service-center:
-    image: 'servicecomb/service-center:latest'
-    ports:
-      - "30100:30100"`
-
 	hzZKServerImports = []string{
 		hzCommonRegistyImport,
 		"github.com/hertz-contrib/registry/zookeeper",
@@ -142,11 +110,6 @@ var (
     if err != nil {
         panic(err)
     }` + consts.LineBreak + hzCommonRegistryBody
-
-	hzZKDocker = `zookeeper:
-    image: zookeeper
-    ports:
-      - "2181:2181"`
 )
 
 var hzServerMVCTemplates = []Template{
@@ -493,6 +456,7 @@ services:
     image: 'redis:latest'
     ports:
       - 6379:6379
+  
   {{.RegistryDocker}}
 `,
 	},

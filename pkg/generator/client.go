@@ -240,7 +240,6 @@ func (clientGen *ClientGenerator) handleInitImports() (err error) {
 		}
 
 		// set kitex client basic options for client.go
-		kitexClientBasicImports = append(kitexClientBasicImports, clientGen.GoModule+"/conf")
 		if err = clientGen.GoFileImports.appendImports(consts.KitexExtensionClient, kitexClientBasicImports); err != nil {
 			return err
 		}
@@ -310,31 +309,31 @@ func (clientGen *ClientGenerator) handleResolver(resolverName string) (err error
 	case consts.RPC:
 		switch clientGen.ResolverName {
 		case consts.Nacos:
-			if err = clientGen.handleRPCResolver(kitexNacosClient, nacosServerAddr, kitexNacosClientImports); err != nil {
+			if err = clientGen.handleRPCResolver(kitexNacosClient, nacosServerAddr, kitexNacosClientImports, false, true); err != nil {
 				return
 			}
 		case consts.Consul:
-			if err = clientGen.handleRPCResolver(kitexConsulClient, consulServerAddr, kitexConsulClientImports); err != nil {
+			if err = clientGen.handleRPCResolver(kitexConsulClient, consulServerAddr, kitexConsulClientImports, true, true); err != nil {
 				return
 			}
 		case consts.Etcd:
-			if err = clientGen.handleRPCResolver(kitexEtcdClient, etcdServerAddr, kitexEtcdClientImports); err != nil {
+			if err = clientGen.handleRPCResolver(kitexEtcdClient, etcdServerAddr, kitexEtcdClientImports, true, true); err != nil {
 				return
 			}
 		case consts.Eureka:
-			if err = clientGen.handleRPCResolver(kitexEurekaClient, eurekaServerAddr, kitexEurekaClientImports); err != nil {
+			if err = clientGen.handleRPCResolver(kitexEurekaClient, eurekaServerAddr, kitexEurekaClientImports, true, false); err != nil {
 				return
 			}
 		case consts.Polaris:
-			if err = clientGen.handleRPCResolver(kitexPolarisClient, polarisServerAddr, kitexPolarisClientImports); err != nil {
+			if err = clientGen.handleRPCResolver(kitexPolarisClient, polarisServerAddr, kitexPolarisClientImports, false, false); err != nil {
 				return
 			}
 		case consts.ServiceComb:
-			if err = clientGen.handleRPCResolver(kitexServiceCombClient, serviceCombServerAddr, kitexServiceCombClientImports); err != nil {
+			if err = clientGen.handleRPCResolver(kitexServiceCombClient, serviceCombServerAddr, kitexServiceCombClientImports, false, true); err != nil {
 				return
 			}
 		case consts.Zk:
-			if err = clientGen.handleRPCResolver(kitexZKClient, zkServerAddr, kitexZKClientImports); err != nil {
+			if err = clientGen.handleRPCResolver(kitexZKClient, zkServerAddr, kitexZKClientImports, true, true); err != nil {
 				return
 			}
 		default:
@@ -350,31 +349,31 @@ func (clientGen *ClientGenerator) handleResolver(resolverName string) (err error
 	case consts.HTTP:
 		switch clientGen.ResolverName {
 		case consts.Nacos:
-			if err = clientGen.handleHTTPResolver(hzNacosClient, nacosServerAddr, hzNacosClientImports); err != nil {
+			if err = clientGen.handleHTTPResolver(hzNacosClient, nacosServerAddr, hzNacosClientImports, false); err != nil {
 				return
 			}
 		case consts.Consul:
-			if err = clientGen.handleHTTPResolver(hzConsulClient, consulServerAddr, hzConsulClientImports); err != nil {
+			if err = clientGen.handleHTTPResolver(hzConsulClient, consulServerAddr, hzConsulClientImports, true); err != nil {
 				return
 			}
 		case consts.Etcd:
-			if err = clientGen.handleHTTPResolver(hzEtcdClient, etcdServerAddr, hzEtcdClientImports); err != nil {
+			if err = clientGen.handleHTTPResolver(hzEtcdClient, etcdServerAddr, hzEtcdClientImports, true); err != nil {
 				return
 			}
 		case consts.Eureka:
-			if err = clientGen.handleHTTPResolver(hzEurekaClient, eurekaServerAddr, hzEurekaClientImports); err != nil {
+			if err = clientGen.handleHTTPResolver(hzEurekaClient, eurekaServerAddr, hzEurekaClientImports, true); err != nil {
 				return
 			}
 		case consts.Polaris:
-			if err = clientGen.handleHTTPResolver(hzPolarisClient, polarisServerAddr, hzPolarisClientImports); err != nil {
+			if err = clientGen.handleHTTPResolver(hzPolarisClient, polarisServerAddr, hzPolarisClientImports, false); err != nil {
 				return
 			}
 		case consts.ServiceComb:
-			if err = clientGen.handleHTTPResolver(hzServiceCombClient, serviceCombServerAddr, hzServiceCombClientImports); err != nil {
+			if err = clientGen.handleHTTPResolver(hzServiceCombClient, serviceCombServerAddr, hzServiceCombClientImports, true); err != nil {
 				return
 			}
 		case consts.Zk:
-			if err = clientGen.handleHTTPResolver(hzZKClient, zkServerAddr, hzZKClientImports); err != nil {
+			if err = clientGen.handleHTTPResolver(hzZKClient, zkServerAddr, hzZKClientImports, true); err != nil {
 				return
 			}
 		default:
@@ -386,9 +385,15 @@ func (clientGen *ClientGenerator) handleResolver(resolverName string) (err error
 	return
 }
 
-func (clientGen *ClientGenerator) handleRPCResolver(body string, addr, imports []string) (err error) {
+func (clientGen *ClientGenerator) handleRPCResolver(body string, addr, imports []string, needConf, needKlog bool) (err error) {
 	clientGen.DefaultResolverAddress = addr
 
+	if needKlog {
+		imports = append(imports, "github.com/cloudwego/kitex/pkg/klog")
+	}
+	if needConf {
+		imports = append(imports, clientGen.GoModule+"/conf")
+	}
 	if err = clientGen.GoFileImports.appendImports(consts.KitexExtensionClient, imports); err != nil {
 		return
 	}
@@ -399,11 +404,13 @@ func (clientGen *ClientGenerator) handleRPCResolver(body string, addr, imports [
 	return
 }
 
-func (clientGen *ClientGenerator) handleHTTPResolver(body string, addr, imports []string) (err error) {
+func (clientGen *ClientGenerator) handleHTTPResolver(body string, addr, imports []string, needConf bool) (err error) {
 	clientGen.ResolverBody = body
 	clientGen.DefaultResolverAddress = addr
 
-	imports = append(imports, clientGen.GoModule+"/conf")
+	if needConf {
+		imports = append(imports, clientGen.GoModule+"/conf")
+	}
 	if err = clientGen.GoFileImports.appendImports(consts.InitGo, imports); err != nil {
 		return
 	}

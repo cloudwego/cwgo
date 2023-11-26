@@ -50,12 +50,6 @@ var (
 		klog.Fatal(err)
 	}` + consts.LineBreak + kitexCommonRegisterBody
 
-	kitexEtcdDocker = `Etcd:
-    image: 'bitnami/etcd:latest'
-    ports:
-      - "2379:2379"
-      - "2380:2380"	`
-
 	kitexZKServerImports = []string{
 		"github.com/kitex-contrib/registry-zookeeper/registry",
 		"time",
@@ -66,11 +60,6 @@ var (
         klog.Fatal(err)
     }` + consts.LineBreak + kitexCommonRegisterBody
 
-	kitexZKDocker = `zookeeper:
-    image: zookeeper
-    ports:
-      - "2181:2181"`
-
 	kitexNacosServerImports = []string{"github.com/kitex-contrib/registry-nacos/registry"}
 
 	kitexNacosServer = `r, err := registry.NewDefaultNacosRegistry()
@@ -78,17 +67,13 @@ var (
 		klog.Fatal(err)
 	}` + consts.LineBreak + kitexCommonRegisterBody
 
-	kitexNacosDocker = `nacos:
-    image: nacos/nacos-server:latest
-    ports:
-      - "8848:8848"`
-
 	kitexPolarisServerImports = []string{
 		"github.com/kitex-contrib/polaris",
 		"github.com/cloudwego/kitex/pkg/registry",
 	}
 
-	kitexPolarisServer = `r, err := polaris.NewPolarisRegistry()
+	kitexPolarisServer = `so := polaris.ServerOptions{}
+	r, err := polaris.NewPolarisRegistry(so)
 	if err != nil {
 		klog.Fatal(err)
 	}
@@ -100,27 +85,20 @@ var (
 	}
 	options = append(options, server.WithRegistry(r), server.WithRegistryInfo(info))`
 
-	kitexPolarisDocker = `polaris:
-    image: polarismesh/polaris-server:latest
-    ports:
-      - "8090:8090"`
-
 	kitexEurekaServerImports = []string{
 		"github.com/kitex-contrib/registry-eureka/registry",
 		"time",
 	}
 
-	kitexEurekaServer = `r := euregistry.NewEurekaRegistry(conf.GetConf().Registry.Address, 15*time.Second)` +
+	kitexEurekaServer = `r := registry.NewEurekaRegistry(conf.GetConf().Registry.Address, 15*time.Second)` +
 		consts.LineBreak + kitexCommonRegisterBody
 
-	kitexEurekaDocker = `eureka:
-    image: 'xdockerh/eureka-server:latest'
-    ports:
-      - 8761:8761`
+	kitexConsulServerImports = []string{
+		"github.com/kitex-contrib/registry-consul",
+		"github.com/cloudwego/kitex/pkg/registry",
+	}
 
-	kitexConsulServerImports = []string{"github.com/kitex-contrib/registry-consul"}
-
-	kitexConsulServer = `r, err := consul.NewConsulRegister("127.0.0.1:8500")
+	kitexConsulServer = `r, err := consul.NewConsulRegister(conf.GetConf().Registry.Address[0])
 	if err != nil {
 		klog.Fatal(err)
 	}
@@ -130,22 +108,12 @@ var (
 	}
 	options = append(options, server.WithRegistry(r), server.WithRegistryInfo(info))`
 
-	kitexConsulDocker = `consul:
-    image: consul:latest
-    ports:
-      - "8500:8500"`
-
 	kitexServiceCombServerImports = []string{"github.com/kitex-contrib/registry-servicecomb/registry"}
 
 	kitexServiceCombServer = `r, err := registry.NewDefaultSCRegistry()
     if err != nil {
         klog.Fatal(err)
     }` + consts.LineBreak + kitexCommonRegisterBody
-
-	kitexServiceCombDocker = `service-center:
-    image: 'servicecomb/service-center:latest'
-    ports:
-      - "30100:30100"`
 )
 
 var (
@@ -156,6 +124,42 @@ var (
 	polarisServerAddr     = []string{"127.0.0.1:8090"}
 	serviceCombServerAddr = []string{"127.0.0.1:30100"}
 	zkServerAddr          = []string{"127.0.0.1:2181"}
+
+	etcdDocker = `Etcd:
+    image: 'bitnami/etcd:latest'
+    ports:
+      - "2379:2379"
+      - "2380:2380"	`
+
+	zkDocker = `zookeeper:
+    image: zookeeper
+    ports:
+      - "2181:2181"`
+
+	nacosDocker = `nacos:
+    image: nacos/nacos-server:latest
+    ports:
+      - "8848:8848"`
+
+	polarisDocker = `polaris:
+    image: polarismesh/polaris-server:latest
+    ports:
+      - "8090:8090"`
+
+	eurekaDocker = `eureka:
+    image: 'xdockerh/eureka-server:latest'
+    ports:
+      - 8761:8761`
+
+	consulDocker = `consul:
+    image: consul:latest
+    ports:
+      - "8500:8500"`
+
+	serviceCombDocker = `service-center:
+    image: 'servicecomb/service-center:latest'
+    ports:
+      - "30100:30100"`
 )
 
 var kitexServerMVCTemplates = []Template{
@@ -405,6 +409,7 @@ services:
     image: 'redis:latest'
     ports:
       - 6379:6379
+  
   {{.RegistryDocker}}
 `,
 	},

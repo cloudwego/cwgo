@@ -37,7 +37,10 @@ func check(ca *config.ClientArgument) error {
 		ca.Resolver != consts.Zk &&
 		ca.Resolver != consts.Nacos &&
 		ca.Resolver != consts.Etcd &&
-		ca.Resolver != consts.Polaris {
+		ca.Resolver != consts.Polaris &&
+		ca.Resolver != consts.Consul &&
+		ca.Resolver != consts.Eureka &&
+		ca.Resolver != consts.ServiceComb {
 		return errors.New("unsupported resolver")
 	}
 

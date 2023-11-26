@@ -41,13 +41,14 @@ type ServerArgument struct {
 }
 
 type CommonParam struct {
-	Service         string // service name
-	Type            string // GenerateType: RPC or HTTP
-	GoMod           string // Go Mod name
-	IdlPath         string
-	OutDir          string // output path
-	TemplateDir     string // for generating kitex extensions.yaml
-	CustomExtension string
+	Service             string // service name
+	Type                string // GenerateType: RPC or HTTP
+	GoMod               string // Go Mod name
+	IdlPath             string
+	OutDir              string // output path
+	TemplateDir         string // for generating kitex extensions.yaml
+	CustomExtension     string
+	DefaultCwgoGenerate bool
 }
 
 func NewServerArgument() *ServerArgument {

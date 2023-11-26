@@ -109,6 +109,7 @@ Flags:
 			kitexArgument.TemplateDir = sa.Template
 		} else {
 			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, consts.Client, consts.Standard)
+			sa.DefaultCwgoGenerate = true
 		}
 	}
 

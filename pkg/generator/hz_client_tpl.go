@@ -89,7 +89,7 @@ var (
 
 	hzZKClientImports = []string{
 		hzCommonResolverImport,
-		"github.com/hertz-contrib/registry/servicecomb",
+		"github.com/hertz-contrib/registry/zookeeper",
 		"time",
 	}
 

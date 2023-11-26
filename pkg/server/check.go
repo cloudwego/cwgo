@@ -37,7 +37,10 @@ func check(sa *config.ServerArgument) error {
 		sa.Registry != consts.Zk &&
 		sa.Registry != consts.Nacos &&
 		sa.Registry != consts.Etcd &&
-		sa.Registry != consts.Polaris {
+		sa.Registry != consts.Polaris &&
+		sa.Registry != consts.Consul &&
+		sa.Registry != consts.Eureka &&
+		sa.Registry != consts.ServiceComb {
 		return errors.New("unsupported registry")
 	}
 

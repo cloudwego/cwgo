@@ -22,9 +22,7 @@ import (
 
 // related to basic options
 var (
-	kitexClientBasicImports = []string{
-		"github.com/cloudwego/kitex/pkg/klog",
-	}
+	kitexClientBasicImports = []string{}
 
 	kitexClientBasicOpts = ``
 )
@@ -45,7 +43,7 @@ var (
 		"time",
 	}
 
-	kitexZKClient = `r, err := resolver.NewZookeeperResolver(conf.GetConf().Registry.Address, 40*time.Second)
+	kitexZKClient = `r, err := resolver.NewZookeeperResolver(conf.GetConf().Resolver.Address, 40*time.Second)
     if err != nil {
 		klog.Fatal(err)
     }` + consts.LineBreak + kitexCommonResolverBody
@@ -58,19 +56,19 @@ var (
 	}` + consts.LineBreak + kitexCommonResolverBody
 
 	kitexPolarisClientImports = []string{
-		"github.com/kitex-contrib/registry-polaris",
+		"github.com/kitex-contrib/polaris",
 	}
 
 	kitexPolarisClient = `options = append(options, client.WithSuite(polaris.NewDefaultClientSuite()))`
 
 	kitexEurekaClientImports = []string{"github.com/kitex-contrib/registry-eureka/resolver"}
 
-	kitexEurekaClient = `r := resolver.NewEurekaResolver(conf.GetConf().Registry.Address)` +
+	kitexEurekaClient = `r := resolver.NewEurekaResolver(conf.GetConf().Resolver.Address)` +
 		consts.LineBreak + kitexCommonResolverBody
 
 	kitexConsulClientImports = []string{"github.com/kitex-contrib/registry-consul"}
 
-	kitexConsulClient = `r, err := consul.NewConsulResolver("127.0.0.1:8500")
+	kitexConsulClient = `r, err := consul.NewConsulResolver(conf.GetConf().Resolver.Address[0])
 	if err != nil {
 		klog.Fatal(err)
 	}` + consts.LineBreak + kitexCommonResolverBody
