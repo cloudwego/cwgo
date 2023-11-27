@@ -61,7 +61,7 @@ func Client(c *config.ClientArgument) error {
 			return err
 		}
 
-		if c.DefaultCwgoGenerate {
+		if c.Template == "" {
 			// initialize cwgo side generator parameters
 			clientGen, err := generator.NewClientGenerator(consts.RPC)
 			if err != nil {
@@ -100,7 +100,7 @@ func Client(c *config.ClientArgument) error {
 		}
 
 		var clientGen *generator.ClientGenerator
-		if c.DefaultCwgoGenerate {
+		if c.Template == "" {
 			// initialize cwgo side generator parameters
 			clientGen, err = generator.NewClientGenerator(consts.HTTP)
 			if err != nil {
@@ -127,7 +127,7 @@ func Client(c *config.ClientArgument) error {
 
 		utils.ReplaceThriftVersion()
 
-		if c.DefaultCwgoGenerate {
+		if c.Template == "" {
 			// generate cwgo side files
 			if err = generator.GenerateClient(clientGen); err != nil {
 				return cli.Exit(err, consts.GenerateCwgoError)

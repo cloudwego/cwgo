@@ -22,13 +22,13 @@ import (
 )
 
 type CommonGenerator struct {
-	communicationType string
-	templateDir       string // for kitex
+	communicationType string // rpc or http
+	templateDir       string // for generating kitex extensions.yaml
 
 	kitexExtension *generator.TemplateExtension // for kitex extension
 
-	isNew    bool
-	manifest *meta.Manifest
+	isNew    bool           // whether .cwgo exists
+	manifest *meta.Manifest // .cwgo
 
-	CustomExtensionFile string
+	CustomExtensionFile string // custom extension file path
 }

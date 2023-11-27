@@ -22,9 +22,7 @@ import (
 	"github.com/cloudwego/cwgo/pkg/consts"
 )
 
-var (
-	keyInputErr = errors.New("input wrong key")
-)
+var keyInputErr = errors.New("input wrong key")
 
 type ImportsMap map[string]map[string]struct{}
 
@@ -72,13 +70,10 @@ func (m ImportsMap) appendImports(key string, imports []string) (err error) {
 var (
 	kitexServerInitImports = map[string]map[string]struct{}{
 		consts.ConfGo: {
-			"bytes":                               struct{}{},
 			"io/ioutil":                           struct{}{},
 			"os":                                  struct{}{},
-			"os/exec":                             struct{}{},
 			"path/filepath":                       struct{}{},
 			"sync":                                struct{}{},
-			"github.com/bytedance/sonic":          struct{}{},
 			"github.com/cloudwego/kitex/pkg/klog": struct{}{},
 			"github.com/kr/pretty":                struct{}{},
 			"gopkg.in/validator.v2":               struct{}{},
@@ -90,13 +85,10 @@ var (
 
 	kitexClientInitImports = map[string]map[string]struct{}{
 		consts.ConfGo: {
-			"bytes":                               struct{}{},
 			"io/ioutil":                           struct{}{},
 			"os":                                  struct{}{},
-			"os/exec":                             struct{}{},
 			"path/filepath":                       struct{}{},
 			"sync":                                struct{}{},
-			"github.com/bytedance/sonic":          struct{}{},
 			"github.com/cloudwego/kitex/pkg/klog": struct{}{},
 			"github.com/kr/pretty":                struct{}{},
 			"gopkg.in/validator.v2":               struct{}{},
@@ -112,13 +104,10 @@ var (
 
 	hzServerInitImports = map[string]map[string]struct{}{
 		consts.ConfGo: {
-			"bytes":                      struct{}{},
-			"io/ioutil":                  struct{}{},
-			"os":                         struct{}{},
-			"os/exec":                    struct{}{},
-			"path/filepath":              struct{}{},
-			"sync":                       struct{}{},
-			"github.com/bytedance/sonic": struct{}{},
+			"io/ioutil":     struct{}{},
+			"os":            struct{}{},
+			"path/filepath": struct{}{},
+			"sync":          struct{}{},
 			"github.com/cloudwego/hertz/pkg/common/hlog": struct{}{},
 			"github.com/kr/pretty":                       struct{}{},
 			"gopkg.in/validator.v2":                      struct{}{},
@@ -146,13 +135,10 @@ var (
 		consts.InitGo: {},
 
 		consts.ConfGo: {
-			"bytes":                      struct{}{},
-			"io/ioutil":                  struct{}{},
-			"os":                         struct{}{},
-			"os/exec":                    struct{}{},
-			"path/filepath":              struct{}{},
-			"sync":                       struct{}{},
-			"github.com/bytedance/sonic": struct{}{},
+			"io/ioutil":     struct{}{},
+			"os":            struct{}{},
+			"path/filepath": struct{}{},
+			"sync":          struct{}{},
 			"github.com/cloudwego/hertz/pkg/common/hlog": struct{}{},
 			"github.com/kr/pretty":                       struct{}{},
 			"gopkg.in/validator.v2":                      struct{}{},

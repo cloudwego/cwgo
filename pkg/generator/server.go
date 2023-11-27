@@ -30,21 +30,19 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var (
-	typeInputErr = errors.New("input wrong type")
-)
+var typeInputErr = errors.New("input wrong type")
 
 type ServerGenerator struct {
-	CommonGenerator
+	CommonGenerator // common generator params
 
-	ServerRender
+	ServerRender // for template render
 }
 
 type ServerRender struct {
 	GoModule    string
 	ServiceName string
 
-	GoFileImports ImportsMap
+	GoFileImports ImportsMap // handle .go files imports
 
 	ServerExtension
 }

@@ -57,7 +57,7 @@ func Server(c *config.ServerArgument) error {
 			return err
 		}
 
-		if c.DefaultCwgoGenerate {
+		if c.Template == "" {
 			// initialize cwgo side generator parameters
 			serverGen, err := generator.NewServerGenerator(consts.RPC)
 			if err != nil {
@@ -114,7 +114,7 @@ func Server(c *config.ServerArgument) error {
 		}
 
 		var serverGen *generator.ServerGenerator
-		if c.DefaultCwgoGenerate {
+		if c.Template == "" {
 			// initialize cwgo side generator parameters
 			serverGen, err = generator.NewServerGenerator(consts.HTTP)
 			if err != nil {
@@ -145,7 +145,7 @@ func Server(c *config.ServerArgument) error {
 				return cli.Exit(err, meta.GenerateLayoutError)
 			}
 
-			if c.DefaultCwgoGenerate {
+			if c.Template == "" {
 				// generate cwgo side files
 				if err = generator.GenerateServer(serverGen); err != nil {
 					return cli.Exit(err, consts.GenerateCwgoError)
@@ -184,7 +184,7 @@ func Server(c *config.ServerArgument) error {
 				return fmt.Errorf("go.mod not found in %s", workPath)
 			}
 
-			if c.DefaultCwgoGenerate {
+			if c.Template == "" {
 				// generate cwgo side files
 				if err = generator.GenerateServer(serverGen); err != nil {
 					return cli.Exit(err, consts.GenerateCwgoError)

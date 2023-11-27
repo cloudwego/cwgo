@@ -33,9 +33,9 @@ import (
 )
 
 type ClientGenerator struct {
-	CommonGenerator
+	CommonGenerator // common generator params
 
-	ClientRender
+	ClientRender // for template render
 }
 
 type ClientRender struct {
@@ -47,7 +47,7 @@ type ClientRender struct {
 	SnakeServiceNames     []string
 	CamelServiceNames     []string
 
-	GoFileImports ImportsMap
+	GoFileImports ImportsMap // handle .go files imports
 
 	ClientExtension
 }
@@ -271,7 +271,7 @@ func (clientGen *ClientGenerator) handleInitImports() (err error) {
 }
 
 func (clientGen *ClientGenerator) handleResolver(resolverName string) (err error) {
-	// custom server registry
+	// custom server resolver
 	if clientGen.CustomExtensionFile != "" && clientGen.ResolverName != "" {
 		switch clientGen.communicationType {
 		case consts.RPC:

@@ -109,7 +109,6 @@ Flags:
 			kitexArgument.TemplateDir = sa.Template
 		} else {
 			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, consts.Client, consts.Standard)
-			sa.DefaultCwgoGenerate = true
 		}
 	}
 
@@ -193,5 +192,6 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 		a.PackagePrefix = a.Use
 	}
 	a.OutputPath = curpath
+	a.PackagePrefix = strings.ReplaceAll(a.PackagePrefix, consts.BackSlash, consts.Slash)
 	return nil
 }

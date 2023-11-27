@@ -309,10 +309,6 @@ registry:
   }   
   {{end}}
 
-  type BindMainDir struct {
-    Dir string ` + "`json:\"Dir\"`" + `
-  }
-
   // GetConf gets configuration instance
   func GetConf() *Config {
     once.Do(initConf)
@@ -320,7 +316,8 @@ registry:
   }
 
   func initConf() {
-    confFileRelPath := getConfAbsPath()
+    prefix := "conf"
+    confFileRelPath := filepath.Join(prefix, filepath.Join(GetEnv(), "conf.yaml"))
     content, err := ioutil.ReadFile(confFileRelPath)
     if err != nil {
       panic(err)
@@ -337,25 +334,6 @@ registry:
     }
     conf.Env = GetEnv()
     pretty.Printf("%+v\n", conf)
-  }
-
-  func getConfAbsPath() string {
-    cmd := exec.Command("go", "list", "-m", "-json")
-
-    var out bytes.Buffer
-    cmd.Stdout = &out
-    cmd.Stderr = &out
-    if err := cmd.Run(); err != nil {
-      panic(err)
-    }
-
-    bindDir := &BindMainDir{}
-    if err := sonic.Unmarshal(out.Bytes(), bindDir); err != nil {
-      panic(err)
-    }
-
-    prefix := "conf"
-    return filepath.Join(bindDir.Dir, prefix, filepath.Join(GetEnv(), "conf.yaml"))
   }
 
   func GetEnv() string {

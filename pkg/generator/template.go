@@ -121,7 +121,7 @@ func (tg *TemplateGenerator) renderClient(clientGen *ClientGenerator) error {
 	case consts.RPC:
 		mvcTemplates = kitexClientMVCTemplates
 	case consts.HTTP:
-		mvcTemplates = hzClientTemplates
+		mvcTemplates = hzClientMVCTemplates
 	default:
 		return typeInputErr
 	}
