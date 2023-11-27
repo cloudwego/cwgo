@@ -22,7 +22,7 @@ import (
 	"github.com/cloudwego/cwgo/pkg/consts"
 )
 
-var keyInputErr = errors.New("input wrong key")
+var errKeyInput = errors.New("input wrong key")
 
 type ImportsMap map[string]map[string]struct{}
 
@@ -35,7 +35,7 @@ func newImportsMap(cmdType, protocolType string) (ImportsMap, error) {
 		case consts.HTTP:
 			return hzServerInitImports, nil
 		default:
-			return nil, typeInputErr
+			return nil, errTypeInput
 		}
 	case consts.Client:
 		switch protocolType {
@@ -44,17 +44,17 @@ func newImportsMap(cmdType, protocolType string) (ImportsMap, error) {
 		case consts.HTTP:
 			return hzClientInitImports, nil
 		default:
-			return nil, typeInputErr
+			return nil, errTypeInput
 		}
 	default:
-		return nil, typeInputErr
+		return nil, errTypeInput
 	}
 }
 
 func (m ImportsMap) appendImports(key string, imports []string) (err error) {
 	// check whether the key exists
 	if _, ok := m[key]; !ok {
-		return keyInputErr
+		return errKeyInput
 	}
 
 	for _, imp := range imports {

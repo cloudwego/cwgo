@@ -49,7 +49,7 @@ func check(sa *config.ServerArgument) error {
 	}
 
 	if sa.CustomExtension != "" {
-		if isExist, _ := utils.PathExist(sa.CustomExtension); isExist == false {
+		if isExist, _ := utils.PathExist(sa.CustomExtension); !isExist {
 			return errors.New("must specify correct custom extension file path")
 		}
 	}

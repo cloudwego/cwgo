@@ -27,10 +27,10 @@ var (
 		Tags:        nil,
 	}))`
 
-	hzCommonRegistyImport = "github.com/cloudwego/hertz/pkg/app/server/registry"
+	hzCommonRegistryImport = "github.com/cloudwego/hertz/pkg/app/server/registry"
 
 	hzEtcdServerImports = []string{
-		hzCommonRegistyImport,
+		hzCommonRegistryImport,
 		"github.com/hertz-contrib/registry/etcd",
 	}
 
@@ -40,7 +40,7 @@ var (
 	}` + consts.LineBreak + hzCommonRegistryBody
 
 	hzNacosServerImports = []string{
-		hzCommonRegistyImport,
+		hzCommonRegistryImport,
 		"github.com/hertz-contrib/registry/nacos",
 	}
 
@@ -50,7 +50,7 @@ var (
     }` + consts.LineBreak + hzCommonRegistryBody
 
 	hzConsulServerImports = []string{
-		hzCommonRegistyImport,
+		hzCommonRegistryImport,
 		"github.com/hashicorp/consul/api",
 		"github.com/hertz-contrib/registry/consul",
 	}
@@ -65,7 +65,7 @@ var (
     r := consul.NewConsulRegister(consulClient)` + consts.LineBreak + hzCommonRegistryBody
 
 	hzEurekaServerImports = []string{
-		hzCommonRegistyImport,
+		hzCommonRegistryImport,
 		"github.com/hertz-contrib/registry/eureka",
 		"time",
 	}
@@ -74,7 +74,7 @@ var (
 		consts.LineBreak + hzCommonRegistryBody
 
 	hzPolarisServerImports = []string{
-		hzCommonRegistyImport,
+		hzCommonRegistryImport,
 		"github.com/hertz-contrib/registry/polaris",
 	}
 
@@ -91,7 +91,7 @@ var (
 	}))`
 
 	hzServiceCombServerImports = []string{
-		hzCommonRegistyImport,
+		hzCommonRegistryImport,
 		"github.com/hertz-contrib/registry/servicecomb",
 	}
 
@@ -101,7 +101,7 @@ var (
     }` + consts.LineBreak + hzCommonRegistryBody
 
 	hzZKServerImports = []string{
-		hzCommonRegistyImport,
+		hzCommonRegistryImport,
 		"github.com/hertz-contrib/registry/zookeeper",
 		"time",
 	}

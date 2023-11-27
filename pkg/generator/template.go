@@ -96,7 +96,7 @@ func (tg *TemplateGenerator) renderServer(serverGen *ServerGenerator) error {
 	case consts.HTTP:
 		mvcTemplates = hzServerMVCTemplates
 	default:
-		return typeInputErr
+		return errTypeInput
 	}
 
 	for _, tpl := range mvcTemplates {
@@ -123,7 +123,7 @@ func (tg *TemplateGenerator) renderClient(clientGen *ClientGenerator) error {
 	case consts.HTTP:
 		mvcTemplates = hzClientMVCTemplates
 	default:
-		return typeInputErr
+		return errTypeInput
 	}
 
 	for index, tpl := range mvcTemplates {
@@ -193,7 +193,12 @@ func (tg *TemplateGenerator) persist() error {
 
 		err = func() error {
 			file, err := os.OpenFile(abPath, os.O_CREATE|os.O_TRUNC|os.O_RDWR, os.FileMode(0o755))
-			defer file.Close()
+			defer func() {
+				closeErr := file.Close()
+				if err == nil {
+					err = closeErr
+				}
+			}()
 			if err != nil {
 				return fmt.Errorf("open file '%s' failed, err: %v", abPath, err.Error())
 			}

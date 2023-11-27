@@ -100,7 +100,7 @@ func NewClientGenerator(types string) (*ClientGenerator, error) {
 		}, nil
 
 	default:
-		return nil, typeInputErr
+		return nil, errTypeInput
 	}
 }
 
@@ -132,7 +132,7 @@ func ConvertClientGenerator(clientGen *ClientGenerator, args *config.ClientArgum
 
 func (clientGen *ClientGenerator) setKitexExtension(key, extendOption string) (err error) {
 	if _, ok := clientGen.GoFileImports[key]; !ok {
-		return keyInputErr
+		return errKeyInput
 	}
 
 	for impt := range clientGen.GoFileImports[key] {
@@ -215,7 +215,7 @@ func (clientGen *ClientGenerator) handleInitArguments(args *config.ClientArgumen
 			clientGen.CamelServiceNames = append(clientGen.CamelServiceNames, utils.SnakeToCamel(s))
 		}
 	default:
-		return typeInputErr
+		return errTypeInput
 	}
 
 	return
@@ -264,7 +264,7 @@ func (clientGen *ClientGenerator) handleInitImports() (err error) {
 			return err
 		}
 	default:
-		return typeInputErr
+		return errTypeInput
 	}
 
 	return
@@ -293,7 +293,7 @@ func (clientGen *ClientGenerator) handleResolver(resolverName string) (err error
 			}
 
 		default:
-			return typeInputErr
+			return errTypeInput
 		}
 
 		return
@@ -379,7 +379,7 @@ func (clientGen *ClientGenerator) handleResolver(resolverName string) (err error
 		default:
 		}
 	default:
-		return typeInputErr
+		return errTypeInput
 	}
 
 	return

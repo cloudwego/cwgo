@@ -53,7 +53,7 @@ func check(ca *config.ClientArgument) error {
 	}
 
 	if ca.CustomExtension != "" {
-		if isExist, _ := utils.PathExist(ca.CustomExtension); isExist == false {
+		if isExist, _ := utils.PathExist(ca.CustomExtension); !isExist {
 			return errors.New("must specify correct custom extension file path")
 		}
 	}

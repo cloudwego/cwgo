@@ -30,7 +30,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var typeInputErr = errors.New("input wrong type")
+var errTypeInput = errors.New("input wrong type")
 
 type ServerGenerator struct {
 	CommonGenerator // common generator params
@@ -94,7 +94,7 @@ func NewServerGenerator(types string) (*ServerGenerator, error) {
 		}, nil
 
 	default:
-		return nil, typeInputErr
+		return nil, errTypeInput
 	}
 }
 
@@ -126,7 +126,7 @@ func ConvertServerGenerator(serverGen *ServerGenerator, args *config.ServerArgum
 
 func (serverGen *ServerGenerator) setKitexExtension(key, extendOption string) (err error) {
 	if _, ok := serverGen.GoFileImports[key]; !ok {
-		return keyInputErr
+		return errKeyInput
 	}
 
 	for impt := range serverGen.GoFileImports[key] {
@@ -191,7 +191,7 @@ func (serverGen *ServerGenerator) handleInitArguments(args *config.ServerArgumen
 	case consts.HTTP:
 
 	default:
-		return typeInputErr
+		return errTypeInput
 	}
 
 	return
@@ -232,7 +232,7 @@ func (serverGen *ServerGenerator) handleInitImports() (err error) {
 		}
 
 	default:
-		return typeInputErr
+		return errTypeInput
 	}
 
 	return
@@ -261,7 +261,7 @@ func (serverGen *ServerGenerator) handleRegistry(registryName string) (err error
 			}
 
 		default:
-			return typeInputErr
+			return errTypeInput
 		}
 
 		return
@@ -348,7 +348,7 @@ func (serverGen *ServerGenerator) handleRegistry(registryName string) (err error
 		}
 
 	default:
-		return typeInputErr
+		return errTypeInput
 	}
 
 	return
