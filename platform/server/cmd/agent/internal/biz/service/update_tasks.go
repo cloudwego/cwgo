@@ -42,30 +42,12 @@ func (s *UpdateTasksService) Run(req *agent.UpdateTasksReq) (resp *agent.UpdateT
 	tasks := make([]model.Task, 0, len(req.Tasks))
 
 	for _, t := range req.Tasks {
-		switch t.Type {
-		case model.Type_sync_idl_data:
-			var data model.SyncIdlData
-
-			tasks = append(tasks, model.Task{
-				Id:           t.Id,
-				Type:         t.Type,
-				ScheduleTime: t.ScheduleTime,
-				Data: &model.Data{
-					SyncIdlData: &data,
-				},
-			})
-		case model.Type_sync_repo_data:
-			var data model.SyncRepoData
-
-			tasks = append(tasks, model.Task{
-				Id:           t.Id,
-				Type:         t.Type,
-				ScheduleTime: t.ScheduleTime,
-				Data: &model.Data{
-					SyncRepoData: &data,
-				},
-			})
-		}
+		tasks = append(tasks, model.Task{
+			Id:           t.Id,
+			Type:         t.Type,
+			ScheduleTime: t.ScheduleTime,
+			Data:         t.Data,
+		})
 	}
 
 	processor.ProcessorInstance.UpdateTasks(tasks)

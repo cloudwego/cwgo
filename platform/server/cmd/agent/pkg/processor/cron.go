@@ -149,8 +149,9 @@ func (c *Processor) Start() {
 	}()
 	go func() {
 		// send task
-		startTime = time.Now()
 		for {
+			startTime = time.Now()
+
 			for _, t := range c.taskList {
 				select {
 				case <-c.stopChan:
@@ -178,7 +179,13 @@ func (c *Processor) Stop() {
 }
 
 func (c *Processor) UpdateTasks(tasks []model.Task) {
-	c.Stop()
+	if len(c.taskList) != 0 {
+		c.Stop()
+	}
+
 	c.taskList = tasks // replace task list
-	c.Start()
+
+	if len(c.taskList) != 0 {
+		c.Start()
+	}
 }

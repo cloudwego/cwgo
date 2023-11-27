@@ -338,6 +338,7 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int
 	}
 
 	err = m.db.WithContext(ctx).
+		Where("`parent_idl_id` = 0").
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).
