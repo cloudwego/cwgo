@@ -136,11 +136,31 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// create temp dir
 	tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
 	if err != nil {
-		logger.Logger.Error("create temp dir failed", zap.Error(err))
-		return &agent.AddIDLRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
-		}, nil
+		if os.IsNotExist(err) {
+			err = os.Mkdir(consts.TempDir, 0700)
+			if err != nil {
+				logger.Logger.Error("create temp dir failed", zap.Error(err))
+				return &agent.AddIDLRes{
+					Code: http.StatusInternalServerError,
+					Msg:  "internal err",
+				}, nil
+			}
+			tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
+			if err != nil {
+				logger.Logger.Error("create temp dir failed", zap.Error(err))
+				return &agent.AddIDLRes{
+					Code: http.StatusInternalServerError,
+					Msg:  "internal err",
+				}, nil
+			}
+		} else {
+			logger.Logger.Error("create temp dir failed", zap.Error(err))
+			return &agent.AddIDLRes{
+				Code: http.StatusInternalServerError,
+				Msg:  "internal err",
+			}, nil
+		}
+
 	}
 	defer os.RemoveAll(tempDir)
 
