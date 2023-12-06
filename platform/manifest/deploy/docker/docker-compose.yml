@@ -16,7 +16,6 @@ services:
     networks:
       - cwgo
     command: >
-      ./cwgo-platform
       api
       --server_mode dev
       --config_path config
@@ -36,7 +35,6 @@ services:
     networks:
       - cwgo
     command: >
-      ./cwgo-platform
       agent
       --server_mode dev
       --config_path config
