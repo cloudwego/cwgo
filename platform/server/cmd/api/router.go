@@ -29,8 +29,8 @@ import (
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz, staticFilePath string) {
 	r.LoadHTMLGlob(staticFilePath + "/index.html")
-	r.Static("/", staticFilePath)
-	r.GET("/", func(c context.Context, ctx *app.RequestContext) {
+	r.Static("/assets", staticFilePath)
+	r.GET("/*static", func(c context.Context, ctx *app.RequestContext) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
 	})
 }
