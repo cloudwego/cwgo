@@ -65,7 +65,6 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, store
 		server.WithMaxRequestBodySize(1<<20*4), // 4M
 		server.WithHandleMethodNotAllowed(true),
 		server.WithExitWaitTime(5*time.Second),
-		server.WithBasePath("/api"),
 		server.WithMaxKeepBodySize(1<<20*4),
 		server.WithKeepAlive(true),
 		server.WithH2C(true),

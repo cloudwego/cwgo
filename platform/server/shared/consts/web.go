@@ -16,46 +16,9 @@
  *
  */
 
-package idl
+package consts
 
-import (
-	"github.com/cloudwego/hertz/pkg/app"
+const (
+	StaticFileDefaultPath = "./dist"
+	StaticFilePathEnvName = "CWGO_STATIC_FILE_PATH"
 )
-
-func rootMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _idlMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _syncidlsMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _deleteidlMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _updateidlMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _getidlsMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-func _addidlMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-func _apiMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}

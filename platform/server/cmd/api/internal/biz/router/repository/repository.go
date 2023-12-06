@@ -34,10 +34,13 @@ import (
 func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
-	root.POST("/repo", append(_repoMw(), repository.AddRepository)...)
-	_repo := root.Group("/repo", _repoMw()...)
-	_repo.POST("/sync", append(_syncrepositoryMw(), repository.SyncRepository)...)
-	root.DELETE("/repo", append(_deleterepositoryMw(), repository.DeleteRepository)...)
-	root.PATCH("/repo", append(_updaterepositoryMw(), repository.UpdateRepository)...)
-	root.GET("/repo", append(_getrepositoriesMw(), repository.GetRepositories)...)
+	{
+		_api := root.Group("/api", _apiMw()...)
+		_api.POST("/repo", append(_repoMw(), repository.AddRepository)...)
+		_repo := _api.Group("/repo", _repoMw()...)
+		_repo.POST("/sync", append(_syncrepositoryMw(), repository.SyncRepository)...)
+		_api.DELETE("/repo", append(_deleterepositoryMw(), repository.DeleteRepository)...)
+		_api.PATCH("/repo", append(_updaterepositoryMw(), repository.UpdateRepository)...)
+		_api.GET("/repo", append(_getrepositoriesMw(), repository.GetRepositories)...)
+	}
 }

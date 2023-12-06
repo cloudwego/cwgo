@@ -56,10 +56,10 @@ struct SyncRepositoryByIdRes{
 }
 
 service RepositoryService {
-    AddRepositoryRes AddRepository(1: AddRepositoryReq req) (api.post="/repo")
-    DeleteRepositoriesRes DeleteRepository(1: DeleteRepositoriesReq req) (api.delete="/repo")
-    UpdateRepositoryRes UpdateRepository(1: UpdateRepositoryReq req) (api.patch="/repo")
-    GetRepositoriesRes GetRepositories(1: GetRepositoriesReq req) (api.get="/repo")
+    AddRepositoryRes AddRepository(1: AddRepositoryReq req) (api.post="/api/repo")
+    DeleteRepositoriesRes DeleteRepository(1: DeleteRepositoriesReq req) (api.delete="/api/repo")
+    UpdateRepositoryRes UpdateRepository(1: UpdateRepositoryReq req) (api.patch="/api/repo")
+    GetRepositoriesRes GetRepositories(1: GetRepositoriesReq req) (api.get="/api/repo")
 
-    SyncRepositoryByIdRes SyncRepository(1: SyncRepositoryByIdReq req) (api.post="/repo/sync")
+    SyncRepositoryByIdRes SyncRepository(1: SyncRepositoryByIdReq req) (api.post="/api/repo/sync")
 }

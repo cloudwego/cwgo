@@ -27,7 +27,7 @@ struct UpdateRes{
 }
 
 service RegistryService {
-    RegisterRes Register(1: RegisterReq req) (api.get="/registry/register")
-    DeRegisterRes Deregister(1: DeregisterReq req) (api.get="/registry/dnregister")
-    UpdateRes Update(1: UpdateReq req) (api.get="/registry/update")
+    RegisterRes Register(1: RegisterReq req) (api.get="/api/registry/register")
+    DeRegisterRes Deregister(1: DeregisterReq req) (api.get="/api/registry/dnregister")
+    UpdateRes Update(1: UpdateReq req) (api.get="/api/registry/update")
 }

@@ -5,7 +5,9 @@ package base
 import (
 	"context"
 	"fmt"
+
 	"github.com/apache/thrift/lib/go/thrift"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 )
 
 type PingReq struct {
@@ -1059,16 +1061,16 @@ func (p *LoginRes) String() string {
 }
 
 type LoginResData struct {
-	UserInfo *UserInfo `thrift:"user_info,1" form:"user_info" json:"user_info" query:"user_info"`
+	UserInfo *model.UserInfo `thrift:"user_info,1" form:"user_info" json:"user_info" query:"user_info"`
 }
 
 func NewLoginResData() *LoginResData {
 	return &LoginResData{}
 }
 
-var LoginResData_UserInfo_DEFAULT *UserInfo
+var LoginResData_UserInfo_DEFAULT *model.UserInfo
 
-func (p *LoginResData) GetUserInfo() (v *UserInfo) {
+func (p *LoginResData) GetUserInfo() (v *model.UserInfo) {
 	if !p.IsSetUserInfo() {
 		return LoginResData_UserInfo_DEFAULT
 	}
@@ -1143,7 +1145,7 @@ ReadStructEndError:
 }
 
 func (p *LoginResData) ReadField1(iprot thrift.TProtocol) error {
-	p.UserInfo = NewUserInfo()
+	p.UserInfo = model.NewUserInfo()
 	if err := p.UserInfo.Read(iprot); err != nil {
 		return err
 	}

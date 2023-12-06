@@ -34,13 +34,16 @@ import (
 func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
-	root.POST("/template", append(_templateMw(), template.AddTemplate)...)
-	_template := root.Group("/template", _templateMw()...)
-	_template.POST("/item", append(_addtemplateitemMw(), template.AddTemplateItem)...)
-	_template.DELETE("/item", append(_deletetemplateitemMw(), template.DeleteTemplateItem)...)
-	_template.PATCH("/item", append(_updatetemplateitemMw(), template.UpdateTemplateItem)...)
-	_template.GET("/item", append(_gettemplateitemsMw(), template.GetTemplateItems)...)
-	root.DELETE("/template", append(_deletetemplateMw(), template.DeleteTemplate)...)
-	root.PATCH("/template", append(_updatetemplateMw(), template.UpdateTemplate)...)
-	root.GET("/template", append(_gettemplatesMw(), template.GetTemplates)...)
+	{
+		_api := root.Group("/api", _apiMw()...)
+		_api.POST("/template", append(_templateMw(), template.AddTemplate)...)
+		_template := _api.Group("/template", _templateMw()...)
+		_template.POST("/item", append(_addtemplateitemMw(), template.AddTemplateItem)...)
+		_template.DELETE("/item", append(_deletetemplateitemMw(), template.DeleteTemplateItem)...)
+		_template.PATCH("/item", append(_updatetemplateitemMw(), template.UpdateTemplateItem)...)
+		_template.GET("/item", append(_gettemplateitemsMw(), template.GetTemplateItems)...)
+		_api.DELETE("/template", append(_deletetemplateMw(), template.DeleteTemplate)...)
+		_api.PATCH("/template", append(_updatetemplateMw(), template.UpdateTemplate)...)
+		_api.GET("/template", append(_gettemplatesMw(), template.GetTemplates)...)
+	}
 }

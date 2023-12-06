@@ -39,6 +39,8 @@ import (
 	"time"
 )
 
+// Manager that
+// api manager
 type Manager struct {
 	sync.Mutex
 	updateTaskInterval    time.Duration
@@ -76,6 +78,7 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 		resolver:   resolver,
 	}
 
+	// get all task from database
 	page := 1
 	for {
 		idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(), int32(page), 1000, consts.OrderNumDec, "update_time")
@@ -149,6 +152,7 @@ func (m *Manager) AddTask(t *model.Task) error {
 func (m *Manager) UpdateAgentTasks() {
 	var wg sync.WaitGroup
 	for _, svr := range m.agents {
+		// push tasks to each agent
 		wg.Add(1)
 		go func(serviceId string) {
 			defer wg.Done()
@@ -205,6 +209,8 @@ func (m *Manager) StartUpdate() {
 	}()
 }
 
+// SyncService
+// sync service from registry
 func (m *Manager) SyncService() {
 	services, err := m.registry.GetAllService()
 	if err != nil {

@@ -34,10 +34,13 @@ import (
 func Register(r *server.Hertz) {
 
 	root := r.Group("/", rootMw()...)
-	root.POST("/idl", append(_idlMw(), idl.AddIDL)...)
-	_idl := root.Group("/idl", _idlMw()...)
-	_idl.POST("/sync", append(_syncidlsMw(), idl.SyncIDLs)...)
-	root.DELETE("/idl", append(_deleteidlMw(), idl.DeleteIDL)...)
-	root.PATCH("/idl", append(_updateidlMw(), idl.UpdateIDL)...)
-	root.GET("/idl", append(_getidlsMw(), idl.GetIDLs)...)
+	{
+		_api := root.Group("/api", _apiMw()...)
+		_api.POST("/idl", append(_idlMw(), idl.AddIDL)...)
+		_idl := _api.Group("/idl", _idlMw()...)
+		_idl.POST("/sync", append(_syncidlsMw(), idl.SyncIDLs)...)
+		_api.DELETE("/idl", append(_deleteidlMw(), idl.DeleteIDL)...)
+		_api.PATCH("/idl", append(_updateidlMw(), idl.UpdateIDL)...)
+		_api.GET("/idl", append(_getidlsMw(), idl.GetIDLs)...)
+	}
 }

@@ -28,7 +28,6 @@ import (
 )
 
 type ServiceContext struct {
-	DaoManager      *dao.Manager
 	BuiltinRegistry *registry.BuiltinRegistry
 	Manager         *manager.Manager
 }
@@ -44,7 +43,6 @@ func InitServiceContext() {
 	}
 	logger.Logger.Info("initialize dao manager successfully")
 	Svc = &ServiceContext{
-		DaoManager:      daoManager,
 		BuiltinRegistry: config.GetManager().ApiConfigManager.RegistryConfigManager.GetRegistry().(*registry.BuiltinRegistry),
 		Manager: manager.NewManager(
 			config.GetManager().Config.App,

@@ -32,8 +32,8 @@ struct LoginResData{
 }
 
 service BaseService {
-    PingRes Ping(1: PingReq req)(api.get="/ping")
+    PingRes Ping(1: PingReq req)(api.get="/api/ping")
 
-    RegisterRes Register(1: RegisterReq req) (api.post="/register")
-    LoginRes Login(1: LoginReq req) (api.post="/login");
+    RegisterRes Register(1: RegisterReq req) (api.post="/api/register")
+    LoginRes Login(1: LoginReq req) (api.post="/api/login");
 }

@@ -21,9 +21,10 @@ package api
 import "github.com/spf13/cobra"
 
 type setupOptions struct {
-	ServerMode string
-	ConfigType string
-	ConfigPath string
+	ServerMode     string
+	ConfigType     string
+	ConfigPath     string
+	StaticFilePath string
 }
 
 func newSetupOptions() *setupOptions {
@@ -36,4 +37,5 @@ func (o *setupOptions) AddFlags(cmd *cobra.Command) {
 	flagSet.StringVarP(&o.ServerMode, "server_mode", "", "", "")
 	flagSet.StringVarP(&o.ConfigType, "config_type", "", "", "")
 	flagSet.StringVarP(&o.ConfigPath, "config_path", "", "", "")
+	flagSet.StringVarP(&o.StaticFilePath, "static_file_path", "", "", "")
 }

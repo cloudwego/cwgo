@@ -55,10 +55,10 @@ struct SyncIDLsByIdRes{
 }
 
 service IdlService {
-    AddIDLRes AddIDL(1: AddIDLReq req) (api.post="/idl")
-    DeleteIDLsRes DeleteIDL(1: DeleteIDLsReq req) (api.delete="/idl")
-    UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/idl")
-    GetIDLsRes GetIDLs(1: GetIDLsReq req) (api.get="/idl")
+    AddIDLRes AddIDL(1: AddIDLReq req) (api.post="/api/idl")
+    DeleteIDLsRes DeleteIDL(1: DeleteIDLsReq req) (api.delete="/api/idl")
+    UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/api/idl")
+    GetIDLsRes GetIDLs(1: GetIDLsReq req) (api.get="/api/idl")
 
-    SyncIDLsByIdRes SyncIDLs(1: SyncIDLsByIdReq req) (api.post="/idl/sync")
+    SyncIDLsByIdRes SyncIDLs(1: SyncIDLsByIdReq req) (api.post="/api/idl/sync")
 }
