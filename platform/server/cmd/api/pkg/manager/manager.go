@@ -79,31 +79,33 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 	}
 
 	// get all task from database
-	page := 1
-	for {
-		idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(), int32(page), 1000, consts.OrderNumDec, "update_time")
-		if err != nil {
-			panic(fmt.Sprintf("get idl list failed, err: %v", err))
-		}
-		for _, idlModel := range idlModels {
-			err = manager.AddTask(
-				task.NewTask(
-					model.Type_sync_idl_data,
-					manager.syncRepositoryInterval.String(),
-					&model.Data{
-						SyncIdlData: &model.SyncIdlData{
-							IdlId: idlModel.Id,
-						},
-					},
-				))
+	if manager.syncIdlInterval != 0 {
+		page := 1
+		for {
+			idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(), model.IDL{}, int32(page), 1000, consts.OrderNumDec, "update_time")
 			if err != nil {
-				panic(err)
+				panic(fmt.Sprintf("get idl list failed, err: %v", err))
 			}
+			for _, idlModel := range idlModels {
+				err = manager.AddTask(
+					task.NewTask(
+						model.Type_sync_idl_data,
+						manager.syncIdlInterval.String(),
+						&model.Data{
+							SyncIdlData: &model.SyncIdlData{
+								IdlId: idlModel.Id,
+							},
+						},
+					))
+				if err != nil {
+					panic(err)
+				}
+			}
+			if int64(page)*1000 >= total {
+				break
+			}
+			page++
 		}
-		if int64(page)*1000 >= total {
-			break
-		}
-		page++
 	}
 
 	go manager.StartUpdate()

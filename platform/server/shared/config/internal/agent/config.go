@@ -22,6 +22,7 @@ type Config struct {
 	Addr           string `mapstructure:"addr"`
 	MaxConnections int64  `mapstructure:"maxConnections"`
 	MaxQPS         int64  `mapstructure:"maxQPS"`
+	WorkerNum      int    `mapstructure:"workerNum"`
 }
 
 type Metadata struct {

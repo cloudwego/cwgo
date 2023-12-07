@@ -18,6 +18,7 @@ package processor
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"time"
@@ -86,8 +87,9 @@ type Processor struct {
 	// worker pool (read only)
 	// get available worker's task chan
 	// and push task into this chan
-	workerPool chan chan model.Task
-	workerList []Worker
+	isDynamicWorker bool
+	workerPool      chan chan model.Task
+	workerList      []Worker
 
 	stopChan chan struct{} // stop signal
 }
@@ -105,23 +107,32 @@ const (
 var ProcessorInstance *Processor
 
 func InitProcessor(service agent.AgentService) {
+	workerNum := config.GetManager().Config.Agent.WorkerNum
+	var isDynamicWorker bool
+
+	if workerNum == 0 {
+		isDynamicWorker = true
+		workerNum = defaultWorkerNum
+	}
+
 	// create worker pool
-	workerPool := make(chan chan model.Task, defaultWorkerNum)
+	workerPool := make(chan chan model.Task, workerNum)
 
 	// create workers
-	workerList := make([]Worker, defaultWorkerNum)
-	for i := 0; i < defaultWorkerNum; i++ {
+	workerList := make([]Worker, workerNum)
+	for i := 0; i < workerNum; i++ {
 		worker := NewWorker(service, workerPool)
 		workerList[i] = worker
 		worker.Start()
 	}
 
 	ProcessorInstance = &Processor{
-		service:    service,
-		taskList:   nil,
-		workerPool: workerPool,
-		workerList: workerList,
-		stopChan:   make(chan struct{}),
+		service:         service,
+		taskList:        nil,
+		isDynamicWorker: isDynamicWorker,
+		workerPool:      workerPool,
+		workerList:      workerList,
+		stopChan:        make(chan struct{}),
 	}
 }
 
@@ -129,24 +140,26 @@ func InitProcessor(service agent.AgentService) {
 func (c *Processor) Start() {
 	var startTime time.Time
 	var taskProcessedNum int64
-	go func() {
-		// worker adjust
-		for {
-			time.Sleep(adjustTimeDuration)
-			if c.taskList == nil || len(c.taskList) == 0 {
-				continue
-			}
+	if c.isDynamicWorker {
+		go func() {
+			// worker adjust
+			for {
+				time.Sleep(adjustTimeDuration)
+				if c.taskList == nil || len(c.taskList) == 0 {
+					continue
+				}
 
-			if time.Now().Sub(startTime).Nanoseconds()/taskProcessedNum*int64(len(c.taskList)) > maxSyncTime.Nanoseconds() {
-				if len(c.workerList) <= maxWorkerNum {
-					// add worker when sync time exceed the max sync time
-					worker := NewWorker(c.service, c.workerPool)
-					c.workerList = append(c.workerList, worker)
-					worker.Start()
+				if time.Now().Sub(startTime).Nanoseconds()/taskProcessedNum*int64(len(c.taskList)) > maxSyncTime.Nanoseconds() {
+					if len(c.workerList) <= maxWorkerNum {
+						// add worker when sync time exceed the max sync time
+						worker := NewWorker(c.service, c.workerPool)
+						c.workerList = append(c.workerList, worker)
+						worker.Start()
+					}
 				}
 			}
-		}
-	}()
+		}()
+	}
 	go func() {
 		// send task
 		for {
@@ -163,10 +176,12 @@ func (c *Processor) Start() {
 					taskProcessedNum++
 				}
 			}
-			if time.Now().Sub(startTime) < minSyncTime && len(c.workerList) > defaultWorkerNum {
-				// reduce worker
-				c.workerList[0].Stop()
-				c.workerList = c.workerList[1:]
+			if c.isDynamicWorker {
+				if time.Now().Sub(startTime) < minSyncTime && len(c.workerList) > defaultWorkerNum {
+					// reduce worker
+					c.workerList[0].Stop()
+					c.workerList = c.workerList[1:]
+				}
 			}
 		}
 	exit:
