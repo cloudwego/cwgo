@@ -1293,6 +1293,48 @@ func (p *GetRepositoriesReq) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 5:
+			if fieldTypeId == thrift.I32 {
+				l, err = p.FastReadField5(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 6:
+			if fieldTypeId == thrift.I32 {
+				l, err = p.FastReadField6(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 7:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField7(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -1384,6 +1426,48 @@ func (p *GetRepositoriesReq) FastReadField4(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *GetRepositoriesReq) FastReadField5(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.RepositoryType = v
+
+	}
+	return offset, nil
+}
+
+func (p *GetRepositoriesReq) FastReadField6(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.StoreType = v
+
+	}
+	return offset, nil
+}
+
+func (p *GetRepositoriesReq) FastReadField7(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.RepositoryUrl = v
+
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *GetRepositoriesReq) FastWrite(buf []byte) int {
 	return 0
@@ -1396,7 +1480,10 @@ func (p *GetRepositoriesReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.Bi
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 		offset += p.fastWriteField3(buf[offset:], binaryWriter)
+		offset += p.fastWriteField5(buf[offset:], binaryWriter)
+		offset += p.fastWriteField6(buf[offset:], binaryWriter)
 		offset += p.fastWriteField4(buf[offset:], binaryWriter)
+		offset += p.fastWriteField7(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -1411,6 +1498,9 @@ func (p *GetRepositoriesReq) BLength() int {
 		l += p.field2Length()
 		l += p.field3Length()
 		l += p.field4Length()
+		l += p.field5Length()
+		l += p.field6Length()
+		l += p.field7Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -1453,6 +1543,33 @@ func (p *GetRepositoriesReq) fastWriteField4(buf []byte, binaryWriter bthrift.Bi
 	return offset
 }
 
+func (p *GetRepositoriesReq) fastWriteField5(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_type", thrift.I32, 5)
+	offset += bthrift.Binary.WriteI32(buf[offset:], p.RepositoryType)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *GetRepositoriesReq) fastWriteField6(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "store_type", thrift.I32, 6)
+	offset += bthrift.Binary.WriteI32(buf[offset:], p.StoreType)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *GetRepositoriesReq) fastWriteField7(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_url", thrift.STRING, 7)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.RepositoryUrl)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
 func (p *GetRepositoriesReq) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("page", thrift.I32, 1)
@@ -1484,6 +1601,33 @@ func (p *GetRepositoriesReq) field4Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("order_by", thrift.STRING, 4)
 	l += bthrift.Binary.StringLengthNocopy(p.OrderBy)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *GetRepositoriesReq) field5Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("repository_type", thrift.I32, 5)
+	l += bthrift.Binary.I32Length(p.RepositoryType)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *GetRepositoriesReq) field6Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("store_type", thrift.I32, 6)
+	l += bthrift.Binary.I32Length(p.StoreType)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *GetRepositoriesReq) field7Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("repository_url", thrift.STRING, 7)
+	l += bthrift.Binary.StringLengthNocopy(p.RepositoryUrl)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l

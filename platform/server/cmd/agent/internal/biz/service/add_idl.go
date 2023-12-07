@@ -281,6 +281,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
+	// TODO: is async?
 	res, err := s.agentService.GenerateCode(s.ctx, &agent.GenerateCodeReq{
 		IdlId: mainIdlId,
 	})

@@ -1176,10 +1176,11 @@ func (p *UpdateIDLRes) String() string {
 }
 
 type GetIDLsReq struct {
-	Page    int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
-	Limit   int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
-	Order   int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
-	OrderBy string `thrift:"order_by,4" json:"order_by" query:"order_by"`
+	Page        int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
+	Limit       int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
+	Order       int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
+	OrderBy     string `thrift:"order_by,4" json:"order_by" query:"order_by"`
+	ServiceName string `thrift:"service_name,5" json:"service_name" query:"service_name"`
 }
 
 func NewGetIDLsReq() *GetIDLsReq {
@@ -1202,11 +1203,16 @@ func (p *GetIDLsReq) GetOrderBy() (v string) {
 	return p.OrderBy
 }
 
+func (p *GetIDLsReq) GetServiceName() (v string) {
+	return p.ServiceName
+}
+
 var fieldIDToName_GetIDLsReq = map[int16]string{
 	1: "page",
 	2: "limit",
 	3: "order",
 	4: "order_by",
+	5: "service_name",
 }
 
 func (p *GetIDLsReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1261,6 +1267,16 @@ func (p *GetIDLsReq) Read(iprot thrift.TProtocol) (err error) {
 		case 4:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1334,6 +1350,15 @@ func (p *GetIDLsReq) ReadField4(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *GetIDLsReq) ReadField5(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.ServiceName = v
+	}
+	return nil
+}
+
 func (p *GetIDLsReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("GetIDLsReq"); err != nil {
@@ -1354,6 +1379,10 @@ func (p *GetIDLsReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 
@@ -1441,6 +1470,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *GetIDLsReq) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_name", thrift.STRING, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.ServiceName); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
 }
 
 func (p *GetIDLsReq) String() string {

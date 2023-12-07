@@ -72,6 +72,22 @@ func (l *GetRepositoriesLogic) GetRepositories(req *repository.GetRepositoriesRe
 		req.Limit = consts.DefaultLimit
 	}
 
+	if req.RepositoryType < 0 || req.RepositoryType > consts.RepositoryTypeNum {
+		return &repository.GetRepositoriesRes{
+			Code: http.StatusBadRequest,
+			Msg:  "invalid repository type",
+			Data: nil,
+		}
+	}
+
+	if req.StoreType < 0 || req.StoreType > consts.RepositoryStoreTypeNum {
+		return &repository.GetRepositoriesRes{
+			Code: http.StatusBadRequest,
+			Msg:  "invalid store type",
+			Data: nil,
+		}
+	}
+
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
 		logger.Logger.Error("get rpc client failed", zap.Error(err))
@@ -82,10 +98,13 @@ func (l *GetRepositoriesLogic) GetRepositories(req *repository.GetRepositoriesRe
 	}
 
 	rpcRes, err := client.GetRepositories(l.ctx, &agent.GetRepositoriesReq{
-		Page:    req.Page,
-		Limit:   req.Limit,
-		Order:   req.Order,
-		OrderBy: req.OrderBy,
+		Page:           req.Page,
+		Limit:          req.Limit,
+		Order:          req.Order,
+		OrderBy:        req.OrderBy,
+		RepositoryType: req.RepositoryType,
+		StoreType:      req.StoreType,
+		RepositoryUrl:  req.RepositoryURL,
 	})
 	if err != nil {
 		logger.Logger.Error("connect to rpc client failed", zap.Error(err))

@@ -37,6 +37,7 @@ struct GetIDLsReq{
     2: i32 limit
     3: i32 order
     4: string order_by
+    5: string service_name
 }
 struct GetIDLsRes{
     1: i32 code

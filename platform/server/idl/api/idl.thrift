@@ -35,6 +35,7 @@ struct GetIDLsReq{
     2: i32 limit (api.query="limit",api.vd="$>=0")
     3: i32 order (api.query="order",api.vd="$>=0")
     4: string order_by (api.query="order_by")
+    5: string service_name (api.query="service_name")
 }
 struct GetIDLsRes{
     1: i32 code

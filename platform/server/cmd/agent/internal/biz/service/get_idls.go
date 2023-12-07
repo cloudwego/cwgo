@@ -22,6 +22,7 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"net/http"
 )
 
@@ -38,7 +39,12 @@ func NewGetIDLsService(ctx context.Context, svcCtx *svc.ServiceContext) *GetIDLs
 
 // Run create note info
 func (s *GetIDLsService) Run(req *agent.GetIDLsReq) (resp *agent.GetIDLsRes, err error) {
-	idls, total, err := s.svcCtx.DaoManager.Idl.GetIDLList(s.ctx, req.Page, req.Limit, req.Order, req.OrderBy)
+	idls, total, err := s.svcCtx.DaoManager.Idl.GetIDLList(s.ctx,
+		model.IDL{
+			ServiceName: req.ServiceName,
+		},
+		req.Page, req.Limit, req.Order, req.OrderBy,
+	)
 	if err != nil {
 		return &agent.GetIDLsRes{
 			Code: http.StatusBadRequest,

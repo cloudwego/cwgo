@@ -9,6 +9,7 @@ const (
 const (
 	RepositoryTypeNumGitLab = iota + 1
 	RepositoryTypeNumGithub
+	RepositoryTypeNum = iota
 )
 
 var (
@@ -21,6 +22,7 @@ var (
 const (
 	RepositoryStoreTypeNumIdl = iota + 1
 	RepositoryStoreTypeNumService
+	RepositoryStoreTypeNum = iota
 )
 
 const (

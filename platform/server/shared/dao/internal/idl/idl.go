@@ -20,6 +20,7 @@ package idl
 
 import (
 	"context"
+	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
@@ -38,7 +39,7 @@ type IIdlDaoManager interface {
 	Sync(ctx context.Context, idlModel model.IDL) error
 
 	GetIDL(ctx context.Context, id int64) (*model.IDL, error)
-	GetIDLList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.IDL, int64, error)
+	GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDL, int64, error)
 	CheckMainIdlIfExist(ctx context.Context, repositoryId int64, mainIdlPath string) (bool, error)
 }
 
@@ -304,7 +305,7 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDL, err
 	}, nil
 }
 
-func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.IDL, int64, error) {
+func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDL, int64, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -312,7 +313,13 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int
 
 	var total int64
 
-	err := m.db.WithContext(ctx).
+	db := m.db.WithContext(ctx)
+
+	if idlModel.ServiceName != "" {
+		db = db.Where("`service_name` LIKE ?", fmt.Sprintf("%%%s%%", idlModel.ServiceName))
+	}
+
+	err := db.
 		Model(&entity.MysqlIDL{}).
 		Count(&total).Error
 	if err != nil {
@@ -337,7 +344,7 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, page, limit, order int
 		orderBy = orderBy + " " + consts.OrderDec
 	}
 
-	err = m.db.WithContext(ctx).
+	err = db.
 		Where("`parent_idl_id` = 0").
 		Offset(int(offset)).
 		Limit(int(limit)).

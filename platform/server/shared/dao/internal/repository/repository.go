@@ -21,6 +21,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
@@ -39,7 +40,7 @@ type IRepositoryDaoManager interface {
 	ChangeRepositoryStatus(ctx context.Context, id int64, status int32) error
 
 	GetRepository(ctx context.Context, id int64) (*model.Repository, error)
-	GetRepositoryList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Repository, int64, error)
+	GetRepositoryList(ctx context.Context, repositoryModel model.Repository, page, limit, order int32, orderBy string) ([]*model.Repository, int64, error)
 	GetAllRepositories(ctx context.Context) ([]*model.Repository, error)
 	GetTokenByID(ctx context.Context, id int64) (string, error)
 	GetRepoTypeByID(ctx context.Context, id int64) (int32, error)
@@ -210,7 +211,7 @@ func (m *MysqlRepositoryManager) GetRepository(ctx context.Context, id int64) (*
 	}, nil
 }
 
-func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Repository, int64, error) {
+func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, repositoryModel model.Repository, page, limit, order int32, orderBy string) ([]*model.Repository, int64, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -218,7 +219,19 @@ func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, page, li
 
 	var total int64
 
-	err := m.db.WithContext(ctx).
+	db := m.db.WithContext(ctx)
+
+	if repositoryModel.RepositoryType != 0 {
+		db = db.Where("`repository_type` = ?", repositoryModel.RepositoryType)
+	}
+	if repositoryModel.StoreType != 0 {
+		db = db.Where("`store_type` = ?", repositoryModel.StoreType)
+	}
+	if repositoryModel.RepositoryUrl != "" {
+		db = db.Where("`repository_url` LIKE ?", fmt.Sprintf("%%%s%%", repositoryModel.RepositoryUrl))
+	}
+
+	err := db.
 		Model(&entity.MysqlRepository{}).
 		Count(&total).Error
 	if err != nil {
@@ -243,7 +256,7 @@ func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, page, li
 		orderBy = orderBy + " " + consts.OrderDec
 	}
 
-	err = m.db.WithContext(ctx).
+	err = db.
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).

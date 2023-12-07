@@ -1552,10 +1552,11 @@ func (p *UpdateIDLRes) Field2DeepEqual(src string) bool {
 }
 
 type GetIDLsReq struct {
-	Page    int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
-	Limit   int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
-	Order   int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
-	OrderBy string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
+	Page        int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
+	Limit       int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
+	Order       int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
+	OrderBy     string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
+	ServiceName string `thrift:"service_name,5" frugal:"5,default,string" json:"service_name"`
 }
 
 func NewGetIDLsReq() *GetIDLsReq {
@@ -1581,6 +1582,10 @@ func (p *GetIDLsReq) GetOrder() (v int32) {
 func (p *GetIDLsReq) GetOrderBy() (v string) {
 	return p.OrderBy
 }
+
+func (p *GetIDLsReq) GetServiceName() (v string) {
+	return p.ServiceName
+}
 func (p *GetIDLsReq) SetPage(val int32) {
 	p.Page = val
 }
@@ -1593,12 +1598,16 @@ func (p *GetIDLsReq) SetOrder(val int32) {
 func (p *GetIDLsReq) SetOrderBy(val string) {
 	p.OrderBy = val
 }
+func (p *GetIDLsReq) SetServiceName(val string) {
+	p.ServiceName = val
+}
 
 var fieldIDToName_GetIDLsReq = map[int16]string{
 	1: "page",
 	2: "limit",
 	3: "order",
 	4: "order_by",
+	5: "service_name",
 }
 
 func (p *GetIDLsReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1653,6 +1662,16 @@ func (p *GetIDLsReq) Read(iprot thrift.TProtocol) (err error) {
 		case 4:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1726,6 +1745,15 @@ func (p *GetIDLsReq) ReadField4(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *GetIDLsReq) ReadField5(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.ServiceName = v
+	}
+	return nil
+}
+
 func (p *GetIDLsReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("GetIDLsReq"); err != nil {
@@ -1746,6 +1774,10 @@ func (p *GetIDLsReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 
@@ -1835,6 +1867,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
+func (p *GetIDLsReq) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_name", thrift.STRING, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.ServiceName); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
 func (p *GetIDLsReq) String() string {
 	if p == nil {
 		return "<nil>"
@@ -1858,6 +1907,9 @@ func (p *GetIDLsReq) DeepEqual(ano *GetIDLsReq) bool {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.OrderBy) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.ServiceName) {
 		return false
 	}
 	return true
@@ -1887,6 +1939,13 @@ func (p *GetIDLsReq) Field3DeepEqual(src int32) bool {
 func (p *GetIDLsReq) Field4DeepEqual(src string) bool {
 
 	if strings.Compare(p.OrderBy, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetIDLsReq) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.ServiceName, src) != 0 {
 		return false
 	}
 	return true

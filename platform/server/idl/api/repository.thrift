@@ -36,6 +36,9 @@ struct GetRepositoriesReq{
     2: i32 limit (api.query="limit",api.vd="$>=0")
     3: i32 order (api.query="order",api.vd="$>=0")
     4: string order_by (api.query="order_by")
+    5: i32 repository_type (api.query="repository_type")
+    6: i32 store_type (api.query="store_type")
+    7: string repository_url (api.query="repository_url")
 }
 struct GetRepositoriesRes{
     1: i32 code

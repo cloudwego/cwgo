@@ -1493,10 +1493,13 @@ func (p *UpdateRepositoryRes) Field2DeepEqual(src string) bool {
 }
 
 type GetRepositoriesReq struct {
-	Page    int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
-	Limit   int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
-	Order   int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
-	OrderBy string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
+	Page           int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
+	Limit          int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
+	Order          int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
+	OrderBy        string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
+	RepositoryType int32  `thrift:"repository_type,5" frugal:"5,default,i32" json:"repository_type"`
+	StoreType      int32  `thrift:"store_type,6" frugal:"6,default,i32" json:"store_type"`
+	RepositoryUrl  string `thrift:"repository_url,7" frugal:"7,default,string" json:"repository_url"`
 }
 
 func NewGetRepositoriesReq() *GetRepositoriesReq {
@@ -1522,6 +1525,18 @@ func (p *GetRepositoriesReq) GetOrder() (v int32) {
 func (p *GetRepositoriesReq) GetOrderBy() (v string) {
 	return p.OrderBy
 }
+
+func (p *GetRepositoriesReq) GetRepositoryType() (v int32) {
+	return p.RepositoryType
+}
+
+func (p *GetRepositoriesReq) GetStoreType() (v int32) {
+	return p.StoreType
+}
+
+func (p *GetRepositoriesReq) GetRepositoryUrl() (v string) {
+	return p.RepositoryUrl
+}
 func (p *GetRepositoriesReq) SetPage(val int32) {
 	p.Page = val
 }
@@ -1534,12 +1549,24 @@ func (p *GetRepositoriesReq) SetOrder(val int32) {
 func (p *GetRepositoriesReq) SetOrderBy(val string) {
 	p.OrderBy = val
 }
+func (p *GetRepositoriesReq) SetRepositoryType(val int32) {
+	p.RepositoryType = val
+}
+func (p *GetRepositoriesReq) SetStoreType(val int32) {
+	p.StoreType = val
+}
+func (p *GetRepositoriesReq) SetRepositoryUrl(val string) {
+	p.RepositoryUrl = val
+}
 
 var fieldIDToName_GetRepositoriesReq = map[int16]string{
 	1: "page",
 	2: "limit",
 	3: "order",
 	4: "order_by",
+	5: "repository_type",
+	6: "store_type",
+	7: "repository_url",
 }
 
 func (p *GetRepositoriesReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1594,6 +1621,36 @@ func (p *GetRepositoriesReq) Read(iprot thrift.TProtocol) (err error) {
 		case 4:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField5(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 6:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField6(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 7:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField7(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1667,6 +1724,33 @@ func (p *GetRepositoriesReq) ReadField4(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *GetRepositoriesReq) ReadField5(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.RepositoryType = v
+	}
+	return nil
+}
+
+func (p *GetRepositoriesReq) ReadField6(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.StoreType = v
+	}
+	return nil
+}
+
+func (p *GetRepositoriesReq) ReadField7(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.RepositoryUrl = v
+	}
+	return nil
+}
+
 func (p *GetRepositoriesReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("GetRepositoriesReq"); err != nil {
@@ -1687,6 +1771,18 @@ func (p *GetRepositoriesReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
+			goto WriteFieldError
+		}
+		if err = p.writeField6(oprot); err != nil {
+			fieldId = 6
+			goto WriteFieldError
+		}
+		if err = p.writeField7(oprot); err != nil {
+			fieldId = 7
 			goto WriteFieldError
 		}
 
@@ -1776,6 +1872,57 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
+func (p *GetRepositoriesReq) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("repository_type", thrift.I32, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.RepositoryType); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
+func (p *GetRepositoriesReq) writeField6(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("store_type", thrift.I32, 6); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.StoreType); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
+}
+
+func (p *GetRepositoriesReq) writeField7(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("repository_url", thrift.STRING, 7); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.RepositoryUrl); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 7 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
+}
+
 func (p *GetRepositoriesReq) String() string {
 	if p == nil {
 		return "<nil>"
@@ -1799,6 +1946,15 @@ func (p *GetRepositoriesReq) DeepEqual(ano *GetRepositoriesReq) bool {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.OrderBy) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.RepositoryType) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.StoreType) {
+		return false
+	}
+	if !p.Field7DeepEqual(ano.RepositoryUrl) {
 		return false
 	}
 	return true
@@ -1828,6 +1984,27 @@ func (p *GetRepositoriesReq) Field3DeepEqual(src int32) bool {
 func (p *GetRepositoriesReq) Field4DeepEqual(src string) bool {
 
 	if strings.Compare(p.OrderBy, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesReq) Field5DeepEqual(src int32) bool {
+
+	if p.RepositoryType != src {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesReq) Field6DeepEqual(src int32) bool {
+
+	if p.StoreType != src {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesReq) Field7DeepEqual(src string) bool {
+
+	if strings.Compare(p.RepositoryUrl, src) != 0 {
 		return false
 	}
 	return true

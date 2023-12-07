@@ -82,10 +82,11 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 	}
 
 	rpcRes, err := client.GetIDLs(l.ctx, &agent.GetIDLsReq{
-		Page:    req.Page,
-		Limit:   req.Limit,
-		Order:   req.Order,
-		OrderBy: req.OrderBy,
+		Page:        req.Page,
+		Limit:       req.Limit,
+		Order:       req.Order,
+		OrderBy:     req.OrderBy,
+		ServiceName: req.ServiceName,
 	})
 	if err != nil {
 		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
