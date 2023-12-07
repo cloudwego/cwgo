@@ -119,7 +119,7 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 	}
 }
 
-func NewGitlabClient(token string) (*gitlab.Client, error) {
+func NewGitlabClient(token, baseURL string) (*gitlab.Client, error) {
 	var client *gitlab.Client
 	var err error
 
@@ -128,7 +128,7 @@ func NewGitlabClient(token string) (*gitlab.Client, error) {
 		httpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}, Timeout: 5 * time.Second}
 		client, err = gitlab.NewClient(token, gitlab.WithHTTPClient(httpClient))
 	} else {
-		client, err = gitlab.NewClient(token)
+		client, err = gitlab.NewClient(token, gitlab.WithBaseURL(baseURL))
 	}
 
 	if err != nil {
