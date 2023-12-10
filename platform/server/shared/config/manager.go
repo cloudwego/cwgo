@@ -18,6 +18,11 @@ package config
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/api"
@@ -28,10 +33,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"time"
 )
 
 type Manager struct {

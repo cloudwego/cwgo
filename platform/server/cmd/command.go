@@ -17,10 +17,11 @@
 package main
 
 import (
+	"os"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func main() {
@@ -32,7 +33,7 @@ func main() {
 	cmd.AddCommand(
 		api.NewCommand(),
 		agent.NewCommand(),
-		//NewHelpCommand(),
+		// NewHelpCommand(),
 	)
 
 	if err := cmd.Execute(); err != nil {

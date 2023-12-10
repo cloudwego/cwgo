@@ -40,9 +40,7 @@ const (
 	RdbKeyRegistryService = ProjectName + ":" + "registry:service:%s"
 )
 
-var (
-	TempDir string
-)
+var TempDir string
 
 func init() {
 	TempDir = filepath.Join(os.TempDir(), ProjectName)

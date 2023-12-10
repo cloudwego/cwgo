@@ -22,11 +22,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/utils"
-	"time"
 )
 
 type GormZapWriter struct {

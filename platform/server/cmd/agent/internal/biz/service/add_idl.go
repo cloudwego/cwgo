@@ -20,6 +20,10 @@ package service
 
 import (
 	"context"
+	"os"
+	"path/filepath"
+	"strconv"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/errx"
@@ -29,9 +33,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/parser"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
-	"os"
-	"path/filepath"
-	"strconv"
 )
 
 type AddIDLService struct {
@@ -119,7 +120,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
 	if err != nil {
 		if os.IsNotExist(err) {
-			err = os.Mkdir(consts.TempDir, 0700)
+			err = os.Mkdir(consts.TempDir, 0o700)
 			if err != nil {
 				logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 				return &agent.AddIDLRes{
@@ -142,7 +143,6 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 				Msg:  consts.ErrMsgCommonCreateTempDir,
 			}, nil
 		}
-
 	}
 	defer os.RemoveAll(tempDir)
 

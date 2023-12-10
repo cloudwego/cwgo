@@ -20,12 +20,13 @@ package store
 
 import (
 	"fmt"
+	"net/url"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"net/url"
 )
 
 type Mysql struct {

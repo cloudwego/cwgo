@@ -20,6 +20,8 @@ package api
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/bytedance/gopkg/util/gopool"
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
@@ -28,7 +30,6 @@ import (
 	http2config "github.com/hertz-contrib/http2/config"
 	http2factory "github.com/hertz-contrib/http2/factory"
 	"github.com/hertz-contrib/pprof"
-	"time"
 )
 
 type ConfigManager struct {

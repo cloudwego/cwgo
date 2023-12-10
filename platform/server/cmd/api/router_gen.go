@@ -25,7 +25,6 @@ import (
 
 // register registers all routers.
 func register(r *server.Hertz, staticFilePath string) {
-
 	router.GeneratedRegister(r)
 
 	customizedRegister(r, staticFilePath)

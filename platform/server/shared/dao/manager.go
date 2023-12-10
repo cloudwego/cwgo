@@ -20,6 +20,7 @@ package dao
 
 import (
 	"fmt"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/idl"

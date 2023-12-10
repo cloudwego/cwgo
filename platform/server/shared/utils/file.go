@@ -57,7 +57,6 @@ func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ..
 
 			return nil
 		})
-
 		// Check if an error occurred while walking the folder
 		if err != nil {
 			fmt.Printf("Error walking path %s: %v\n", folder, err)
