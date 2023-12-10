@@ -1,6 +1,3 @@
-SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
-
 /*
  *
  *  * Copyright 2022 CloudWeGo Authors
@@ -18,6 +15,9 @@ SET FOREIGN_KEY_CHECKS = 0;
  *  * limitations under the License.
  *
  */
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
 -- Table structure for template
