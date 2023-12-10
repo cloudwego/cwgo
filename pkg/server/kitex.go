@@ -17,23 +17,29 @@
 package server
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/printer"
+	"go/token"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/tpl"
+	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
+	"github.com/cloudwego/hertz/cmd/hz/meta"
 	"github.com/cloudwego/kitex"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/generator"
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"
-	"github.com/cloudwego/kitex/tool/internal_pkg/util"
 )
 
 func convertKitexArgs(sa *config.ServerArgument, kitexArgument *kargs.Arguments) (err error) {
@@ -93,8 +99,8 @@ Flags:
 	}
 
 	// Non-standard template
-	if strings.HasSuffix(sa.Template, ".git") {
-		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, "server"))
+	if strings.HasSuffix(sa.Template, consts.SuffixGit) {
+		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, consts.Server))
 		if err != nil {
 			return err
 		}
@@ -102,13 +108,13 @@ Flags:
 		if err != nil {
 			return err
 		}
-		gitPath = path.Join(tpl.KitexDir, "server", gitPath)
+		gitPath = path.Join(tpl.KitexDir, consts.Server, gitPath)
 		kitexArgument.TemplateDir = gitPath
 	} else {
 		if len(sa.Template) != 0 {
 			kitexArgument.TemplateDir = sa.Template
 		} else {
-			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, "server", config.Standard)
+			kitexArgument.TemplateDir = path.Join(tpl.KitexDir, consts.Server, consts.Standard)
 		}
 	}
 
@@ -118,7 +124,7 @@ Flags:
 }
 
 func checkKitexArgs(a *kargs.Arguments) (err error) {
-	// check IDL`
+	// check IDL
 	a.IDLType, err = utils.GetIdlType(a.IDL, consts.Protobuf)
 	if err != nil {
 		return err
@@ -132,20 +138,21 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 		}
 	}
 
-	// check path
-	pathToGo, err := exec.LookPath("go")
+	gopath, err := utils.GetGOPATH()
 	if err != nil {
-		log.Warn(err)
-		os.Exit(1)
+		return fmt.Errorf("get gopath failed: %s", err)
+	}
+	if gopath == "" {
+		return fmt.Errorf("GOPATH is not set")
 	}
 
-	gosrc := filepath.Join(util.GetGOPATH(), "src")
+	gosrc := filepath.Join(gopath, consts.Src)
 	gosrc, err = filepath.Abs(gosrc)
 	if err != nil {
 		log.Warn("Get GOPATH/src path failed:", err.Error())
 		os.Exit(1)
 	}
-	curpath, err := filepath.Abs(".")
+	curpath, err := filepath.Abs(consts.CurrentDir)
 	if err != nil {
 		log.Warn("Get current path failed:", err.Error())
 		os.Exit(1)
@@ -165,7 +172,7 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 	}
 
 	if a.ModuleName != "" {
-		module, p, ok := util.SearchGoMod(curpath)
+		module, p, ok := utils.SearchGoMod(curpath, true)
 		if ok {
 			// go.mod exists
 			if module != a.ModuleName {
@@ -179,7 +186,7 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 			}
 			a.PackagePrefix = filepath.Join(a.ModuleName, a.PackagePrefix, generator.KitexGenPath)
 		} else {
-			if err = initGoMod(pathToGo, a.ModuleName); err != nil {
+			if err = utils.InitGoMod(a.ModuleName); err != nil {
 				log.Warn("Init go mod failed:", err.Error())
 				os.Exit(1)
 			}
@@ -191,34 +198,194 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 		a.PackagePrefix = a.Use
 	}
 	a.OutputPath = curpath
+	a.PackagePrefix = strings.ReplaceAll(a.PackagePrefix, consts.BackSlash, consts.Slash)
 	return nil
 }
 
-func initGoMod(pathToGo, module string) error {
-	if util.Exists("go.mod") {
-		return nil
+func hzArgsForHex(c *config.ServerArgument) (*hzConfig.Argument, error) {
+	utils.SetHzVerboseLog(c.Verbose)
+	hzArgs := hzConfig.NewArgument()
+	err := convertHzArgument(c, hzArgs)
+	if err != nil {
+		return nil, err
 	}
-
-	cmd := &exec.Cmd{
-		Path:   pathToGo,
-		Args:   []string{"go", "mod", "init", module},
-		Stdin:  os.Stdin,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
+	hzArgs.CmdType = meta.CmdUpdate // update command is enough for hex
+	// these options are aligned with the kitex
+	hzArgs.ThriftOptions = append(hzArgs.ThriftOptions, "naming_style=golint", "ignore_initialisms", "gen_setter", "gen_deep_equal", "compatible_names", "frugal_tag")
+	hzArgs.ModelDir = consts.DefaultKitexModelDir
+	if hzArgs.CustomizePackage == path.Join(tpl.HertzDir, consts.Server, consts.Standard, consts.PackageLayoutFile) {
+		hzArgs.CustomizePackage = "" // disable the default hertz template for hex
 	}
-	return cmd.Run()
+	return hzArgs, nil
 }
 
-func replaceThriftVersion(args *kargs.Arguments) {
-	if args.IDLType == "thrift" {
-		cmd := "go mod edit -replace github.com/apache/thrift=github.com/apache/thrift@v0.13.0"
-		argv := strings.Split(cmd, " ")
-		err := exec.Command(argv[0], argv[1:]...).Run()
+func generateHexFile(c *config.ServerArgument) error {
+	tmplContent := `package main
 
-		res := "Done"
-		if err != nil {
-			res = err.Error()
-		}
-		log.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net"
+	"regexp"
+
+	"github.com/cloudwego/hertz/pkg/app"
+	hertzServer "github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/utils"
+	"github.com/cloudwego/hertz/pkg/network"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/hertz/pkg/route"
+	"github.com/cloudwego/kitex/pkg/endpoint"
+	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/cloudwego/kitex/pkg/remote"
+	"github.com/cloudwego/kitex/pkg/remote/trans/detection"
+	"github.com/cloudwego/kitex/pkg/remote/trans/netpoll"
+	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2"
+	"{{$.ProjPackage}}/biz/router"
+)
+
+type mixTransHandlerFactory struct {
+	originFactory remote.ServerTransHandlerFactory
+}
+
+type transHandler struct {
+	remote.ServerTransHandler
+}
+
+// SetInvokeHandleFunc is used to set invoke handle func.
+func (t *transHandler) SetInvokeHandleFunc(inkHdlFunc endpoint.Endpoint) {
+	t.ServerTransHandler.(remote.InvokeHandleFuncSetter).SetInvokeHandleFunc(inkHdlFunc)
+}
+
+func (m mixTransHandlerFactory) NewTransHandler(opt *remote.ServerOption) (remote.ServerTransHandler, error) {
+	var kitexOrigin remote.ServerTransHandler
+	var err error
+
+	if m.originFactory != nil {
+		kitexOrigin, err = m.originFactory.NewTransHandler(opt)
+	} else {
+		// if no customized factory just use the default factory under detection pkg.
+		kitexOrigin, err = detection.NewSvrTransHandlerFactory(netpoll.NewSvrTransHandlerFactory(), nphttp2.NewSvrTransHandlerFactory()).NewTransHandler(opt)
 	}
+	if err != nil {
+		return nil, err
+	}
+	return &transHandler{ServerTransHandler: kitexOrigin}, nil
+}
+
+var httpReg = regexp.MustCompile(` + "`^(?:GET |POST|PUT|DELE|HEAD|OPTI|CONN|TRAC|PATC)$`" + `)
+
+func (t *transHandler) OnRead(ctx context.Context, conn net.Conn) error {
+	c, ok := conn.(network.Conn)
+	if ok {
+		pre, _ := c.Peek(4)
+		if httpReg.Match(pre) {
+			klog.Info("using Hertz to process request")
+			err := hertzEngine.Serve(ctx, c)
+			if err != nil {
+				err = errors.New(fmt.Sprintf("HERTZ: %s", err.Error()))
+			}
+			return err
+		}
+	}
+	return t.ServerTransHandler.OnRead(ctx, conn)
+}
+
+func initHertz() *route.Engine {
+	h := hertzServer.New(hertzServer.WithIdleTimeout(0))
+	// add a ping route to test
+	h.GET("/ping", func(c context.Context, ctx *app.RequestContext) {
+		ctx.JSON(consts.StatusOK, utils.H{"ping": "pong"})
+	})
+	router.GeneratedRegister(h)
+	if err := h.Engine.Init(); err != nil {
+		panic(err)
+	}
+	//if err := h.Engine.SetEngineRun(); err != nil {
+	//	panic(err)
+	//}
+	return h.Engine
+}
+
+var hertzEngine *route.Engine
+
+func init() {
+	hertzEngine = initHertz()
+}
+`
+	exist, err := utils.PathExist("hex_trans_handler.go")
+	if err != nil {
+		return err
+	}
+	if exist {
+		return nil
+	}
+	tmpl := template.Must(template.New("hex_trans_handler").Parse(tmplContent))
+	file, err := os.Create("hex_trans_handler.go")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return tmpl.Execute(file, map[string]string{
+		"ProjPackage": c.GoMod,
+	})
+}
+
+func addHexOptions() error {
+	filePath := consts.Main
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+	if bytes.Contains(content, []byte("server.WithTransHandlerFactory(&mixTransHandlerFactory{nil})")) {
+		return nil
+	}
+	fset := token.NewFileSet()
+	astFile, err := parser.ParseFile(fset, filePath, nil, parser.ParseComments)
+	if err != nil {
+		return err
+	}
+	found, err := insertCodeInFunction(astFile, "kitexInit", "opts", "append(opts,server.WithTransHandlerFactory(&mixTransHandlerFactory{nil}))")
+	if err != nil {
+		return err
+	}
+	if !found {
+		return nil
+	}
+	outputFile, err := os.Create(consts.Main)
+	if err != nil {
+		return err
+	}
+	defer outputFile.Close()
+	err = printer.Fprint(outputFile, fset, astFile)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func insertCodeInFunction(file *ast.File, functionName, left, right string) (bool, error) {
+	for _, decl := range file.Decls {
+		funcDecl, ok := decl.(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
+		if funcDecl.Name.Name == functionName {
+			insertedStmt, err := parser.ParseExpr(right)
+			if err != nil {
+				return false, err
+			}
+
+			assignStmt := &ast.AssignStmt{
+				Tok: token.ASSIGN,
+				Lhs: []ast.Expr{ast.NewIdent(left)},
+				Rhs: []ast.Expr{insertedStmt},
+			}
+
+			funcDecl.Body.List = append([]ast.Stmt{assignStmt}, funcDecl.Body.List...)
+			return true, nil
+		}
+	}
+	return false, nil
 }

@@ -20,6 +20,7 @@ import (
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/pkg/consts"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/AlecAivazis/survey/v2/core"
@@ -27,10 +28,10 @@ import (
 
 var dbConfig = []*survey.Question{
 	{
-		Name: "type",
+		Name: consts.ServiceType,
 		Prompt: &survey.Select{
 			Message: "Select db type",
-			Options: []string{"MySQL", "SQLServer", "SQLite", "PostgreSQL"},
+			Options: []string{string(consts.MySQL), string(consts.SQLServer), string(consts.Sqlite), string(consts.Postgres)},
 		},
 		Validate: survey.Required,
 		Transform: func(ans interface{}) (newAns interface{}) {
@@ -54,7 +55,7 @@ type ps struct {
 
 var pass = []*survey.Question{
 	{
-		Name: "pass",
+		Name: consts.Pass,
 		Prompt: &survey.Input{
 			Message: "Please input custom param",
 		},
@@ -63,20 +64,25 @@ var pass = []*survey.Question{
 
 func parsePass(da *config.ModelArgument, pass string) error {
 	f := flag.NewFlagSet("", flag.ContinueOnError)
-	f.StringVar(&da.OutPath, config.OutDir, "biz/dal/query", "")
-	f.StringVar(&da.OutFile, config.OutFile, "gen.go", "")
-	f.BoolVar(&da.WithUnitTest, config.UnitTest, false, "")
-	f.BoolVar(&da.OnlyModel, config.OnlyModel, false, "")
-	f.StringVar(&da.ModelPkgName, config.ModelPkgName, "", "")
-	f.BoolVar(&da.FieldNullable, config.Nullable, false, "")
-	f.BoolVar(&da.FieldSignable, config.Signable, false, "")
-	f.BoolVar(&da.FieldWithTypeTag, config.TypeTag, false, "")
-	f.BoolVar(&da.FieldWithIndexTag, config.IndexTag, false, "")
-	var tables utils.FlagStringSlice
-	f.Var(&tables, config.Tables, "")
+	f.StringVar(&da.OutPath, consts.OutDir, consts.DefaultDbOutDir, "")
+	f.StringVar(&da.OutFile, consts.OutFile, consts.DefaultDbOutFile, "")
+	f.BoolVar(&da.WithUnitTest, consts.UnitTest, false, "")
+	f.BoolVar(&da.OnlyModel, consts.OnlyModel, false, "")
+	f.StringVar(&da.ModelPkgName, consts.ModelPkgName, "", "")
+	f.BoolVar(&da.FieldNullable, consts.Nullable, false, "")
+	f.BoolVar(&da.FieldSignable, consts.Signable, false, "")
+	f.BoolVar(&da.FieldWithTypeTag, consts.TypeTag, false, "")
+	f.BoolVar(&da.FieldWithIndexTag, consts.IndexTag, false, "")
+	var (
+		tables        utils.FlagStringSlice
+		excludeTables utils.FlagStringSlice
+	)
+	f.Var(&tables, consts.Tables, "")
+	f.Var(&excludeTables, consts.ExcludeTables, "")
 	if err := f.Parse(utils.StringSliceSpilt([]string{pass})); err != nil {
 		return err
 	}
 	da.Tables = tables
+	da.ExcludeTables = excludeTables
 	return nil
 }

@@ -21,7 +21,6 @@ body: |-
   	{{- end}}
   )
 
-
   {{range .Methods}}
 
   func Test{{.Name}}_Run(t *testing.T) {

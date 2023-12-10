@@ -7,7 +7,7 @@ layouts:
        "context"
 
        "github.com/cloudwego/hertz/pkg/app"
-        "github.com/cloudwego/hertz/pkg/protocol/consts"
+       "github.com/cloudwego/hertz/pkg/protocol/consts"
       {{- range $k, $v := .Imports}}
        {{$k}} "{{$v.Package}}"
       {{- end}}
@@ -59,6 +59,7 @@ layouts:
               "{{$.ProjPackage}}/biz/service/{{$OutDir}}"
             {{end}}
           {{- end}}
+
   - path: handler_single.go
     body: |+
       {{.Comment}}
@@ -83,6 +84,7 @@ layouts:
         }
        utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
       }
+
   - path: "biz/service/{{.HandlerGenPath}}/{{ToSnakeCase .MethodName}}.go"
     loop_method: true
     update_behavior:
@@ -114,6 +116,7 @@ layouts:
         // todo edit your code
        return
       }
+
   - path: "biz/service/{{.HandlerGenPath}}/{{ToSnakeCase .MethodName}}_test.go"
     loop_method: true
     update_behavior:
@@ -141,6 +144,7 @@ layouts:
         assert.DeepEqual(t, nil, err)
         // todo edit your unit test.
       }
+
   - path: "{{.HandlerDir}}/{{.GenPackage}}/{{ToSnakeCase .ServiceName}}_test.go"
     loop_service: true
     update_behavior:

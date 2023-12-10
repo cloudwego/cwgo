@@ -5,16 +5,15 @@ body: |-
   package conf
 
   import (
-  	"io/ioutil"
-  	"os"
-  	"path/filepath"
-  	"sync"
+    "io/ioutil"
+    "os"
+    "path/filepath"
+    "sync"
 
-  	"gopkg.in/validator.v2"
-  	"gopkg.in/yaml.v2"
-
-  	"github.com/cloudwego/kitex/pkg/klog"
-  	"github.com/kr/pretty"
+    "github.com/cloudwego/kitex/pkg/klog"
+    "github.com/kr/pretty"
+    "gopkg.in/validator.v2"
+    "gopkg.in/yaml.v2"
   )
 
   var (
@@ -33,7 +32,7 @@ body: |-
   type MySQL struct {
     DSN string `yaml:"dsn"`
   }
-  
+
   type Redis struct {
     Address  string `yaml:"address"`
     Username string `yaml:"username"`
@@ -94,7 +93,7 @@ body: |-
     }
     return e
   }
-  
+
   func LogLevel() klog.Level {
     level := GetConf().Kitex.LogLevel
     switch level {

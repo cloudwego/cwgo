@@ -7,4 +7,7 @@ header:
     - '**/*.go'
     - '**/*.s'
 
+  paths-ignore:
+    - "example/**"
+
   comment: on-failure

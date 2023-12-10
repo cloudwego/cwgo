@@ -24,19 +24,20 @@ import (
 	"strings"
 
 	"github.com/cloudwego/cwgo/config"
-	"github.com/cloudwego/hertz/cmd/hz/util"
+	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/pkg/consts"
 )
 
 func check(ca *config.ClientArgument) error {
-	if ca.Type != config.RPC && ca.Type != config.HTTP {
+	if ca.Type != consts.RPC && ca.Type != consts.HTTP {
 		return errors.New("generate type not supported")
 	}
 
 	if ca.Registry != "" &&
-		ca.Registry != config.Zk &&
-		ca.Registry != config.Nacos &&
-		ca.Registry != config.Etcd &&
-		ca.Registry != config.Polaris {
+		ca.Registry != consts.Zk &&
+		ca.Registry != consts.Nacos &&
+		ca.Registry != consts.Etcd &&
+		ca.Registry != consts.Polaris {
 		return errors.New("unsupported registry")
 	}
 
@@ -51,8 +52,8 @@ func check(ca *config.ClientArgument) error {
 	}
 	ca.Cwd = dir
 	if ca.OutDir == "" {
-		if strings.ToUpper(ca.Type) == config.HTTP {
-			ca.OutDir = "biz/http"
+		if strings.ToUpper(ca.Type) == consts.HTTP {
+			ca.OutDir = consts.DefaultHZClientDir
 		} else {
 			ca.OutDir = dir
 		}
@@ -62,7 +63,7 @@ func check(ca *config.ClientArgument) error {
 		ca.OutDir = ap
 	}
 
-	gopath, err := util.GetGOPATH()
+	gopath, err := utils.GetGOPATH()
 	if err != nil {
 		return fmt.Errorf("get gopath failed: %s", err)
 	}
@@ -71,23 +72,35 @@ func check(ca *config.ClientArgument) error {
 	}
 
 	ca.GoPath = gopath
-	ca.GoSrc = filepath.Join(gopath, "src")
+	ca.GoSrc = filepath.Join(gopath, consts.Src)
 
 	// Generate the project under gopath, use the relative path as the package name
 	if strings.HasPrefix(ca.Cwd, ca.GoSrc) {
-		if gopkg, err := filepath.Rel(ca.GoSrc, ca.Cwd); err != nil {
+		if goPkg, err := filepath.Rel(ca.GoSrc, ca.Cwd); err != nil {
 			return fmt.Errorf("get relative path to GOPATH/src failed: %s", err)
 		} else {
-			ca.GoPkg = gopkg
+			ca.GoPkg = goPkg
 		}
+
 		if ca.GoMod == "" {
-			ca.GoMod = ca.GoPkg
+			if utils.IsWindows() {
+				ca.GoMod = strings.ReplaceAll(ca.GoPkg, consts.BackSlash, consts.Slash)
+			} else {
+				ca.GoMod = ca.GoPkg
+			}
 		}
-		if ca.GoMod != "" && ca.GoMod != ca.GoPkg {
-			return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", ca.GoMod, ca.GoPkg)
-		}
-		if ca.GoMod == "" {
-			ca.GoMod = ca.GoPkg
+
+		if ca.GoMod != "" {
+			if utils.IsWindows() {
+				goPkgSlash := strings.ReplaceAll(ca.GoPkg, consts.BackSlash, consts.Slash)
+				if goPkgSlash != ca.GoMod {
+					return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", ca.GoMod, goPkgSlash)
+				}
+			} else {
+				if ca.GoMod != ca.GoPkg {
+					return fmt.Errorf("module name: %s is not the same with GoPkg under GoPath: %s", ca.GoMod, ca.GoPkg)
+				}
+			}
 		}
 	}
 	return nil
