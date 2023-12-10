@@ -21,6 +21,8 @@ package agent
 import (
 	"context"
 	"errors"
+	"os"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/handler"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/generator"
@@ -32,7 +34,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"go.uber.org/zap"
-	"os"
 )
 
 func run(opts *setupOptions) error {

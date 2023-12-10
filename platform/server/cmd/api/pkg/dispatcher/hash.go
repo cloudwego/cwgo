@@ -20,10 +20,11 @@ package dispatcher
 
 import (
 	"errors"
-	"github.com/buraksezer/consistent"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"hash/fnv"
 	"sync"
+
+	"github.com/buraksezer/consistent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 )
 
 type hasher struct{}

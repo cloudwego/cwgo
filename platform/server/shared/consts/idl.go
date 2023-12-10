@@ -23,9 +23,7 @@ const (
 	IdlTypeNumProto
 )
 
-var (
-	IdlTypeNumMap = map[int]struct{}{
-		IdlTypeNumThrift: {},
-		IdlTypeNumProto:  {},
-	}
-)
+var IdlTypeNumMap = map[int]struct{}{
+	IdlTypeNumThrift: {},
+	IdlTypeNumProto:  {},
+}

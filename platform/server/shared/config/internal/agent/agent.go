@@ -20,6 +20,8 @@ package agent
 
 import (
 	"fmt"
+	"net"
+
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -31,7 +33,6 @@ import (
 	"github.com/cloudwego/kitex/server"
 	"github.com/kitex-contrib/obs-opentelemetry/tracing"
 	"go.uber.org/zap"
-	"net"
 )
 
 type ConfigManager struct {

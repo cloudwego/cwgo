@@ -22,14 +22,18 @@ import (
 	typeid "go.jetpack.io/typeid/typed"
 )
 
-type servicePrefix struct{}
-type taskPrefix struct{}
+type (
+	servicePrefix struct{}
+	taskPrefix    struct{}
+)
 
 func (servicePrefix) Type() string { return "service" }
 func (taskPrefix) Type() string    { return "task" }
 
-type serviceId struct{ typeid.TypeID[servicePrefix] }
-type taskId struct{ typeid.TypeID[taskId] }
+type (
+	serviceId struct{ typeid.TypeID[servicePrefix] }
+	taskId    struct{ typeid.TypeID[taskId] }
+)
 
 func NewServiceId() (string, error) {
 	id, err := typeid.New[servicePrefix]()

@@ -36,10 +36,12 @@ func _registerMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
 func _pingMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
 func _apiMw() []app.HandlerFunc {
 	// your code...
 	return nil

@@ -20,6 +20,7 @@ package registry
 
 import (
 	"fmt"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"

@@ -19,14 +19,15 @@ package repository
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"time"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/google/go-github/v56/github"
 	"go.uber.org/zap"
-	"io/ioutil"
-	"net/http"
-	"time"
 )
 
 const (
@@ -111,6 +112,7 @@ func (a *GitHubApi) GetRepoDefaultBranch() (string, error) {
 
 	return *repo.DefaultBranch, nil
 }
+
 func (a *GitHubApi) ValidateRepoBranch(branch string) (bool, error) {
 	branchesRes, _, err := a.client.Repositories.ListBranches(context.Background(), a.repoOwner, a.repoName, &github.BranchListOptions{})
 	if err != nil {
