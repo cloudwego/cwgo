@@ -129,6 +129,7 @@ func (m *MysqlRepositoryManager) UpdateRepository(ctx context.Context, repoModel
 
 	repoEntity := entity.MysqlRepository{
 		ID:     repoModel.Id,
+		Branch: repoModel.RepositoryBranch,
 		Status: repoModel.Status,
 	}
 

@@ -168,13 +168,13 @@ func (m *MysqlTokenManager) GetActiveTokenForDomain(ctx context.Context, domain 
 	err := m.db.WithContext(ctx).
 		Model(&entity.MysqlToken{}).
 		Where("`expiration_time` <= ?", time.Now()).
-		UpdateColumn("status", 0).Error
+		UpdateColumn("status", consts.TokenStatusNumExpired).Error
 	if err != nil {
 		return nil, err
 	}
 
 	err = m.db.WithContext(ctx).
-		Where("`repository_domain` = ? AND `status` = 1", domain).
+		Where("`repository_domain` = ? AND `status` = ?", domain, consts.TokenStatusNumValid).
 		Find(&tokenEntities).Error
 	if err != nil {
 		if err != gorm.ErrRecordNotFound {

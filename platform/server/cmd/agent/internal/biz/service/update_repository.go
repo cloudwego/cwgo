@@ -42,7 +42,7 @@ func NewUpdateRepositoryService(ctx context.Context, svcCtx *svc.ServiceContext)
 // Run create note info
 func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *agent.UpdateRepositoryRes, err error) {
 	// validate repo info
-	repoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.Id)
+	_, err = s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.Id)
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 			return &agent.UpdateRepositoryRes{
@@ -52,12 +52,36 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 		}
 	}
 
-	repoModel.Status = req.Status
+	if req.Branch != "" {
+		repoClient, err := s.svcCtx.RepoManager.GetClient(req.Id)
+		if err != nil {
+			return &agent.UpdateRepositoryRes{
+				Code: consts.ErrNumRepoGetClient,
+				Msg:  consts.ErrMsgRepoGetClient,
+			}, nil
+		}
+
+		isValid, err := repoClient.ValidateRepoBranch(req.Branch)
+		if err != nil {
+			return &agent.UpdateRepositoryRes{
+				Code: consts.ErrNumRepoValidateBranch,
+				Msg:  consts.ErrMsgRepoValidateBranch,
+			}, nil
+		}
+
+		if !isValid {
+			return &agent.UpdateRepositoryRes{
+				Code: consts.ErrNumParamRepositoryBranch,
+				Msg:  consts.ErrMsgParamRepositoryBranch,
+			}, nil
+		}
+	}
 
 	// update repo info
 	err = s.svcCtx.DaoManager.Repository.UpdateRepository(s.ctx, model.Repository{
-		Id:     req.Id,
-		Status: req.Status,
+		Id:               req.Id,
+		RepositoryBranch: req.Branch,
+		Status:           req.Status,
 	})
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {

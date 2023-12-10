@@ -90,7 +90,7 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, 
 		RepositoryDomain: req.RepositoryDomain,
 		Owner:            owner,
 		Token:            req.Token,
-		Status:           1,
+		Status:           consts.TokenStatusNumValid,
 		ExpirationTime:   expirationTime.String(),
 	}
 

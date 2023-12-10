@@ -23,7 +23,7 @@ const (
 )
 
 const (
-	RepositoryStatusNumInactive = iota
+	RepositoryStatusNumInactive = iota + 1
 	RepositoryStatusNumActive
 )
 

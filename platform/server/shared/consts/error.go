@@ -35,6 +35,7 @@ const (
 	ErrNumParamTemplateType
 	ErrNumParamUrl
 	ErrNumParamRepositoryStatus
+	ErrNumParamRepositoryBranch
 )
 
 const (
@@ -49,6 +50,7 @@ const (
 	ErrMsgParamTemplateType     = "invalid template type"
 	ErrMsgParamUrl              = "invalid url"
 	ErrMsgParamRepositoryStatus = "invalid repository status"
+	ErrMsgParamRepositoryBranch = "invalid repository branch"
 )
 
 var (
@@ -62,6 +64,7 @@ var (
 	ErrParamTemplateType     = errx.New(ErrNumParamTemplateType, ErrMsgParamTemplateType)
 	ErrParamUrl              = errx.New(ErrNumParamUrl, ErrMsgParamUrl)
 	ErrParamRepositoryStatus = errx.New(ErrNumParamRepositoryStatus, ErrMsgParamRepositoryStatus)
+	ErrParamRepositoryBranch = errx.New(ErrNumParamRepositoryBranch, ErrMsgParamRepositoryBranch)
 )
 
 // rpc err
@@ -155,30 +158,33 @@ const (
 	ErrNumRepoCreate
 	ErrNumRepoGetClient
 	ErrNumRepoPush
+	ErrNumRepoValidateBranch
 )
 
 const (
-	ErrMsgRepo              = "repo err"
-	ErrMsgRepoGetFile       = "get file from repo failed"
-	ErrMsgRepoGetCommitHash = "get commit hash failed"
-	ErrMsgRepoGetArchive    = "get repo archive failed"
-	ErrMsgRepoParseArchive  = "parse repo archive failed"
-	ErrMsgRepoGetPrivacy    = "get repo privacy failed"
-	ErrMsgRepoCreate        = "create repo failed"
-	ErrMsgRepoGetClient     = "get repo client failed"
-	ErrMsgRepoPush          = "push files to repo failed"
+	ErrMsgRepo               = "repo err"
+	ErrMsgRepoGetFile        = "get file from repo failed"
+	ErrMsgRepoGetCommitHash  = "get commit hash failed"
+	ErrMsgRepoGetArchive     = "get repo archive failed"
+	ErrMsgRepoParseArchive   = "parse repo archive failed"
+	ErrMsgRepoGetPrivacy     = "get repo privacy failed"
+	ErrMsgRepoCreate         = "create repo failed"
+	ErrMsgRepoGetClient      = "get repo client failed"
+	ErrMsgRepoPush           = "push files to repo failed"
+	ErrMsgRepoValidateBranch = "validate repo branch failed"
 )
 
 var (
-	ErrRepo              = errx.New(ErrNumRepo, ErrMsgRepo)
-	ErrRepoGetFile       = errx.New(ErrNumRepoGetFile, ErrMsgRepoGetFile)
-	ErrRepoGetCommitHash = errx.New(ErrNumRepoGetCommitHash, ErrMsgRepoGetCommitHash)
-	ErrRepoGetArchive    = errx.New(ErrNumRepoGetArchive, ErrMsgRepoGetArchive)
-	ErrRepoParseArchive  = errx.New(ErrNumRepoParseArchive, ErrMsgRepoParseArchive)
-	ErrRepoGetPrivacy    = errx.New(ErrNumRepoGetPrivacy, ErrMsgRepoGetPrivacy)
-	ErrRepoCreate        = errx.New(ErrNumRepoCreate, ErrMsgRepoCreate)
-	ErrRepoGetClient     = errx.New(ErrNumRepoGetClient, ErrMsgRepoGetClient)
-	ErrRepoPush          = errx.New(ErrNumRepoPush, ErrMsgRepoPush)
+	ErrRepo               = errx.New(ErrNumRepo, ErrMsgRepo)
+	ErrRepoGetFile        = errx.New(ErrNumRepoGetFile, ErrMsgRepoGetFile)
+	ErrRepoGetCommitHash  = errx.New(ErrNumRepoGetCommitHash, ErrMsgRepoGetCommitHash)
+	ErrRepoGetArchive     = errx.New(ErrNumRepoGetArchive, ErrMsgRepoGetArchive)
+	ErrRepoParseArchive   = errx.New(ErrNumRepoParseArchive, ErrMsgRepoParseArchive)
+	ErrRepoGetPrivacy     = errx.New(ErrNumRepoGetPrivacy, ErrMsgRepoGetPrivacy)
+	ErrRepoCreate         = errx.New(ErrNumRepoCreate, ErrMsgRepoCreate)
+	ErrRepoGetClient      = errx.New(ErrNumRepoGetClient, ErrMsgRepoGetClient)
+	ErrRepoPush           = errx.New(ErrNumRepoPush, ErrMsgRepoPush)
+	ErrRepoValidateBranch = errx.New(ErrNumRepoValidateBranch, ErrMsgRepoValidateBranch)
 )
 
 // common err
