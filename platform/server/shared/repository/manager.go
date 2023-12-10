@@ -126,7 +126,7 @@ func NewGitlabClient(token, baseURL string) (*gitlab.Client, error) {
 	if consts.ProxyUrl != "" {
 		proxyUrl, _ := url.Parse(consts.ProxyUrl)
 		httpClient := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyUrl)}, Timeout: 5 * time.Second}
-		client, err = gitlab.NewClient(token, gitlab.WithHTTPClient(httpClient))
+		client, err = gitlab.NewClient(token, gitlab.WithHTTPClient(httpClient), gitlab.WithBaseURL(baseURL))
 	} else {
 		client, err = gitlab.NewClient(token, gitlab.WithBaseURL(baseURL))
 	}
