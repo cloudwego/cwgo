@@ -16,7 +16,11 @@
 
 package utils
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/cloudwego/cwgo/pkg/consts"
+)
 
 type FlagStringSlice []string
 
@@ -32,7 +36,7 @@ func (f *FlagStringSlice) Set(value string) error {
 func StringSliceSpilt(s []string) []string {
 	var ret []string
 	for _, v := range s {
-		ret = append(ret, strings.Split(v, " ")...)
+		ret = append(ret, strings.Split(v, consts.BlackSpace)...)
 	}
 	return ret
 }

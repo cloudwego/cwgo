@@ -52,15 +52,8 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, store
 		if err != nil {
 			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
 		}
-
-	case consts.RegistryTypeConsul:
-		registryConfigManager, err = registryconfig.NewConsulRegistryConfigManager(registryConfig.Consul)
-		if err != nil {
-			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
-		}
-
 	default:
-
+		panic("not support registryConfigType")
 	}
 
 	return &ConfigManager{

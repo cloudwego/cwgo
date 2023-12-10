@@ -18,21 +18,23 @@ package model
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/consts"
 
 	"gorm.io/gen"
 	"gorm.io/gorm"
 )
 
 func Model(c *config.ModelArgument) error {
-	dialector := config.OpenTypeFuncMap[config.DataBaseType(c.Type)]
+	dialector := config.OpenTypeFuncMap[consts.DataBaseType(c.Type)]
 	db, err := gorm.Open(dialector(c.DSN))
 	if err != nil {
 		return err
 	}
 
-	g := gen.NewGenerator(gen.Config{
+	genConfig := gen.Config{
 		OutPath:           c.OutPath,
 		OutFile:           c.OutFile,
 		ModelPkgPath:      c.ModelPkgName,
@@ -40,7 +42,25 @@ func Model(c *config.ModelArgument) error {
 		FieldNullable:     c.FieldNullable,
 		FieldSignable:     c.FieldSignable,
 		FieldWithIndexTag: c.FieldWithIndexTag,
-	})
+	}
+
+	if len(c.ExcludeTables) > 0 || c.Type == string(consts.Sqlite) {
+		genConfig.WithTableNameStrategy(func(tableName string) (targetTableName string) {
+			if c.Type == string(consts.Sqlite) && strings.HasPrefix(tableName, "sqlite") {
+				return ""
+			}
+			if len(c.ExcludeTables) > 0 {
+				for _, table := range c.ExcludeTables {
+					if tableName == table {
+						return ""
+					}
+				}
+			}
+			return tableName
+		})
+	}
+
+	g := gen.NewGenerator(genConfig)
 
 	g.UseDB(db)
 
