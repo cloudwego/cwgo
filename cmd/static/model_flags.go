@@ -21,32 +21,34 @@ import (
 	"strings"
 
 	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/urfave/cli/v2"
 )
 
 func modelFlags() []cli.Flag {
 	return []cli.Flag{
-		&cli.StringFlag{Name: config.DSN, Usage: "Specify the database source name. (https://gorm.io/docs/connecting_to_the_database.html)", Value: "", DefaultText: "", Action: func(context *cli.Context, s string) error {
+		&cli.StringFlag{Name: consts.DSN, Usage: "Specify the database source name. (https://gorm.io/docs/connecting_to_the_database.html)", Value: "", DefaultText: "", Action: func(context *cli.Context, s string) error {
 			if len(s) == 0 {
 				return fmt.Errorf("dsn cannot be empty")
 			}
 			return nil
 		}},
-		&cli.StringFlag{Name: config.DBType, Usage: "Specify database type. (mysql or sqlserver or sqlite or postgres)", Value: "mysql", DefaultText: "mysql", Action: func(context *cli.Context, s string) error {
-			if _, ok := config.OpenTypeFuncMap[config.DataBaseType(strings.ToLower(s))]; !ok {
+		&cli.StringFlag{Name: consts.DBType, Usage: "Specify database type. (mysql or sqlserver or sqlite or postgres)", Value: string(consts.MySQL), DefaultText: string(consts.MySQL), Action: func(context *cli.Context, s string) error {
+			if _, ok := config.OpenTypeFuncMap[consts.DataBaseType(strings.ToLower(s))]; !ok {
 				return fmt.Errorf("unknow db type %s (support mysql || postgres || sqlite || sqlserver for now)", s)
 			}
 			return nil
 		}},
-		&cli.StringFlag{Name: config.OutDir, Usage: "Specify output directory", Value: "biz/dal/query", DefaultText: "biz/dao/query"},
-		&cli.StringFlag{Name: config.OutFile, Usage: "Specify output filename", Value: "gen.go", DefaultText: "gen.go"},
-		&cli.StringSliceFlag{Name: config.Tables, Usage: "Specify databases tables"},
-		&cli.BoolFlag{Name: config.UnitTest, Usage: "Specify generate unit test", Value: false, DefaultText: "false"},
-		&cli.BoolFlag{Name: config.OnlyModel, Usage: "Specify only generate model code", Value: false, DefaultText: "false"},
-		&cli.StringFlag{Name: config.ModelPkgName, Usage: "Specify model package name", Value: "", DefaultText: ""},
-		&cli.BoolFlag{Name: config.Nullable, Usage: "Specify generate with pointer when field is nullable", Value: false, DefaultText: "false"},
-		&cli.BoolFlag{Name: config.Signable, Usage: "Specify detect integer field's unsigned type, adjust generated data type", Value: false, DefaultText: "false"},
-		&cli.BoolFlag{Name: config.TypeTag, Usage: "Specify generate field with gorm column type tag", Value: false, DefaultText: "false"},
-		&cli.BoolFlag{Name: config.IndexTag, Usage: "Specify generate field with gorm index tag", Value: false, DefaultText: "false"},
+		&cli.StringFlag{Name: consts.OutDir, Usage: "Specify output directory", Value: consts.DefaultDbOutDir, DefaultText: consts.DefaultDbOutDir},
+		&cli.StringFlag{Name: consts.OutFile, Usage: "Specify output filename", Value: consts.DefaultDbOutFile, DefaultText: consts.DefaultDbOutFile},
+		&cli.StringSliceFlag{Name: consts.Tables, Usage: "Specify databases tables"},
+		&cli.StringSliceFlag{Name: consts.ExcludeTables, Usage: "Specify exclude tables"},
+		&cli.BoolFlag{Name: consts.UnitTest, Usage: "Specify generate unit test", Value: false, DefaultText: "false"},
+		&cli.BoolFlag{Name: consts.OnlyModel, Usage: "Specify only generate model code", Value: false, DefaultText: "false"},
+		&cli.StringFlag{Name: consts.ModelPkgName, Usage: "Specify model package name", Value: "", DefaultText: ""},
+		&cli.BoolFlag{Name: consts.Nullable, Usage: "Specify generate with pointer when field is nullable", Value: false, DefaultText: "false"},
+		&cli.BoolFlag{Name: consts.Signable, Usage: "Specify detect integer field's unsigned type, adjust generated data type", Value: false, DefaultText: "false"},
+		&cli.BoolFlag{Name: consts.TypeTag, Usage: "Specify generate field with gorm column type tag", Value: false, DefaultText: "false"},
+		&cli.BoolFlag{Name: consts.IndexTag, Usage: "Specify generate field with gorm index tag", Value: false, DefaultText: "false"},
 	}
 }

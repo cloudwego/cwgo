@@ -20,6 +20,8 @@ import (
 	"net/url"
 	"os/exec"
 	"strings"
+
+	"github.com/cloudwego/cwgo/pkg/consts"
 )
 
 func GitClone(gitURL, path string) error {
@@ -37,7 +39,7 @@ func GitPath(gitURL string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	p := strings.Split(strings.Trim(u.Path, ""), "/")
+	p := strings.Split(strings.Trim(u.Path, ""), consts.Slash)
 	path := p[len(p)-1]
 	return path[:len(path)-4], nil
 }

@@ -21,6 +21,7 @@ import (
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/meta"
 	"github.com/cloudwego/cwgo/pkg/client"
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/pkg/fallback"
 	"github.com/cloudwego/cwgo/pkg/model"
 	"github.com/cloudwego/cwgo/pkg/server"
@@ -32,11 +33,11 @@ func Init() *cli.App {
 	verboseFlag := cli.BoolFlag{Name: "verbose,vv", Usage: "turn on verbose mode"}
 
 	app := cli.NewApp()
-	app.Name = "cwgo"
-	app.Usage = "All in one tools for CloudWeGo"
+	app.Name = meta.Name
+	app.Usage = AppUsage
 	app.Version = meta.Version
 	// The default separator for multiple parameters is modified to ";"
-	app.SliceFlagSeparator = ";"
+	app.SliceFlagSeparator = consts.Comma
 
 	// global flags
 	app.Flags = []cli.Flag{
@@ -87,8 +88,8 @@ func Init() *cli.App {
 			},
 		},
 		{
-			Name:  "fallback",
-			Usage: "fallback to hz or kitex",
+			Name:  FallbackName,
+			Usage: FallbackUsage,
 			Action: func(c *cli.Context) error {
 				if err := globalArgs.FallbackArgument.ParseCli(c); err != nil {
 					return err
@@ -101,6 +102,8 @@ func Init() *cli.App {
 }
 
 const (
+	AppUsage = "All in one tools for CloudWeGo"
+
 	ServerName  = "server"
 	ServerUsage = `generate RPC or HTTP server
 
@@ -128,9 +131,12 @@ Examples:
 
 Examples:
   # Generate DB model code 
-  cwgo  model --db_type mysql --dsn "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8&parseTime=True&loc=Local"
+  cwgo  model --db_type mysql --dsn "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8mb4&parseTime=True&loc=Local"
 `
 
 	InitName  = "init"
 	InitUsage = `interactive terminals provide a more user-friendly experience for generating code`
+
+	FallbackName  = "fallback"
+	FallbackUsage = "fallback to hz or kitex"
 )

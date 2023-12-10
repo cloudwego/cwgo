@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/cloudwego/cwgo/pkg/common/kx_registry"
+	"github.com/cloudwego/cwgo/pkg/consts"
 
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
@@ -45,7 +46,7 @@ func Client(c *config.ClientArgument) error {
 		return err
 	}
 	switch c.Type {
-	case config.RPC:
+	case consts.RPC:
 		var args kargs.Arguments
 		log.Verbose = c.Verbose
 		err = convertKitexArgs(c, &args)
@@ -63,13 +64,13 @@ func Client(c *config.ClientArgument) error {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
 				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
-					replaceThriftVersion(&args)
+					utils.ReplaceThriftVersion()
 				}
 			}
 			os.Exit(1)
 		}
-		replaceThriftVersion(&args)
-	case config.HTTP:
+		utils.ReplaceThriftVersion()
+	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)
 		err = convertHzArgument(c, args)

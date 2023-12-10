@@ -31,3 +31,5 @@ output/*
 /platform/server/log/
 /platform/manifest/config/config-dev.yaml
 /platform/manifest/config/config-pro.yaml
+# mac
+.DS_Store

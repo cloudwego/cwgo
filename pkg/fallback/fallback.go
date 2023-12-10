@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/hertz/cmd/hz/app"
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 	"github.com/cloudwego/kitex"
@@ -31,7 +32,7 @@ import (
 
 func Fallback(c *config.FallbackArgument) error {
 	switch c.ToolType {
-	case config.Kitex:
+	case consts.KitexTool:
 		os.Args = c.Args
 		var args kargs.Arguments
 		args.ParseArgs(kitex.Version)
@@ -48,7 +49,7 @@ func Fallback(c *config.FallbackArgument) error {
 			}
 			os.Exit(1)
 		}
-	case config.Hz:
+	case consts.Hz:
 		os.Args = c.Args
 		defer func() {
 			logs.Flush()
