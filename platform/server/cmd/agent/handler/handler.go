@@ -177,3 +177,24 @@ func (s *AgentServiceImpl) GetTemplateItems(ctx context.Context, req *agent.GetT
 
 	return resp, err
 }
+
+// AddToken implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) AddToken(ctx context.Context, req *agent.AddTokenReq) (resp *agent.AddTokenRes, err error) {
+	resp, err = service.NewAddTokenService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// DeleteToken implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) DeleteToken(ctx context.Context, req *agent.DeleteTokenReq) (resp *agent.DeleteTokenRes, err error) {
+	resp, err = service.NewDeleteTokenService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// GetToken implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) GetToken(ctx context.Context, req *agent.GetTokenReq) (resp *agent.GetTokenRes, err error) {
+	resp, err = service.NewGetTokenService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}

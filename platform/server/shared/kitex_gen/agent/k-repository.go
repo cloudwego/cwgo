@@ -90,8 +90,36 @@ func (p *AddRepositoryReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 4:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				l, err = p.FastReadField4(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField5(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 6:
+			if fieldTypeId == thrift.I32 {
+				l, err = p.FastReadField6(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -160,7 +188,7 @@ func (p *AddRepositoryReq) FastReadField2(buf []byte) (int, error) {
 	} else {
 		offset += l
 
-		p.RepositoryUrl = v
+		p.RepositoryDomain = v
 
 	}
 	return offset, nil
@@ -174,13 +202,41 @@ func (p *AddRepositoryReq) FastReadField3(buf []byte) (int, error) {
 	} else {
 		offset += l
 
-		p.Token = v
+		p.RepositoryOwner = v
 
 	}
 	return offset, nil
 }
 
 func (p *AddRepositoryReq) FastReadField4(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.RepositoryName = v
+
+	}
+	return offset, nil
+}
+
+func (p *AddRepositoryReq) FastReadField5(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.Branch = v
+
+	}
+	return offset, nil
+}
+
+func (p *AddRepositoryReq) FastReadField6(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
@@ -204,9 +260,11 @@ func (p *AddRepositoryReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.Bina
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "AddRepositoryReq")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
-		offset += p.fastWriteField4(buf[offset:], binaryWriter)
+		offset += p.fastWriteField6(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 		offset += p.fastWriteField3(buf[offset:], binaryWriter)
+		offset += p.fastWriteField4(buf[offset:], binaryWriter)
+		offset += p.fastWriteField5(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -221,6 +279,8 @@ func (p *AddRepositoryReq) BLength() int {
 		l += p.field2Length()
 		l += p.field3Length()
 		l += p.field4Length()
+		l += p.field5Length()
+		l += p.field6Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -238,8 +298,8 @@ func (p *AddRepositoryReq) fastWriteField1(buf []byte, binaryWriter bthrift.Bina
 
 func (p *AddRepositoryReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_url", thrift.STRING, 2)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.RepositoryUrl)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_domain", thrift.STRING, 2)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.RepositoryDomain)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -247,8 +307,8 @@ func (p *AddRepositoryReq) fastWriteField2(buf []byte, binaryWriter bthrift.Bina
 
 func (p *AddRepositoryReq) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "token", thrift.STRING, 3)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Token)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_owner", thrift.STRING, 3)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.RepositoryOwner)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -256,7 +316,25 @@ func (p *AddRepositoryReq) fastWriteField3(buf []byte, binaryWriter bthrift.Bina
 
 func (p *AddRepositoryReq) fastWriteField4(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "store_type", thrift.I32, 4)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_name", thrift.STRING, 4)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.RepositoryName)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *AddRepositoryReq) fastWriteField5(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "branch", thrift.STRING, 5)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Branch)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *AddRepositoryReq) fastWriteField6(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "store_type", thrift.I32, 6)
 	offset += bthrift.Binary.WriteI32(buf[offset:], p.StoreType)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
@@ -274,8 +352,8 @@ func (p *AddRepositoryReq) field1Length() int {
 
 func (p *AddRepositoryReq) field2Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("repository_url", thrift.STRING, 2)
-	l += bthrift.Binary.StringLengthNocopy(p.RepositoryUrl)
+	l += bthrift.Binary.FieldBeginLength("repository_domain", thrift.STRING, 2)
+	l += bthrift.Binary.StringLengthNocopy(p.RepositoryDomain)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -283,8 +361,8 @@ func (p *AddRepositoryReq) field2Length() int {
 
 func (p *AddRepositoryReq) field3Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("token", thrift.STRING, 3)
-	l += bthrift.Binary.StringLengthNocopy(p.Token)
+	l += bthrift.Binary.FieldBeginLength("repository_owner", thrift.STRING, 3)
+	l += bthrift.Binary.StringLengthNocopy(p.RepositoryOwner)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -292,7 +370,25 @@ func (p *AddRepositoryReq) field3Length() int {
 
 func (p *AddRepositoryReq) field4Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("store_type", thrift.I32, 4)
+	l += bthrift.Binary.FieldBeginLength("repository_name", thrift.STRING, 4)
+	l += bthrift.Binary.StringLengthNocopy(p.RepositoryName)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *AddRepositoryReq) field5Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("branch", thrift.STRING, 5)
+	l += bthrift.Binary.StringLengthNocopy(p.Branch)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *AddRepositoryReq) field6Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("store_type", thrift.I32, 6)
 	l += bthrift.Binary.I32Length(p.StoreType)
 
 	l += bthrift.Binary.FieldEndLength()
@@ -932,7 +1028,7 @@ func (p *UpdateRepositoryReq) FastReadField2(buf []byte) (int, error) {
 	} else {
 		offset += l
 
-		p.Token = v
+		p.Branch = v
 
 	}
 	return offset, nil
@@ -994,8 +1090,8 @@ func (p *UpdateRepositoryReq) fastWriteField1(buf []byte, binaryWriter bthrift.B
 
 func (p *UpdateRepositoryReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "token", thrift.STRING, 2)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Token)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "branch", thrift.STRING, 2)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Branch)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -1021,8 +1117,8 @@ func (p *UpdateRepositoryReq) field1Length() int {
 
 func (p *UpdateRepositoryReq) field2Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("token", thrift.STRING, 2)
-	l += bthrift.Binary.StringLengthNocopy(p.Token)
+	l += bthrift.Binary.FieldBeginLength("branch", thrift.STRING, 2)
+	l += bthrift.Binary.StringLengthNocopy(p.Branch)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -1335,6 +1431,34 @@ func (p *GetRepositoriesReq) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 8:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField8(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 9:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField9(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -1462,7 +1586,35 @@ func (p *GetRepositoriesReq) FastReadField7(buf []byte) (int, error) {
 	} else {
 		offset += l
 
-		p.RepositoryUrl = v
+		p.RepositoryDomain = v
+
+	}
+	return offset, nil
+}
+
+func (p *GetRepositoriesReq) FastReadField8(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.RepositoryOwner = v
+
+	}
+	return offset, nil
+}
+
+func (p *GetRepositoriesReq) FastReadField9(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.RepositoryName = v
 
 	}
 	return offset, nil
@@ -1484,6 +1636,8 @@ func (p *GetRepositoriesReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.Bi
 		offset += p.fastWriteField6(buf[offset:], binaryWriter)
 		offset += p.fastWriteField4(buf[offset:], binaryWriter)
 		offset += p.fastWriteField7(buf[offset:], binaryWriter)
+		offset += p.fastWriteField8(buf[offset:], binaryWriter)
+		offset += p.fastWriteField9(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -1501,6 +1655,8 @@ func (p *GetRepositoriesReq) BLength() int {
 		l += p.field5Length()
 		l += p.field6Length()
 		l += p.field7Length()
+		l += p.field8Length()
+		l += p.field9Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -1563,8 +1719,26 @@ func (p *GetRepositoriesReq) fastWriteField6(buf []byte, binaryWriter bthrift.Bi
 
 func (p *GetRepositoriesReq) fastWriteField7(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_url", thrift.STRING, 7)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.RepositoryUrl)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_domain", thrift.STRING, 7)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.RepositoryDomain)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *GetRepositoriesReq) fastWriteField8(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_owner", thrift.STRING, 8)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.RepositoryOwner)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *GetRepositoriesReq) fastWriteField9(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_name", thrift.STRING, 9)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.RepositoryName)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -1626,8 +1800,26 @@ func (p *GetRepositoriesReq) field6Length() int {
 
 func (p *GetRepositoriesReq) field7Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("repository_url", thrift.STRING, 7)
-	l += bthrift.Binary.StringLengthNocopy(p.RepositoryUrl)
+	l += bthrift.Binary.FieldBeginLength("repository_domain", thrift.STRING, 7)
+	l += bthrift.Binary.StringLengthNocopy(p.RepositoryDomain)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *GetRepositoriesReq) field8Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("repository_owner", thrift.STRING, 8)
+	l += bthrift.Binary.StringLengthNocopy(p.RepositoryOwner)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *GetRepositoriesReq) field9Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("repository_name", thrift.STRING, 9)
+	l += bthrift.Binary.StringLengthNocopy(p.RepositoryName)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l

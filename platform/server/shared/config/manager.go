@@ -31,6 +31,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type Manager struct {
@@ -93,12 +94,23 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 	}
 
+	var err error
+
 	// init consts in config
 	consts.ProxyUrl = config.App.ProxyUrl
 
+	if config.App.Timezone == "" {
+		consts.TimeZone = time.Local
+	} else {
+		consts.TimeZone, err = time.LoadLocation(config.App.Timezone)
+		if err != nil {
+			return err
+		}
+	}
+
 	// get service id
 	var serviceId string
-	_, err := os.Stat(consts.AgentMetadataFile)
+	_, err = os.Stat(consts.AgentMetadataFile)
 	if os.IsNotExist(err) {
 		// agent file not exist
 		// generate a new service id

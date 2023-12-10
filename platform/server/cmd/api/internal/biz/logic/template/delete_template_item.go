@@ -22,10 +22,10 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 const (
@@ -47,10 +47,10 @@ func NewDeleteTemplateItemLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 func (l *DeleteTemplateItemLogic) DeleteTemplateItem(req *template.DeleteTemplateItemReq) (res *template.DeleteTemplateItemRes) {
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &template.DeleteTemplateItemRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
@@ -58,15 +58,15 @@ func (l *DeleteTemplateItemLogic) DeleteTemplateItem(req *template.DeleteTemplat
 		Ids: req.Ids,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &template.DeleteTemplateItemRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
 		return &template.DeleteTemplateItemRes{
-			Code: http.StatusBadRequest,
+			Code: rpcRes.Code,
 			Msg:  rpcRes.Msg,
 		}
 	}

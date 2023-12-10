@@ -20,52 +20,131 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/xanzy/go-gitlab"
-	"regexp"
+	"go.uber.org/zap"
 	"strings"
+	"time"
 )
 
 type GitLabApi struct {
-	client *gitlab.Client
+	client              *gitlab.Client
+	repoApiDomain       string
+	token               string
+	tokenOwner          string
+	repoOwner           string
+	repoName            string
+	tokenExpirationTime time.Time
 }
 
-func NewGitLabApi(client *gitlab.Client) *GitLabApi {
+func NewGitLabApi(domain, token, repoOwner, repoName string) (*GitLabApi, error) {
+	client, err := utils.NewGitlabClient(token, "https://"+domain)
+	if err != nil {
+		if utils.IsNetworkError(err) {
+			return nil, errors.New("client initialization request timeout")
+		} else {
+			return nil, errors.New("client initialization request unknown error")
+		}
+	}
+
+	// get token info
+	tokenOwner, tokenExpirationTime, err := utils.GetGitLabTokenInfo(client)
+	if err != nil {
+		return nil, err
+	}
+
+	// check token has certain repo permission
+	isValid, err := utils.ValidateTokenForRepoGitLab(client, repoOwner, repoName)
+	if err != nil {
+		logger.Logger.Error("validate token for repo failed", zap.Error(err))
+		return nil, err
+	}
+
+	if !isValid {
+		return nil, consts.ErrTokenInvalid
+	}
+
 	return &GitLabApi{
-		client: client,
-	}
+		client:              client,
+		repoApiDomain:       domain,
+		token:               token,
+		tokenOwner:          tokenOwner,
+		repoOwner:           repoOwner,
+		repoName:            repoName,
+		tokenExpirationTime: tokenExpirationTime,
+	}, nil
 }
 
-const (
-	regGitLabURL     = `https?://[^/]+/([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`
-	regGitLabRepoURL = `https?://[^/]+/([^/]+)/([^/]+)`
-)
-
-func (a *GitLabApi) ParseIdlUrl(url string) (filePid, owner, repoName string, err error) {
-	// using regular expressions to match fields
-	regex := regexp.MustCompile(regGitLabURL)
-	matches := regex.FindStringSubmatch(url)
-	if len(matches) != 5 {
-		return "", "", "", errors.New("idlPath format wrong, cannot parse gitlab URL")
-	}
-
-	owner = matches[1]
-	repoName = matches[2]
-	filePid = strings.Split(matches[4], "?")[0]
-
-	return filePid, owner, repoName, nil
+func (a *GitLabApi) GetProjectPid() string {
+	return fmt.Sprintf("%s/%s", a.repoOwner, a.repoName)
 }
 
-func (a *GitLabApi) ParseRepoUrl(url string) (owner, repoName string, err error) {
-	// Extracting information using regular expressions
-	r := regexp.MustCompile(regGitLabRepoURL)
-	matches := r.FindStringSubmatch(url)
+func (a *GitLabApi) GetRepoApiDomain() (domain string) {
+	return a.repoApiDomain
+}
 
-	if len(matches) != 3 {
-		return "", "", errors.New("repoPath format wrong, cannot parse gitlab repository URL")
+func (a *GitLabApi) GetToken() (token string) {
+	return a.token
+}
+
+func (a *GitLabApi) GetTokenOwner() (tokenOwner string) {
+	return a.tokenOwner
+}
+
+func (a *GitLabApi) GetRepoOwner() (repoOwner string) {
+	return a.repoOwner
+}
+
+func (a *GitLabApi) GetRepoName() (repoName string) {
+	return a.repoName
+}
+
+func (a *GitLabApi) CheckTokenIfExpired() bool {
+	return a.tokenExpirationTime.Before(time.Now())
+}
+
+func (a *GitLabApi) GetRepoDefaultBranch() (string, error) {
+	project, _, err := a.client.Projects.GetProject(a.GetProjectPid(), &gitlab.GetProjectOptions{})
+	if err != nil {
+		return "", err
 	}
 
-	return matches[1], matches[2], nil
+	return project.DefaultBranch, nil
+}
+func (a *GitLabApi) ValidateRepoBranch(branch string) (bool, error) {
+	branchesRes, _, err := a.client.Branches.ListBranches(a.GetProjectPid(), &gitlab.ListBranchesOptions{})
+	if err != nil {
+		return false, err
+	}
+
+	for _, branchRes := range branchesRes {
+		if branchRes.Name == branch {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (a *GitLabApi) GetRepoBranches() ([]string, error) {
+	branchesRes, _, err := a.client.Branches.ListBranches(a.GetProjectPid(), &gitlab.ListBranchesOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	branches := make([]string, len(branchesRes))
+
+	for i, branchRes := range branchesRes {
+		branches[i] = branchRes.Name
+	}
+
+	return branches, nil
+}
+
+func (a *GitLabApi) ParseFileUrl(url string) (filePid, owner, repoName string, err error) {
+	return utils.ParseRepoFileUrl(consts.RepositoryTypeNumGitLab, url)
 }
 
 func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {

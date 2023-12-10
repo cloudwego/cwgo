@@ -21,10 +21,10 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"gorm.io/gorm"
-	"net/http"
 )
 
 type UpdateIDLService struct {
@@ -47,15 +47,16 @@ func (s *UpdateIDLService) Run(req *agent.UpdateIDLReq) (resp *agent.UpdateIDLRe
 		ServiceName:     req.ServiceName,
 	})
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 			return &agent.UpdateIDLRes{
-				Code: http.StatusBadRequest,
+				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "idl id not exist",
 			}, nil
 		}
+
 		return &agent.UpdateIDLRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 

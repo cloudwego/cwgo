@@ -22,8 +22,8 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
-	"net/http"
 )
 
 type DeleteRepositoriesService struct {
@@ -41,15 +41,16 @@ func NewDeleteRepositoriesService(ctx context.Context, svcCtx *svc.ServiceContex
 func (s *DeleteRepositoriesService) Run(req *agent.DeleteRepositoriesReq) (resp *agent.DeleteRepositoriesRes, err error) {
 	err = s.svcCtx.DaoManager.Repository.DeleteRepository(s.ctx, req.Ids)
 	if err != nil {
-		if err == consts.ErrRecordNotFound {
+		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 			return &agent.DeleteRepositoriesRes{
-				Code: http.StatusBadRequest,
+				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "repo id not exist",
 			}, nil
 		}
+
 		return &agent.DeleteRepositoriesRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 

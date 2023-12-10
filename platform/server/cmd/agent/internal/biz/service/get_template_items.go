@@ -21,8 +21,8 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
-	"net/http"
 )
 
 type GetTemplateItemsService struct {
@@ -41,8 +41,8 @@ func (s *GetTemplateItemsService) Run(req *agent.GetTemplateItemsReq) (resp *age
 	templateItems, err := s.svcCtx.DaoManager.Template.GetTemplateItemList(s.ctx, req.TemplateId, req.Page, req.Limit, req.Order, req.OrderBy)
 	if err != nil {
 		return &agent.GetTemplateItemsRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  consts.ErrMsgDatabase,
 			Data: nil,
 		}, nil
 	}

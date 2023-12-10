@@ -25,6 +25,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/idl"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/template"
+	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/token"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
 )
@@ -33,6 +34,7 @@ type Manager struct {
 	Idl        idl.IIdlDaoManager
 	Repository repository.IRepositoryDaoManager
 	Template   template.ITemplateDaoManager
+	Token      token.ITokenDaoManager
 }
 
 func NewDaoManager(conf store.Config) (*Manager, error) {
@@ -49,11 +51,13 @@ func NewDaoManager(conf store.Config) (*Manager, error) {
 		idlDaoManager := idl.NewMysqlIDL(mysqlDb)
 		repositoryDaoManager := repository.NewMysqlRepository(mysqlDb)
 		templateDaoManager := template.NewMysqlTemplate(mysqlDb)
+		tokenDaoManager := token.NewMysqlToken(mysqlDb)
 
 		return &Manager{
 			Idl:        idlDaoManager,
 			Repository: repositoryDaoManager,
 			Template:   templateDaoManager,
+			Token:      tokenDaoManager,
 		}, nil
 
 	case consts.StoreTypeNumMongo:

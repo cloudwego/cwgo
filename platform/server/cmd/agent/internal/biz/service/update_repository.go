@@ -21,11 +21,10 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/repository"
-	"gorm.io/gorm"
-	"net/http"
 )
 
 type UpdateRepositoryService struct {
@@ -44,9 +43,9 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 	// validate repo info
 	repoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.Id)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 			return &agent.UpdateRepositoryRes{
-				Code: http.StatusBadRequest,
+				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "repo id not exist",
 			}, nil
 		}
@@ -54,42 +53,21 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 
 	repoModel.Status = req.Status
 
-	if req.Token != "" {
-		// check token if valid
-		repoModel.Token = req.Token
-
-		err = s.svcCtx.RepoManager.AddClient(repoModel)
-		if err != nil {
-			if err == repository.ErrTokenInvalid {
-				return &agent.UpdateRepositoryRes{
-					Code: http.StatusBadRequest,
-					Msg:  err.Error(),
-				}, nil
-			}
-
-			return &agent.UpdateRepositoryRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
-			}, nil
-		}
-	}
-
 	// update repo info
 	err = s.svcCtx.DaoManager.Repository.UpdateRepository(s.ctx, model.Repository{
 		Id:     req.Id,
-		Token:  req.Token,
 		Status: req.Status,
 	})
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 			return &agent.UpdateRepositoryRes{
-				Code: http.StatusBadRequest,
+				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "repo id not exist",
 			}, nil
 		}
 		return &agent.UpdateRepositoryRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 

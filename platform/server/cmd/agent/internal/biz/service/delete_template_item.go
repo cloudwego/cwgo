@@ -21,8 +21,8 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
-	"net/http"
 )
 
 type DeleteTemplateItemService struct {
@@ -41,8 +41,8 @@ func (s *DeleteTemplateItemService) Run(req *agent.DeleteTemplateItemReq) (resp 
 	err = s.svcCtx.DaoManager.Template.DeleteTemplateItem(context.Background(), req.Ids)
 	if err != nil {
 		return &agent.DeleteTemplateItemRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 

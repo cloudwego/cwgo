@@ -25,8 +25,8 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
-	"net/http"
 	"net/url"
 )
 
@@ -47,54 +47,59 @@ func NewAddRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Add
 }
 
 func (l *AddRepositoryLogic) AddRepository(req *repository.AddRepositoryReq) (res *repository.AddRepositoryRes) {
+	// validate repository url
 	_, err := url.Parse(req.RepositoryURL)
 	if err != nil {
 		return &repository.AddRepositoryRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid repository url path",
+			Code: consts.ErrNumParamRepositoryUrl,
+			Msg:  consts.ErrMsgParamRepositoryUrl,
 		}
 	}
 
 	if _, ok := consts.RepositoryTypeNumMap[int(req.RepositoryType)]; !ok {
 		return &repository.AddRepositoryRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid repository type",
+			Code: consts.ErrNumParamRepositoryType,
+			Msg:  consts.ErrMsgParamRepositoryType,
+		}
+	}
+
+	// parse repository url
+	domain, owner, repoName, err := utils.ParseRepoUrl(req.RepositoryURL)
+	if err != nil {
+		return &repository.AddRepositoryRes{
+			Code: consts.ErrNumParamRepositoryUrl,
+			Msg:  consts.ErrMsgParamRepositoryUrl,
 		}
 	}
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &repository.AddRepositoryRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
 	rpcRes, err := client.AddRepository(l.ctx, &agent.AddRepositoryReq{
-		RepositoryType: req.RepositoryType,
-		RepositoryUrl:  req.RepositoryURL,
-		StoreType:      req.StoreType,
-		Token:          req.Token,
+		RepositoryType:   req.RepositoryType,
+		RepositoryDomain: domain,
+		RepositoryOwner:  owner,
+		RepositoryName:   repoName,
+		Branch:           req.Branch,
+		StoreType:        req.StoreType,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &repository.AddRepositoryRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
-		if rpcRes.Code == http.StatusBadRequest {
-			return &repository.AddRepositoryRes{
-				Code: http.StatusBadRequest,
-				Msg:  rpcRes.Msg,
-			}
-		}
-
 		return &repository.AddRepositoryRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: rpcRes.Code,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

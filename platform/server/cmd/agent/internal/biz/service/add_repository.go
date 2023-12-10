@@ -22,10 +22,9 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/repository"
-	"net/http"
 )
 
 type AddRepositoryService struct {
@@ -42,41 +41,43 @@ func NewAddRepositoryService(ctx context.Context, svcCtx *svc.ServiceContext) *A
 // Run create note info
 func (s *AddRepositoryService) Run(req *agent.AddRepositoryReq) (resp *agent.AddRepositoryRes, err error) {
 	repo := model.Repository{
-		RepositoryType: req.RepositoryType,
-		StoreType:      req.StoreType,
-		RepositoryUrl:  req.RepositoryUrl,
-		Token:          req.Token,
+		RepositoryType:   req.RepositoryType,
+		RepositoryDomain: req.RepositoryDomain,
+		RepositoryOwner:  req.RepositoryOwner,
+		RepositoryName:   req.RepositoryName,
+		StoreType:        req.StoreType,
+		RepositoryBranch: req.Branch,
 	}
 
 	// validate repo info add repo to memory
 	err = s.svcCtx.RepoManager.AddClient(&repo)
 	if err != nil {
-		if err == repository.ErrTokenInvalid {
+		if errx.GetCode(err) == consts.ErrNumTokenInvalid {
 			return &agent.AddRepositoryRes{
-				Code: http.StatusBadRequest,
+				Code: consts.ErrNumTokenInvalid,
 				Msg:  err.Error(),
 			}, nil
 		}
 
 		return &agent.AddRepositoryRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: -1,
+			Msg:  err.Error(),
 		}, nil
 	}
 
 	// save repo info to db
 	_, err = s.svcCtx.DaoManager.Repository.AddRepository(s.ctx, repo)
 	if err != nil {
-		if err == consts.ErrDuplicateRecord {
+		if errx.GetCode(err) == consts.ErrNumDatabaseDuplicateRecord {
 			return &agent.AddRepositoryRes{
-				Code: http.StatusBadRequest,
+				Code: consts.ErrNumDatabaseDuplicateRecord,
 				Msg:  "repository is already exist",
 			}, nil
 		}
 
 		return &agent.AddRepositoryRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 

@@ -22,8 +22,8 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
-	"net/http"
 )
 
 type DeleteIDLService struct {
@@ -41,15 +41,16 @@ func NewDeleteIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *Delet
 func (s *DeleteIDLService) Run(req *agent.DeleteIDLsReq) (resp *agent.DeleteIDLsRes, err error) {
 	err = s.svcCtx.DaoManager.Idl.DeleteIDLs(s.ctx, req.Ids)
 	if err != nil {
-		if err == consts.ErrRecordNotFound {
+		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 			return &agent.DeleteIDLsRes{
-				Code: http.StatusBadRequest,
+				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "repo id not exist",
 			}, nil
 		}
+
 		return &agent.DeleteIDLsRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 

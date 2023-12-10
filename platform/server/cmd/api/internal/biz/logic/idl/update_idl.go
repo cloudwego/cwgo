@@ -22,10 +22,10 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 const (
@@ -47,10 +47,10 @@ func NewUpdateIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateI
 func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes) {
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &idl.UpdateIDLRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
@@ -59,22 +59,16 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 		ServiceName:  req.ServiceName,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &idl.UpdateIDLRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
-		if rpcRes.Code == http.StatusBadRequest {
-			return &idl.UpdateIDLRes{
-				Code: http.StatusBadRequest,
-				Msg:  rpcRes.Msg,
-			}
-		}
 		return &idl.UpdateIDLRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: rpcRes.Code,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

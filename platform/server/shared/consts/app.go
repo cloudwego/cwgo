@@ -18,6 +18,9 @@
 
 package consts
 
+import "time"
+
 var (
 	ProxyUrl string
+	TimeZone *time.Location
 )

@@ -17,8 +17,19 @@
 package repository
 
 type IRepository interface {
-	ParseIdlUrl(url string) (filePid, owner, repoName string, err error)                                // parse IDL URL to the key message
-	ParseRepoUrl(url string) (owner, repoName string, err error)                                        // parse Repository to the key message
+	GetRepoApiDomain() (domain string)
+	GetToken() (token string)
+	GetTokenOwner() (tokenOwner string)
+	GetRepoOwner() (repoOwner string)
+	GetRepoName() (repoName string)
+
+	CheckTokenIfExpired() bool
+
+	GetRepoDefaultBranch() (string, error)
+	ValidateRepoBranch(branch string) (bool, error)
+	GetRepoBranches() ([]string, error)
+
+	ParseFileUrl(url string) (filePid, owner, repoName string, err error)                               // parse file URL to the key message
 	GetFile(owner, repoName, filePid, ref string) (*File, error)                                        // get a file from a repository
 	PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error // push files to the repository
 	GetRepositoryArchive(owner, repoName, ref string) ([]byte, error)                                   // obtain the byte of the compressed package, gitlab could not specify ref

@@ -10,10 +10,12 @@ import (
 )
 
 type AddRepositoryReq struct {
-	RepositoryType int32  `thrift:"repository_type,1" frugal:"1,default,i32" json:"repository_type"`
-	RepositoryUrl  string `thrift:"repository_url,2" frugal:"2,default,string" json:"repository_url"`
-	Token          string `thrift:"token,3" frugal:"3,default,string" json:"token"`
-	StoreType      int32  `thrift:"store_type,4" frugal:"4,default,i32" json:"store_type"`
+	RepositoryType   int32  `thrift:"repository_type,1" frugal:"1,default,i32" json:"repository_type"`
+	RepositoryDomain string `thrift:"repository_domain,2" frugal:"2,default,string" json:"repository_domain"`
+	RepositoryOwner  string `thrift:"repository_owner,3" frugal:"3,default,string" json:"repository_owner"`
+	RepositoryName   string `thrift:"repository_name,4" frugal:"4,default,string" json:"repository_name"`
+	Branch           string `thrift:"branch,5" frugal:"5,default,string" json:"branch"`
+	StoreType        int32  `thrift:"store_type,6" frugal:"6,default,i32" json:"store_type"`
 }
 
 func NewAddRepositoryReq() *AddRepositoryReq {
@@ -28,12 +30,20 @@ func (p *AddRepositoryReq) GetRepositoryType() (v int32) {
 	return p.RepositoryType
 }
 
-func (p *AddRepositoryReq) GetRepositoryUrl() (v string) {
-	return p.RepositoryUrl
+func (p *AddRepositoryReq) GetRepositoryDomain() (v string) {
+	return p.RepositoryDomain
 }
 
-func (p *AddRepositoryReq) GetToken() (v string) {
-	return p.Token
+func (p *AddRepositoryReq) GetRepositoryOwner() (v string) {
+	return p.RepositoryOwner
+}
+
+func (p *AddRepositoryReq) GetRepositoryName() (v string) {
+	return p.RepositoryName
+}
+
+func (p *AddRepositoryReq) GetBranch() (v string) {
+	return p.Branch
 }
 
 func (p *AddRepositoryReq) GetStoreType() (v int32) {
@@ -42,11 +52,17 @@ func (p *AddRepositoryReq) GetStoreType() (v int32) {
 func (p *AddRepositoryReq) SetRepositoryType(val int32) {
 	p.RepositoryType = val
 }
-func (p *AddRepositoryReq) SetRepositoryUrl(val string) {
-	p.RepositoryUrl = val
+func (p *AddRepositoryReq) SetRepositoryDomain(val string) {
+	p.RepositoryDomain = val
 }
-func (p *AddRepositoryReq) SetToken(val string) {
-	p.Token = val
+func (p *AddRepositoryReq) SetRepositoryOwner(val string) {
+	p.RepositoryOwner = val
+}
+func (p *AddRepositoryReq) SetRepositoryName(val string) {
+	p.RepositoryName = val
+}
+func (p *AddRepositoryReq) SetBranch(val string) {
+	p.Branch = val
 }
 func (p *AddRepositoryReq) SetStoreType(val int32) {
 	p.StoreType = val
@@ -54,9 +70,11 @@ func (p *AddRepositoryReq) SetStoreType(val int32) {
 
 var fieldIDToName_AddRepositoryReq = map[int16]string{
 	1: "repository_type",
-	2: "repository_url",
-	3: "token",
-	4: "store_type",
+	2: "repository_domain",
+	3: "repository_owner",
+	4: "repository_name",
+	5: "branch",
+	6: "store_type",
 }
 
 func (p *AddRepositoryReq) Read(iprot thrift.TProtocol) (err error) {
@@ -109,8 +127,28 @@ func (p *AddRepositoryReq) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 4:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField5(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 6:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField6(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -161,7 +199,7 @@ func (p *AddRepositoryReq) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.RepositoryUrl = v
+		p.RepositoryDomain = v
 	}
 	return nil
 }
@@ -170,12 +208,30 @@ func (p *AddRepositoryReq) ReadField3(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.Token = v
+		p.RepositoryOwner = v
 	}
 	return nil
 }
 
 func (p *AddRepositoryReq) ReadField4(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.RepositoryName = v
+	}
+	return nil
+}
+
+func (p *AddRepositoryReq) ReadField5(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.Branch = v
+	}
+	return nil
+}
+
+func (p *AddRepositoryReq) ReadField6(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -204,6 +260,14 @@ func (p *AddRepositoryReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
+			goto WriteFieldError
+		}
+		if err = p.writeField6(oprot); err != nil {
+			fieldId = 6
 			goto WriteFieldError
 		}
 
@@ -243,10 +307,10 @@ WriteFieldEndError:
 }
 
 func (p *AddRepositoryReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("repository_url", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("repository_domain", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.RepositoryUrl); err != nil {
+	if err := oprot.WriteString(p.RepositoryDomain); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -260,10 +324,10 @@ WriteFieldEndError:
 }
 
 func (p *AddRepositoryReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("token", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("repository_owner", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Token); err != nil {
+	if err := oprot.WriteString(p.RepositoryOwner); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -277,10 +341,10 @@ WriteFieldEndError:
 }
 
 func (p *AddRepositoryReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("store_type", thrift.I32, 4); err != nil {
+	if err = oprot.WriteFieldBegin("repository_name", thrift.STRING, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.StoreType); err != nil {
+	if err := oprot.WriteString(p.RepositoryName); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -291,6 +355,40 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *AddRepositoryReq) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("branch", thrift.STRING, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Branch); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
+func (p *AddRepositoryReq) writeField6(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("store_type", thrift.I32, 6); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.StoreType); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
 }
 
 func (p *AddRepositoryReq) String() string {
@@ -309,13 +407,19 @@ func (p *AddRepositoryReq) DeepEqual(ano *AddRepositoryReq) bool {
 	if !p.Field1DeepEqual(ano.RepositoryType) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.RepositoryUrl) {
+	if !p.Field2DeepEqual(ano.RepositoryDomain) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Token) {
+	if !p.Field3DeepEqual(ano.RepositoryOwner) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.StoreType) {
+	if !p.Field4DeepEqual(ano.RepositoryName) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.Branch) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.StoreType) {
 		return false
 	}
 	return true
@@ -330,19 +434,33 @@ func (p *AddRepositoryReq) Field1DeepEqual(src int32) bool {
 }
 func (p *AddRepositoryReq) Field2DeepEqual(src string) bool {
 
-	if strings.Compare(p.RepositoryUrl, src) != 0 {
+	if strings.Compare(p.RepositoryDomain, src) != 0 {
 		return false
 	}
 	return true
 }
 func (p *AddRepositoryReq) Field3DeepEqual(src string) bool {
 
-	if strings.Compare(p.Token, src) != 0 {
+	if strings.Compare(p.RepositoryOwner, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *AddRepositoryReq) Field4DeepEqual(src int32) bool {
+func (p *AddRepositoryReq) Field4DeepEqual(src string) bool {
+
+	if strings.Compare(p.RepositoryName, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddRepositoryReq) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.Branch, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddRepositoryReq) Field6DeepEqual(src int32) bool {
 
 	if p.StoreType != src {
 		return false
@@ -989,7 +1107,7 @@ func (p *DeleteRepositoriesRes) Field2DeepEqual(src string) bool {
 
 type UpdateRepositoryReq struct {
 	Id     int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
-	Token  string `thrift:"token,2" frugal:"2,default,string" json:"token"`
+	Branch string `thrift:"branch,2" frugal:"2,default,string" json:"branch"`
 	Status int32  `thrift:"status,3" frugal:"3,default,i32" json:"status"`
 }
 
@@ -1005,8 +1123,8 @@ func (p *UpdateRepositoryReq) GetId() (v int64) {
 	return p.Id
 }
 
-func (p *UpdateRepositoryReq) GetToken() (v string) {
-	return p.Token
+func (p *UpdateRepositoryReq) GetBranch() (v string) {
+	return p.Branch
 }
 
 func (p *UpdateRepositoryReq) GetStatus() (v int32) {
@@ -1015,8 +1133,8 @@ func (p *UpdateRepositoryReq) GetStatus() (v int32) {
 func (p *UpdateRepositoryReq) SetId(val int64) {
 	p.Id = val
 }
-func (p *UpdateRepositoryReq) SetToken(val string) {
-	p.Token = val
+func (p *UpdateRepositoryReq) SetBranch(val string) {
+	p.Branch = val
 }
 func (p *UpdateRepositoryReq) SetStatus(val int32) {
 	p.Status = val
@@ -1024,7 +1142,7 @@ func (p *UpdateRepositoryReq) SetStatus(val int32) {
 
 var fieldIDToName_UpdateRepositoryReq = map[int16]string{
 	1: "id",
-	2: "token",
+	2: "branch",
 	3: "status",
 }
 
@@ -1120,7 +1238,7 @@ func (p *UpdateRepositoryReq) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.Token = v
+		p.Branch = v
 	}
 	return nil
 }
@@ -1189,10 +1307,10 @@ WriteFieldEndError:
 }
 
 func (p *UpdateRepositoryReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("token", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("branch", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Token); err != nil {
+	if err := oprot.WriteString(p.Branch); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1238,7 +1356,7 @@ func (p *UpdateRepositoryReq) DeepEqual(ano *UpdateRepositoryReq) bool {
 	if !p.Field1DeepEqual(ano.Id) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.Token) {
+	if !p.Field2DeepEqual(ano.Branch) {
 		return false
 	}
 	if !p.Field3DeepEqual(ano.Status) {
@@ -1256,7 +1374,7 @@ func (p *UpdateRepositoryReq) Field1DeepEqual(src int64) bool {
 }
 func (p *UpdateRepositoryReq) Field2DeepEqual(src string) bool {
 
-	if strings.Compare(p.Token, src) != 0 {
+	if strings.Compare(p.Branch, src) != 0 {
 		return false
 	}
 	return true
@@ -1493,13 +1611,15 @@ func (p *UpdateRepositoryRes) Field2DeepEqual(src string) bool {
 }
 
 type GetRepositoriesReq struct {
-	Page           int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
-	Limit          int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
-	Order          int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
-	OrderBy        string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
-	RepositoryType int32  `thrift:"repository_type,5" frugal:"5,default,i32" json:"repository_type"`
-	StoreType      int32  `thrift:"store_type,6" frugal:"6,default,i32" json:"store_type"`
-	RepositoryUrl  string `thrift:"repository_url,7" frugal:"7,default,string" json:"repository_url"`
+	Page             int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
+	Limit            int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
+	Order            int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
+	OrderBy          string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
+	RepositoryType   int32  `thrift:"repository_type,5" frugal:"5,default,i32" json:"repository_type"`
+	StoreType        int32  `thrift:"store_type,6" frugal:"6,default,i32" json:"store_type"`
+	RepositoryDomain string `thrift:"repository_domain,7" frugal:"7,default,string" json:"repository_domain"`
+	RepositoryOwner  string `thrift:"repository_owner,8" frugal:"8,default,string" json:"repository_owner"`
+	RepositoryName   string `thrift:"repository_name,9" frugal:"9,default,string" json:"repository_name"`
 }
 
 func NewGetRepositoriesReq() *GetRepositoriesReq {
@@ -1534,8 +1654,16 @@ func (p *GetRepositoriesReq) GetStoreType() (v int32) {
 	return p.StoreType
 }
 
-func (p *GetRepositoriesReq) GetRepositoryUrl() (v string) {
-	return p.RepositoryUrl
+func (p *GetRepositoriesReq) GetRepositoryDomain() (v string) {
+	return p.RepositoryDomain
+}
+
+func (p *GetRepositoriesReq) GetRepositoryOwner() (v string) {
+	return p.RepositoryOwner
+}
+
+func (p *GetRepositoriesReq) GetRepositoryName() (v string) {
+	return p.RepositoryName
 }
 func (p *GetRepositoriesReq) SetPage(val int32) {
 	p.Page = val
@@ -1555,8 +1683,14 @@ func (p *GetRepositoriesReq) SetRepositoryType(val int32) {
 func (p *GetRepositoriesReq) SetStoreType(val int32) {
 	p.StoreType = val
 }
-func (p *GetRepositoriesReq) SetRepositoryUrl(val string) {
-	p.RepositoryUrl = val
+func (p *GetRepositoriesReq) SetRepositoryDomain(val string) {
+	p.RepositoryDomain = val
+}
+func (p *GetRepositoriesReq) SetRepositoryOwner(val string) {
+	p.RepositoryOwner = val
+}
+func (p *GetRepositoriesReq) SetRepositoryName(val string) {
+	p.RepositoryName = val
 }
 
 var fieldIDToName_GetRepositoriesReq = map[int16]string{
@@ -1566,7 +1700,9 @@ var fieldIDToName_GetRepositoriesReq = map[int16]string{
 	4: "order_by",
 	5: "repository_type",
 	6: "store_type",
-	7: "repository_url",
+	7: "repository_domain",
+	8: "repository_owner",
+	9: "repository_name",
 }
 
 func (p *GetRepositoriesReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1651,6 +1787,26 @@ func (p *GetRepositoriesReq) Read(iprot thrift.TProtocol) (err error) {
 		case 7:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField7(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 8:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField8(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 9:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField9(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1746,7 +1902,25 @@ func (p *GetRepositoriesReq) ReadField7(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.RepositoryUrl = v
+		p.RepositoryDomain = v
+	}
+	return nil
+}
+
+func (p *GetRepositoriesReq) ReadField8(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.RepositoryOwner = v
+	}
+	return nil
+}
+
+func (p *GetRepositoriesReq) ReadField9(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.RepositoryName = v
 	}
 	return nil
 }
@@ -1783,6 +1957,14 @@ func (p *GetRepositoriesReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField7(oprot); err != nil {
 			fieldId = 7
+			goto WriteFieldError
+		}
+		if err = p.writeField8(oprot); err != nil {
+			fieldId = 8
+			goto WriteFieldError
+		}
+		if err = p.writeField9(oprot); err != nil {
+			fieldId = 9
 			goto WriteFieldError
 		}
 
@@ -1907,10 +2089,10 @@ WriteFieldEndError:
 }
 
 func (p *GetRepositoriesReq) writeField7(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("repository_url", thrift.STRING, 7); err != nil {
+	if err = oprot.WriteFieldBegin("repository_domain", thrift.STRING, 7); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.RepositoryUrl); err != nil {
+	if err := oprot.WriteString(p.RepositoryDomain); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1921,6 +2103,40 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 7 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
+}
+
+func (p *GetRepositoriesReq) writeField8(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("repository_owner", thrift.STRING, 8); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.RepositoryOwner); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 8 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 8 end error: ", p), err)
+}
+
+func (p *GetRepositoriesReq) writeField9(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("repository_name", thrift.STRING, 9); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.RepositoryName); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 9 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 9 end error: ", p), err)
 }
 
 func (p *GetRepositoriesReq) String() string {
@@ -1954,7 +2170,13 @@ func (p *GetRepositoriesReq) DeepEqual(ano *GetRepositoriesReq) bool {
 	if !p.Field6DeepEqual(ano.StoreType) {
 		return false
 	}
-	if !p.Field7DeepEqual(ano.RepositoryUrl) {
+	if !p.Field7DeepEqual(ano.RepositoryDomain) {
+		return false
+	}
+	if !p.Field8DeepEqual(ano.RepositoryOwner) {
+		return false
+	}
+	if !p.Field9DeepEqual(ano.RepositoryName) {
 		return false
 	}
 	return true
@@ -2004,7 +2226,21 @@ func (p *GetRepositoriesReq) Field6DeepEqual(src int32) bool {
 }
 func (p *GetRepositoriesReq) Field7DeepEqual(src string) bool {
 
-	if strings.Compare(p.RepositoryUrl, src) != 0 {
+	if strings.Compare(p.RepositoryDomain, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesReq) Field8DeepEqual(src string) bool {
+
+	if strings.Compare(p.RepositoryOwner, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetRepositoriesReq) Field9DeepEqual(src string) bool {
+
+	if strings.Compare(p.RepositoryName, src) != 0 {
 		return false
 	}
 	return true

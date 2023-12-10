@@ -20,10 +20,12 @@ package store
 
 import (
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"net/url"
 )
 
 type Mysql struct {
@@ -36,13 +38,15 @@ type Mysql struct {
 }
 
 func (m Mysql) GetDsn() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Asia%%2FShanghai",
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=%s",
 		m.Username,
 		m.Password,
 		m.Addr,
 		m.Port,
 		m.Db,
-		m.Charset)
+		m.Charset,
+		url.PathEscape(consts.TimeZone.String()),
+	)
 }
 
 func (c Config) NewMysqlDB() (*gorm.DB, error) {

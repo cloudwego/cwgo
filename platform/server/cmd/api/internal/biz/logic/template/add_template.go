@@ -26,7 +26,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 const (
@@ -48,17 +47,17 @@ func NewAddTemplateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddTe
 func (l *AddTemplateLogic) AddTemplate(req *template.AddTemplateReq) (res *template.AddTemplateRes) {
 	if _, ok := consts.TemplateTypeNumMap[int(req.Type)]; !ok {
 		return &template.AddTemplateRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid template type",
+			Code: consts.ErrNumParamTemplateType,
+			Msg:  consts.ErrMsgParamTemplateType,
 		}
 	}
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &template.AddTemplateRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
@@ -67,15 +66,15 @@ func (l *AddTemplateLogic) AddTemplate(req *template.AddTemplateReq) (res *templ
 		Type: req.Type,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &template.AddTemplateRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
 		return &template.AddTemplateRes{
-			Code: http.StatusBadRequest,
+			Code: rpcRes.Code,
 			Msg:  rpcRes.Msg,
 		}
 	}

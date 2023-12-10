@@ -1,9 +1,8 @@
 package consts
 
 const (
-	MainRef = "main"
-
-	InvalidToken = "invalid_token"
+	MainRef      = "main"
+	GitHubDomain = "github.com"
 )
 
 const (
@@ -26,8 +25,8 @@ const (
 )
 
 const (
-	RepositoryStatusNumActive = iota + 1
-	RepositoryStatusNumInactive
+	RepositoryStatusNumInactive = iota
+	RepositoryStatusNumActive
 )
 
 var (

@@ -26,7 +26,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 const (
@@ -48,8 +47,8 @@ func NewGetTemplatesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetT
 func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *template.GetTemplatesRes) {
 	if req.Order != consts.OrderNumInc && req.Order != consts.OrderNumDec {
 		return &template.GetTemplatesRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid order num",
+			Code: consts.ErrNumParamOrderNum,
+			Msg:  consts.ErrMsgParamOrderNum,
 			Data: nil,
 		}
 	}
@@ -61,8 +60,8 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 
 	default:
 		return &template.GetTemplatesRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid order by",
+			Code: consts.ErrNumParamOrderBy,
+			Msg:  consts.ErrMsgParamOrderBy,
 			Data: nil,
 		}
 	}
@@ -76,10 +75,10 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &template.GetTemplatesRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
@@ -90,15 +89,15 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 		OrderBy: req.OrderBy,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &template.GetTemplatesRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
 		return &template.GetTemplatesRes{
-			Code: http.StatusBadRequest,
+			Code: rpcRes.Code,
 			Msg:  rpcRes.Msg,
 		}
 	}

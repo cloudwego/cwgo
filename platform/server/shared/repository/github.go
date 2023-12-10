@@ -18,24 +18,16 @@ package repository
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/google/go-github/v56/github"
+	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
-	"regexp"
+	"time"
 )
-
-type GitHubApi struct {
-	client *github.Client
-}
-
-func NewGitHubApi(client *github.Client) *GitHubApi {
-	return &GitHubApi{
-		client: client,
-	}
-}
 
 const (
 	githubURLPrefix  = "https://github.com/"
@@ -43,33 +35,114 @@ const (
 	regGithubRepoURL = `https://github\.com/([^\/]+)\/([^\/]+)`
 )
 
-func (a *GitHubApi) ParseIdlUrl(url string) (filePid, owner, repoName string, err error) {
-	// define a regular expression to parse the GitHub URL.
-	regex := regexp.MustCompile(regGitHubURL)
-
-	// use the regular expression to extract relevant components from the URL.
-	matches := regex.FindStringSubmatch(url)
-	if len(matches) != 5 {
-		return "", "", "", errors.New("IDL path format is incorrect; unable to parse the GitHub URL")
-	}
-
-	// assign values to the returned variables.
-	owner = matches[1]
-	repoName = matches[2]
-	filePid = matches[4]
-
-	return filePid, owner, repoName, nil
+type GitHubApi struct {
+	client              *github.Client
+	repoApiDomain       string
+	token               string
+	tokenOwner          string
+	repoOwner           string
+	repoName            string
+	tokenExpirationTime time.Time
 }
 
-func (a *GitHubApi) ParseRepoUrl(url string) (owner, repoName string, err error) {
-	// extracting information using regular expressions
-	r := regexp.MustCompile(regGithubRepoURL)
-	matches := r.FindStringSubmatch(url)
-	if len(matches) != 3 {
-		return "", "", errors.New("repository path format is incorrect; unable to parse the GitHub URL")
+func NewGitHubApi(token, repoOwner, repoName string) (*GitHubApi, error) {
+	client, err := utils.NewGithubClient(token)
+	if err != nil {
+		return nil, err
 	}
 
-	return matches[1], matches[2], nil
+	// get token info
+	tokenOwner, tokenExpirationTime, err := utils.GetGitHubTokenInfo(client)
+	if err != nil {
+		return nil, err
+	}
+
+	// check token has certain repo permission
+	isValid, err := utils.ValidateTokenForRepoGitHub(client, repoOwner, repoName)
+	if err != nil {
+		logger.Logger.Error("validate token for repo failed", zap.Error(err))
+		return nil, err
+	}
+
+	if !isValid {
+		return nil, consts.ErrTokenInvalid
+	}
+
+	return &GitHubApi{
+		client:              client,
+		repoApiDomain:       consts.GitHubDomain,
+		token:               token,
+		tokenOwner:          tokenOwner,
+		repoOwner:           repoOwner,
+		repoName:            repoName,
+		tokenExpirationTime: tokenExpirationTime,
+	}, nil
+}
+
+func (a *GitHubApi) GetRepoApiDomain() (domain string) {
+	return a.repoApiDomain
+}
+
+func (a *GitHubApi) GetToken() (token string) {
+	return a.token
+}
+
+func (a *GitHubApi) GetTokenOwner() (tokenOwner string) {
+	return a.tokenOwner
+}
+
+func (a *GitHubApi) GetRepoOwner() (repoOwner string) {
+	return a.repoOwner
+}
+
+func (a *GitHubApi) GetRepoName() (repoName string) {
+	return a.repoName
+}
+
+func (a *GitHubApi) CheckTokenIfExpired() bool {
+	return a.tokenExpirationTime.Before(time.Now())
+}
+
+func (a *GitHubApi) GetRepoDefaultBranch() (string, error) {
+	repo, _, err := a.client.Repositories.Get(context.TODO(), a.repoOwner, a.repoName)
+	if err != nil {
+		return "", err
+	}
+
+	return *repo.DefaultBranch, nil
+}
+func (a *GitHubApi) ValidateRepoBranch(branch string) (bool, error) {
+	branchesRes, _, err := a.client.Repositories.ListBranches(context.Background(), a.repoOwner, a.repoName, &github.BranchListOptions{})
+	if err != nil {
+		return false, err
+	}
+
+	for _, branchRes := range branchesRes {
+		if *branchRes.Name == branch {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (a *GitHubApi) GetRepoBranches() ([]string, error) {
+	branchesRes, _, err := a.client.Repositories.ListBranches(context.Background(), a.repoOwner, a.repoName, &github.BranchListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	branches := make([]string, len(branchesRes))
+
+	for i, branchRes := range branchesRes {
+		branches[i] = *branchRes.Name
+	}
+
+	return branches, nil
+}
+
+func (a *GitHubApi) ParseFileUrl(url string) (filePid, owner, repoName string, err error) {
+	return utils.ParseRepoFileUrl(consts.RepositoryTypeNumGithub, url)
 }
 
 func (a *GitHubApi) GetFile(owner, repoName, filePath, ref string) (*File, error) {

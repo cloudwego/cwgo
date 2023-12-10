@@ -134,7 +134,7 @@ func (m *MysqlIDLManager) DeleteIDLs(ctx context.Context, ids []int64) error {
 			}
 
 			if res.RowsAffected == 0 {
-				return consts.ErrRecordNotFound
+				return consts.ErrDatabaseRecordNotFound
 			}
 
 			err := tx.
@@ -154,7 +154,7 @@ func (m *MysqlIDLManager) DeleteIDLs(ctx context.Context, ids []int64) error {
 func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) error {
 	var lastSyncTime time.Time
 	if idlModel.LastSyncTime != "" {
-		lastSyncTime, _ = time.Parse(time.DateTime, idlModel.LastSyncTime)
+		lastSyncTime, _ = time.ParseInLocation(time.DateTime, idlModel.LastSyncTime, consts.TimeZone)
 	} else {
 		lastSyncTime = time.Now()
 	}
@@ -173,6 +173,9 @@ func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) err
 			// TODO: check
 			err := tx.Model(&mainIdlEntity).Updates(mainIdlEntity).Error
 			if err != nil {
+				if err == gorm.ErrRecordNotFound {
+					return consts.ErrDatabaseRecordNotFound
+				}
 				return err
 			}
 
@@ -270,6 +273,9 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDL, err
 		Where("`id` = ? AND `parent_idl_id` = 0", id).
 		Take(&mainIdlEntity).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, consts.ErrDatabaseRecordNotFound
+		}
 		return nil, err
 	}
 
@@ -279,6 +285,9 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDL, err
 		Where("`parent_idl_id` = ?", id).
 		Find(&importIdlEntities).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, consts.ErrDatabaseRecordNotFound
+		}
 		return nil, err
 	}
 

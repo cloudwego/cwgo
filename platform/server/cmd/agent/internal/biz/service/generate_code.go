@@ -20,20 +20,16 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
-	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
-	"net/http"
 	"os"
 	"strconv"
-)
-
-const (
-	successMsgGenerateCode = "generate code successfully"
 )
 
 type GenerateCodeService struct {
@@ -54,8 +50,8 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	if err != nil {
 		logger.Logger.Error("get idl info failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  "get idl info failed",
 		}, nil
 	}
 
@@ -64,42 +60,47 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	if err != nil {
 		logger.Logger.Error("get repo info failed", zap.Error(err))
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  "get repo info failed",
 		}, nil
 	}
 
 	// get repo client
 	client, err := s.svcCtx.RepoManager.GetClient(repoModel.Id)
 	if err != nil {
-		if err == repository.ErrTokenInvalid {
+		if errx.GetCode(err) == consts.ErrNumTokenInvalid {
 			// repo token is invalid or expired
 			return &agent.GenerateCodeRes{
-				Code: http.StatusBadRequest,
+				Code: consts.ErrNumTokenInvalid,
 				Msg:  err.Error(),
 			}, nil
 		}
-		logger.Logger.Error("get repo client failed", zap.Error(err), zap.Int64("repo_id", repoModel.Id))
+
+		logger.Logger.Error(consts.ErrMsgRepoGetClient, zap.Error(err), zap.Int64("repo_id", repoModel.Id))
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRepoGetClient,
+			Msg:  consts.ErrMsgRepoGetClient,
 		}, nil
 	}
 
 	// parsing URLs to obtain information
-	idlPid, owner, repoName, err := client.ParseIdlUrl(
+	idlPid, owner, repoName, err := client.ParseFileUrl(
 		utils.GetRepoFullUrl(
 			repoModel.RepositoryType,
-			repoModel.RepositoryUrl,
+			fmt.Sprintf("https://%s/%s/%s",
+				repoModel.RepositoryDomain,
+				repoModel.RepositoryOwner,
+				repoModel.RepositoryName,
+			),
 			consts.MainRef,
 			idlModel.MainIdlPath,
 		),
 	)
 	if err != nil {
-		logger.Logger.Error("parse repo url failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgParamRepositoryUrl, zap.Error(err))
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumParamRepositoryUrl,
+			Msg:  consts.ErrMsgParamRepositoryUrl,
 		}, nil
 	}
 
@@ -109,26 +110,26 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 		if os.IsNotExist(err) {
 			err = os.Mkdir(consts.TempDir, 0700)
 			if err != nil {
-				logger.Logger.Error("create temp dir failed", zap.Error(err))
+				logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 				return &agent.GenerateCodeRes{
-					Code: http.StatusInternalServerError,
-					Msg:  "internal err",
+					Code: consts.ErrNumCommonCreateTempDir,
+					Msg:  consts.ErrMsgCommonCreateTempDir,
 				}, nil
 			}
 
 			tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
 			if err != nil {
-				logger.Logger.Error("create temp dir failed", zap.Error(err))
+				logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 				return &agent.GenerateCodeRes{
-					Code: http.StatusInternalServerError,
-					Msg:  "internal err",
+					Code: consts.ErrNumCommonCreateTempDir,
+					Msg:  consts.ErrMsgCommonCreateTempDir,
 				}, nil
 			}
 		} else {
-			logger.Logger.Error("create temp dir failed", zap.Error(err))
+			logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 			return &agent.GenerateCodeRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumCommonCreateTempDir,
+				Msg:  consts.ErrMsgCommonCreateTempDir,
 			}, nil
 		}
 	}
@@ -137,10 +138,10 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	// get the entire repository archive
 	archiveData, err := client.GetRepositoryArchive(owner, repoName, consts.MainRef)
 	if err != nil {
-		logger.Logger.Error("get archive failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRepoGetArchive,
+			Msg:  consts.ErrMsgRepoGetArchive,
 		}, nil
 	}
 
@@ -153,20 +154,20 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	// extract the tar package and persist it to a temporary file
 	archiveName, err := utils.UnTar(archiveData, tempDir, isTarBall)
 	if err != nil {
-		logger.Logger.Error("parse archive failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRepoParseArchive,
+			Msg:  consts.ErrMsgRepoParseArchive,
 		}, nil
 	}
 
 	// generate code using cwgo
 	err = s.svcCtx.Generator.Generate(tempDir+"/"+archiveName+idlPid, idlModel.ServiceName, tempDir)
 	if err != nil {
-		logger.Logger.Error("generate file failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgCommonGenerateCode, zap.Error(err))
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumCommonGenerateCode,
+			Msg:  consts.ErrMsgCommonGenerateCode,
 		}, nil
 	}
 
@@ -174,8 +175,8 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	// parse the file and add it to the map
 	if err := utils.ProcessFolders(fileContentMap, tempDir, "kitex_gen", "rpc"); err != nil {
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumCommonProcessFolders,
+			Msg:  consts.ErrMsgCommonProcessFolders,
 		}, nil
 	}
 
@@ -183,29 +184,21 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	serviceRepositoryModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idlModel.ServiceRepositoryId)
 	if err != nil {
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 
-	_, serviceRepoName, err := client.ParseRepoUrl(serviceRepositoryModel.RepositoryUrl)
+	err = client.PushFilesToRepository(fileContentMap, owner, serviceRepositoryModel.RepositoryName, consts.MainRef, "generated by cwgo")
 	if err != nil {
 		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
-		}, nil
-	}
-
-	err = client.PushFilesToRepository(fileContentMap, owner, serviceRepoName, consts.MainRef, "generated by cwgo")
-	if err != nil {
-		return &agent.GenerateCodeRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRepoPush,
+			Msg:  consts.ErrMsgRepoPush,
 		}, nil
 	}
 
 	return &agent.GenerateCodeRes{
 		Code: 0,
-		Msg:  successMsgGenerateCode,
+		Msg:  "generate code successfully",
 	}, nil
 }

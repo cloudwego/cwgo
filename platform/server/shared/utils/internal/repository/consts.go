@@ -16,12 +16,13 @@
  *
  */
 
-package consts
+package repository
 
-import "errors"
+const (
+	RegRepoURL = "https?:\\/\\/([^\\/]+)\\/([^\\/]+)\\/([^\\/]+)"
 
-var (
-	ErrDuplicateRecord       = errors.New("duplicate record")
-	ErrDuplicateRecordString = "duplicate record"
-	ErrRecordNotFound        = errors.New("record not found")
+	githubURLPrefix = "https://github.com/"
+	regGitHubURL    = `https://github\.com/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
+
+	regGitLabURL = `https?://[^/]+/([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`
 )

@@ -26,7 +26,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 const (
@@ -48,8 +47,8 @@ func NewGetIDLsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetIDLsLo
 func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 	if req.Order != consts.OrderNumInc && req.Order != consts.OrderNumDec {
 		return &idl.GetIDLsRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid order num",
+			Code: consts.ErrNumParamOrderNum,
+			Msg:  consts.ErrMsgParamOrderNum,
 			Data: nil,
 		}
 	}
@@ -59,8 +58,8 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 
 	default:
 		return &idl.GetIDLsRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid order by",
+			Code: consts.ErrNumParamOrderBy,
+			Msg:  consts.ErrMsgParamOrderBy,
 			Data: nil,
 		}
 	}
@@ -74,10 +73,10 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &idl.GetIDLsRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
@@ -89,22 +88,16 @@ func (l *GetIDLsLogic) GetIDLs(req *idl.GetIDLsReq) (res *idl.GetIDLsRes) {
 		ServiceName: req.ServiceName,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &idl.GetIDLsRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
-		if rpcRes.Code == http.StatusBadRequest {
-			return &idl.GetIDLsRes{
-				Code: http.StatusBadRequest,
-				Msg:  rpcRes.Msg,
-			}
-		}
 		return &idl.GetIDLsRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: rpcRes.Code,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

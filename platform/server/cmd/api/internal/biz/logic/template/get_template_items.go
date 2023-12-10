@@ -22,10 +22,10 @@ import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 const (
@@ -47,10 +47,10 @@ func NewGetTemplateItemsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 func (l *GetTemplateItemsLogic) GetTemplateItems(req *template.GetTemplateItemsReq) (res *template.GetTemplateItemsRes) {
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &template.GetTemplateItemsRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
@@ -58,15 +58,15 @@ func (l *GetTemplateItemsLogic) GetTemplateItems(req *template.GetTemplateItemsR
 		TemplateId: req.ID,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &template.GetTemplateItemsRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
 		return &template.GetTemplateItemsRes{
-			Code: http.StatusBadRequest,
+			Code: rpcRes.Code,
 			Msg:  rpcRes.Msg,
 		}
 	}

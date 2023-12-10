@@ -39,6 +39,9 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"GetTemplateItems":   kitex.NewMethodInfo(getTemplateItemsHandler, newAgentServiceGetTemplateItemsArgs, newAgentServiceGetTemplateItemsResult, false),
 		"UpdateTasks":        kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
 		"GenerateCode":       kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
+		"AddToken":           kitex.NewMethodInfo(addTokenHandler, newAgentServiceAddTokenArgs, newAgentServiceAddTokenResult, false),
+		"DeleteToken":        kitex.NewMethodInfo(deleteTokenHandler, newAgentServiceDeleteTokenArgs, newAgentServiceDeleteTokenResult, false),
+		"GetToken":           kitex.NewMethodInfo(getTokenHandler, newAgentServiceGetTokenArgs, newAgentServiceGetTokenResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "agent",
@@ -414,6 +417,60 @@ func newAgentServiceGenerateCodeResult() interface{} {
 	return agent.NewAgentServiceGenerateCodeResult()
 }
 
+func addTokenHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceAddTokenArgs)
+	realResult := result.(*agent.AgentServiceAddTokenResult)
+	success, err := handler.(agent.AgentService).AddToken(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceAddTokenArgs() interface{} {
+	return agent.NewAgentServiceAddTokenArgs()
+}
+
+func newAgentServiceAddTokenResult() interface{} {
+	return agent.NewAgentServiceAddTokenResult()
+}
+
+func deleteTokenHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceDeleteTokenArgs)
+	realResult := result.(*agent.AgentServiceDeleteTokenResult)
+	success, err := handler.(agent.AgentService).DeleteToken(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceDeleteTokenArgs() interface{} {
+	return agent.NewAgentServiceDeleteTokenArgs()
+}
+
+func newAgentServiceDeleteTokenResult() interface{} {
+	return agent.NewAgentServiceDeleteTokenResult()
+}
+
+func getTokenHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceGetTokenArgs)
+	realResult := result.(*agent.AgentServiceGetTokenResult)
+	success, err := handler.(agent.AgentService).GetToken(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServiceGetTokenArgs() interface{} {
+	return agent.NewAgentServiceGetTokenArgs()
+}
+
+func newAgentServiceGetTokenResult() interface{} {
+	return agent.NewAgentServiceGetTokenResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -619,6 +676,36 @@ func (p *kClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq) 
 	_args.Req = req
 	var _result agent.AgentServiceGenerateCodeResult
 	if err = p.c.Call(ctx, "GenerateCode", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) AddToken(ctx context.Context, req *agent.AddTokenReq) (r *agent.AddTokenRes, err error) {
+	var _args agent.AgentServiceAddTokenArgs
+	_args.Req = req
+	var _result agent.AgentServiceAddTokenResult
+	if err = p.c.Call(ctx, "AddToken", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteToken(ctx context.Context, req *agent.DeleteTokenReq) (r *agent.DeleteTokenRes, err error) {
+	var _args agent.AgentServiceDeleteTokenArgs
+	_args.Req = req
+	var _result agent.AgentServiceDeleteTokenResult
+	if err = p.c.Call(ctx, "DeleteToken", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetToken(ctx context.Context, req *agent.GetTokenReq) (r *agent.GetTokenRes, err error) {
+	var _args agent.AgentServiceGetTokenArgs
+	_args.Req = req
+	var _result agent.AgentServiceGetTokenResult
+	if err = p.c.Call(ctx, "GetToken", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

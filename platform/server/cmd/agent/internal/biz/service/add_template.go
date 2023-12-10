@@ -21,9 +21,9 @@ package service
 import (
 	"context"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"net/http"
 )
 
 type AddTemplateService struct {
@@ -45,8 +45,8 @@ func (s *AddTemplateService) Run(req *agent.AddTemplateReq) (resp *agent.AddTemp
 	})
 	if err != nil {
 		return &agent.AddTemplateRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumDatabase,
+			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 

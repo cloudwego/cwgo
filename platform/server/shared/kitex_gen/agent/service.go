@@ -48,6 +48,12 @@ type AgentService interface {
 	UpdateTasks(ctx context.Context, req *UpdateTasksReq) (r *UpdateTasksRes, err error)
 
 	GenerateCode(ctx context.Context, req *GenerateCodeReq) (r *GenerateCodeRes, err error)
+
+	AddToken(ctx context.Context, req *AddTokenReq) (r *AddTokenRes, err error)
+
+	DeleteToken(ctx context.Context, req *DeleteTokenReq) (r *DeleteTokenRes, err error)
+
+	GetToken(ctx context.Context, req *GetTokenReq) (r *GetTokenRes, err error)
 }
 
 type AgentServiceClient struct {
@@ -256,6 +262,33 @@ func (p *AgentServiceClient) GenerateCode(ctx context.Context, req *GenerateCode
 	}
 	return _result.GetSuccess(), nil
 }
+func (p *AgentServiceClient) AddToken(ctx context.Context, req *AddTokenReq) (r *AddTokenRes, err error) {
+	var _args AgentServiceAddTokenArgs
+	_args.Req = req
+	var _result AgentServiceAddTokenResult
+	if err = p.Client_().Call(ctx, "AddToken", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+func (p *AgentServiceClient) DeleteToken(ctx context.Context, req *DeleteTokenReq) (r *DeleteTokenRes, err error) {
+	var _args AgentServiceDeleteTokenArgs
+	_args.Req = req
+	var _result AgentServiceDeleteTokenResult
+	if err = p.Client_().Call(ctx, "DeleteToken", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+func (p *AgentServiceClient) GetToken(ctx context.Context, req *GetTokenReq) (r *GetTokenRes, err error) {
+	var _args AgentServiceGetTokenArgs
+	_args.Req = req
+	var _result AgentServiceGetTokenResult
+	if err = p.Client_().Call(ctx, "GetToken", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
 
 type AgentServiceProcessor struct {
 	processorMap map[string]thrift.TProcessorFunction
@@ -297,6 +330,9 @@ func NewAgentServiceProcessor(handler AgentService) *AgentServiceProcessor {
 	self.AddToProcessorMap("GetTemplateItems", &agentServiceProcessorGetTemplateItems{handler: handler})
 	self.AddToProcessorMap("UpdateTasks", &agentServiceProcessorUpdateTasks{handler: handler})
 	self.AddToProcessorMap("GenerateCode", &agentServiceProcessorGenerateCode{handler: handler})
+	self.AddToProcessorMap("AddToken", &agentServiceProcessorAddToken{handler: handler})
+	self.AddToProcessorMap("DeleteToken", &agentServiceProcessorDeleteToken{handler: handler})
+	self.AddToProcessorMap("GetToken", &agentServiceProcessorGetToken{handler: handler})
 	return self
 }
 func (p *AgentServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -1260,6 +1296,150 @@ func (p *agentServiceProcessorGenerateCode) Process(ctx context.Context, seqId i
 		result.Success = retval
 	}
 	if err2 = oprot.WriteMessageBegin("GenerateCode", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type agentServiceProcessorAddToken struct {
+	handler AgentService
+}
+
+func (p *agentServiceProcessorAddToken) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AgentServiceAddTokenArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("AddToken", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AgentServiceAddTokenResult{}
+	var retval *AddTokenRes
+	if retval, err2 = p.handler.AddToken(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing AddToken: "+err2.Error())
+		oprot.WriteMessageBegin("AddToken", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("AddToken", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type agentServiceProcessorDeleteToken struct {
+	handler AgentService
+}
+
+func (p *agentServiceProcessorDeleteToken) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AgentServiceDeleteTokenArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("DeleteToken", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AgentServiceDeleteTokenResult{}
+	var retval *DeleteTokenRes
+	if retval, err2 = p.handler.DeleteToken(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing DeleteToken: "+err2.Error())
+		oprot.WriteMessageBegin("DeleteToken", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("DeleteToken", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type agentServiceProcessorGetToken struct {
+	handler AgentService
+}
+
+func (p *agentServiceProcessorGetToken) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AgentServiceGetTokenArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("GetToken", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AgentServiceGetTokenResult{}
+	var retval *GetTokenRes
+	if retval, err2 = p.handler.GetToken(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetToken: "+err2.Error())
+		oprot.WriteMessageBegin("GetToken", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("GetToken", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -8190,6 +8370,1044 @@ func (p *AgentServiceGenerateCodeResult) DeepEqual(ano *AgentServiceGenerateCode
 }
 
 func (p *AgentServiceGenerateCodeResult) Field0DeepEqual(src *GenerateCodeRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceAddTokenArgs struct {
+	Req *AddTokenReq `thrift:"req,1" frugal:"1,default,AddTokenReq" json:"req"`
+}
+
+func NewAgentServiceAddTokenArgs() *AgentServiceAddTokenArgs {
+	return &AgentServiceAddTokenArgs{}
+}
+
+func (p *AgentServiceAddTokenArgs) InitDefault() {
+	*p = AgentServiceAddTokenArgs{}
+}
+
+var AgentServiceAddTokenArgs_Req_DEFAULT *AddTokenReq
+
+func (p *AgentServiceAddTokenArgs) GetReq() (v *AddTokenReq) {
+	if !p.IsSetReq() {
+		return AgentServiceAddTokenArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *AgentServiceAddTokenArgs) SetReq(val *AddTokenReq) {
+	p.Req = val
+}
+
+var fieldIDToName_AgentServiceAddTokenArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AgentServiceAddTokenArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AgentServiceAddTokenArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceAddTokenArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceAddTokenArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewAddTokenReq()
+	if err := p.Req.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceAddTokenArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AddToken_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceAddTokenArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AgentServiceAddTokenArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceAddTokenArgs(%+v)", *p)
+}
+
+func (p *AgentServiceAddTokenArgs) DeepEqual(ano *AgentServiceAddTokenArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceAddTokenArgs) Field1DeepEqual(src *AddTokenReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceAddTokenResult struct {
+	Success *AddTokenRes `thrift:"success,0,optional" frugal:"0,optional,AddTokenRes" json:"success,omitempty"`
+}
+
+func NewAgentServiceAddTokenResult() *AgentServiceAddTokenResult {
+	return &AgentServiceAddTokenResult{}
+}
+
+func (p *AgentServiceAddTokenResult) InitDefault() {
+	*p = AgentServiceAddTokenResult{}
+}
+
+var AgentServiceAddTokenResult_Success_DEFAULT *AddTokenRes
+
+func (p *AgentServiceAddTokenResult) GetSuccess() (v *AddTokenRes) {
+	if !p.IsSetSuccess() {
+		return AgentServiceAddTokenResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *AgentServiceAddTokenResult) SetSuccess(x interface{}) {
+	p.Success = x.(*AddTokenRes)
+}
+
+var fieldIDToName_AgentServiceAddTokenResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AgentServiceAddTokenResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AgentServiceAddTokenResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceAddTokenResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceAddTokenResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewAddTokenRes()
+	if err := p.Success.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceAddTokenResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AddToken_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceAddTokenResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AgentServiceAddTokenResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceAddTokenResult(%+v)", *p)
+}
+
+func (p *AgentServiceAddTokenResult) DeepEqual(ano *AgentServiceAddTokenResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceAddTokenResult) Field0DeepEqual(src *AddTokenRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceDeleteTokenArgs struct {
+	Req *DeleteTokenReq `thrift:"req,1" frugal:"1,default,DeleteTokenReq" json:"req"`
+}
+
+func NewAgentServiceDeleteTokenArgs() *AgentServiceDeleteTokenArgs {
+	return &AgentServiceDeleteTokenArgs{}
+}
+
+func (p *AgentServiceDeleteTokenArgs) InitDefault() {
+	*p = AgentServiceDeleteTokenArgs{}
+}
+
+var AgentServiceDeleteTokenArgs_Req_DEFAULT *DeleteTokenReq
+
+func (p *AgentServiceDeleteTokenArgs) GetReq() (v *DeleteTokenReq) {
+	if !p.IsSetReq() {
+		return AgentServiceDeleteTokenArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *AgentServiceDeleteTokenArgs) SetReq(val *DeleteTokenReq) {
+	p.Req = val
+}
+
+var fieldIDToName_AgentServiceDeleteTokenArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AgentServiceDeleteTokenArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AgentServiceDeleteTokenArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceDeleteTokenArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteTokenArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewDeleteTokenReq()
+	if err := p.Req.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceDeleteTokenArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("DeleteToken_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteTokenArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteTokenArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceDeleteTokenArgs(%+v)", *p)
+}
+
+func (p *AgentServiceDeleteTokenArgs) DeepEqual(ano *AgentServiceDeleteTokenArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceDeleteTokenArgs) Field1DeepEqual(src *DeleteTokenReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceDeleteTokenResult struct {
+	Success *DeleteTokenRes `thrift:"success,0,optional" frugal:"0,optional,DeleteTokenRes" json:"success,omitempty"`
+}
+
+func NewAgentServiceDeleteTokenResult() *AgentServiceDeleteTokenResult {
+	return &AgentServiceDeleteTokenResult{}
+}
+
+func (p *AgentServiceDeleteTokenResult) InitDefault() {
+	*p = AgentServiceDeleteTokenResult{}
+}
+
+var AgentServiceDeleteTokenResult_Success_DEFAULT *DeleteTokenRes
+
+func (p *AgentServiceDeleteTokenResult) GetSuccess() (v *DeleteTokenRes) {
+	if !p.IsSetSuccess() {
+		return AgentServiceDeleteTokenResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *AgentServiceDeleteTokenResult) SetSuccess(x interface{}) {
+	p.Success = x.(*DeleteTokenRes)
+}
+
+var fieldIDToName_AgentServiceDeleteTokenResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AgentServiceDeleteTokenResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AgentServiceDeleteTokenResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceDeleteTokenResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteTokenResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewDeleteTokenRes()
+	if err := p.Success.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceDeleteTokenResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("DeleteToken_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteTokenResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AgentServiceDeleteTokenResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceDeleteTokenResult(%+v)", *p)
+}
+
+func (p *AgentServiceDeleteTokenResult) DeepEqual(ano *AgentServiceDeleteTokenResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceDeleteTokenResult) Field0DeepEqual(src *DeleteTokenRes) bool {
+
+	if !p.Success.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceGetTokenArgs struct {
+	Req *GetTokenReq `thrift:"req,1" frugal:"1,default,GetTokenReq" json:"req"`
+}
+
+func NewAgentServiceGetTokenArgs() *AgentServiceGetTokenArgs {
+	return &AgentServiceGetTokenArgs{}
+}
+
+func (p *AgentServiceGetTokenArgs) InitDefault() {
+	*p = AgentServiceGetTokenArgs{}
+}
+
+var AgentServiceGetTokenArgs_Req_DEFAULT *GetTokenReq
+
+func (p *AgentServiceGetTokenArgs) GetReq() (v *GetTokenReq) {
+	if !p.IsSetReq() {
+		return AgentServiceGetTokenArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *AgentServiceGetTokenArgs) SetReq(val *GetTokenReq) {
+	p.Req = val
+}
+
+var fieldIDToName_AgentServiceGetTokenArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AgentServiceGetTokenArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AgentServiceGetTokenArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetTokenArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetTokenArgs) ReadField1(iprot thrift.TProtocol) error {
+	p.Req = NewGetTokenReq()
+	if err := p.Req.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceGetTokenArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetToken_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetTokenArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AgentServiceGetTokenArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceGetTokenArgs(%+v)", *p)
+}
+
+func (p *AgentServiceGetTokenArgs) DeepEqual(ano *AgentServiceGetTokenArgs) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Req) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceGetTokenArgs) Field1DeepEqual(src *GetTokenReq) bool {
+
+	if !p.Req.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AgentServiceGetTokenResult struct {
+	Success *GetTokenRes `thrift:"success,0,optional" frugal:"0,optional,GetTokenRes" json:"success,omitempty"`
+}
+
+func NewAgentServiceGetTokenResult() *AgentServiceGetTokenResult {
+	return &AgentServiceGetTokenResult{}
+}
+
+func (p *AgentServiceGetTokenResult) InitDefault() {
+	*p = AgentServiceGetTokenResult{}
+}
+
+var AgentServiceGetTokenResult_Success_DEFAULT *GetTokenRes
+
+func (p *AgentServiceGetTokenResult) GetSuccess() (v *GetTokenRes) {
+	if !p.IsSetSuccess() {
+		return AgentServiceGetTokenResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *AgentServiceGetTokenResult) SetSuccess(x interface{}) {
+	p.Success = x.(*GetTokenRes)
+}
+
+var fieldIDToName_AgentServiceGetTokenResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AgentServiceGetTokenResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AgentServiceGetTokenResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetTokenResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetTokenResult) ReadField0(iprot thrift.TProtocol) error {
+	p.Success = NewGetTokenRes()
+	if err := p.Success.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *AgentServiceGetTokenResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetToken_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AgentServiceGetTokenResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AgentServiceGetTokenResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServiceGetTokenResult(%+v)", *p)
+}
+
+func (p *AgentServiceGetTokenResult) DeepEqual(ano *AgentServiceGetTokenResult) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field0DeepEqual(ano.Success) {
+		return false
+	}
+	return true
+}
+
+func (p *AgentServiceGetTokenResult) Field0DeepEqual(src *GetTokenRes) bool {
 
 	if !p.Success.DeepEqual(src) {
 		return false
