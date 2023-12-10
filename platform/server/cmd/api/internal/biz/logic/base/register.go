@@ -20,6 +20,7 @@ package base
 
 import (
 	"context"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/base"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 )

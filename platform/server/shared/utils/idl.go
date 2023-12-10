@@ -20,8 +20,9 @@ package utils
 
 import (
 	"errors"
-	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"regexp"
+
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 )
 
 func DetermineIdlType(idlPid string) (int32, error) {

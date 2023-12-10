@@ -20,11 +20,12 @@ package logger
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
 )
 
 var Logger *zap.Logger
@@ -45,7 +46,6 @@ func InitLogger(config Config, serverType consts.ServerType, serviceId string, s
 			serviceId,
 		)
 	} else {
-
 	}
 
 	err := utils.IsNotExistMkDir(savePath)

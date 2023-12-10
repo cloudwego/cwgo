@@ -21,6 +21,9 @@ package service
 import (
 	"context"
 	"fmt"
+	"os"
+	"strconv"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/errx"
@@ -28,8 +31,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
-	"os"
-	"strconv"
 )
 
 type GenerateCodeService struct {
@@ -108,7 +109,7 @@ func (s *GenerateCodeService) Run(req *agent.GenerateCodeReq) (resp *agent.Gener
 	tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
 	if err != nil {
 		if os.IsNotExist(err) {
-			err = os.Mkdir(consts.TempDir, 0700)
+			err = os.Mkdir(consts.TempDir, 0o700)
 			if err != nil {
 				logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 				return &agent.GenerateCodeRes{

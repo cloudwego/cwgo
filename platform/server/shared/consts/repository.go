@@ -11,12 +11,10 @@ const (
 	RepositoryTypeNum = iota
 )
 
-var (
-	RepositoryTypeNumMap = map[int]struct{}{
-		RepositoryTypeNumGitLab: {},
-		RepositoryTypeNumGithub: {},
-	}
-)
+var RepositoryTypeNumMap = map[int]struct{}{
+	RepositoryTypeNumGitLab: {},
+	RepositoryTypeNumGithub: {},
+}
 
 const (
 	RepositoryStoreTypeNumIdl = iota + 1
@@ -29,9 +27,7 @@ const (
 	RepositoryStatusNumActive
 )
 
-var (
-	RepositoryStatusNumMap = map[int]struct{}{
-		RepositoryStatusNumActive:   {},
-		RepositoryStatusNumInactive: {},
-	}
-)
+var RepositoryStatusNumMap = map[int]struct{}{
+	RepositoryStatusNumActive:   {},
+	RepositoryStatusNumInactive: {},
+}

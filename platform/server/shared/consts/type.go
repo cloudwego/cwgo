@@ -30,12 +30,10 @@ const (
 	ServerTypeEnvName = "CWGO_SERVER_TYPE"
 )
 
-var (
-	ServerTypeMapToStr = map[ServerType]string{
-		ServerTypeNumApi:   ServerTypeApi,
-		ServerTypeNumAgent: ServerTypeAgent,
-	}
-)
+var ServerTypeMapToStr = map[ServerType]string{
+	ServerTypeNumApi:   ServerTypeApi,
+	ServerTypeNumAgent: ServerTypeAgent,
+}
 
 type ServerMode uint32
 
@@ -68,12 +66,10 @@ const (
 	RegistryTypeConsul  = "consul"
 )
 
-var (
-	RegistryTypeMapToNum = map[string]RegistryType{
-		RegistryTypeBuiltin: RegistryTypeNumBuiltin,
-		RegistryTypeConsul:  RegistryTypeNumConsul,
-	}
-)
+var RegistryTypeMapToNum = map[string]RegistryType{
+	RegistryTypeBuiltin: RegistryTypeNumBuiltin,
+	RegistryTypeConsul:  RegistryTypeNumConsul,
+}
 
 type StoreType uint32
 
@@ -83,13 +79,11 @@ const (
 	StoreTypeNumRedis
 )
 
-var (
-	StoreTypeMapToNum = map[string]StoreType{
-		"mysql": StoreTypeNumMysql,
-		"mongo": StoreTypeNumMongo,
-		"redis": StoreTypeNumRedis,
-	}
-)
+var StoreTypeMapToNum = map[string]StoreType{
+	"mysql": StoreTypeNumMysql,
+	"mongo": StoreTypeNumMongo,
+	"redis": StoreTypeNumRedis,
+}
 
 type DispatcherType uint32
 
@@ -99,8 +93,6 @@ const (
 	DispatcherTypeHash = "consistent-hash"
 )
 
-var (
-	DispatcherMapToNum = map[string]DispatcherType{
-		DispatcherTypeHash: DispatcherTypeNumHash,
-	}
-)
+var DispatcherMapToNum = map[string]DispatcherType{
+	DispatcherTypeHash: DispatcherTypeNumHash,
+}

@@ -21,6 +21,10 @@ package service
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/errx"
@@ -30,9 +34,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/parser"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
-	"os"
-	"path/filepath"
-	"strconv"
 )
 
 type SyncIDLsByIdService struct {
@@ -133,7 +134,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
 		if err != nil {
 			if os.IsNotExist(err) {
-				err = os.Mkdir(consts.TempDir, 0700)
+				err = os.Mkdir(consts.TempDir, 0o700)
 				if err != nil {
 					logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 					return &agent.SyncIDLsByIdRes{

@@ -21,6 +21,9 @@ package manager
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -35,8 +38,6 @@ import (
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	"go.uber.org/zap"
-	"sync"
-	"time"
 )
 
 // Manager that

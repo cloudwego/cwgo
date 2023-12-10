@@ -19,8 +19,9 @@
 package entity
 
 import (
-	"gorm.io/plugin/soft_delete"
 	"time"
+
+	"gorm.io/plugin/soft_delete"
 )
 
 const TableNameMysqlIDL = "idl"

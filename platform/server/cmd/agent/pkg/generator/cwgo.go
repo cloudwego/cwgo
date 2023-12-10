@@ -22,8 +22,7 @@ import (
 	"os/exec"
 )
 
-type CwgoGenerator struct {
-}
+type CwgoGenerator struct{}
 
 func NewCwgoGenerator() *CwgoGenerator {
 	return &CwgoGenerator{}

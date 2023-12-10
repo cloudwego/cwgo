@@ -22,15 +22,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils/internal/repository"
-	"github.com/google/go-github/v56/github"
-	"github.com/xanzy/go-gitlab"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/utils/internal/repository"
+	"github.com/google/go-github/v56/github"
+	"github.com/xanzy/go-gitlab"
 )
 
 func NewGitlabClient(token, baseURL string) (client *gitlab.Client, err error) {

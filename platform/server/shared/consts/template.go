@@ -23,9 +23,7 @@ const (
 	TemplateTypeNumKitex
 )
 
-var (
-	TemplateTypeNumMap = map[int]struct{}{
-		TemplateTypeNumHz:    {},
-		TemplateTypeNumKitex: {},
-	}
-)
+var TemplateTypeNumMap = map[int]struct{}{
+	TemplateTypeNumHz:    {},
+	TemplateTypeNumKitex: {},
+}

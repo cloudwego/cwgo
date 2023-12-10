@@ -20,13 +20,14 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/xanzy/go-gitlab"
 	"go.uber.org/zap"
-	"strings"
-	"time"
 )
 
 type GitLabApi struct {
@@ -113,6 +114,7 @@ func (a *GitLabApi) GetRepoDefaultBranch() (string, error) {
 
 	return project.DefaultBranch, nil
 }
+
 func (a *GitLabApi) ValidateRepoBranch(branch string) (bool, error) {
 	branchesRes, _, err := a.client.Branches.ListBranches(a.GetProjectPid(), &gitlab.ListBranchesOptions{})
 	if err != nil {
