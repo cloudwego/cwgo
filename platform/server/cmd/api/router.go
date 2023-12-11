@@ -20,9 +20,10 @@ package api
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
-	"net/http"
 )
 
 // customizeRegister registers customize routers.
