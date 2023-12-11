@@ -55,6 +55,10 @@ func (s *DeleteRepositoriesService) Run(req *agent.DeleteRepositoriesReq) (resp 
 		}, nil
 	}
 
+	for _, id := range req.Ids {
+		s.svcCtx.RepoManager.DelClient(id)
+	}
+
 	return &agent.DeleteRepositoriesRes{
 		Code: 0,
 		Msg:  "delete repositories successfully",

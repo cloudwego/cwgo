@@ -21,7 +21,6 @@ package repository
 import (
 	"context"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -36,23 +35,17 @@ import (
 type Manager struct {
 	daoManager *dao.Manager
 
-	repositoryClientsCache    *cache.Cache
-	repositoryApiClientsCache *cache.Cache
-
-	sync.RWMutex
+	repositoryClientsCache *cache.Cache
 }
 
 const (
-	repositoryClientDefaultExpiration    = 24 * time.Hour
-	repositoryApiClientDefaultExpiration = 24 * time.Hour
+	repositoryClientDefaultExpiration = 24 * time.Hour
 )
 
 func NewRepoManager(daoManager *dao.Manager) (*Manager, error) {
 	manager := &Manager{
-		daoManager:                daoManager,
-		repositoryClientsCache:    cache.New(repositoryClientDefaultExpiration, 1*time.Minute),
-		repositoryApiClientsCache: cache.New(repositoryApiClientDefaultExpiration, 1*time.Minute),
-		RWMutex:                   sync.RWMutex{},
+		daoManager:             daoManager,
+		repositoryClientsCache: cache.New(repositoryClientDefaultExpiration, 1*time.Minute),
 	}
 
 	return manager, nil
@@ -156,17 +149,17 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 		repositoryModel.RepositoryBranch = defaultBranch
 	}
 
-	rm.Lock()
 	rm.repositoryClientsCache.SetDefault(strconv.FormatInt(repositoryModel.Id, 10), repositoryClient)
-	rm.Unlock()
 
 	return nil
 }
 
+func (rm *Manager) DelClient(repoId int64) {
+	rm.repositoryClientsCache.Delete(strconv.FormatInt(repoId, 10))
+}
+
 func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
-	rm.RLock()
 	if clientIface, ok := rm.repositoryClientsCache.Get(strconv.FormatInt(repoId, 10)); !ok {
-		rm.RUnlock()
 		repoModel, err := rm.daoManager.Repository.GetRepository(context.Background(), repoId)
 		if err != nil {
 			return nil, err
@@ -189,7 +182,6 @@ func (rm *Manager) GetClient(repoId int64) (IRepository, error) {
 
 		return rm.GetClient(repoId)
 	} else {
-		rm.RUnlock()
 		return clientIface.(IRepository), nil
 	}
 }

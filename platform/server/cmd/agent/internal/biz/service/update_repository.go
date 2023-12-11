@@ -103,6 +103,10 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 		}, nil
 	}
 
+	if req.Status == consts.RepositoryStatusNumInactive {
+		s.svcCtx.RepoManager.DelClient(req.Id)
+	}
+
 	return &agent.UpdateRepositoryRes{
 		Code: 0,
 		Msg:  "update repository successfully",
