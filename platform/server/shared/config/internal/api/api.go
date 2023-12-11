@@ -47,7 +47,9 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, store
 	switch registryConfig.Type {
 	case consts.RegistryTypeBuiltin:
 		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin, storeConfig)
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
 	default:
 
 	}
