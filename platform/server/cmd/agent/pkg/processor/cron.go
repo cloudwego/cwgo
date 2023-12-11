@@ -150,7 +150,7 @@ func (c *Processor) Start() {
 					continue
 				}
 
-				if time.Now().Sub(startTime).Nanoseconds()/taskProcessedNum*int64(len(c.taskList)) > maxSyncTime.Nanoseconds() {
+				if time.Since(startTime).Nanoseconds()/taskProcessedNum*int64(len(c.taskList)) > maxSyncTime.Nanoseconds() {
 					if len(c.workerList) <= maxWorkerNum {
 						// add worker when sync time exceed the max sync time
 						worker := NewWorker(c.service, c.workerPool)
@@ -178,7 +178,7 @@ func (c *Processor) Start() {
 				}
 			}
 			if c.isDynamicWorker {
-				if time.Now().Sub(startTime) < minSyncTime && len(c.workerList) > defaultWorkerNum {
+				if time.Since(startTime) < minSyncTime && len(c.workerList) > defaultWorkerNum {
 					// reduce worker
 					c.workerList[0].Stop()
 					c.workerList = c.workerList[1:]
