@@ -47,17 +47,30 @@ func NewAddTokenLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddToken
 }
 
 func (l *AddTokenLogic) AddToken(req *token.AddTokenReq) (res *token.AddTokenRes) {
-	if req.RepositoryType != consts.RepositoryTypeNumGithub {
-		_, err := net.LookupHost(req.RepositoryDomain)
-		if err != nil {
-			return &token.AddTokenRes{
-				Code: consts.ErrNumParamDomain,
-				Msg:  consts.ErrMsgParamDomain,
-				Data: nil,
-			}
+	switch req.RepositoryType {
+	case consts.RepositoryTypeNumGitLab:
+		if req.RepositoryDomain == "" {
+			req.RepositoryDomain = consts.GitHubDomain
 		}
-	} else {
-		req.RepositoryDomain = "github.com"
+	case consts.RepositoryTypeNumGithub:
+		if req.RepositoryDomain == "" {
+			req.RepositoryDomain = consts.GitLabDomain
+		}
+	default:
+		return &token.AddTokenRes{
+			Code: consts.ErrNumParamRepositoryType,
+			Msg:  consts.ErrMsgParamRepositoryType,
+			Data: nil,
+		}
+	}
+
+	_, err := net.LookupHost(req.RepositoryDomain)
+	if err != nil {
+		return &token.AddTokenRes{
+			Code: consts.ErrNumParamDomain,
+			Msg:  consts.ErrMsgParamDomain,
+			Data: nil,
+		}
 	}
 
 	client, err := l.svcCtx.Manager.GetAgentClient()

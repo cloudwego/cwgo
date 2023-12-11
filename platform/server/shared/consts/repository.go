@@ -21,6 +21,7 @@ package consts
 const (
 	MainRef      = "main"
 	GitHubDomain = "github.com"
+	GitLabDomain = "gitlab.com"
 )
 
 const (
