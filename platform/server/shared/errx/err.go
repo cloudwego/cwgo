@@ -75,8 +75,8 @@ func GetCode(err error) int32 {
 			rvf := rv.Field(i)
 
 			if rvtf.PkgPath == PkgName && rvtf.Name == "c" && rvf.Kind() == reflect.Int32 {
-				if rvf.CanUint() {
-					return int32(rvf.Uint())
+				if rvf.CanInt() {
+					return int32(rvf.Int())
 				}
 				return -1
 			}
