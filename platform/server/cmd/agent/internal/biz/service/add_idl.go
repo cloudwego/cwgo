@@ -81,7 +81,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	_, err = repoClient.GetFile(owner, repoName, idlPid, consts.MainRef)
+	_, err = repoClient.GetFile(owner, repoName, idlPid, repoClient.GetBranch())
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumRepoGetFile,
@@ -90,7 +90,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	// obtain the commit hash for the main IDL
-	mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
+	mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, repoClient.GetBranch())
 	if err != nil {
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumRepoGetCommitHash,
@@ -147,7 +147,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	defer os.RemoveAll(tempDir)
 
 	// get the entire repository archive
-	archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, consts.MainRef)
+	archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, repoClient.GetBranch())
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
 		return &agent.AddIDLRes{
@@ -198,7 +198,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// calculate the hash value and add it to the importIDLs slice
 	for i, importPath := range importPaths {
 		calculatedPath := filepath.ToSlash(filepath.Join(mainIdlDir, importPath))
-		commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, consts.MainRef)
+		commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, repoClient.GetBranch())
 		if err != nil {
 			logger.Logger.Error(consts.ErrMsgRepoGetCommitHash, zap.Error(err))
 			return &agent.AddIDLRes{

@@ -106,6 +106,17 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 	if req.Status == consts.RepositoryStatusNumInactive {
 		s.svcCtx.RepoManager.DelClient(req.Id)
 	}
+	if req.Branch != "" {
+		client, err := s.svcCtx.RepoManager.GetClient(req.Id)
+		if err != nil {
+			return &agent.UpdateRepositoryRes{
+				Code: consts.ErrNumRepoGetClient,
+				Msg:  consts.ErrMsgRepoGetClient,
+			}, nil
+		}
+
+		client.UpdateBranch(req.Branch)
+	}
 
 	return &agent.UpdateRepositoryRes{
 		Code: 0,

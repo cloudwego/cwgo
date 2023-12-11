@@ -22,6 +22,8 @@ type IRepository interface {
 	GetTokenOwner() (tokenOwner string)
 	GetRepoOwner() (repoOwner string)
 	GetRepoName() (repoName string)
+	GetBranch() (branch string)
+	UpdateBranch(branch string)
 
 	CheckTokenIfExpired() bool
 

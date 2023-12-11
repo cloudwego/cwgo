@@ -37,10 +37,11 @@ type GitLabApi struct {
 	tokenOwner          string
 	repoOwner           string
 	repoName            string
+	branch              string
 	tokenExpirationTime time.Time
 }
 
-func NewGitLabApi(domain, token, repoOwner, repoName string) (*GitLabApi, error) {
+func NewGitLabApi(domain, token, repoOwner, repoName, branch string) (*GitLabApi, error) {
 	client, err := utils.NewGitlabClient(token, "https://"+domain)
 	if err != nil {
 		if utils.IsNetworkError(err) {
@@ -74,6 +75,7 @@ func NewGitLabApi(domain, token, repoOwner, repoName string) (*GitLabApi, error)
 		tokenOwner:          tokenOwner,
 		repoOwner:           repoOwner,
 		repoName:            repoName,
+		branch:              branch,
 		tokenExpirationTime: tokenExpirationTime,
 	}, nil
 }
@@ -100,6 +102,14 @@ func (a *GitLabApi) GetRepoOwner() (repoOwner string) {
 
 func (a *GitLabApi) GetRepoName() (repoName string) {
 	return a.repoName
+}
+
+func (a *GitLabApi) GetBranch() (branch string) {
+	return a.branch
+}
+
+func (a *GitLabApi) UpdateBranch(branch string) {
+	a.branch = branch
 }
 
 func (a *GitLabApi) CheckTokenIfExpired() bool {
@@ -274,6 +284,7 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 				Visibility:           &v,
 				Description:          gitlab.String("generate by cwgo"),
 				InitializeWithReadme: gitlab.Bool(true),
+				DefaultBranch:        gitlab.String(consts.MainRef),
 			})
 			if err != nil {
 				return "", err

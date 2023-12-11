@@ -43,10 +43,11 @@ type GitHubApi struct {
 	tokenOwner          string
 	repoOwner           string
 	repoName            string
+	branch              string
 	tokenExpirationTime time.Time
 }
 
-func NewGitHubApi(token, repoOwner, repoName string) (*GitHubApi, error) {
+func NewGitHubApi(token, repoOwner, repoName, branch string) (*GitHubApi, error) {
 	client, err := utils.NewGithubClient(token)
 	if err != nil {
 		return nil, err
@@ -76,6 +77,7 @@ func NewGitHubApi(token, repoOwner, repoName string) (*GitHubApi, error) {
 		tokenOwner:          tokenOwner,
 		repoOwner:           repoOwner,
 		repoName:            repoName,
+		branch:              branch,
 		tokenExpirationTime: tokenExpirationTime,
 	}, nil
 }
@@ -98,6 +100,14 @@ func (a *GitHubApi) GetRepoOwner() (repoOwner string) {
 
 func (a *GitHubApi) GetRepoName() (repoName string) {
 	return a.repoName
+}
+
+func (a *GitHubApi) GetBranch() (branch string) {
+	return a.branch
+}
+
+func (a *GitHubApi) UpdateBranch(branch string) {
+	a.branch = branch
 }
 
 func (a *GitHubApi) CheckTokenIfExpired() bool {
@@ -326,10 +336,11 @@ func (a *GitHubApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 		// if the error is caused by the inability to find a repository with the name, create the repository
 		if _, ok := err.(*github.ErrorResponse); ok {
 			newRepo := &github.Repository{
-				Name:        github.String(repoName),
-				Private:     &isPrivate,
-				Description: github.String("generate by cwgo"),
-				AutoInit:    github.Bool(true),
+				Name:          github.String(repoName),
+				Private:       &isPrivate,
+				Description:   github.String("generate by cwgo"),
+				AutoInit:      github.Bool(true),
+				DefaultBranch: github.String(consts.MainRef),
 			}
 
 			_, _, err := a.client.Repositories.Create(ctx, "", newRepo)

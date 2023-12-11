@@ -64,12 +64,14 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 					tokenModel.Token,
 					repositoryModel.RepositoryOwner,
 					repositoryModel.RepositoryName,
+					repositoryModel.RepositoryBranch,
 				)
 			case consts.RepositoryTypeNumGithub:
 				repositoryClient, err = NewGitHubApi(
 					tokenModel.Token,
 					repositoryModel.RepositoryOwner,
 					repositoryModel.RepositoryName,
+					repositoryModel.RepositoryBranch,
 				)
 			default:
 				return consts.ErrParamRepositoryType
@@ -78,6 +80,7 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 				if errx.GetCode(err) != consts.ErrNumTokenInvalid {
 					return err
 				}
+				repositoryClient = nil
 			}
 		}
 	}
@@ -106,6 +109,7 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 					tokenModel.Token,
 					repositoryModel.RepositoryOwner,
 					repositoryModel.RepositoryName,
+					repositoryModel.RepositoryBranch,
 				)
 				if err != nil {
 					logger.Logger.Error("init repo client failed", zap.Error(err))

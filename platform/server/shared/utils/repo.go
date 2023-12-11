@@ -75,18 +75,14 @@ func GetGitLabTokenInfo(client *gitlab.Client) (owner string, expirationTime tim
 	}
 
 	// TODO: whether have scope: read_api
-	var hasReadApi, hasReadRepository, hasWriteRepository bool
+	var hasApi bool
 	for _, scope := range token.Scopes {
-		if scope == "read_api" {
-			hasReadApi = true
-		} else if scope == "read_repository" {
-			hasReadRepository = true
-		} else if scope == "write_repository" {
-			hasWriteRepository = true
+		if scope == "api" {
+			hasApi = true
 		}
 	}
 
-	if !hasReadApi || !hasReadRepository || !hasWriteRepository {
+	if !hasApi {
 		return "", time.Time{}, consts.ErrTokenInvalid
 	}
 

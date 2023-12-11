@@ -100,7 +100,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 					repoModel.RepositoryOwner,
 					repoModel.RepositoryName,
 				),
-				consts.MainRef,
+				repoModel.RepositoryBranch,
 				idlModel.MainIdlPath,
 			),
 		)
@@ -112,7 +112,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		_, err = repoClient.GetFile(owner, repoName, idlPid, consts.MainRef)
+		_, err = repoClient.GetFile(owner, repoName, idlPid, repoModel.RepositoryBranch)
 		if err != nil {
 			logger.Logger.Error(consts.ErrMsgRepoGetFile, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
@@ -162,7 +162,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		defer os.RemoveAll(tempDir)
 
 		// get the entire repository archive
-		archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, consts.MainRef)
+		archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, repoModel.RepositoryBranch)
 		if err != nil {
 			logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
@@ -214,7 +214,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		// calculate the hash value and add it to the importIDLs slice
 		for _, importPath := range importPaths {
 			calculatedPath := filepath.ToSlash(filepath.Join(mainIdlDir, importPath))
-			commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, consts.MainRef)
+			commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, repoModel.RepositoryBranch)
 			if err != nil {
 				return &agent.SyncIDLsByIdRes{
 					Code: consts.ErrNumRepoGetCommitHash,
@@ -255,7 +255,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		}
 
 		// compare main idl
-		hash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
+		hash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, repoModel.RepositoryBranch)
 		if err != nil {
 			logger.Logger.Error("get latest commit hash failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{

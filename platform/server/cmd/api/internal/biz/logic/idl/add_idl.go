@@ -47,8 +47,14 @@ func NewAddIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLLogi
 }
 
 func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
-	_, err := url.Parse(req.MainIdlPath)
+	urlParsed, err := url.Parse(req.MainIdlPath)
 	if err != nil {
+		return &idl.AddIDLRes{
+			Code: consts.ErrNumParamMainIdlPath,
+			Msg:  consts.ErrMsgParamMainIdlPath,
+		}
+	}
+	if urlParsed.Scheme != "http" && urlParsed.Scheme != "https" {
 		return &idl.AddIDLRes{
 			Code: consts.ErrNumParamMainIdlPath,
 			Msg:  consts.ErrMsgParamMainIdlPath,
