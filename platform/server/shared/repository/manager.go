@@ -119,6 +119,11 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 					return
 				}
 
+				logger.Logger.Debug("get token for repo",
+					zap.Int64("repo_id", repositoryModel.Id),
+					zap.Int64("token_id", tokenModel.Id),
+				)
+
 				exitChan <- struct {
 					RepositoryClient IRepository
 					TokenId          int64
