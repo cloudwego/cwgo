@@ -21,5 +21,4 @@ package registry
 type Config struct {
 	Type    string                `mapstructure:"type"`
 	Builtin BuiltinRegistryConfig `mapstructure:"builtin"`
-	Consul  ConsulRegistryConfig  `mapstructure:"consul"`
 }

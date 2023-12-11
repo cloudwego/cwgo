@@ -30,7 +30,6 @@ const (
 	defaultNetwork = "tcp"
 	allEths        = "0.0.0.0"
 	envPodIP       = "POD_IP"
-	consulTags     = "consul_tags"
 )
 
 var _ net.Addr = (*NetAddr)(nil)
