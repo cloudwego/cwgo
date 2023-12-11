@@ -60,7 +60,6 @@ func NewRepoManager(daoManager *dao.Manager) (*Manager, error) {
 
 func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 	var repositoryClient IRepository
-
 	if repositoryModel.TokenId != 0 {
 		// if repo has existed token, then get the token info
 		tokenModel, err := rm.daoManager.Token.GetTokenById(context.TODO(), repositoryModel.TokenId)
@@ -88,7 +87,8 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 				}
 			}
 		}
-	} else {
+	}
+	if repositoryClient == nil {
 		// if repo's token is invalid or has no token
 		// then search valid token in database
 		tokenModels, err := rm.daoManager.Token.GetActiveTokenForDomain(context.TODO(), repositoryModel.RepositoryDomain)

@@ -42,7 +42,7 @@ func NewUpdateRepositoryService(ctx context.Context, svcCtx *svc.ServiceContext)
 // Run create note info
 func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *agent.UpdateRepositoryRes, err error) {
 	// validate repo info
-	_, err = s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.Id)
+	repoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.Id)
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 			return &agent.UpdateRepositoryRes{
@@ -50,6 +50,13 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 				Msg:  "repo id not exist",
 			}, nil
 		}
+	}
+
+	if req.Branch == repoModel.RepositoryBranch {
+		return &agent.UpdateRepositoryRes{
+			Code: consts.ErrNumParamRepositoryBranch,
+			Msg:  "repo branch already switched",
+		}, nil
 	}
 
 	if req.Branch != "" {
