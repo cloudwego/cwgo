@@ -50,11 +50,11 @@ func (l *AddTokenLogic) AddToken(req *token.AddTokenReq) (res *token.AddTokenRes
 	switch req.RepositoryType {
 	case consts.RepositoryTypeNumGitLab:
 		if req.RepositoryDomain == "" {
-			req.RepositoryDomain = consts.GitHubDomain
+			req.RepositoryDomain = consts.GitLabDomain
 		}
 	case consts.RepositoryTypeNumGithub:
 		if req.RepositoryDomain == "" {
-			req.RepositoryDomain = consts.GitLabDomain
+			req.RepositoryDomain = consts.GitHubDomain
 		}
 	default:
 		return &token.AddTokenRes{

@@ -63,8 +63,8 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 		repoClient, err := s.svcCtx.RepoManager.GetClient(req.Id)
 		if err != nil {
 			return &agent.UpdateRepositoryRes{
-				Code: consts.ErrNumRepoGetClient,
-				Msg:  consts.ErrMsgRepoGetClient,
+				Code: errx.GetCode(err),
+				Msg:  err.Error(),
 			}, nil
 		}
 
@@ -110,8 +110,8 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 		client, err := s.svcCtx.RepoManager.GetClient(req.Id)
 		if err != nil {
 			return &agent.UpdateRepositoryRes{
-				Code: consts.ErrNumRepoGetClient,
-				Msg:  consts.ErrMsgRepoGetClient,
+				Code: errx.GetCode(err),
+				Msg:  err.Error(),
 			}, nil
 		}
 
