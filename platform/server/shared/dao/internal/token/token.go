@@ -147,7 +147,7 @@ func (m *MysqlTokenManager) GetTokenList(ctx context.Context, tokenModel model.T
 	for i, tokenEntity := range tokenEntities {
 		tokenModels[i] = &model.Token{
 			Id:               tokenEntity.ID,
-			Owner:            tokenEntity.Token,
+			Owner:            tokenEntity.Owner,
 			RepositoryType:   tokenEntity.RepositoryType,
 			RepositoryDomain: tokenEntity.RepositoryDomain,
 			Token:            tokenEntity.Token,
