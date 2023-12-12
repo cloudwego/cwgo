@@ -46,6 +46,15 @@ func NewUpdateRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *UpdateRepositoryLogic) UpdateRepository(req *repository.UpdateRepositoryReq) (res *repository.UpdateRepositoryRes) {
+	if req.Status != 0 {
+		if _, ok := consts.RepositoryStatusNumMap[int(req.Status)]; !ok {
+			return &repository.UpdateRepositoryRes{
+				Code: consts.ErrNumParamRepositoryStatus,
+				Msg:  consts.ErrMsgParamRepositoryStatus,
+			}
+		}
+	}
+
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))

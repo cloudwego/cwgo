@@ -167,6 +167,7 @@ func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) err
 		CommitHash:   idlModel.CommitHash,
 		ServiceName:  idlModel.ServiceName,
 		LastSyncTime: lastSyncTime,
+		Status:       idlModel.Status,
 	}
 
 	err := m.db.WithContext(ctx).Transaction(
@@ -192,6 +193,7 @@ func (m *MysqlIDLManager) UpdateIDL(ctx context.Context, idlModel model.IDL) err
 						CommitHash:          importIdl.CommitHash,
 						ServiceName:         mainIdlEntity.ServiceName,
 						LastSyncTime:        lastSyncTime,
+						Status:              idlModel.Status,
 					}
 				}
 

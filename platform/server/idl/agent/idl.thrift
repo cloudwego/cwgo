@@ -25,7 +25,8 @@ struct UpdateIDLReq{
     1: i64 id
     2: i64 repository_id
     3: string main_idl_path
-    4: string service_name
+    4: i32 status
+    5: string service_name
 }
 struct UpdateIDLRes{
     1: i32 code

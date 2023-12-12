@@ -991,7 +991,8 @@ type UpdateIDLReq struct {
 	Id           int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
 	RepositoryId int64  `thrift:"repository_id,2" frugal:"2,default,i64" json:"repository_id"`
 	MainIdlPath  string `thrift:"main_idl_path,3" frugal:"3,default,string" json:"main_idl_path"`
-	ServiceName  string `thrift:"service_name,4" frugal:"4,default,string" json:"service_name"`
+	Status       int32  `thrift:"status,4" frugal:"4,default,i32" json:"status"`
+	ServiceName  string `thrift:"service_name,5" frugal:"5,default,string" json:"service_name"`
 }
 
 func NewUpdateIDLReq() *UpdateIDLReq {
@@ -1014,6 +1015,10 @@ func (p *UpdateIDLReq) GetMainIdlPath() (v string) {
 	return p.MainIdlPath
 }
 
+func (p *UpdateIDLReq) GetStatus() (v int32) {
+	return p.Status
+}
+
 func (p *UpdateIDLReq) GetServiceName() (v string) {
 	return p.ServiceName
 }
@@ -1026,6 +1031,9 @@ func (p *UpdateIDLReq) SetRepositoryId(val int64) {
 func (p *UpdateIDLReq) SetMainIdlPath(val string) {
 	p.MainIdlPath = val
 }
+func (p *UpdateIDLReq) SetStatus(val int32) {
+	p.Status = val
+}
 func (p *UpdateIDLReq) SetServiceName(val string) {
 	p.ServiceName = val
 }
@@ -1034,7 +1042,8 @@ var fieldIDToName_UpdateIDLReq = map[int16]string{
 	1: "id",
 	2: "repository_id",
 	3: "main_idl_path",
-	4: "service_name",
+	4: "status",
+	5: "service_name",
 }
 
 func (p *UpdateIDLReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1087,8 +1096,18 @@ func (p *UpdateIDLReq) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 4:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1154,6 +1173,15 @@ func (p *UpdateIDLReq) ReadField3(iprot thrift.TProtocol) error {
 }
 
 func (p *UpdateIDLReq) ReadField4(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.Status = v
+	}
+	return nil
+}
+
+func (p *UpdateIDLReq) ReadField5(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -1182,6 +1210,10 @@ func (p *UpdateIDLReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 
@@ -1255,10 +1287,10 @@ WriteFieldEndError:
 }
 
 func (p *UpdateIDLReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("service_name", thrift.STRING, 4); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.I32, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.ServiceName); err != nil {
+	if err := oprot.WriteI32(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1269,6 +1301,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *UpdateIDLReq) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_name", thrift.STRING, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.ServiceName); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
 }
 
 func (p *UpdateIDLReq) String() string {
@@ -1293,7 +1342,10 @@ func (p *UpdateIDLReq) DeepEqual(ano *UpdateIDLReq) bool {
 	if !p.Field3DeepEqual(ano.MainIdlPath) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.ServiceName) {
+	if !p.Field4DeepEqual(ano.Status) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.ServiceName) {
 		return false
 	}
 	return true
@@ -1320,7 +1372,14 @@ func (p *UpdateIDLReq) Field3DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *UpdateIDLReq) Field4DeepEqual(src string) bool {
+func (p *UpdateIDLReq) Field4DeepEqual(src int32) bool {
+
+	if p.Status != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateIDLReq) Field5DeepEqual(src string) bool {
 
 	if strings.Compare(p.ServiceName, src) != 0 {
 		return false

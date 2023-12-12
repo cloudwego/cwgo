@@ -17,7 +17,7 @@ type IDL struct {
 	ImportIdls          []*ImportIDL `thrift:"import_idls,6" frugal:"6,default,list<ImportIDL>" json:"import_idls"`
 	ServiceName         string       `thrift:"service_name,7" frugal:"7,default,string" json:"service_name"`
 	LastSyncTime        string       `thrift:"last_sync_time,8" frugal:"8,default,string" json:"last_sync_time"`
-	Status              string       `thrift:"status,9" frugal:"9,default,string" json:"status"`
+	Status              int32        `thrift:"status,9" frugal:"9,default,i32" json:"status"`
 	IsDeleted           bool         `thrift:"is_deleted,10" frugal:"10,default,bool" json:"is_deleted"`
 	CreateTime          string       `thrift:"create_time,11" frugal:"11,default,string" json:"create_time"`
 	UpdateTime          string       `thrift:"update_time,12" frugal:"12,default,string" json:"update_time"`
@@ -63,7 +63,7 @@ func (p *IDL) GetLastSyncTime() (v string) {
 	return p.LastSyncTime
 }
 
-func (p *IDL) GetStatus() (v string) {
+func (p *IDL) GetStatus() (v int32) {
 	return p.Status
 }
 
@@ -102,7 +102,7 @@ func (p *IDL) SetServiceName(val string) {
 func (p *IDL) SetLastSyncTime(val string) {
 	p.LastSyncTime = val
 }
-func (p *IDL) SetStatus(val string) {
+func (p *IDL) SetStatus(val int32) {
 	p.Status = val
 }
 func (p *IDL) SetIsDeleted(val bool) {
@@ -230,7 +230,7 @@ func (p *IDL) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 9:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField9(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -383,7 +383,7 @@ func (p *IDL) ReadField8(iprot thrift.TProtocol) error {
 }
 
 func (p *IDL) ReadField9(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		p.Status = v
@@ -636,10 +636,10 @@ WriteFieldEndError:
 }
 
 func (p *IDL) writeField9(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.STRING, 9); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.I32, 9); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Status); err != nil {
+	if err := oprot.WriteI32(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -817,9 +817,9 @@ func (p *IDL) Field8DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *IDL) Field9DeepEqual(src string) bool {
+func (p *IDL) Field9DeepEqual(src int32) bool {
 
-	if strings.Compare(p.Status, src) != 0 {
+	if p.Status != src {
 		return false
 	}
 	return true

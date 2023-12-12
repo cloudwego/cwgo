@@ -20,7 +20,6 @@ package idl
 
 import (
 	"context"
-
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -46,6 +45,15 @@ func NewUpdateIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateI
 }
 
 func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes) {
+	if req.Status != 0 {
+		if _, ok := consts.IdlStatusNumMap[int(req.Status)]; !ok {
+			return &idl.UpdateIDLRes{
+				Code: consts.ErrNumParamIdlStatus,
+				Msg:  consts.ErrMsgParamIdlStatus,
+			}
+		}
+	}
+
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
@@ -58,6 +66,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 	rpcRes, err := client.UpdateIDL(l.ctx, &agent.UpdateIDLReq{
 		RepositoryId: req.ID,
 		ServiceName:  req.ServiceName,
+		Status:       req.Status,
 	})
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))

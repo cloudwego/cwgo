@@ -23,7 +23,8 @@ struct DeleteIDLsRes{
 
 struct UpdateIDLReq{
     1: i64 id (api.body="id,required")
-    2: string service_name (api.body="service_name")
+    2: i32 status (api.body="status")
+    3: string service_name (api.body="service_name")
 }
 struct UpdateIDLRes{
     1: i32 code

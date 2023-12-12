@@ -46,6 +46,7 @@ func (s *UpdateIDLService) Run(req *agent.UpdateIDLReq) (resp *agent.UpdateIDLRe
 		IdlRepositoryId: req.RepositoryId,
 		MainIdlPath:     req.MainIdlPath,
 		ServiceName:     req.ServiceName,
+		Status:          req.Status,
 	})
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {

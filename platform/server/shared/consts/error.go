@@ -36,6 +36,7 @@ const (
 	ErrNumParamUrl
 	ErrNumParamRepositoryStatus
 	ErrNumParamRepositoryBranch
+	ErrNumParamIdlStatus
 )
 
 const (
@@ -51,6 +52,7 @@ const (
 	ErrMsgParamUrl              = "invalid url"
 	ErrMsgParamRepositoryStatus = "invalid repository status"
 	ErrMsgParamRepositoryBranch = "invalid repository branch"
+	ErrMsgParamIdlStatus        = "invalid idl status"
 )
 
 var (
