@@ -14,18 +14,19 @@ body: |-
       		{{- end}}
       	{{- end}}
       {{- end}}
+      "{{.ImportPath}}/{{ToLower .ServiceName}}"
       "github.com/cloudwego/kitex/client/callopt"
       "github.com/cloudwego/kitex/pkg/klog"
   )
   {{range .AllMethods}}
       {{- if or .ClientStreaming .ServerStreaming}}
-          func {{.Name}} ({{if not .ClientStreaming}}{{range .Args}}{{LowerFirst .Name}} {{.Type}}, {{end}}{{end}}stream {{.PkgRefName}}.{{.ServiceName}}_{{.RawName}}Server) (err error){
-             err = defaultClient.{{.Name}}(ctx, {{- range .Args}}{{LowerFirst .Name}},{{end}} callOptions...)
+          func {{.Name}} (ctx context.Context {{if not .ClientStreaming}}{{range .Args}}, {{.RawName}} {{.Type}}{{end}}{{end}}, callOptions ...callopt.Option) (stream {{ToLower .ServiceName}}.{{.ServiceName}}_{{.RawName}}Client, err error){
+             stream, err = defaultClient.{{.Name}}(ctx {{if not .ClientStreaming}}{{range .Args}}, {{.RawName}} {{end}}{{end}}, callOptions...)
              if err != nil {
              	klog.CtxErrorf(ctx, "{{.Name}} call failed,err =%+v", err)
-             	return err
+             	return nil, err
              }
-             return err
+             return stream, nil
           }
       {{ else }}
       {{- if .Oneway}}

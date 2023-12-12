@@ -8,7 +8,6 @@ body: |-
   
      "github.com/cloudwego/kitex/client"
     {{- if .HasStreaming }}
-     "github.com/cloudwego/kitex/pkg/transmeta"
      "github.com/cloudwego/kitex/transport"
     {{- end }}
   )
@@ -19,8 +18,7 @@ body: |-
   	defaultClientOpts = []client.Option{
   		client.WithHostPorts("127.0.0.1:8888"),
         {{- if .HasStreaming }}
-        client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
-        client.WithTransportProtocol(transport.TTHeader),
+        client.WithTransportProtocol(transport.GRPC),
         {{- end}}
   	}
   	once       sync.Once
