@@ -30,6 +30,9 @@ const (
 	ServiceNameAgent = ProjectName + "-" + ServerTypeAgent
 
 	AgentMetadataFile = ServiceNameAgent + ".yaml"
+
+	ServerRunModeStandalone = "standalone"
+	ServerRunModeCluster    = "cluster"
 )
 
 const (

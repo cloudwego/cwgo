@@ -18,7 +18,17 @@
 
 package registry
 
+import "github.com/cloudwego/cwgo/platform/server/shared/consts"
+
 type Config struct {
 	Type    string                `mapstructure:"type"`
 	Builtin BuiltinRegistryConfig `mapstructure:"builtin"`
+}
+
+func (conf *Config) SetUp() {
+	conf.setDefaults()
+}
+
+func (conf *Config) setDefaults() {
+	conf.Type = consts.RegistryTypeBuiltin
 }

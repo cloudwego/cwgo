@@ -43,6 +43,10 @@ type BuiltinRegistryConfigManager struct {
 }
 
 func NewBuiltinRegistryConfigManager(config BuiltinRegistryConfig, storeConfig store.Config) (*BuiltinRegistryConfigManager, error) {
+	if config.Address == "" {
+		panic("builtin registry address is empty")
+	}
+
 	return &BuiltinRegistryConfigManager{
 		Config:       config,
 		storeConfig:  storeConfig,

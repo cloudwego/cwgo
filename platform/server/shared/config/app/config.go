@@ -18,9 +18,13 @@
 
 package app
 
-import "time"
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"time"
+)
 
 type Config struct {
+	RunMode                  string `mapstructure:"runMode"`
 	Timezone                 string `mapstructure:"timezone"`
 	ProxyUrl                 string `mapstructure:"proxyUrl"`
 	SyncAgentServiceInterval string `mapstructure:"syncAgentServiceInterval"`
@@ -34,8 +38,16 @@ const (
 	defaultSyncIdlInterval          = 3 * time.Minute
 )
 
-func (c Config) GetSyncAgentServiceInterval() time.Duration {
-	duration, err := time.ParseDuration(c.SyncAgentServiceInterval)
+func (conf *Config) SetUp() {
+	conf.setDefaults()
+}
+
+func (conf *Config) setDefaults() {
+	conf.RunMode = consts.ServerRunModeCluster
+}
+
+func (conf *Config) GetSyncAgentServiceInterval() time.Duration {
+	duration, err := time.ParseDuration(conf.SyncAgentServiceInterval)
 	if err == nil {
 		return duration
 	}
@@ -43,8 +55,8 @@ func (c Config) GetSyncAgentServiceInterval() time.Duration {
 	return defaultSyncAgentServiceInterval
 }
 
-func (c Config) GetSyncRepositoryInterval() time.Duration {
-	duration, err := time.ParseDuration(c.SyncIdlInterval)
+func (conf *Config) GetSyncRepositoryInterval() time.Duration {
+	duration, err := time.ParseDuration(conf.SyncIdlInterval)
 	if err == nil {
 		return duration
 	}
@@ -52,8 +64,8 @@ func (c Config) GetSyncRepositoryInterval() time.Duration {
 	return defaultSyncRepositoryInterval
 }
 
-func (c Config) GetSyncIdlInterval() time.Duration {
-	duration, err := time.ParseDuration(c.SyncIdlInterval)
+func (conf *Config) GetSyncIdlInterval() time.Duration {
+	duration, err := time.ParseDuration(conf.SyncIdlInterval)
 	if err == nil {
 		return duration
 	}

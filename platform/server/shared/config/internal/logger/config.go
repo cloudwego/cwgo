@@ -18,9 +18,33 @@
 
 package logger
 
+import "github.com/cloudwego/cwgo/platform/server/shared/logger"
+
 type Config struct {
 	SavePath     string `mapstructure:"savePath"`
 	EncoderType  string `mapstructure:"encoderType"`
 	EncodeLevel  string `mapstructure:"encodeLevel"`
 	EncodeCaller string `mapstructure:"encodeCaller"`
+}
+
+func (conf *Config) SetUp() {
+	conf.setDefaults()
+}
+
+func (conf *Config) setDefaults() {
+	if conf.SavePath == "" {
+		conf.SavePath = "log"
+	}
+
+	if conf.EncoderType == "" {
+		conf.EncoderType = logger.ConsoleEncoder
+	}
+
+	if conf.EncodeLevel == "" {
+		conf.EncodeLevel = logger.CapitalLevelEncoder
+	}
+
+	if conf.EncodeCaller == "" {
+		conf.EncodeCaller = logger.FullCallerEncoder
+	}
 }

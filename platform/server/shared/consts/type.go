@@ -77,12 +77,16 @@ const (
 	StoreTypeNumMysql StoreType = iota + 1
 	StoreTypeNumMongo
 	StoreTypeNumRedis
+
+	StoreTypeMysql = "mysql"
+	StoreTypeMongo = "mongo"
+	StoreTypeRedis = "redis"
 )
 
 var StoreTypeMapToNum = map[string]StoreType{
-	"mysql": StoreTypeNumMysql,
-	"mongo": StoreTypeNumMongo,
-	"redis": StoreTypeNumRedis,
+	StoreTypeMysql: StoreTypeNumMysql,
+	StoreTypeMongo: StoreTypeNumMongo,
+	StoreTypeRedis: StoreTypeNumRedis,
 }
 
 type DispatcherType uint32

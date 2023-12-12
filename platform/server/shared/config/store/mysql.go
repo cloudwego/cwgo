@@ -50,15 +50,15 @@ func (m Mysql) GetDsn() string {
 	)
 }
 
-func (c Config) NewMysqlDB() (*gorm.DB, error) {
-	logger.Logger.Info("connecting mysql", zap.Reflect("dsn", c.Mysql.GetDsn()))
+func (conf *Config) NewMysqlDB() (*gorm.DB, error) {
+	logger.Logger.Info("connecting mysql", zap.Reflect("dsn", conf.Mysql.GetDsn()))
 
 	gormLogger, err := logger.GetGormZapWriter(logger.GetGormLoggerConfig())
 	if err != nil {
 		return nil, err
 	}
 
-	db, err := gorm.Open(mysql.Open(c.Mysql.GetDsn()), &gorm.Config{
+	db, err := gorm.Open(mysql.Open(conf.Mysql.GetDsn()), &gorm.Config{
 		Logger:      gormLogger,
 		PrepareStmt: true,
 	})

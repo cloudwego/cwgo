@@ -29,6 +29,14 @@ type Config struct {
 	Redis Redis  `mapstructure:"redis"`
 }
 
-func (c Config) GetStoreType() consts.StoreType {
-	return consts.StoreTypeMapToNum[c.Type]
+func (conf *Config) SetUp() {
+	conf.setDefaults()
+}
+
+func (conf *Config) setDefaults() {
+	conf.Type = consts.StoreTypeMysql
+}
+
+func (conf *Config) GetStoreType() consts.StoreType {
+	return consts.StoreTypeMapToNum[conf.Type]
 }

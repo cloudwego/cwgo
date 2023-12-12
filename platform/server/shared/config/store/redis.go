@@ -51,39 +51,39 @@ type RedisCluster struct {
 	Password string `mapstructure:"password"`
 }
 
-func (c Config) NewRedisClient() (redis.UniversalClient, error) {
+func (conf *Config) NewRedisClient() (redis.UniversalClient, error) {
 	var rdb redis.UniversalClient
 
-	if c.Redis.Type == "standalone" {
+	if conf.Redis.Type == "standalone" {
 		logger.Logger.Info("connecting redis",
-			zap.String("type", c.Redis.Type),
-			zap.Reflect("config", c.Redis.StandAlone),
+			zap.String("type", conf.Redis.Type),
+			zap.Reflect("config", conf.Redis.StandAlone),
 		)
 
 		rdb = redis.NewClient(&redis.Options{
-			Addr:     c.Redis.StandAlone.Addr,
-			Username: c.Redis.StandAlone.Username,
-			Password: c.Redis.StandAlone.Password,
-			DB:       c.Redis.StandAlone.Db,
+			Addr:     conf.Redis.StandAlone.Addr,
+			Username: conf.Redis.StandAlone.Username,
+			Password: conf.Redis.StandAlone.Password,
+			DB:       conf.Redis.StandAlone.Db,
 		})
-	} else if c.Redis.Type == "cluster" || c.Redis.Type == "" {
+	} else if conf.Redis.Type == "cluster" || conf.Redis.Type == "" {
 		logger.Logger.Info("connecting redis",
-			zap.String("type", c.Redis.Type),
-			zap.Reflect("config", c.Redis.Cluster),
+			zap.String("type", conf.Redis.Type),
+			zap.Reflect("config", conf.Redis.Cluster),
 		)
 
-		addrs := make([]string, len(c.Redis.Cluster.Addrs))
-		for i, addr := range c.Redis.Cluster.Addrs {
+		addrs := make([]string, len(conf.Redis.Cluster.Addrs))
+		for i, addr := range conf.Redis.Cluster.Addrs {
 			addrs[i] = fmt.Sprintf("%s:%s", addr.Ip, addr.Port)
 		}
 
 		rdb = redis.NewClusterClient(&redis.ClusterOptions{
 			Addrs:    addrs,
-			Username: c.Redis.Cluster.Username,
-			Password: c.Redis.Cluster.Password,
+			Username: conf.Redis.Cluster.Username,
+			Password: conf.Redis.Cluster.Password,
 		})
 	} else {
-		logger.Logger.Error("invalid redis type", zap.String("type", c.Redis.Type))
+		logger.Logger.Error("invalid redis type", zap.String("type", conf.Redis.Type))
 		return nil, errors.New("invalid redis type")
 	}
 

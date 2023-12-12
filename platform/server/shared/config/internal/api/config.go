@@ -40,3 +40,19 @@ type RpcClientConf struct {
 	Name          string `mapstructure:"name" json:"name"`
 	MuxConnection int    `mapstructure:"muxConnection" json:"mux_connection,default=1"`
 }
+
+func (conf *Config) SetUp() {
+	conf.setDefaults()
+}
+
+func (conf *Config) setDefaults() {
+	if conf.Host == "" {
+		conf.Host = "0.0.0.0"
+	}
+
+	if conf.Port == 0 {
+		conf.Port = 8089
+	}
+
+	conf.Dispatcher.SetUp()
+}

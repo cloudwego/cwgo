@@ -53,6 +53,15 @@ type Config struct {
 	Agent    agent.Config    `mapstructure:"agent"`
 }
 
+func (conf *Config) SetUp() {
+	conf.App.SetUp()
+	conf.Logger.SetUp()
+	conf.Registry.SetUp()
+	conf.Store.SetUp()
+	conf.Api.SetUp()
+	conf.Agent.SetUp()
+}
+
 var manager *Manager
 
 type FileConfig struct {

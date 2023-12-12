@@ -28,3 +28,21 @@ type Config struct {
 type Metadata struct {
 	ServiceId string `yaml:"service_id"`
 }
+
+func (conf *Config) SetUp() {
+	conf.setDefaults()
+}
+
+func (conf *Config) setDefaults() {
+	if conf.Addr == "" {
+		conf.Addr = "0.0.0.0:11010"
+	}
+
+	if conf.MaxConnections == 0 {
+		conf.MaxConnections = 2000
+	}
+
+	if conf.MaxQPS == 0 {
+		conf.MaxQPS = 500
+	}
+}

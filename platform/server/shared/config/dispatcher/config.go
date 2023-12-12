@@ -27,8 +27,16 @@ type Config struct {
 	Type string `mapstructure:"type"`
 }
 
-func (c Config) NewDispatcher() dispatcher.IDispatcher {
-	dispatcherType, ok := consts.DispatcherMapToNum[c.Type]
+func (conf *Config) SetUp() {
+	conf.setDefaults()
+}
+
+func (conf *Config) setDefaults() {
+	conf.Type = consts.DispatcherTypeHash
+}
+
+func (conf *Config) NewDispatcher() dispatcher.IDispatcher {
+	dispatcherType, ok := consts.DispatcherMapToNum[conf.Type]
 	if !ok {
 		panic("invalid dispatcher type")
 	}
