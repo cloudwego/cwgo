@@ -177,12 +177,17 @@ func (c *Processor) Start() {
 					taskProcessedNum++
 				}
 			}
+
 			if c.isDynamicWorker {
 				if time.Since(startTime) < minSyncTime && len(c.workerList) > defaultWorkerNum {
 					// reduce worker
 					c.workerList[0].Stop()
 					c.workerList = c.workerList[1:]
 				}
+			}
+
+			if time.Since(startTime) < minSyncTime {
+				time.Sleep(minSyncTime - time.Since(startTime))
 			}
 		}
 	exit:
