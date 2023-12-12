@@ -120,7 +120,7 @@ layouts:
   - path: "{{.HandlerDir}}/{{.GenPackage}}/{{ToSnakeCase .ServiceName}}_test.go"
     loop_service: true
     update_behavior:
-      type: append
+      type: "append"
       append_key: "method"
       insert_key: "Test{{$.Name}}"
       append_content_tpl: |-
