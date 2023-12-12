@@ -32,6 +32,7 @@ CREATE TABLE `idl` (
   `commit_hash` char(40) NOT NULL COMMENT 'idl file commit hash',
   `service_name` varchar(255) NOT NULL COMMENT 'service name',
   `last_sync_time` datetime NOT NULL COMMENT 'last update time',
+  `status` tinyint(1) NULL DEFAULT 1 COMMENT 'status',
   `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is deleted',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',

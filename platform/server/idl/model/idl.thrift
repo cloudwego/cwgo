@@ -9,9 +9,10 @@ struct IDL{
     6: list<ImportIDL> import_idls
     7: string service_name // service name
     8: string last_sync_time // idl last sync time
-    9: bool is_deleted
-    10: string create_time
-    11: string update_time
+    9: string status // idl status
+    10: bool is_deleted
+    11: string create_time
+    12: string update_time
 }
 
 struct ImportIDL{

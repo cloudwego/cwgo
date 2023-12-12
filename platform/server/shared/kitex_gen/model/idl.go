@@ -17,9 +17,10 @@ type IDL struct {
 	ImportIdls          []*ImportIDL `thrift:"import_idls,6" frugal:"6,default,list<ImportIDL>" json:"import_idls"`
 	ServiceName         string       `thrift:"service_name,7" frugal:"7,default,string" json:"service_name"`
 	LastSyncTime        string       `thrift:"last_sync_time,8" frugal:"8,default,string" json:"last_sync_time"`
-	IsDeleted           bool         `thrift:"is_deleted,9" frugal:"9,default,bool" json:"is_deleted"`
-	CreateTime          string       `thrift:"create_time,10" frugal:"10,default,string" json:"create_time"`
-	UpdateTime          string       `thrift:"update_time,11" frugal:"11,default,string" json:"update_time"`
+	Status              string       `thrift:"status,9" frugal:"9,default,string" json:"status"`
+	IsDeleted           bool         `thrift:"is_deleted,10" frugal:"10,default,bool" json:"is_deleted"`
+	CreateTime          string       `thrift:"create_time,11" frugal:"11,default,string" json:"create_time"`
+	UpdateTime          string       `thrift:"update_time,12" frugal:"12,default,string" json:"update_time"`
 }
 
 func NewIDL() *IDL {
@@ -62,6 +63,10 @@ func (p *IDL) GetLastSyncTime() (v string) {
 	return p.LastSyncTime
 }
 
+func (p *IDL) GetStatus() (v string) {
+	return p.Status
+}
+
 func (p *IDL) GetIsDeleted() (v bool) {
 	return p.IsDeleted
 }
@@ -97,6 +102,9 @@ func (p *IDL) SetServiceName(val string) {
 func (p *IDL) SetLastSyncTime(val string) {
 	p.LastSyncTime = val
 }
+func (p *IDL) SetStatus(val string) {
+	p.Status = val
+}
 func (p *IDL) SetIsDeleted(val bool) {
 	p.IsDeleted = val
 }
@@ -116,9 +124,10 @@ var fieldIDToName_IDL = map[int16]string{
 	6:  "import_idls",
 	7:  "service_name",
 	8:  "last_sync_time",
-	9:  "is_deleted",
-	10: "create_time",
-	11: "update_time",
+	9:  "status",
+	10: "is_deleted",
+	11: "create_time",
+	12: "update_time",
 }
 
 func (p *IDL) Read(iprot thrift.TProtocol) (err error) {
@@ -221,7 +230,7 @@ func (p *IDL) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 9:
-			if fieldTypeId == thrift.BOOL {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField9(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -231,7 +240,7 @@ func (p *IDL) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 10:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.BOOL {
 				if err = p.ReadField10(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -243,6 +252,16 @@ func (p *IDL) Read(iprot thrift.TProtocol) (err error) {
 		case 11:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField11(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 12:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField12(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -364,6 +383,15 @@ func (p *IDL) ReadField8(iprot thrift.TProtocol) error {
 }
 
 func (p *IDL) ReadField9(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.Status = v
+	}
+	return nil
+}
+
+func (p *IDL) ReadField10(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadBool(); err != nil {
 		return err
 	} else {
@@ -372,7 +400,7 @@ func (p *IDL) ReadField9(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *IDL) ReadField10(iprot thrift.TProtocol) error {
+func (p *IDL) ReadField11(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -381,7 +409,7 @@ func (p *IDL) ReadField10(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *IDL) ReadField11(iprot thrift.TProtocol) error {
+func (p *IDL) ReadField12(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -438,6 +466,10 @@ func (p *IDL) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField11(oprot); err != nil {
 			fieldId = 11
+			goto WriteFieldError
+		}
+		if err = p.writeField12(oprot); err != nil {
+			fieldId = 12
 			goto WriteFieldError
 		}
 
@@ -604,10 +636,10 @@ WriteFieldEndError:
 }
 
 func (p *IDL) writeField9(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("is_deleted", thrift.BOOL, 9); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.STRING, 9); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteBool(p.IsDeleted); err != nil {
+	if err := oprot.WriteString(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -621,10 +653,10 @@ WriteFieldEndError:
 }
 
 func (p *IDL) writeField10(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 10); err != nil {
+	if err = oprot.WriteFieldBegin("is_deleted", thrift.BOOL, 10); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.CreateTime); err != nil {
+	if err := oprot.WriteBool(p.IsDeleted); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -638,10 +670,10 @@ WriteFieldEndError:
 }
 
 func (p *IDL) writeField11(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 11); err != nil {
+	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 11); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.UpdateTime); err != nil {
+	if err := oprot.WriteString(p.CreateTime); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -652,6 +684,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 11 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 11 end error: ", p), err)
+}
+
+func (p *IDL) writeField12(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 12); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.UpdateTime); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 12 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 12 end error: ", p), err)
 }
 
 func (p *IDL) String() string {
@@ -691,13 +740,16 @@ func (p *IDL) DeepEqual(ano *IDL) bool {
 	if !p.Field8DeepEqual(ano.LastSyncTime) {
 		return false
 	}
-	if !p.Field9DeepEqual(ano.IsDeleted) {
+	if !p.Field9DeepEqual(ano.Status) {
 		return false
 	}
-	if !p.Field10DeepEqual(ano.CreateTime) {
+	if !p.Field10DeepEqual(ano.IsDeleted) {
 		return false
 	}
-	if !p.Field11DeepEqual(ano.UpdateTime) {
+	if !p.Field11DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field12DeepEqual(ano.UpdateTime) {
 		return false
 	}
 	return true
@@ -765,21 +817,28 @@ func (p *IDL) Field8DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *IDL) Field9DeepEqual(src bool) bool {
+func (p *IDL) Field9DeepEqual(src string) bool {
+
+	if strings.Compare(p.Status, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDL) Field10DeepEqual(src bool) bool {
 
 	if p.IsDeleted != src {
 		return false
 	}
 	return true
 }
-func (p *IDL) Field10DeepEqual(src string) bool {
+func (p *IDL) Field11DeepEqual(src string) bool {
 
 	if strings.Compare(p.CreateTime, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *IDL) Field11DeepEqual(src string) bool {
+func (p *IDL) Field12DeepEqual(src string) bool {
 
 	if strings.Compare(p.UpdateTime, src) != 0 {
 		return false

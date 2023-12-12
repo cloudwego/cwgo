@@ -158,7 +158,7 @@ func (p *IDL) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 9:
-			if fieldTypeId == thrift.BOOL {
+			if fieldTypeId == thrift.STRING {
 				l, err = p.FastReadField9(buf[offset:])
 				offset += l
 				if err != nil {
@@ -172,7 +172,7 @@ func (p *IDL) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 10:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.BOOL {
 				l, err = p.FastReadField10(buf[offset:])
 				offset += l
 				if err != nil {
@@ -188,6 +188,20 @@ func (p *IDL) FastRead(buf []byte) (int, error) {
 		case 11:
 			if fieldTypeId == thrift.STRING {
 				l, err = p.FastReadField11(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 12:
+			if fieldTypeId == thrift.STRING {
+				l, err = p.FastReadField12(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -362,6 +376,20 @@ func (p *IDL) FastReadField8(buf []byte) (int, error) {
 func (p *IDL) FastReadField9(buf []byte) (int, error) {
 	offset := 0
 
+	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.Status = v
+
+	}
+	return offset, nil
+}
+
+func (p *IDL) FastReadField10(buf []byte) (int, error) {
+	offset := 0
+
 	if v, l, err := bthrift.Binary.ReadBool(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -373,7 +401,7 @@ func (p *IDL) FastReadField9(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDL) FastReadField10(buf []byte) (int, error) {
+func (p *IDL) FastReadField11(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -387,7 +415,7 @@ func (p *IDL) FastReadField10(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDL) FastReadField11(buf []byte) (int, error) {
+func (p *IDL) FastReadField12(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -413,14 +441,15 @@ func (p *IDL) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 		offset += p.fastWriteField3(buf[offset:], binaryWriter)
-		offset += p.fastWriteField9(buf[offset:], binaryWriter)
+		offset += p.fastWriteField10(buf[offset:], binaryWriter)
 		offset += p.fastWriteField4(buf[offset:], binaryWriter)
 		offset += p.fastWriteField5(buf[offset:], binaryWriter)
 		offset += p.fastWriteField6(buf[offset:], binaryWriter)
 		offset += p.fastWriteField7(buf[offset:], binaryWriter)
 		offset += p.fastWriteField8(buf[offset:], binaryWriter)
-		offset += p.fastWriteField10(buf[offset:], binaryWriter)
+		offset += p.fastWriteField9(buf[offset:], binaryWriter)
 		offset += p.fastWriteField11(buf[offset:], binaryWriter)
+		offset += p.fastWriteField12(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -442,6 +471,7 @@ func (p *IDL) BLength() int {
 		l += p.field9Length()
 		l += p.field10Length()
 		l += p.field11Length()
+		l += p.field12Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -529,8 +559,8 @@ func (p *IDL) fastWriteField8(buf []byte, binaryWriter bthrift.BinaryWriter) int
 
 func (p *IDL) fastWriteField9(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "is_deleted", thrift.BOOL, 9)
-	offset += bthrift.Binary.WriteBool(buf[offset:], p.IsDeleted)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "status", thrift.STRING, 9)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.Status)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -538,8 +568,8 @@ func (p *IDL) fastWriteField9(buf []byte, binaryWriter bthrift.BinaryWriter) int
 
 func (p *IDL) fastWriteField10(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "create_time", thrift.STRING, 10)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.CreateTime)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "is_deleted", thrift.BOOL, 10)
+	offset += bthrift.Binary.WriteBool(buf[offset:], p.IsDeleted)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -547,7 +577,16 @@ func (p *IDL) fastWriteField10(buf []byte, binaryWriter bthrift.BinaryWriter) in
 
 func (p *IDL) fastWriteField11(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "update_time", thrift.STRING, 11)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "create_time", thrift.STRING, 11)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.CreateTime)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
+func (p *IDL) fastWriteField12(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "update_time", thrift.STRING, 12)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.UpdateTime)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
@@ -631,8 +670,8 @@ func (p *IDL) field8Length() int {
 
 func (p *IDL) field9Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("is_deleted", thrift.BOOL, 9)
-	l += bthrift.Binary.BoolLength(p.IsDeleted)
+	l += bthrift.Binary.FieldBeginLength("status", thrift.STRING, 9)
+	l += bthrift.Binary.StringLengthNocopy(p.Status)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -640,8 +679,8 @@ func (p *IDL) field9Length() int {
 
 func (p *IDL) field10Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("create_time", thrift.STRING, 10)
-	l += bthrift.Binary.StringLengthNocopy(p.CreateTime)
+	l += bthrift.Binary.FieldBeginLength("is_deleted", thrift.BOOL, 10)
+	l += bthrift.Binary.BoolLength(p.IsDeleted)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -649,7 +688,16 @@ func (p *IDL) field10Length() int {
 
 func (p *IDL) field11Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("update_time", thrift.STRING, 11)
+	l += bthrift.Binary.FieldBeginLength("create_time", thrift.STRING, 11)
+	l += bthrift.Binary.StringLengthNocopy(p.CreateTime)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *IDL) field12Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("update_time", thrift.STRING, 12)
 	l += bthrift.Binary.StringLengthNocopy(p.UpdateTime)
 
 	l += bthrift.Binary.FieldEndLength()

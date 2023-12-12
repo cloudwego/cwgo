@@ -27,3 +27,13 @@ var IdlTypeNumMap = map[int]struct{}{
 	IdlTypeNumThrift: {},
 	IdlTypeNumProto:  {},
 }
+
+const (
+	IdlStatusNumInactive = iota + 1
+	IdlStatusNumActive
+)
+
+var IdlStatusNumMap = map[int]struct{}{
+	IdlStatusNumActive:   {},
+	IdlStatusNumInactive: {},
+}

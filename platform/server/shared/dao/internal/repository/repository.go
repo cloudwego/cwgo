@@ -107,14 +107,26 @@ func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel mo
 func (m *MysqlRepositoryManager) DeleteRepository(ctx context.Context, ids []int64) error {
 	var repoEntity entity.MysqlRepository
 
-	res := m.db.WithContext(ctx).
-		Delete(&repoEntity, ids)
-	if res.Error != nil {
-		return res.Error
-	}
+	err := m.db.WithContext(ctx).Transaction(
+		func(tx *gorm.DB) error {
+			// delete repo info
+			res := tx.Delete(&repoEntity, ids)
+			if res.Error != nil {
+				return res.Error
+			}
+			if res.RowsAffected == 0 {
+				return consts.ErrDatabaseRecordNotFound
+			}
 
-	if res.RowsAffected == 0 {
-		return consts.ErrDatabaseRecordNotFound
+			// delete idl info in repo
+			err := tx.Where("`idl_repository_id` IN ?", ids).
+				Delete(&entity.MysqlIDL{}).Error
+
+			return err
+		},
+	)
+	if err != nil {
+		return err
 	}
 
 	return nil
@@ -133,14 +145,33 @@ func (m *MysqlRepositoryManager) UpdateRepository(ctx context.Context, repoModel
 		Status: repoModel.Status,
 	}
 
-	err := m.db.WithContext(ctx).
-		Model(&repoEntity).
-		Updates(repoEntity).Error
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return consts.ErrDatabaseRecordNotFound
-		}
-	}
+	err := m.db.WithContext(ctx).Transaction(
+		func(tx *gorm.DB) error {
+			if repoEntity.Status == consts.RepositoryStatusNumInactive {
+				// if repo status change to inactive
+				// then idl in repo should change to inactive too
+				err := tx.
+					Table(entity.TableNameMysqlIDL).
+					Where("`idl_repository_id` = ?", repoEntity.ID).
+					UpdateColumn("status", consts.IdlStatusNumInactive).Error
+				if err != nil {
+					return err
+				}
+			}
+
+			// update repo info
+			err := tx.
+				Model(&repoEntity).
+				Updates(repoEntity).Error
+			if err != nil {
+				if err == gorm.ErrRecordNotFound {
+					return consts.ErrDatabaseRecordNotFound
+				}
+			}
+
+			return nil
+		},
+	)
 
 	return err
 }
@@ -181,9 +212,33 @@ func (m *MysqlRepositoryManager) ChangeRepositoryStatus(ctx context.Context, id 
 		Status: status,
 	}
 
-	err := m.db.WithContext(ctx).
-		Model(&repoEntity).
-		Updates(repoEntity).Error
+	err := m.db.WithContext(ctx).Transaction(
+		func(tx *gorm.DB) error {
+			if repoEntity.Status == consts.RepositoryStatusNumInactive {
+				// if repo status change to inactive
+				// then idl in repo should change to inactive too
+				err := tx.
+					Table(entity.TableNameMysqlIDL).
+					Where("`idl_repository_id` = ?", repoEntity.ID).
+					UpdateColumn("status", consts.IdlStatusNumInactive).Error
+				if err != nil {
+					return err
+				}
+			}
+
+			// update repo info
+			err := tx.
+				Model(&repoEntity).
+				Updates(repoEntity).Error
+			if err != nil {
+				if err == gorm.ErrRecordNotFound {
+					return consts.ErrDatabaseRecordNotFound
+				}
+			}
+
+			return nil
+		},
+	)
 
 	return err
 }
