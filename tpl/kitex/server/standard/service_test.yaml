@@ -49,12 +49,9 @@ body: |-
 
     {{else -}}
     resp, err := s.Run({{range .Args}}{{LowerFirst .Name}}{{end}})
-    if err != nil {
-      t.Errorf("unexpected error: %v", err)
-    }
-    if resp == nil {
-      t.Errorf("unexpected nil response")
-    }
+    t.Logf("err: %v", err)
+    t.Logf("resp: %v", resp)
+  
     // todo: edit your unit test
     {{end}}
     {{end}}

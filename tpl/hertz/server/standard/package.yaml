@@ -117,50 +117,26 @@ layouts:
        return
       }
 
-  - path: "biz/service/{{.HandlerGenPath}}/{{ToSnakeCase .MethodName}}_test.go"
-    loop_method: true
-    update_behavior:
-      type: "skip"
-    body: |-
-      package {{.FilePackage}}
-      import (
-        "context"
-        "testing"
-
-        "github.com/cloudwego/hertz/pkg/app"
-        "github.com/cloudwego/hertz/pkg/common/test/assert"
-      {{- range $k, $v := .Models}}
-       {{$k}} "{{$v.Package}}"
-      {{- end}}
-      )
-      func Test{{.Name}}Service_Run(t *testing.T) {
-        ctx := context.Background()
-        c := app.NewContext(1)
-        s := New{{.Name}}Service(ctx, c)
-        // init req and assert value
-        req := &{{.RequestTypeName}}{}
-        resp, err := s.Run(req)
-        assert.DeepEqual(t, nil, resp)
-        assert.DeepEqual(t, nil, err)
-        // todo edit your unit test.
-      }
-
   - path: "{{.HandlerDir}}/{{.GenPackage}}/{{ToSnakeCase .ServiceName}}_test.go"
     loop_service: true
     update_behavior:
-      type: "append"
+      type: append
       append_key: "method"
       insert_key: "Test{{$.Name}}"
-      append_tpl: |-
+      append_content_tpl: |-
         func Test{{.Name}}(t *testing.T) {
-          h := server.Default()
-          h.GET("{{.Path}}", {{.Name}})
-          w := ut.PerformRequest(h.Engine, "{{.HTTPMethod}}", "{{.Path}}", &ut.Body{Body: bytes.NewBufferString(""), Len: 1},
-          ut.Header{})
-          resp := w.Result()
-          assert.DeepEqual(t, 201, resp.StatusCode())
-          assert.DeepEqual(t, "", string(resp.Body()))
-          // todo edit your unit test.
+        h := server.Default()
+        h.{{.HTTPMethod}}("{{.Path}}", {{.Name}})
+        path:= "{{.Path}}"                                          // todo: you can customize query
+        body:= &ut.Body{Body: bytes.NewBufferString(""), Len: 1} // todo: you can customize body
+        header:= ut.Header{}                                     // todo: you can customize header
+        w := ut.PerformRequest(h.Engine, "{{.HTTPMethod}}", path, body,header)
+        resp := w.Result()
+        t.Log(string(resp.Body()))
+        
+        // todo edit your unit test.
+        // assert.DeepEqual(t, 200, resp.StatusCode())
+        // assert.DeepEqual(t, "null", string(resp.Body()))
         }
     body: |-
       package {{.FilePackage}}
@@ -169,18 +145,22 @@ layouts:
         "testing"
 
         "github.com/cloudwego/hertz/pkg/app/server"
-        "github.com/cloudwego/hertz/pkg/common/test/assert"
+        //"github.com/cloudwego/hertz/pkg/common/test/assert"
         "github.com/cloudwego/hertz/pkg/common/ut"
       )
       {{range $_, $MethodInfo := $.Methods}}
         func Test{{$MethodInfo.Name}}(t *testing.T) {
         h := server.Default()
-        h.GET("{{$MethodInfo.Path}}", {{$MethodInfo.Name}})
-        w := ut.PerformRequest(h.Engine, "{{$MethodInfo.HTTPMethod}}", "{{$MethodInfo.Path}}", &ut.Body{Body: bytes.NewBufferString(""), Len: 1},
-        ut.Header{})
+        h.{{$MethodInfo.HTTPMethod}}("{{$MethodInfo.Path}}", {{$MethodInfo.Name}})
+        path:= "{{$MethodInfo.Path}}"                                          // todo: you can customize query
+        body:= &ut.Body{Body: bytes.NewBufferString(""), Len: 1} // todo: you can customize body
+        header:= ut.Header{}                                     // todo: you can customize header
+        w := ut.PerformRequest(h.Engine, "{{$MethodInfo.HTTPMethod}}", path, body,header)
         resp := w.Result()
-        assert.DeepEqual(t, 201, resp.StatusCode())
-        assert.DeepEqual(t, "", string(resp.Body()))
+        t.Log(string(resp.Body()))
+      
         // todo edit your unit test.
+        // assert.DeepEqual(t, 200, resp.StatusCode())
+        // assert.DeepEqual(t, "null", string(resp.Body()))
         }
       {{end}}
