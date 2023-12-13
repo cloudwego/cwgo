@@ -363,7 +363,7 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, pa
 	db := m.db.WithContext(ctx)
 
 	if idlModel.ServiceName != "" {
-		db = db.Where("`service_name` LIKE ?", fmt.Sprintf("%%%s%%", idlModel.ServiceName))
+		db = db.Where("`idl.service_name` LIKE ?", fmt.Sprintf("%%%s%%", idlModel.ServiceName))
 	}
 
 	err := db.
