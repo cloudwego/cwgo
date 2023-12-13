@@ -13,7 +13,7 @@ export default defineConfig({
 	server: {
 		proxy: {
 			"/api": {
-				target: "http://localhost:8089",
+				target: "http://cwgo.stellaris.wang:8089",
 				changeOrigin: true,
 				rewrite: (path) => path.replace(/^\/api/, "/api")
 			}

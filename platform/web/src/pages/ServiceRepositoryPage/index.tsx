@@ -209,18 +209,25 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 						>
 							跳转 commit
 						</Button>
-						<Button
-							onClick={() => {
-								navigator.clipboard.writeText(
-									`import "${service_repository.repository_domain}/${service_repository.repository_owner}/rpc/${service_name}}"`
-								);
-								Toast.success({
-									content: "已复制到剪贴板"
-								});
+						<Tooltip
+							content={`import "${service_repository.repository_domain}/${service_repository.repository_owner}/rpc/${service_name}"`}
+							style={{
+								maxWidth: "100vw"
 							}}
 						>
-							复制添加依赖
-						</Button>
+							<Button
+								onClick={() => {
+									navigator.clipboard.writeText(
+										`import "${service_repository.repository_domain}/${service_repository.repository_owner}/rpc/${service_name}"`
+									);
+									Toast.success({
+										content: "已复制到剪贴板"
+									});
+								}}
+							>
+								复制添加依赖
+							</Button>
+						</Tooltip>
 					</Space>
 				);
 			}
