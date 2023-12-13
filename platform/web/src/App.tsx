@@ -8,24 +8,28 @@ import Footer from "./components/Footer";
 
 export default function App() {
 	const { Sider, Content } = Layout;
-	const [selectedKey, setSelectedKey] = useState("idl");
+	const [selectedKey, setSelectedKey] = useState("idlrepo");
 	const navList = [
 		{
-			itemKey: "idl",
-			text: "IDL 信息查询",
+			itemKey: "idlrepo",
+			text: "IDL 仓库信息管理",
+			icon: <IconGitlabLogo size="large" />
+		},
+		{
+			itemKey: "idlinfo",
+			text: "IDL 信息同步",
 			icon: <IconCode size="large" />
 		},
 		{
-			itemKey: "repository",
-			text: "仓库信息管理",
+			itemKey: "servicerepo",
+			text: "代码产物信息查询",
 			icon: <IconGitlabLogo size="large" />
+		},
+		{
+			itemKey: "tokeninfo",
+			text: "TOKEN 管理",
+			icon: <IconCode size="large" />
 		}
-		// ,
-		// {
-		// 	itemKey: "template",
-		// 	text: "模版管理",
-		// 	icon: <IconFolderOpen size="large" />
-		// }
 	];
 
 	// 主题模式

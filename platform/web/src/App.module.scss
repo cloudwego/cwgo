@@ -2,14 +2,13 @@
 	height: 100vh;
 	background-color: var(--semi-color-bg-1);
 	.nav {
-		height: 6vh;
+		height: 6v;
 	}
 	.inner-layout {
 		margin-top: 6vh;
 		height: 94vh;
 		overflow: auto;
 		.content-wrapper {
-			// 隐藏滚动条
 			-ms-overflow-style: none;
 			scrollbar-width: none;
 			&::-webkit-scrollbar {

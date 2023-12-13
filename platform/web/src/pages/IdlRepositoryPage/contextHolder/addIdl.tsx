@@ -1,13 +1,18 @@
-import { Button, Input, Select, Space, Toast } from "@douyinfe/semi-ui";
+import { Button, Input, Space, Toast } from "@douyinfe/semi-ui";
 import { useState } from "react";
-import { createRepo } from "../api";
+import { createIdl } from "../api";
 
-export default function ContextHolder({ update }: { update: () => void }) {
+export default function ContextHolder({
+	update,
+	id: idProp
+}: {
+	update: () => void;
+	id: number;
+}) {
 	// 表单状态
-	const [url, setUrl] = useState("");
-	const [token, setToken] = useState("");
-	const [storeType, setStoreType] = useState(1);
-	const [repoType, setRepoType] = useState(1);
+	const [idlPath, setIdlPath] = useState("");
+	const [serviceName, setServiceName] = useState("");
+	const [serviceRepoName, setServiceRepoName] = useState("");
 
 	return (
 		<Space vertical>
@@ -18,14 +23,20 @@ export default function ContextHolder({ update }: { update: () => void }) {
 					width: "100%"
 				}}
 			>
-				<div>仓库 URL</div>
+				<div
+					style={{
+						width: "5rem"
+					}}
+				>
+					主 idl 路径
+				</div>
 				<Input
 					style={{
 						width: "30rem"
 					}}
 					showClear
 					onChange={(value) => {
-						setUrl(value);
+						setIdlPath(value);
 					}}
 				></Input>
 			</Space>
@@ -41,7 +52,7 @@ export default function ContextHolder({ update }: { update: () => void }) {
 						width: "5rem"
 					}}
 				>
-					token
+					服务名
 				</div>
 				<Input
 					style={{
@@ -49,7 +60,7 @@ export default function ContextHolder({ update }: { update: () => void }) {
 					}}
 					showClear
 					onChange={(value) => {
-						setToken(value);
+						setServiceName(value);
 					}}
 				></Input>
 			</Space>
@@ -65,55 +76,17 @@ export default function ContextHolder({ update }: { update: () => void }) {
 						width: "5rem"
 					}}
 				>
-					存储类型
+					服务仓库名
 				</div>
-				<div
+				<Input
 					style={{
 						width: "30rem"
 					}}
-				>
-					<Select
-						defaultValue={1}
-						style={{ width: 120 }}
-						onChange={(value) => {
-							setStoreType(value as number);
-						}}
-					>
-						<Select.Option value={1}>IDL 文件</Select.Option>
-						<Select.Option value={2}>服务代码</Select.Option>
-					</Select>
-				</div>
-			</Space>
-			<Space
-				style={{
-					display: "flex",
-					justifyContent: "space-between",
-					width: "100%"
-				}}
-			>
-				<div
-					style={{
-						width: "5rem"
+					showClear
+					onChange={(value) => {
+						setServiceRepoName(value);
 					}}
-				>
-					仓库类型
-				</div>
-				<div
-					style={{
-						width: "30rem"
-					}}
-				>
-					<Select
-						defaultValue={1}
-						style={{ width: 120 }}
-						onChange={(value) => {
-							setRepoType(value as number);
-						}}
-					>
-						<Select.Option value={1}>Gitlab</Select.Option>
-						<Select.Option value={2}>Github</Select.Option>
-					</Select>
-				</div>
+				></Input>
 			</Space>
 			<Button
 				style={{
@@ -122,9 +95,21 @@ export default function ContextHolder({ update }: { update: () => void }) {
 				}}
 				type="primary"
 				onClick={() => {
-					if (!url || !token) {
+					if (!idlPath) {
 						Toast.error({
-							content: "请填写完整信息"
+							content: "主 idl 路径不能为空"
+						});
+						return;
+					}
+					if (!serviceName) {
+						Toast.error({
+							content: "服务名不能为空"
+						});
+						return;
+					}
+					if (!serviceRepoName) {
+						Toast.error({
+							content: "服务仓库名不能为空"
 						});
 						return;
 					}
@@ -132,7 +117,7 @@ export default function ContextHolder({ update }: { update: () => void }) {
 						content: "正在更新仓库",
 						duration: 0
 					});
-					createRepo(repoType, url, token, storeType)
+					createIdl(idProp, idlPath, serviceName, serviceRepoName)
 						.then((res) => {
 							Toast.success({
 								content: res

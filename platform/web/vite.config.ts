@@ -5,6 +5,11 @@ import viteEslint from "vite-plugin-eslint";
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [react(), viteEslint()],
+	resolve: {
+		alias: {
+			"@": "/src"
+		}
+	},
 	server: {
 		proxy: {
 			"/api": {
