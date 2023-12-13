@@ -18,10 +18,13 @@
 
 package agent
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/cloudwego/cwgo/platform/server/cmd/internal/options"
+	"github.com/spf13/cobra"
+)
 
 func NewCommand() *cobra.Command {
-	opt := newSetupOptions()
+	opt := options.NewAgentOptions()
 	cmd := &cobra.Command{
 		Use:   "agent",
 		Short: "agent service",
