@@ -8,10 +8,10 @@ async function getRepo(fetchOption: repoFetchOption) {
 			limit: fetchOption.pageSize,
 			order: 0,
 			order_by: "create_time",
-			repository_domain: fetchOption.repository_domain,
-			repository_name: fetchOption.repository_name
+			service_name: fetchOption.service_name
 		}
 	});
+	console.log(repoData.data);
 	return repoData.data;
 }
 

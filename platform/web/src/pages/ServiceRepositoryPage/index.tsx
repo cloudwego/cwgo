@@ -27,8 +27,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 	const [total, setTotal] = useState(0);
 	const [statusActive, setStatusActive] = useState(1);
 	const [searchInfo, setSearchInfo] = useState({
-		repository_domain: "",
-		repository_name: ""
+		service_name: ""
 	});
 	// let destroyFn = () => {};
 	const [pageSize, setPageSize] = useState(5);
@@ -64,7 +63,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 	const columns = [
 		{
 			title: "仓库类型",
-			dataIndex: "idl_repository",
+			dataIndex: "service_repository",
 			width: 100,
 			render: (value: { repository_type: number }) => {
 				return value.repository_type === 1 ? (
@@ -80,7 +79,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库域名",
-			dataIndex: "idl_repository.repository_domain",
+			dataIndex: "service_repository.repository_domain",
 			width: 150,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -88,7 +87,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库名",
-			dataIndex: "idl_repository.repository_name",
+			dataIndex: "service_repository.repository_name",
 			width: 150,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -96,7 +95,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库所有者",
-			dataIndex: "idl_repository.repository_owner",
+			dataIndex: "service_repository.repository_owner",
 			width: 120,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -104,7 +103,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "分支",
-			dataIndex: "idl_repository.repository_branch",
+			dataIndex: "service_repository.repository_branch",
 			width: 120,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -112,7 +111,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库最后更新时间",
-			dataIndex: "idl_repository.last_update_time",
+			dataIndex: "service_repository.last_update_time",
 			width: 180,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -132,7 +131,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库最后同步时间",
-			dataIndex: "idl_repository.last_sync_time",
+			dataIndex: "service_repository.last_sync_time",
 			width: 180,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -152,7 +151,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "状态",
-			dataIndex: "idl_repository.status",
+			dataIndex: "service_repository.status",
 			width: 100,
 			render: (value: number) => {
 				return value === 2 ? (
@@ -170,18 +169,18 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 			title: "快捷命令",
 			render: ({
 				commit_hash,
-				service_name,
-				idl_repository
+				service_repository,
+				service_name
 			}: {
 				commit_hash: string;
-				idl_repository: {
+				service_repository: {
 					repository_domain: string;
 					repository_owner: string;
 					repository_name: string;
 				};
 				service_name: string;
 			}) => {
-				const temp = `go get ${idl_repository.repository_domain}/${idl_repository.repository_owner}/${idl_repository.repository_name}/rpc/${service_name}`;
+				const temp = `go get ${service_repository.repository_domain}/${service_repository.repository_owner}/${service_repository.repository_name}`;
 				return (
 					<Space>
 						<Tooltip
@@ -204,11 +203,23 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 						<Button
 							onClick={() => {
 								window.open(
-									`https://${idl_repository.repository_domain}/${idl_repository.repository_owner}/${idl_repository.repository_name}/commit/${commit_hash}`
+									`https://${service_repository.repository_domain}/${service_repository.repository_owner}/${service_repository.repository_name}/commit/${commit_hash}`
 								);
 							}}
 						>
 							跳转 commit
+						</Button>
+						<Button
+							onClick={() => {
+								navigator.clipboard.writeText(
+									`import "${service_repository.repository_domain}/${service_repository.repository_owner}/rpc/${service_name}}"`
+								);
+								Toast.success({
+									content: "已复制到剪贴板"
+								});
+							}}
+						>
+							复制添加依赖
 						</Button>
 					</Space>
 				);
@@ -217,9 +228,9 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		{
 			title: "操作",
 			render: ({
-				idl_repository: { id }
+				service_repository: { id }
 			}: {
-				idl_repository: {
+				service_repository: {
 					id: number;
 					status: number;
 				};
@@ -296,7 +307,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "记录更新时间",
-			dataIndex: "idl_repository.update_time",
+			dataIndex: "service_repository.update_time",
 			width: 150,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -316,7 +327,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "创建时间",
-			dataIndex: "idl_repository.create_time",
+			dataIndex: "service_repository.create_time",
 			width: 150,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -380,14 +391,8 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 					<Space align="end">
 						<Form.Input
 							showClear
-							field="repository_domain"
-							label="仓库域名"
-							style={{ width: 180 }}
-						/>
-						<Form.Input
-							showClear
-							field="repository_name"
-							label="仓库名"
+							field="service_name"
+							label="服务名"
 							style={{ width: 180 }}
 						/>
 						<Button
@@ -405,7 +410,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 								})
 									.then((res) => {
 										console.log(res);
-										setData(res.repositories);
+										setData(res.idls);
 										setTotal(res.total);
 										Toast.success({
 											content: "搜索成功"

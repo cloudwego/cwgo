@@ -12,7 +12,6 @@ export default function ContextHolder({
 	// 表单状态
 	const [idlPath, setIdlPath] = useState("");
 	const [serviceName, setServiceName] = useState("");
-	const [serviceRepoName, setServiceRepoName] = useState("");
 
 	return (
 		<Space vertical>
@@ -64,30 +63,6 @@ export default function ContextHolder({
 					}}
 				></Input>
 			</Space>
-			<Space
-				style={{
-					display: "flex",
-					justifyContent: "space-between",
-					width: "100%"
-				}}
-			>
-				<div
-					style={{
-						width: "5rem"
-					}}
-				>
-					服务仓库名
-				</div>
-				<Input
-					style={{
-						width: "30rem"
-					}}
-					showClear
-					onChange={(value) => {
-						setServiceRepoName(value);
-					}}
-				></Input>
-			</Space>
 			<Button
 				style={{
 					width: "100%",
@@ -107,17 +82,11 @@ export default function ContextHolder({
 						});
 						return;
 					}
-					if (!serviceRepoName) {
-						Toast.error({
-							content: "服务仓库名不能为空"
-						});
-						return;
-					}
 					const toast = Toast.info({
 						content: "正在更新仓库",
 						duration: 0
 					});
-					createIdl(idProp, idlPath, serviceName, serviceRepoName)
+					createIdl(idProp, idlPath, serviceName)
 						.then((res) => {
 							Toast.success({
 								content: res

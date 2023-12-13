@@ -60,17 +60,11 @@ async function deleteRepo(id: number) {
 	return repoData.msg;
 }
 
-async function createIdl(
-	id: number,
-	idlPath: string,
-	serviceName: string,
-	serviceRepoName: string
-) {
+async function createIdl(id: number, idlPath: string, serviceName: string) {
 	const repoData: { msg: string } = await service.post("/api/idl", {
 		repository_id: id,
 		main_idl_path: idlPath,
-		service_name: serviceName,
-		service_repository_name: serviceRepoName
+		service_name: serviceName
 	});
 	return repoData.msg;
 }

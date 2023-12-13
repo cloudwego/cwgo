@@ -4,6 +4,7 @@ export interface repoFetchOption {
 	repoType: string;
 	repository_domain?: string;
 	repository_name?: string;
+	service_name?: string;
 }
 
 export interface IdlRes {
