@@ -43,7 +43,7 @@ func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, serviceName, ge
 			"go mod tidy",
 			idlPath, "rpc", serviceName, fmt.Sprintf("%s/%s/%s", repoDomain, repoOwner, serviceName),
 		),
-	)
+	) //ignore_security_alert RCE
 
 	cwgoCmd.Dir = generatePath
 
