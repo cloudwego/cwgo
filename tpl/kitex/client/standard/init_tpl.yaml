@@ -7,7 +7,8 @@ body: |-
      "sync"
   
      "github.com/cloudwego/kitex/client"
-    {{- if .HasStreaming }}
+    {{- if eq .Codec "thrift"}}
+     "github.com/cloudwego/kitex/pkg/transmeta"
      "github.com/cloudwego/kitex/transport"
     {{- end }}
   )
@@ -17,8 +18,9 @@ body: |-
   	defaultDstService = "{{.RealServiceName}}"
   	defaultClientOpts = []client.Option{
   		client.WithHostPorts("127.0.0.1:8888"),
-        {{- if .HasStreaming }}
-        client.WithTransportProtocol(transport.GRPC),
+        {{- if eq .Codec "thrift"}}
+        client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
+        client.WithTransportProtocol(transport.TTHeader),
         {{- end}}
   	}
   	once       sync.Once
