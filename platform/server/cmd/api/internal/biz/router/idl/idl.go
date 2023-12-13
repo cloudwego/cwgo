@@ -19,9 +19,8 @@
 package idl
 
 import (
-	"github.com/cloudwego/hertz/pkg/app/server"
-
 	idl "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler/idl"
+	"github.com/cloudwego/hertz/pkg/route"
 )
 
 /*
@@ -31,7 +30,7 @@ import (
 */
 
 // Register register routes based on the IDL 'api.${HTTP Method}' annotation.
-func Register(r *server.Hertz) {
+func Register(r *route.RouterGroup) {
 
 	root := r.Group("/", rootMw()...)
 	{

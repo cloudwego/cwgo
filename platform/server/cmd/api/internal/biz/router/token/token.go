@@ -19,7 +19,7 @@
 package token
 
 import (
-	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/route"
 
 	token "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler/token"
 )
@@ -31,7 +31,7 @@ import (
 */
 
 // Register register routes based on the IDL 'api.${HTTP Method}' annotation.
-func Register(r *server.Hertz) {
+func Register(r *route.RouterGroup) {
 	root := r.Group("/", rootMw()...)
 	{
 		_api := root.Group("/api", _apiMw()...)
