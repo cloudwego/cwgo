@@ -21,6 +21,7 @@ package idl
 import (
 	"context"
 	"net/url"
+	"strings"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
@@ -59,6 +60,13 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 			Code: consts.ErrNumParamMainIdlPath,
 			Msg:  consts.ErrMsgParamMainIdlPath,
 		}
+	}
+
+	req.ServiceName = strings.Replace(req.ServiceName, "/", "_", -1)
+	req.ServiceName = strings.Replace(req.ServiceName, ".", "_", -1)
+
+	if req.ServiceRepositoryName == "" {
+		req.ServiceName = req.ServiceRepositoryName
 	}
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
