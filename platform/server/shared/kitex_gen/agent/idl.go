@@ -4,9 +4,10 @@ package agent
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"strings"
 )
 
 type AddIDLReq struct {
@@ -2301,8 +2302,8 @@ func (p *GetIDLsRes) Field3DeepEqual(src *GetIDLsResData) bool {
 }
 
 type GetIDLsResData struct {
-	Idls  []*model.IDLWithRepositorInfo `thrift:"idls,1" frugal:"1,default,list<model.IDLWithRepositorInfo>" json:"idls"`
-	Total int32                         `thrift:"total,2" frugal:"2,default,i32" json:"total"`
+	Idls  []*model.IDLWithRepositoryInfo `thrift:"idls,1" frugal:"1,default,list<model.IDLWithRepositoryInfo>" json:"idls"`
+	Total int32                          `thrift:"total,2" frugal:"2,default,i32" json:"total"`
 }
 
 func NewGetIDLsResData() *GetIDLsResData {
@@ -2313,14 +2314,14 @@ func (p *GetIDLsResData) InitDefault() {
 	*p = GetIDLsResData{}
 }
 
-func (p *GetIDLsResData) GetIdls() (v []*model.IDLWithRepositorInfo) {
+func (p *GetIDLsResData) GetIdls() (v []*model.IDLWithRepositoryInfo) {
 	return p.Idls
 }
 
 func (p *GetIDLsResData) GetTotal() (v int32) {
 	return p.Total
 }
-func (p *GetIDLsResData) SetIdls(val []*model.IDLWithRepositorInfo) {
+func (p *GetIDLsResData) SetIdls(val []*model.IDLWithRepositoryInfo) {
 	p.Idls = val
 }
 func (p *GetIDLsResData) SetTotal(val int32) {
@@ -2406,9 +2407,9 @@ func (p *GetIDLsResData) ReadField1(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	p.Idls = make([]*model.IDLWithRepositorInfo, 0, size)
+	p.Idls = make([]*model.IDLWithRepositoryInfo, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := model.NewIDLWithRepositorInfo()
+		_elem := model.NewIDLWithRepositoryInfo()
 		if err := _elem.Read(iprot); err != nil {
 			return err
 		}
@@ -2527,7 +2528,7 @@ func (p *GetIDLsResData) DeepEqual(ano *GetIDLsResData) bool {
 	return true
 }
 
-func (p *GetIDLsResData) Field1DeepEqual(src []*model.IDLWithRepositorInfo) bool {
+func (p *GetIDLsResData) Field1DeepEqual(src []*model.IDLWithRepositoryInfo) bool {
 
 	if len(p.Idls) != len(src) {
 		return false

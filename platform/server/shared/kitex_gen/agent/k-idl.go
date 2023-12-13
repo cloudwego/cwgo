@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/apache/thrift/lib/go/thrift"
-
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
 )
@@ -1949,9 +1948,9 @@ func (p *GetIDLsResData) FastReadField1(buf []byte) (int, error) {
 	if err != nil {
 		return offset, err
 	}
-	p.Idls = make([]*model.IDLWithRepositorInfo, 0, size)
+	p.Idls = make([]*model.IDLWithRepositoryInfo, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := model.NewIDLWithRepositorInfo()
+		_elem := model.NewIDLWithRepositoryInfo()
 		if l, err := _elem.FastRead(buf[offset:]); err != nil {
 			return offset, err
 		} else {

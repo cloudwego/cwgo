@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/apache/thrift/lib/go/thrift"
-
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
 )
 
@@ -882,7 +881,7 @@ func (p *ImportIDL) field2Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) FastRead(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -1126,7 +1125,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_IDLWithRepositorInfo[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_IDLWithRepositoryInfo[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -1135,7 +1134,7 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *IDLWithRepositorInfo) FastReadField1(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
@@ -1149,7 +1148,7 @@ func (p *IDLWithRepositorInfo) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField2(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
@@ -1163,7 +1162,7 @@ func (p *IDLWithRepositorInfo) FastReadField2(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField3(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField3(buf []byte) (int, error) {
 	offset := 0
 
 	tmp := NewRepository()
@@ -1176,7 +1175,7 @@ func (p *IDLWithRepositorInfo) FastReadField3(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField4(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField4(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
@@ -1190,7 +1189,7 @@ func (p *IDLWithRepositorInfo) FastReadField4(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField5(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField5(buf []byte) (int, error) {
 	offset := 0
 
 	tmp := NewRepository()
@@ -1203,7 +1202,7 @@ func (p *IDLWithRepositorInfo) FastReadField5(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField6(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField6(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -1217,7 +1216,7 @@ func (p *IDLWithRepositorInfo) FastReadField6(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField7(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField7(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -1231,7 +1230,7 @@ func (p *IDLWithRepositorInfo) FastReadField7(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField8(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField8(buf []byte) (int, error) {
 	offset := 0
 
 	_, size, l, err := bthrift.Binary.ReadListBegin(buf[offset:])
@@ -1258,7 +1257,7 @@ func (p *IDLWithRepositorInfo) FastReadField8(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField9(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField9(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -1272,7 +1271,7 @@ func (p *IDLWithRepositorInfo) FastReadField9(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField10(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField10(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -1286,7 +1285,7 @@ func (p *IDLWithRepositorInfo) FastReadField10(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField11(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField11(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
@@ -1300,7 +1299,7 @@ func (p *IDLWithRepositorInfo) FastReadField11(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField12(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField12(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadBool(buf[offset:]); err != nil {
@@ -1314,7 +1313,7 @@ func (p *IDLWithRepositorInfo) FastReadField12(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField13(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField13(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -1328,7 +1327,7 @@ func (p *IDLWithRepositorInfo) FastReadField13(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *IDLWithRepositorInfo) FastReadField14(buf []byte) (int, error) {
+func (p *IDLWithRepositoryInfo) FastReadField14(buf []byte) (int, error) {
 	offset := 0
 
 	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
@@ -1343,13 +1342,13 @@ func (p *IDLWithRepositorInfo) FastReadField14(buf []byte) (int, error) {
 }
 
 // for compatibility
-func (p *IDLWithRepositorInfo) FastWrite(buf []byte) int {
+func (p *IDLWithRepositoryInfo) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *IDLWithRepositorInfo) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "IDLWithRepositorInfo")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "IDLWithRepositoryInfo")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
@@ -1371,9 +1370,9 @@ func (p *IDLWithRepositorInfo) FastWriteNocopy(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) BLength() int {
+func (p *IDLWithRepositoryInfo) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("IDLWithRepositorInfo")
+	l += bthrift.Binary.StructBeginLength("IDLWithRepositoryInfo")
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
@@ -1395,7 +1394,7 @@ func (p *IDLWithRepositorInfo) BLength() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "id", thrift.I64, 1)
 	offset += bthrift.Binary.WriteI64(buf[offset:], p.Id)
@@ -1404,7 +1403,7 @@ func (p *IDLWithRepositorInfo) fastWriteField1(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "idl_repository_id", thrift.I64, 2)
 	offset += bthrift.Binary.WriteI64(buf[offset:], p.IdlRepositoryId)
@@ -1413,7 +1412,7 @@ func (p *IDLWithRepositorInfo) fastWriteField2(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "idl_repository", thrift.STRUCT, 3)
 	offset += p.IdlRepository.FastWriteNocopy(buf[offset:], binaryWriter)
@@ -1421,7 +1420,7 @@ func (p *IDLWithRepositorInfo) fastWriteField3(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField4(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField4(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "service_repository_id", thrift.I64, 4)
 	offset += bthrift.Binary.WriteI64(buf[offset:], p.ServiceRepositoryId)
@@ -1430,7 +1429,7 @@ func (p *IDLWithRepositorInfo) fastWriteField4(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField5(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField5(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "service_repository", thrift.STRUCT, 5)
 	offset += p.ServiceRepository.FastWriteNocopy(buf[offset:], binaryWriter)
@@ -1438,7 +1437,7 @@ func (p *IDLWithRepositorInfo) fastWriteField5(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField6(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField6(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "main_idl_path", thrift.STRING, 6)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.MainIdlPath)
@@ -1447,7 +1446,7 @@ func (p *IDLWithRepositorInfo) fastWriteField6(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField7(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField7(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "commit_hash", thrift.STRING, 7)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.CommitHash)
@@ -1456,7 +1455,7 @@ func (p *IDLWithRepositorInfo) fastWriteField7(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField8(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField8(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "import_idls", thrift.LIST, 8)
 	listBeginOffset := offset
@@ -1472,7 +1471,7 @@ func (p *IDLWithRepositorInfo) fastWriteField8(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField9(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField9(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "service_name", thrift.STRING, 9)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.ServiceName)
@@ -1481,7 +1480,7 @@ func (p *IDLWithRepositorInfo) fastWriteField9(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField10(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField10(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "last_sync_time", thrift.STRING, 10)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.LastSyncTime)
@@ -1490,7 +1489,7 @@ func (p *IDLWithRepositorInfo) fastWriteField10(buf []byte, binaryWriter bthrift
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField11(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField11(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "status", thrift.I32, 11)
 	offset += bthrift.Binary.WriteI32(buf[offset:], p.Status)
@@ -1499,7 +1498,7 @@ func (p *IDLWithRepositorInfo) fastWriteField11(buf []byte, binaryWriter bthrift
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField12(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField12(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "is_deleted", thrift.BOOL, 12)
 	offset += bthrift.Binary.WriteBool(buf[offset:], p.IsDeleted)
@@ -1508,7 +1507,7 @@ func (p *IDLWithRepositorInfo) fastWriteField12(buf []byte, binaryWriter bthrift
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField13(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField13(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "create_time", thrift.STRING, 13)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.CreateTime)
@@ -1517,7 +1516,7 @@ func (p *IDLWithRepositorInfo) fastWriteField13(buf []byte, binaryWriter bthrift
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) fastWriteField14(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *IDLWithRepositoryInfo) fastWriteField14(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "update_time", thrift.STRING, 14)
 	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.UpdateTime)
@@ -1526,7 +1525,7 @@ func (p *IDLWithRepositorInfo) fastWriteField14(buf []byte, binaryWriter bthrift
 	return offset
 }
 
-func (p *IDLWithRepositorInfo) field1Length() int {
+func (p *IDLWithRepositoryInfo) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("id", thrift.I64, 1)
 	l += bthrift.Binary.I64Length(p.Id)
@@ -1535,7 +1534,7 @@ func (p *IDLWithRepositorInfo) field1Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field2Length() int {
+func (p *IDLWithRepositoryInfo) field2Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("idl_repository_id", thrift.I64, 2)
 	l += bthrift.Binary.I64Length(p.IdlRepositoryId)
@@ -1544,7 +1543,7 @@ func (p *IDLWithRepositorInfo) field2Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field3Length() int {
+func (p *IDLWithRepositoryInfo) field3Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("idl_repository", thrift.STRUCT, 3)
 	l += p.IdlRepository.BLength()
@@ -1552,7 +1551,7 @@ func (p *IDLWithRepositorInfo) field3Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field4Length() int {
+func (p *IDLWithRepositoryInfo) field4Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("service_repository_id", thrift.I64, 4)
 	l += bthrift.Binary.I64Length(p.ServiceRepositoryId)
@@ -1561,7 +1560,7 @@ func (p *IDLWithRepositorInfo) field4Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field5Length() int {
+func (p *IDLWithRepositoryInfo) field5Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("service_repository", thrift.STRUCT, 5)
 	l += p.ServiceRepository.BLength()
@@ -1569,7 +1568,7 @@ func (p *IDLWithRepositorInfo) field5Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field6Length() int {
+func (p *IDLWithRepositoryInfo) field6Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("main_idl_path", thrift.STRING, 6)
 	l += bthrift.Binary.StringLengthNocopy(p.MainIdlPath)
@@ -1578,7 +1577,7 @@ func (p *IDLWithRepositorInfo) field6Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field7Length() int {
+func (p *IDLWithRepositoryInfo) field7Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("commit_hash", thrift.STRING, 7)
 	l += bthrift.Binary.StringLengthNocopy(p.CommitHash)
@@ -1587,7 +1586,7 @@ func (p *IDLWithRepositorInfo) field7Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field8Length() int {
+func (p *IDLWithRepositoryInfo) field8Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("import_idls", thrift.LIST, 8)
 	l += bthrift.Binary.ListBeginLength(thrift.STRUCT, len(p.ImportIdls))
@@ -1599,7 +1598,7 @@ func (p *IDLWithRepositorInfo) field8Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field9Length() int {
+func (p *IDLWithRepositoryInfo) field9Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("service_name", thrift.STRING, 9)
 	l += bthrift.Binary.StringLengthNocopy(p.ServiceName)
@@ -1608,7 +1607,7 @@ func (p *IDLWithRepositorInfo) field9Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field10Length() int {
+func (p *IDLWithRepositoryInfo) field10Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("last_sync_time", thrift.STRING, 10)
 	l += bthrift.Binary.StringLengthNocopy(p.LastSyncTime)
@@ -1617,7 +1616,7 @@ func (p *IDLWithRepositorInfo) field10Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field11Length() int {
+func (p *IDLWithRepositoryInfo) field11Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("status", thrift.I32, 11)
 	l += bthrift.Binary.I32Length(p.Status)
@@ -1626,7 +1625,7 @@ func (p *IDLWithRepositorInfo) field11Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field12Length() int {
+func (p *IDLWithRepositoryInfo) field12Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("is_deleted", thrift.BOOL, 12)
 	l += bthrift.Binary.BoolLength(p.IsDeleted)
@@ -1635,7 +1634,7 @@ func (p *IDLWithRepositorInfo) field12Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field13Length() int {
+func (p *IDLWithRepositoryInfo) field13Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("create_time", thrift.STRING, 13)
 	l += bthrift.Binary.StringLengthNocopy(p.CreateTime)
@@ -1644,7 +1643,7 @@ func (p *IDLWithRepositorInfo) field13Length() int {
 	return l
 }
 
-func (p *IDLWithRepositorInfo) field14Length() int {
+func (p *IDLWithRepositoryInfo) field14Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("update_time", thrift.STRING, 14)
 	l += bthrift.Binary.StringLengthNocopy(p.UpdateTime)

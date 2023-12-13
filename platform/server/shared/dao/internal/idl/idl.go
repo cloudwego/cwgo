@@ -39,8 +39,8 @@ type IIdlDaoManager interface {
 	UpdateIDL(ctx context.Context, idlModel model.IDL) error
 	Sync(ctx context.Context, idlModel model.IDL) error
 
-	GetIDL(ctx context.Context, id int64) (*model.IDLWithRepositorInfo, error)
-	GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDLWithRepositorInfo, int64, error)
+	GetIDL(ctx context.Context, id int64) (*model.IDLWithRepositoryInfo, error)
+	GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDLWithRepositoryInfo, int64, error)
 	CheckMainIdlIfExist(ctx context.Context, repositoryId int64, mainIdlPath string) (bool, error)
 }
 
@@ -269,7 +269,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 	return err
 }
 
-func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDLWithRepositorInfo, error) {
+func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDLWithRepositoryInfo, error) {
 	var mainIdlEntity entity.MysqlIDLWithRepositoryInfo
 
 	err := m.db.WithContext(ctx).
@@ -304,7 +304,7 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDLWithR
 		}
 	}
 
-	return &model.IDLWithRepositorInfo{
+	return &model.IDLWithRepositoryInfo{
 		Id:              mainIdlEntity.ID,
 		IdlRepositoryId: mainIdlEntity.IdlRepositoryID,
 		IdlRepository: &model.Repository{
@@ -352,7 +352,7 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDLWithR
 	}, nil
 }
 
-func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDLWithRepositorInfo, int64, error) {
+func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDLWithRepositoryInfo, int64, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -404,10 +404,10 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, pa
 	}
 
 	var wg sync.WaitGroup
-	idlModels := make([]*model.IDLWithRepositorInfo, len(idlEntities))
+	idlModels := make([]*model.IDLWithRepositoryInfo, len(idlEntities))
 	for i, idl := range idlEntities {
 		wg.Add(1)
-		idlModels[i] = &model.IDLWithRepositorInfo{
+		idlModels[i] = &model.IDLWithRepositoryInfo{
 			Id:              idl.ID,
 			IdlRepositoryId: idl.IdlRepositoryID,
 			IdlRepository: &model.Repository{

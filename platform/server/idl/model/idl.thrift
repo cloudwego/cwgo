@@ -22,7 +22,7 @@ struct ImportIDL{
     2: string commit_hash
 }
 
-struct IDLWithRepositorInfo{
+struct IDLWithRepositoryInfo{
     1: i64 id // idl record id
     2: i64 idl_repository_id // repository id where stores the idl
     3: repository.Repository idl_repository // idl repository info
