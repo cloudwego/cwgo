@@ -457,7 +457,11 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 				</Form>
 				<div className={styles["content"]}>
 					<Table
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
 						columns={columns}
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
 						dataSource={dataSource as Data[]}
 						pagination={{
 							currentPage,

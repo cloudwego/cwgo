@@ -91,7 +91,7 @@ export default function RepositoryPage() {
 		console.log(curDataSource);
 		setData(curDataSource);
 		setLoading(false);
-		destroyFn();
+		// destroyFn();
 	};
 
 	useEffect(() => {
@@ -202,9 +202,9 @@ export default function RepositoryPage() {
 						showTick
 						position={"bottomLeft"}
 						render={
-							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-							// @ts-ignore
 							<Dropdown.Menu
+								// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+								// @ts-ignore
 								children={
 									<InnerIdls data={import_idls} repo={idl_repository} />
 								}
@@ -394,7 +394,11 @@ export default function RepositoryPage() {
 				</Form>
 				<div className={styles["content"]}>
 					<Table
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
 						columns={columns}
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
 						dataSource={dataSource as Data[]}
 						pagination={{
 							currentPage,
