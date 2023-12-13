@@ -19,5 +19,5 @@
 package generator
 
 type Generator interface {
-	Generate(idlPath, serviceName, generatePath string) error
+	Generate(repoDomain, repoOwner, idlPath, serviceName, generatePath string) error
 }

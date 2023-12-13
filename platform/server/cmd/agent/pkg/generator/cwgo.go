@@ -19,6 +19,7 @@
 package generator
 
 import (
+	"fmt"
 	"os/exec"
 )
 
@@ -28,13 +29,18 @@ func NewCwgoGenerator() *CwgoGenerator {
 	return &CwgoGenerator{}
 }
 
-func (g *CwgoGenerator) Generate(idlPath, serviceName, generatePath string) error {
+func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, serviceName, generatePath string) error {
 	// Fixed options were used to generate code, which can be optimized to be optional in the future
-	cwgoCmd := exec.Command("cwgo", "client",
-		"--idl", idlPath,
-		"--type", "rpc",
-		"--service", serviceName,
-		"--module", serviceName,
+	cwgoCmd := exec.Command("sh", "-c",
+		fmt.Sprintf("cwgo client "+
+			"--idl %s "+
+			"--type %s "+
+			"--service %s "+
+			"--module %s "+
+			"&& "+
+			"go mod tidy",
+			idlPath, "rpc", serviceName, fmt.Sprintf("%s/%s/%s", repoDomain, repoOwner, serviceName),
+		),
 	)
 
 	cwgoCmd.Dir = generatePath
