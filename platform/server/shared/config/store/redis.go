@@ -1,18 +1,18 @@
 /*
  *
- *  * Copyright 2022 CloudWeGo Authors
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -22,6 +22,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
@@ -50,39 +51,39 @@ type RedisCluster struct {
 	Password string `mapstructure:"password"`
 }
 
-func (c Config) NewRedisClient() (redis.UniversalClient, error) {
+func (conf *Config) NewRedisClient() (redis.UniversalClient, error) {
 	var rdb redis.UniversalClient
 
-	if c.Redis.Type == "standalone" {
+	if conf.Redis.Type == "standalone" {
 		logger.Logger.Info("connecting redis",
-			zap.String("type", c.Redis.Type),
-			zap.Reflect("config", c.Redis.StandAlone),
+			zap.String("type", conf.Redis.Type),
+			zap.Reflect("config", conf.Redis.StandAlone),
 		)
 
 		rdb = redis.NewClient(&redis.Options{
-			Addr:     c.Redis.StandAlone.Addr,
-			Username: c.Redis.StandAlone.Username,
-			Password: c.Redis.StandAlone.Password,
-			DB:       c.Redis.StandAlone.Db,
+			Addr:     conf.Redis.StandAlone.Addr,
+			Username: conf.Redis.StandAlone.Username,
+			Password: conf.Redis.StandAlone.Password,
+			DB:       conf.Redis.StandAlone.Db,
 		})
-	} else if c.Redis.Type == "cluster" || c.Redis.Type == "" {
+	} else if conf.Redis.Type == "cluster" || conf.Redis.Type == "" {
 		logger.Logger.Info("connecting redis",
-			zap.String("type", c.Redis.Type),
-			zap.Reflect("config", c.Redis.Cluster),
+			zap.String("type", conf.Redis.Type),
+			zap.Reflect("config", conf.Redis.Cluster),
 		)
 
-		addrs := make([]string, len(c.Redis.Cluster.Addrs))
-		for i, addr := range c.Redis.Cluster.Addrs {
+		addrs := make([]string, len(conf.Redis.Cluster.Addrs))
+		for i, addr := range conf.Redis.Cluster.Addrs {
 			addrs[i] = fmt.Sprintf("%s:%s", addr.Ip, addr.Port)
 		}
 
 		rdb = redis.NewClusterClient(&redis.ClusterOptions{
 			Addrs:    addrs,
-			Username: c.Redis.Cluster.Username,
-			Password: c.Redis.Cluster.Password,
+			Username: conf.Redis.Cluster.Username,
+			Password: conf.Redis.Cluster.Password,
 		})
 	} else {
-		logger.Logger.Error("invalid redis type", zap.String("type", c.Redis.Type))
+		logger.Logger.Error("invalid redis type", zap.String("type", conf.Redis.Type))
 		return nil, errors.New("invalid redis type")
 	}
 

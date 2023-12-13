@@ -25,7 +25,8 @@ struct UpdateIDLReq{
     1: i64 id
     2: i64 repository_id
     3: string main_idl_path
-    4: string service_name
+    4: i32 status
+    5: string service_name
 }
 struct UpdateIDLRes{
     1: i32 code
@@ -37,6 +38,7 @@ struct GetIDLsReq{
     2: i32 limit
     3: i32 order
     4: string order_by
+    5: string service_name
 }
 struct GetIDLsRes{
     1: i32 code
@@ -44,7 +46,7 @@ struct GetIDLsRes{
     3: GetIDLsResData data
 }
 struct GetIDLsResData{
-    1: list<idl.IDL> idls
+    1: list<idl.IDLWithRepositoryInfo> idls
     2: i32 total
 }
 

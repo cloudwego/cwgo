@@ -1,39 +1,39 @@
 /*
 *
-*  * Copyright 2022 CloudWeGo Authors
-*  *
-*  * Licensed under the Apache License, Version 2.0 (the "License");
-*  * you may not use this file except in compliance with the License.
-*  * You may obtain a copy of the License at
-*  *
-*  *     http://www.apache.org/licenses/LICENSE-2.0
-*  *
-*  * Unless required by applicable law or agreed to in writing, software
-*  * distributed under the License is distributed on an "AS IS" BASIS,
-*  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*  * See the License for the specific language governing permissions and
-*  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
 *
- */
+*/
 
 package service
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/parser"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strconv"
 )
 
 type SyncIDLsByIdService struct {
@@ -54,63 +54,70 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 	for _, v := range req.Ids {
 		idlModel, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, v)
 		if err != nil {
-			if err == gorm.ErrRecordNotFound {
+			if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 				return &agent.SyncIDLsByIdRes{
-					Code: http.StatusBadRequest,
+					Code: consts.ErrNumDatabaseRecordNotFound,
 					Msg:  "idl not exist",
 				}, nil
 			}
+
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumDatabase,
+				Msg:  consts.ErrMsgDatabase,
 			}, nil
 		}
 
 		repoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idlModel.IdlRepositoryId)
 		if err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return &agent.SyncIDLsByIdRes{
-					Code: http.StatusBadRequest,
-					Msg:  "idl not exist",
-				}, nil
-			}
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumDatabase,
+				Msg:  consts.ErrMsgDatabase,
 			}, nil
 		}
 
 		repoClient, err := s.svcCtx.RepoManager.GetClient(repoModel.Id)
 		if err != nil {
-			logger.Logger.Error("get repo client failed", zap.Error(err), zap.Int64("repo_id", repoModel.Id))
+			if errx.GetCode(err) == consts.ErrNumTokenInvalid {
+				// repo token is invalid or expired
+				return &agent.SyncIDLsByIdRes{
+					Code: consts.ErrNumTokenInvalid,
+					Msg:  consts.ErrMsgTokenInvalid,
+				}, nil
+			}
+
+			logger.Logger.Error(consts.ErrMsgRepoGetClient, zap.Error(err), zap.Int64("repo_id", repoModel.Id))
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumRepoGetClient,
+				Msg:  consts.ErrMsgRepoGetClient,
 			}, nil
 		}
 
-		idlPid, owner, repoName, err := repoClient.ParseIdlUrl(
+		idlPid, owner, repoName, err := repoClient.ParseFileUrl(
 			utils.GetRepoFullUrl(
 				repoModel.RepositoryType,
-				repoModel.RepositoryUrl,
-				consts.MainRef,
+				fmt.Sprintf("https://%s/%s/%s",
+					repoModel.RepositoryDomain,
+					repoModel.RepositoryOwner,
+					repoModel.RepositoryName,
+				),
+				repoModel.RepositoryBranch,
 				idlModel.MainIdlPath,
 			),
 		)
 		if err != nil {
-			logger.Logger.Error("parse repo url failed", zap.Error(err))
+			logger.Logger.Error(consts.ErrMsgParamRepositoryUrl, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumParamRepositoryUrl,
+				Msg:  consts.ErrMsgParamRepositoryUrl,
 			}, nil
 		}
 
-		_, err = repoClient.GetFile(owner, repoName, idlPid, consts.MainRef)
+		_, err = repoClient.GetFile(owner, repoName, idlPid, repoModel.RepositoryBranch)
 		if err != nil {
-			logger.Logger.Error("get repo file failed", zap.Error(err))
+			logger.Logger.Error(consts.ErrMsgRepoGetFile, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumRepoGetFile,
+				Msg:  consts.ErrMsgRepoGetFile,
 			}, nil
 		}
 
@@ -118,29 +125,49 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		idlType, err := utils.DetermineIdlType(idlPid)
 		if err != nil {
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusBadRequest,
-				Msg:  "incorrect idl type",
+				Code: consts.ErrNumIdlFileExtension,
+				Msg:  consts.ErrMsgIdlFileExtension,
 			}, nil
 		}
 
 		// create temp dir
-		tempDir, err := ioutil.TempDir("", strconv.FormatInt(repoModel.Id, 10))
+		tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
 		if err != nil {
-			logger.Logger.Error("create temp dir failed", zap.Error(err))
-			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
-			}, nil
+			if os.IsNotExist(err) {
+				err = os.Mkdir(consts.TempDir, 0o700)
+				if err != nil {
+					logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
+					return &agent.SyncIDLsByIdRes{
+						Code: consts.ErrNumCommonCreateTempDir,
+						Msg:  consts.ErrMsgCommonCreateTempDir,
+					}, nil
+				}
+
+				tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
+				if err != nil {
+					logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
+					return &agent.SyncIDLsByIdRes{
+						Code: consts.ErrNumCommonCreateTempDir,
+						Msg:  consts.ErrMsgCommonCreateTempDir,
+					}, nil
+				}
+			} else {
+				logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
+				return &agent.SyncIDLsByIdRes{
+					Code: consts.ErrNumCommonCreateTempDir,
+					Msg:  consts.ErrMsgCommonCreateTempDir,
+				}, nil
+			}
 		}
 		defer os.RemoveAll(tempDir)
 
 		// get the entire repository archive
-		archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, consts.MainRef)
+		archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, repoModel.RepositoryBranch)
 		if err != nil {
-			logger.Logger.Error("get archive failed", zap.Error(err))
+			logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumRepoGetArchive,
+				Msg:  consts.ErrMsgRepoGetArchive,
 			}, nil
 		}
 
@@ -153,10 +180,10 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		// extract the tar package and persist it to a temporary file
 		archiveName, err := utils.UnTar(archiveData, tempDir, isTarBall)
 		if err != nil {
-			logger.Logger.Error("parse archive failed", zap.Error(err))
+			logger.Logger.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumRepoParseArchive,
+				Msg:  consts.ErrMsgRepoParseArchive,
 			}, nil
 		}
 
@@ -168,16 +195,16 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			importPaths, err = thriftFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
 			if err != nil {
 				return &agent.SyncIDLsByIdRes{
-					Code: http.StatusBadRequest,
-					Msg:  "get dependent file paths error",
+					Code: consts.ErrNumIdlGetDependentFilePath,
+					Msg:  consts.ErrMsgIdlGetDependentFilePath,
 				}, nil
 			}
 		case consts.IdlTypeNumProto:
 			protoFile := &parser.ProtoFile{}
 			importPaths, err = protoFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusBadRequest,
-				Msg:  "get dependent file paths error",
+				Code: consts.ErrNumIdlGetDependentFilePath,
+				Msg:  consts.ErrMsgIdlGetDependentFilePath,
 			}, nil
 		}
 
@@ -187,10 +214,10 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		// calculate the hash value and add it to the importIDLs slice
 		for _, importPath := range importPaths {
 			calculatedPath := filepath.ToSlash(filepath.Join(mainIdlDir, importPath))
-			commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, consts.MainRef)
+			commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, repoModel.RepositoryBranch)
 			if err != nil {
 				return &agent.SyncIDLsByIdRes{
-					Code: http.StatusBadRequest,
+					Code: consts.ErrNumRepoGetCommitHash,
 					Msg:  "cannot get depended idl latest commit hash",
 				}, nil
 			}
@@ -227,18 +254,21 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			needToSync = true
 		}
 
-		hash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, consts.MainRef)
+		// compare main idl
+		hash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, repoModel.RepositoryBranch)
 		if err != nil {
 			logger.Logger.Error("get latest commit hash failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumRepoGetCommitHash,
+				Msg:  consts.ErrMsgRepoGetCommitHash,
 			}, nil
 		}
 
 		if hash != idlModel.CommitHash {
 			needToSync = true
 		}
+
+		needToSync = true // TODO: delete
 
 		if !needToSync {
 			continue
@@ -252,8 +282,8 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		if err != nil {
 			logger.Logger.Error("sync idl content to dao failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
-				Code: http.StatusInternalServerError,
-				Msg:  "internal err",
+				Code: consts.ErrNumDatabase,
+				Msg:  consts.ErrMsgDatabase,
 			}, nil
 		}
 

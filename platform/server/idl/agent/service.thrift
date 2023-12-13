@@ -4,6 +4,7 @@ include "agent.thrift"
 include "repository.thrift"
 include "idl.thrift"
 include "template.thrift"
+include "token.thrift"
 
 service AgentService {
     repository.AddRepositoryRes AddRepository(1: repository.AddRepositoryReq req)
@@ -29,4 +30,8 @@ service AgentService {
 
     agent.UpdateTasksRes UpdateTasks(1: agent.UpdateTasksReq req)
     agent.GenerateCodeRes GenerateCode(1: agent.GenerateCodeReq req)
+
+    token.AddTokenRes AddToken(1: token.AddTokenReq req)
+    token.DeleteTokenRes DeleteToken(1: token.DeleteTokenReq req)
+    token.GetTokenRes GetToken(1: token.GetTokenReq req)
 }

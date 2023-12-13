@@ -1,25 +1,25 @@
 /*
 *
-*  * Copyright 2022 CloudWeGo Authors
-*  *
-*  * Licensed under the Apache License, Version 2.0 (the "License");
-*  * you may not use this file except in compliance with the License.
-*  * You may obtain a copy of the License at
-*  *
-*  *     http://www.apache.org/licenses/LICENSE-2.0
-*  *
-*  * Unless required by applicable law or agreed to in writing, software
-*  * distributed under the License is distributed on an "AS IS" BASIS,
-*  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-*  * See the License for the specific language governing permissions and
-*  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
 *
- */
+*/
 
 package registry
 
 import (
-	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/route"
 
 	registry "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/handler/registry"
 )
@@ -31,13 +31,15 @@ import (
 */
 
 // Register register routes based on the IDL 'api.${HTTP Method}' annotation.
-func Register(r *server.Hertz) {
-
+func Register(r *route.RouterGroup) {
 	root := r.Group("/", rootMw()...)
 	{
-		_registry := root.Group("/registry", _registryMw()...)
-		_registry.GET("/dnregister", append(_deregisterMw(), registry.Deregister)...)
-		_registry.GET("/register", append(_registerMw(), registry.Register)...)
-		_registry.GET("/update", append(_updateMw(), registry.Update)...)
+		_api := root.Group("/api", _apiMw()...)
+		{
+			_registry := _api.Group("/registry", _registryMw()...)
+			_registry.GET("/dnregister", append(_deregisterMw(), registry.Deregister)...)
+			_registry.GET("/register", append(_registerMw(), registry.Register)...)
+			_registry.GET("/update", append(_updateMw(), registry.Update)...)
+		}
 	}
 }

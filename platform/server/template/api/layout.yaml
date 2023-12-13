@@ -35,19 +35,19 @@ layouts:
     body: |-
       /*
       *
-      *  * Copyright 2022 CloudWeGo Authors
-      *  *
-      *  * Licensed under the Apache License, Version 2.0 (the "License");
-      *  * you may not use this file except in compliance with the License.
-      *  * You may obtain a copy of the License at
-      *  *
-      *  *     http://www.apache.org/licenses/LICENSE-2.0
-      *  *
-      *  * Unless required by applicable law or agreed to in writing, software
-      *  * distributed under the License is distributed on an "AS IS" BASIS,
-      *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-      *  * See the License for the specific language governing permissions and
-      *  * limitations under the License.
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
       *
       */
 
@@ -74,19 +74,19 @@ layouts:
     body: |-
       /*
       *
-      *  * Copyright 2022 CloudWeGo Authors
-      *  *
-      *  * Licensed under the Apache License, Version 2.0 (the "License");
-      *  * you may not use this file except in compliance with the License.
-      *  * You may obtain a copy of the License at
-      *  *
-      *  *     http://www.apache.org/licenses/LICENSE-2.0
-      *  *
-      *  * Unless required by applicable law or agreed to in writing, software
-      *  * distributed under the License is distributed on an "AS IS" BASIS,
-      *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-      *  * See the License for the specific language governing permissions and
-      *  * limitations under the License.
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
       *
       */
 
@@ -111,19 +111,19 @@ layouts:
     body: |-
       /*
       *
-      *  * Copyright 2022 CloudWeGo Authors
-      *  *
-      *  * Licensed under the Apache License, Version 2.0 (the "License");
-      *  * you may not use this file except in compliance with the License.
-      *  * You may obtain a copy of the License at
-      *  *
-      *  *     http://www.apache.org/licenses/LICENSE-2.0
-      *  *
-      *  * Unless required by applicable law or agreed to in writing, software
-      *  * distributed under the License is distributed on an "AS IS" BASIS,
-      *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-      *  * See the License for the specific language governing permissions and
-      *  * limitations under the License.
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
       *
       */
 
@@ -135,18 +135,36 @@ layouts:
       )
 
       // register registers all routers.
-      func register(r *server.Hertz) {
+      func register(r *server.Hertz, staticFilePath string) {
 
       	router.GeneratedRegister(r)
 
       	customizedRegister(r)
       }
-  # 默认路由注册文件，不要修改
-  - path: internal/biz/router/register.go
+  # 默认中间件文件，不要修改
+  - path: internal/biz/router/middleware.go
     delims:
       - ""
       - ""
     body: |-
+      /*
+      *
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
+      *
+      */
+
       /*
       *
       *  * Copyright 2022 CloudWeGo Authors
@@ -162,6 +180,39 @@ layouts:
       *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
       *  * See the License for the specific language governing permissions and
       *  * limitations under the License.
+      *
+      */
+      
+      package router
+      
+      import "github.com/cloudwego/hertz/pkg/app"
+      
+      func rootMw() []app.HandlerFunc {
+        // your code...
+        return []app.HandlerFunc{}
+      }
+
+  # 默认路由注册文件，不要修改
+  - path: internal/biz/router/register.go
+    delims:
+      - ""
+      - ""
+    body: |-
+      /*
+      *
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
       *
       */
 
@@ -174,6 +225,8 @@ layouts:
       // GeneratedRegister registers routers generated by IDL.
       func GeneratedRegister(r *server.Hertz){
       	//INSERT_POINT: DO NOT DELETE THIS LINE!
+      
+        g := r.Group("", rootMw()...)
       }
   # 服务上下文文件
   - path: internal/svc/servicecontext.go
@@ -183,19 +236,19 @@ layouts:
     body: |-
       /*
       *
-      *  * Copyright 2022 CloudWeGo Authors
-      *  *
-      *  * Licensed under the Apache License, Version 2.0 (the "License");
-      *  * you may not use this file except in compliance with the License.
-      *  * You may obtain a copy of the License at
-      *  *
-      *  *     http://www.apache.org/licenses/LICENSE-2.0
-      *  *
-      *  * Unless required by applicable law or agreed to in writing, software
-      *  * distributed under the License is distributed on an "AS IS" BASIS,
-      *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-      *  * See the License for the specific language governing permissions and
-      *  * limitations under the License.
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
       *
       */
 

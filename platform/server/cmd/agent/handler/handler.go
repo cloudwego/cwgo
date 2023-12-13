@@ -1,18 +1,18 @@
 /*
  *
- *  * Copyright 2022 CloudWeGo Authors
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,6 +20,7 @@ package handler
 
 import (
 	"context"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/biz/service"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
@@ -174,6 +175,27 @@ func (s *AgentServiceImpl) UpdateTemplateItem(ctx context.Context, req *agent.Up
 // GetTemplateItems implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq) (resp *agent.GetTemplateItemsRes, err error) {
 	resp, err = service.NewGetTemplateItemsService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// AddToken implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) AddToken(ctx context.Context, req *agent.AddTokenReq) (resp *agent.AddTokenRes, err error) {
+	resp, err = service.NewAddTokenService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// DeleteToken implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) DeleteToken(ctx context.Context, req *agent.DeleteTokenReq) (resp *agent.DeleteTokenRes, err error) {
+	resp, err = service.NewDeleteTokenService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// GetToken implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) GetToken(ctx context.Context, req *agent.GetTokenReq) (resp *agent.GetTokenRes, err error) {
+	resp, err = service.NewGetTokenService(ctx, s.svcCtx).Run(req)
 
 	return resp, err
 }

@@ -1,18 +1,18 @@
 /*
  *
- *  * Copyright 2022 CloudWeGo Authors
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,13 +20,15 @@ package idl
 
 import (
 	"context"
+	"net/url"
+	"strings"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"net/http"
-	"net/url"
 )
 
 const (
@@ -46,20 +48,33 @@ func NewAddIDLLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddIDLLogi
 }
 
 func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
-	_, err := url.Parse(req.MainIdlPath)
+	urlParsed, err := url.Parse(req.MainIdlPath)
 	if err != nil {
 		return &idl.AddIDLRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid main idl path",
+			Code: consts.ErrNumParamMainIdlPath,
+			Msg:  consts.ErrMsgParamMainIdlPath,
 		}
+	}
+	if urlParsed.Scheme != "http" && urlParsed.Scheme != "https" {
+		return &idl.AddIDLRes{
+			Code: consts.ErrNumParamMainIdlPath,
+			Msg:  consts.ErrMsgParamMainIdlPath,
+		}
+	}
+
+	req.ServiceName = strings.Replace(req.ServiceName, "/", "_", -1)
+	req.ServiceName = strings.Replace(req.ServiceName, ".", "_", -1)
+
+	if req.ServiceRepositoryName == "" {
+		req.ServiceRepositoryName = req.ServiceName
 	}
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &idl.AddIDLRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
@@ -70,22 +85,16 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 		ServiceRepositoryName: req.ServiceRepositoryName,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &idl.AddIDLRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
-		if rpcRes.Code == http.StatusBadRequest {
-			return &idl.AddIDLRes{
-				Code: http.StatusBadRequest,
-				Msg:  rpcRes.Msg,
-			}
-		}
 		return &idl.AddIDLRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: rpcRes.Code,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

@@ -1,18 +1,18 @@
 /*
  *
- *  * Copyright 2022 CloudWeGo Authors
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -21,6 +21,9 @@ package manager
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -35,10 +38,10 @@ import (
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	"go.uber.org/zap"
-	"sync"
-	"time"
 )
 
+// Manager that
+// api manager
 type Manager struct {
 	sync.Mutex
 	updateTaskInterval    time.Duration
@@ -76,24 +79,33 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 		resolver:   resolver,
 	}
 
-	repos, err := daoManager.Repository.GetAllRepositories(context.Background())
-	if err != nil {
-		panic(fmt.Sprintf("get all repositories failed, err: %v", err))
-	}
-
-	for _, repo := range repos {
-		err = manager.AddTask(
-			task.NewTask(
-				model.Type_sync_repo_data,
-				manager.syncRepositoryInterval.String(),
-				&model.Data{
-					SyncRepoData: &model.SyncRepoData{
-						RepositoryId: repo.Id,
-					},
-				},
-			))
-		if err != nil {
-			panic(err)
+	// get all task from database
+	if manager.syncIdlInterval != 0 {
+		page := 1
+		for {
+			idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(), model.IDL{}, int32(page), 1000, consts.OrderNumDec, "update_time")
+			if err != nil {
+				panic(fmt.Sprintf("get idl list failed, err: %v", err))
+			}
+			for _, idlModel := range idlModels {
+				err = manager.AddTask(
+					task.NewTask(
+						model.Type_sync_idl_data,
+						manager.syncIdlInterval.String(),
+						&model.Data{
+							SyncIdlData: &model.SyncIdlData{
+								IdlId: idlModel.Id,
+							},
+						},
+					))
+				if err != nil {
+					panic(err)
+				}
+			}
+			if int64(page)*1000 >= total {
+				break
+			}
+			page++
 		}
 	}
 
@@ -143,6 +155,7 @@ func (m *Manager) AddTask(t *model.Task) error {
 func (m *Manager) UpdateAgentTasks() {
 	var wg sync.WaitGroup
 	for _, svr := range m.agents {
+		// push tasks to each agent
 		wg.Add(1)
 		go func(serviceId string) {
 			defer wg.Done()
@@ -199,6 +212,8 @@ func (m *Manager) StartUpdate() {
 	}()
 }
 
+// SyncService
+// sync service from registry
 func (m *Manager) SyncService() {
 	services, err := m.registry.GetAllService()
 	if err != nil {

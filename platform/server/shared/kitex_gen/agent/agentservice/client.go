@@ -31,6 +31,9 @@ type Client interface {
 	GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq, callOptions ...callopt.Option) (r *agent.GetTemplateItemsRes, err error)
 	UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error)
 	GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error)
+	AddToken(ctx context.Context, req *agent.AddTokenReq, callOptions ...callopt.Option) (r *agent.AddTokenRes, err error)
+	DeleteToken(ctx context.Context, req *agent.DeleteTokenReq, callOptions ...callopt.Option) (r *agent.DeleteTokenRes, err error)
+	GetToken(ctx context.Context, req *agent.GetTokenReq, callOptions ...callopt.Option) (r *agent.GetTokenRes, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -160,4 +163,19 @@ func (p *kAgentServiceClient) UpdateTasks(ctx context.Context, req *agent.Update
 func (p *kAgentServiceClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GenerateCode(ctx, req)
+}
+
+func (p *kAgentServiceClient) AddToken(ctx context.Context, req *agent.AddTokenReq, callOptions ...callopt.Option) (r *agent.AddTokenRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.AddToken(ctx, req)
+}
+
+func (p *kAgentServiceClient) DeleteToken(ctx context.Context, req *agent.DeleteTokenReq, callOptions ...callopt.Option) (r *agent.DeleteTokenRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeleteToken(ctx, req)
+}
+
+func (p *kAgentServiceClient) GetToken(ctx context.Context, req *agent.GetTokenReq, callOptions ...callopt.Option) (r *agent.GetTokenRes, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetToken(ctx, req)
 }

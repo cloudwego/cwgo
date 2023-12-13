@@ -1,18 +1,18 @@
 /*
  *
- *  * Copyright 2022 CloudWeGo Authors
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -30,12 +30,10 @@ const (
 	ServerTypeEnvName = "CWGO_SERVER_TYPE"
 )
 
-var (
-	ServerTypeMapToStr = map[ServerType]string{
-		ServerTypeNumApi:   ServerTypeApi,
-		ServerTypeNumAgent: ServerTypeAgent,
-	}
-)
+var ServerTypeMapToStr = map[ServerType]string{
+	ServerTypeNumApi:   ServerTypeApi,
+	ServerTypeNumAgent: ServerTypeAgent,
+}
 
 type ServerMode uint32
 
@@ -68,12 +66,10 @@ const (
 	RegistryTypeConsul  = "consul"
 )
 
-var (
-	RegistryTypeMapToNum = map[string]RegistryType{
-		RegistryTypeBuiltin: RegistryTypeNumBuiltin,
-		RegistryTypeConsul:  RegistryTypeNumConsul,
-	}
-)
+var RegistryTypeMapToNum = map[string]RegistryType{
+	RegistryTypeBuiltin: RegistryTypeNumBuiltin,
+	RegistryTypeConsul:  RegistryTypeNumConsul,
+}
 
 type StoreType uint32
 
@@ -81,15 +77,17 @@ const (
 	StoreTypeNumMysql StoreType = iota + 1
 	StoreTypeNumMongo
 	StoreTypeNumRedis
+
+	StoreTypeMysql = "mysql"
+	StoreTypeMongo = "mongo"
+	StoreTypeRedis = "redis"
 )
 
-var (
-	StoreTypeMapToNum = map[string]StoreType{
-		"mysql": StoreTypeNumMysql,
-		"mongo": StoreTypeNumMongo,
-		"redis": StoreTypeNumRedis,
-	}
-)
+var StoreTypeMapToNum = map[string]StoreType{
+	StoreTypeMysql: StoreTypeNumMysql,
+	StoreTypeMongo: StoreTypeNumMongo,
+	StoreTypeRedis: StoreTypeNumRedis,
+}
 
 type DispatcherType uint32
 
@@ -99,8 +97,6 @@ const (
 	DispatcherTypeHash = "consistent-hash"
 )
 
-var (
-	DispatcherMapToNum = map[string]DispatcherType{
-		DispatcherTypeHash: DispatcherTypeNumHash,
-	}
-)
+var DispatcherMapToNum = map[string]DispatcherType{
+	DispatcherTypeHash: DispatcherTypeNumHash,
+}

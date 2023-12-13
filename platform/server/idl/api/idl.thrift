@@ -23,7 +23,8 @@ struct DeleteIDLsRes{
 
 struct UpdateIDLReq{
     1: i64 id (api.body="id,required")
-    2: string service_name (api.body="service_name")
+    2: i32 status (api.body="status")
+    3: string service_name (api.body="service_name")
 }
 struct UpdateIDLRes{
     1: i32 code
@@ -35,6 +36,7 @@ struct GetIDLsReq{
     2: i32 limit (api.query="limit",api.vd="$>=0")
     3: i32 order (api.query="order",api.vd="$>=0")
     4: string order_by (api.query="order_by")
+    5: string service_name (api.query="service_name")
 }
 struct GetIDLsRes{
     1: i32 code
@@ -42,7 +44,7 @@ struct GetIDLsRes{
     3: GetIDLsResData data
 }
 struct GetIDLsResData{
-    1: list<idl.IDL> idls
+    1: list<idl.IDLWithRepositoryInfo> idls
     2: i32 total
 }
 
@@ -55,10 +57,10 @@ struct SyncIDLsByIdRes{
 }
 
 service IdlService {
-    AddIDLRes AddIDL(1: AddIDLReq req) (api.post="/idl")
-    DeleteIDLsRes DeleteIDL(1: DeleteIDLsReq req) (api.delete="/idl")
-    UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/idl")
-    GetIDLsRes GetIDLs(1: GetIDLsReq req) (api.get="/idl")
+    AddIDLRes AddIDL(1: AddIDLReq req) (api.post="/api/idl")
+    DeleteIDLsRes DeleteIDL(1: DeleteIDLsReq req) (api.delete="/api/idl")
+    UpdateIDLRes UpdateIDL(1: UpdateIDLReq req) (api.patch="/api/idl")
+    GetIDLsRes GetIDLs(1: GetIDLsReq req) (api.get="/api/idl")
 
-    SyncIDLsByIdRes SyncIDLs(1: SyncIDLsByIdReq req) (api.post="/idl/sync")
+    SyncIDLsByIdRes SyncIDLs(1: SyncIDLsByIdReq req) (api.post="/api/idl/sync")
 }

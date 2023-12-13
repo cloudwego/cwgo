@@ -1,18 +1,18 @@
 /*
  *
- *  * Copyright 2022 CloudWeGo Authors
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,13 +20,13 @@ package template
 
 import (
 	"context"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 const (
@@ -48,8 +48,8 @@ func NewGetTemplatesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetT
 func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *template.GetTemplatesRes) {
 	if req.Order != consts.OrderNumInc && req.Order != consts.OrderNumDec {
 		return &template.GetTemplatesRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid order num",
+			Code: consts.ErrNumParamOrderNum,
+			Msg:  consts.ErrMsgParamOrderNum,
 			Data: nil,
 		}
 	}
@@ -61,8 +61,8 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 
 	default:
 		return &template.GetTemplatesRes{
-			Code: http.StatusBadRequest,
-			Msg:  "invalid order by",
+			Code: consts.ErrNumParamOrderBy,
+			Msg:  consts.ErrMsgParamOrderBy,
 			Data: nil,
 		}
 	}
@@ -76,10 +76,10 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &template.GetTemplatesRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
@@ -90,15 +90,15 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 		OrderBy: req.OrderBy,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &template.GetTemplatesRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
 		return &template.GetTemplatesRes{
-			Code: http.StatusBadRequest,
+			Code: rpcRes.Code,
 			Msg:  rpcRes.Msg,
 		}
 	}

@@ -88,13 +88,13 @@ struct GetTemplateItemsResData{
 }
 
 service TemplateService {
-    AddTemplateRes AddTemplate(1: AddTemplateReq req) (api.post="/template")
-    DeleteTemplateRes DeleteTemplate(1: DeleteTemplateReq req) (api.delete="/template")
-    UpdateTemplateRes UpdateTemplate(1: UpdateTemplateReq req) (api.patch="/template")
-    GetTemplatesRes GetTemplates(1: GetTemplatesReq req) (api.get="/template")
+    AddTemplateRes AddTemplate(1: AddTemplateReq req) (api.post="/api/template")
+    DeleteTemplateRes DeleteTemplate(1: DeleteTemplateReq req) (api.delete="/api/template")
+    UpdateTemplateRes UpdateTemplate(1: UpdateTemplateReq req) (api.patch="/api/template")
+    GetTemplatesRes GetTemplates(1: GetTemplatesReq req) (api.get="/api/template")
 
-    AddTemplateItemRes AddTemplateItem(1: AddTemplateItemReq req) (api.post="/template/item")
-    DeleteTemplateItemRes DeleteTemplateItem(1: DeleteTemplateItemReq req) (api.delete="/template/item")
-    UpdateTemplateItemRes UpdateTemplateItem(1: UpdateTemplateItemReq req) (api.patch="/template/item")
-    GetTemplateItemsRes GetTemplateItems(1: GetTemplateItemsReq req) (api.get="/template/item")
+    AddTemplateItemRes AddTemplateItem(1: AddTemplateItemReq req) (api.post="/api/template/item")
+    DeleteTemplateItemRes DeleteTemplateItem(1: DeleteTemplateItemReq req) (api.delete="/api/template/item")
+    UpdateTemplateItemRes UpdateTemplateItem(1: UpdateTemplateItemReq req) (api.patch="/api/template/item")
+    GetTemplateItemsRes GetTemplateItems(1: GetTemplateItemsReq req) (api.get="/api/template/item")
 }

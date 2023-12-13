@@ -1,5 +1,5 @@
 import { Layout, Nav, Breadcrumb, Skeleton } from "@douyinfe/semi-ui";
-import { IconCode, IconGitlabLogo, IconFolderOpen } from "@douyinfe/semi-icons";
+import { IconCode, IconGitlabLogo } from "@douyinfe/semi-icons";
 import { Outlet, useNavigate } from "react-router-dom";
 import styles from "./App.module.scss";
 import { useEffect, useState } from "react";
@@ -8,22 +8,27 @@ import Footer from "./components/Footer";
 
 export default function App() {
 	const { Sider, Content } = Layout;
-	const [selectedKey, setSelectedKey] = useState("idl");
+	const [selectedKey, setSelectedKey] = useState("idlrepo");
 	const navList = [
 		{
-			itemKey: "idl",
-			text: "IDL 信息查询",
+			itemKey: "tokeninfo",
+			text: "令牌管理",
 			icon: <IconCode size="large" />
 		},
 		{
-			itemKey: "repository",
-			text: "仓库信息管理",
+			itemKey: "idlrepo",
+			text: "IDL 仓库信息管理",
 			icon: <IconGitlabLogo size="large" />
 		},
 		{
-			itemKey: "template",
-			text: "模版管理",
-			icon: <IconFolderOpen size="large" />
+			itemKey: "idlinfo",
+			text: "IDL 信息同步",
+			icon: <IconCode size="large" />
+		},
+		{
+			itemKey: "servicerepo",
+			text: "服务代码产物仓库查询",
+			icon: <IconGitlabLogo size="large" />
 		}
 	];
 

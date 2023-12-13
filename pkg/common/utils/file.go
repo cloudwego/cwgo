@@ -24,15 +24,20 @@ import (
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 )
 
-// Exists is used to judge whether the path exists in file system.
-func Exists(path string) bool {
-	_, err := os.Stat(path)
+// PathExist is used to judge whether the path exists in file system.
+func PathExist(path string) (bool, error) {
+	abPath, err := filepath.Abs(path)
 	if err != nil {
-		return os.IsExist(err)
+		return false, err
 	}
-	return true
+	_, err = os.Stat(abPath)
+	if err != nil {
+		return os.IsExist(err), nil
+	}
+	return true, nil
 }
 
+// GetIdlType is used to return the idl type.
 func GetIdlType(path string, pbName ...string) (string, error) {
 	ext := filepath.Ext(path)
 	if ext == "" || ext[0] != '.' {

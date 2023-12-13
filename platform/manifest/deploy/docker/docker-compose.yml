@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  cwgo-api:
+    build:
+      context: ../../../
+      dockerfile: manifest/deploy/docker/Dockerfile
+      args:
+        GOPROXY: 'https://goproxy.cn,direct'
+        TZ: 'Asia/Shanghai'
+    ports:
+      - "8089:8089"
+    volumes:
+      - "../../../api/logs:/app/logs"
+      - "../../../manifest/config:/app/config"
+    networks:
+      - cwgo
+    command: >
+      api
+      --server_mode dev
+      --config_path config
+      --static_file_path ./dist
+  cwgo-agent:
+    depends_on:
+      - cwgo-api
+    build:
+      context: ../../../
+      dockerfile: manifest/deploy/docker/Dockerfile
+      args:
+        GOPROXY: 'https://goproxy.cn,direct'
+        TZ: 'Asia/Shanghai'
+    volumes:
+      - "../../../agent/logs:/app/logs"
+      - "../../../manifest/config:/app/config"
+    networks:
+      - cwgo
+    command: >
+      agent
+      --server_mode dev
+      --config_path config
+
+networks:
+  cwgo:
+    driver: bridge

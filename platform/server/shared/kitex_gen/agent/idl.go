@@ -4,9 +4,10 @@ package agent
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"strings"
 )
 
 type AddIDLReq struct {
@@ -991,7 +992,8 @@ type UpdateIDLReq struct {
 	Id           int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
 	RepositoryId int64  `thrift:"repository_id,2" frugal:"2,default,i64" json:"repository_id"`
 	MainIdlPath  string `thrift:"main_idl_path,3" frugal:"3,default,string" json:"main_idl_path"`
-	ServiceName  string `thrift:"service_name,4" frugal:"4,default,string" json:"service_name"`
+	Status       int32  `thrift:"status,4" frugal:"4,default,i32" json:"status"`
+	ServiceName  string `thrift:"service_name,5" frugal:"5,default,string" json:"service_name"`
 }
 
 func NewUpdateIDLReq() *UpdateIDLReq {
@@ -1014,6 +1016,10 @@ func (p *UpdateIDLReq) GetMainIdlPath() (v string) {
 	return p.MainIdlPath
 }
 
+func (p *UpdateIDLReq) GetStatus() (v int32) {
+	return p.Status
+}
+
 func (p *UpdateIDLReq) GetServiceName() (v string) {
 	return p.ServiceName
 }
@@ -1026,6 +1032,9 @@ func (p *UpdateIDLReq) SetRepositoryId(val int64) {
 func (p *UpdateIDLReq) SetMainIdlPath(val string) {
 	p.MainIdlPath = val
 }
+func (p *UpdateIDLReq) SetStatus(val int32) {
+	p.Status = val
+}
 func (p *UpdateIDLReq) SetServiceName(val string) {
 	p.ServiceName = val
 }
@@ -1034,7 +1043,8 @@ var fieldIDToName_UpdateIDLReq = map[int16]string{
 	1: "id",
 	2: "repository_id",
 	3: "main_idl_path",
-	4: "service_name",
+	4: "status",
+	5: "service_name",
 }
 
 func (p *UpdateIDLReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1087,8 +1097,18 @@ func (p *UpdateIDLReq) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 4:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1154,6 +1174,15 @@ func (p *UpdateIDLReq) ReadField3(iprot thrift.TProtocol) error {
 }
 
 func (p *UpdateIDLReq) ReadField4(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.Status = v
+	}
+	return nil
+}
+
+func (p *UpdateIDLReq) ReadField5(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -1182,6 +1211,10 @@ func (p *UpdateIDLReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 
@@ -1255,10 +1288,10 @@ WriteFieldEndError:
 }
 
 func (p *UpdateIDLReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("service_name", thrift.STRING, 4); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.I32, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.ServiceName); err != nil {
+	if err := oprot.WriteI32(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1269,6 +1302,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *UpdateIDLReq) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_name", thrift.STRING, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.ServiceName); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
 }
 
 func (p *UpdateIDLReq) String() string {
@@ -1293,7 +1343,10 @@ func (p *UpdateIDLReq) DeepEqual(ano *UpdateIDLReq) bool {
 	if !p.Field3DeepEqual(ano.MainIdlPath) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.ServiceName) {
+	if !p.Field4DeepEqual(ano.Status) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.ServiceName) {
 		return false
 	}
 	return true
@@ -1320,7 +1373,14 @@ func (p *UpdateIDLReq) Field3DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *UpdateIDLReq) Field4DeepEqual(src string) bool {
+func (p *UpdateIDLReq) Field4DeepEqual(src int32) bool {
+
+	if p.Status != src {
+		return false
+	}
+	return true
+}
+func (p *UpdateIDLReq) Field5DeepEqual(src string) bool {
 
 	if strings.Compare(p.ServiceName, src) != 0 {
 		return false
@@ -1552,10 +1612,11 @@ func (p *UpdateIDLRes) Field2DeepEqual(src string) bool {
 }
 
 type GetIDLsReq struct {
-	Page    int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
-	Limit   int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
-	Order   int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
-	OrderBy string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
+	Page        int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
+	Limit       int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
+	Order       int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
+	OrderBy     string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
+	ServiceName string `thrift:"service_name,5" frugal:"5,default,string" json:"service_name"`
 }
 
 func NewGetIDLsReq() *GetIDLsReq {
@@ -1581,6 +1642,10 @@ func (p *GetIDLsReq) GetOrder() (v int32) {
 func (p *GetIDLsReq) GetOrderBy() (v string) {
 	return p.OrderBy
 }
+
+func (p *GetIDLsReq) GetServiceName() (v string) {
+	return p.ServiceName
+}
 func (p *GetIDLsReq) SetPage(val int32) {
 	p.Page = val
 }
@@ -1593,12 +1658,16 @@ func (p *GetIDLsReq) SetOrder(val int32) {
 func (p *GetIDLsReq) SetOrderBy(val string) {
 	p.OrderBy = val
 }
+func (p *GetIDLsReq) SetServiceName(val string) {
+	p.ServiceName = val
+}
 
 var fieldIDToName_GetIDLsReq = map[int16]string{
 	1: "page",
 	2: "limit",
 	3: "order",
 	4: "order_by",
+	5: "service_name",
 }
 
 func (p *GetIDLsReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1653,6 +1722,16 @@ func (p *GetIDLsReq) Read(iprot thrift.TProtocol) (err error) {
 		case 4:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -1726,6 +1805,15 @@ func (p *GetIDLsReq) ReadField4(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *GetIDLsReq) ReadField5(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.ServiceName = v
+	}
+	return nil
+}
+
 func (p *GetIDLsReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("GetIDLsReq"); err != nil {
@@ -1746,6 +1834,10 @@ func (p *GetIDLsReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 
@@ -1835,6 +1927,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
+func (p *GetIDLsReq) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_name", thrift.STRING, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.ServiceName); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
 func (p *GetIDLsReq) String() string {
 	if p == nil {
 		return "<nil>"
@@ -1858,6 +1967,9 @@ func (p *GetIDLsReq) DeepEqual(ano *GetIDLsReq) bool {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.OrderBy) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.ServiceName) {
 		return false
 	}
 	return true
@@ -1887,6 +1999,13 @@ func (p *GetIDLsReq) Field3DeepEqual(src int32) bool {
 func (p *GetIDLsReq) Field4DeepEqual(src string) bool {
 
 	if strings.Compare(p.OrderBy, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetIDLsReq) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.ServiceName, src) != 0 {
 		return false
 	}
 	return true
@@ -2183,8 +2302,8 @@ func (p *GetIDLsRes) Field3DeepEqual(src *GetIDLsResData) bool {
 }
 
 type GetIDLsResData struct {
-	Idls  []*model.IDL `thrift:"idls,1" frugal:"1,default,list<model.IDL>" json:"idls"`
-	Total int32        `thrift:"total,2" frugal:"2,default,i32" json:"total"`
+	Idls  []*model.IDLWithRepositoryInfo `thrift:"idls,1" frugal:"1,default,list<model.IDLWithRepositoryInfo>" json:"idls"`
+	Total int32                          `thrift:"total,2" frugal:"2,default,i32" json:"total"`
 }
 
 func NewGetIDLsResData() *GetIDLsResData {
@@ -2195,14 +2314,14 @@ func (p *GetIDLsResData) InitDefault() {
 	*p = GetIDLsResData{}
 }
 
-func (p *GetIDLsResData) GetIdls() (v []*model.IDL) {
+func (p *GetIDLsResData) GetIdls() (v []*model.IDLWithRepositoryInfo) {
 	return p.Idls
 }
 
 func (p *GetIDLsResData) GetTotal() (v int32) {
 	return p.Total
 }
-func (p *GetIDLsResData) SetIdls(val []*model.IDL) {
+func (p *GetIDLsResData) SetIdls(val []*model.IDLWithRepositoryInfo) {
 	p.Idls = val
 }
 func (p *GetIDLsResData) SetTotal(val int32) {
@@ -2288,9 +2407,9 @@ func (p *GetIDLsResData) ReadField1(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	p.Idls = make([]*model.IDL, 0, size)
+	p.Idls = make([]*model.IDLWithRepositoryInfo, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := model.NewIDL()
+		_elem := model.NewIDLWithRepositoryInfo()
 		if err := _elem.Read(iprot); err != nil {
 			return err
 		}
@@ -2409,7 +2528,7 @@ func (p *GetIDLsResData) DeepEqual(ano *GetIDLsResData) bool {
 	return true
 }
 
-func (p *GetIDLsResData) Field1DeepEqual(src []*model.IDL) bool {
+func (p *GetIDLsResData) Field1DeepEqual(src []*model.IDLWithRepositoryInfo) bool {
 
 	if len(p.Idls) != len(src) {
 		return false

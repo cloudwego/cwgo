@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 CloudWeGo Authors
+ * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
 package main
 
 import (
+	"os"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 func main() {
@@ -32,7 +33,7 @@ func main() {
 	cmd.AddCommand(
 		api.NewCommand(),
 		agent.NewCommand(),
-		//NewHelpCommand(),
+		// NewHelpCommand(),
 	)
 
 	if err := cmd.Execute(); err != nil {

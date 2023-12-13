@@ -4,7 +4,6 @@ update_behavior:
 body: |-
   #!/usr/bin/env bash
   RUN_NAME="{{.RealServiceName}}"
-
   mkdir -p output/bin output/conf
   cp script/* output/
   cp -r conf/* output/conf

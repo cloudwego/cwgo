@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 CloudWeGo Authors
+ * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ import (
 	"path/filepath"
 )
 
-func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ...string) error {
-	// Iterate over the specified folders
-	for _, folder := range folders {
-		// Recursively walk through the folder and its subdirectories
-		err := filepath.Walk(tempDir+"/"+folder, func(path string, info os.FileInfo, err error) error {
+func ProcessFolders(fileContentMap map[string][]byte, tempDir string, paths ...string) error {
+	// Iterate over the specified paths
+	for _, path := range paths {
+		// Recursively walk through the path and its subdirectories
+		err := filepath.Walk(tempDir+"/"+path, func(path string, info os.FileInfo, err error) error {
 			// Check if an error occurred during the walk
 			if err != nil {
 				return err
@@ -57,15 +57,14 @@ func ProcessFolders(fileContentMap map[string][]byte, tempDir string, folders ..
 
 			return nil
 		})
-
-		// Check if an error occurred while walking the folder
+		// Check if an error occurred while walking the path
 		if err != nil {
-			fmt.Printf("Error walking path %s: %v\n", folder, err)
+			fmt.Printf("Error walking path %s: %v\n", path, err)
 			return err
 		}
 	}
 
-	// Return nil if the processing of folders is successful
+	// Return nil if the processing of paths is successful
 	return nil
 }
 

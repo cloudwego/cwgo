@@ -1,18 +1,18 @@
 /*
  *
- *  * Copyright 2022 CloudWeGo Authors
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -23,6 +23,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"math"
+	"net"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
@@ -34,18 +42,9 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
-	"io/ioutil"
-	"math"
-	"net"
-	"net/http"
-	"strconv"
-	"strings"
-	"time"
 )
 
-var (
-	ErrServiceNotFound = errors.New("service not found")
-)
+var ErrServiceNotFound = errors.New("service not found")
 
 type BuiltinRegistry struct {
 	agentCache   *cache.Cache
@@ -179,7 +178,7 @@ func (r *BuiltinRegistry) scanServiceKeysAndUpdate(rdb *redis.Client) error {
 	return nil
 }
 
-func (r *BuiltinRegistry) Register(serviceId string, host string, port int) error {
+func (r *BuiltinRegistry) Register(serviceId, host string, port int) error {
 	agentService, err := service.NewService(serviceId, host, port)
 	if err != nil {
 		return err
@@ -317,7 +316,6 @@ func (r *BuiltinRegistryResolver) Resolve(_ context.Context, _ string) (discover
 	var eps []discovery.Instance
 
 	for _, svr := range services {
-
 		eps = append(eps, discovery.NewInstance(
 			"tcp",
 			net.JoinHostPort(svr.Host, strconv.Itoa(svr.Port)),

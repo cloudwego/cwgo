@@ -1,18 +1,18 @@
 /*
  *
- *  * Copyright 2022 CloudWeGo Authors
- *  *
- *  * Licensed under the Apache License, Version 2.0 (the "License");
- *  * you may not use this file except in compliance with the License.
- *  * You may obtain a copy of the License at
- *  *
- *  *     http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  * Unless required by applicable law or agreed to in writing, software
- *  * distributed under the License is distributed on an "AS IS" BASIS,
- *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  * See the License for the specific language governing permissions and
- *  * limitations under the License.
+ * Copyright 2023 CloudWeGo Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  */
 
@@ -20,12 +20,13 @@ package repository
 
 import (
 	"context"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 const (
@@ -45,37 +46,40 @@ func NewUpdateRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *UpdateRepositoryLogic) UpdateRepository(req *repository.UpdateRepositoryReq) (res *repository.UpdateRepositoryRes) {
+	if req.Status != 0 {
+		if _, ok := consts.RepositoryStatusNumMap[int(req.Status)]; !ok {
+			return &repository.UpdateRepositoryRes{
+				Code: consts.ErrNumParamRepositoryStatus,
+				Msg:  consts.ErrMsgParamRepositoryStatus,
+			}
+		}
+	}
+
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error("get rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &repository.UpdateRepositoryRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcGetClient,
+			Msg:  consts.ErrMsgRpcGetClient,
 		}
 	}
 
 	rpcRes, err := client.UpdateRepository(l.ctx, &agent.UpdateRepositoryReq{
 		Id:     req.ID,
-		Token:  req.Token,
+		Branch: req.Branch,
 		Status: req.Status,
 	})
 	if err != nil {
-		logger.Logger.Error("connect to rpc client failed", zap.Error(err))
+		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &repository.UpdateRepositoryRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: consts.ErrNumRpcConnectClient,
+			Msg:  consts.ErrMsgRpcConnectClient,
 		}
 	}
 	if rpcRes.Code != 0 {
-		if rpcRes.Code == http.StatusBadRequest {
-			return &repository.UpdateRepositoryRes{
-				Code: http.StatusBadRequest,
-				Msg:  rpcRes.Msg,
-			}
-		}
 		return &repository.UpdateRepositoryRes{
-			Code: http.StatusInternalServerError,
-			Msg:  "internal err",
+			Code: rpcRes.Code,
+			Msg:  rpcRes.Msg,
 		}
 	}
 

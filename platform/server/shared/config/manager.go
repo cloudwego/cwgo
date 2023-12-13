@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 CloudWeGo Authors
+ * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,11 @@ package config
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"time"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/api"
@@ -28,9 +33,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 type Manager struct {
@@ -49,6 +51,15 @@ type Config struct {
 	Store    store.Config    `mapstructure:"store"`
 	Api      api.Config      `mapstructure:"api"`
 	Agent    agent.Config    `mapstructure:"agent"`
+}
+
+func (conf *Config) SetUp() {
+	conf.App.SetUp()
+	conf.Logger.SetUp()
+	conf.Registry.SetUp()
+	conf.Store.SetUp()
+	conf.Api.SetUp()
+	conf.Agent.SetUp()
 }
 
 var manager *Manager
@@ -93,12 +104,23 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 	}
 
+	var err error
+
 	// init consts in config
 	consts.ProxyUrl = config.App.ProxyUrl
 
+	if config.App.Timezone == "" {
+		consts.TimeZone = time.Local
+	} else {
+		consts.TimeZone, err = time.LoadLocation(config.App.Timezone)
+		if err != nil {
+			return err
+		}
+	}
+
 	// get service id
 	var serviceId string
-	_, err := os.Stat(consts.AgentMetadataFile)
+	_, err = os.Stat(consts.AgentMetadataFile)
 	if os.IsNotExist(err) {
 		// agent file not exist
 		// generate a new service id
