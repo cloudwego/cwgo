@@ -275,7 +275,7 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDLWithR
 	err := m.db.WithContext(ctx).
 		Joins("IdlRepository").
 		Joins("ServiceRepository").
-		Where("`id` = ? AND `parent_idl_id` = 0", id).
+		Where("`idl`.`id` = ? AND `idl`.`parent_idl_id` = 0", id).
 		Take(&mainIdlEntity).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
