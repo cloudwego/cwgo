@@ -47,6 +47,8 @@ func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, serviceName, ge
 
 	cwgoCmd.Dir = generatePath
 
+	logger.Logger.Debug("exec generate command", zap.String("command", cwgoCmd.String()))
+
 	outBytes, err := cwgoCmd.CombinedOutput()
 
 	logger.Logger.Debug("generate command output", zap.String("output", string(outBytes)))

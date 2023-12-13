@@ -66,7 +66,7 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 	req.ServiceName = strings.Replace(req.ServiceName, ".", "_", -1)
 
 	if req.ServiceRepositoryName == "" {
-		req.ServiceName = req.ServiceRepositoryName
+		req.ServiceRepositoryName = req.ServiceName
 	}
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
