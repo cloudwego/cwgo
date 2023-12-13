@@ -51,6 +51,7 @@ export default function ContextHolder({ update }: { update: () => void }) {
 					style={{
 						width: "30rem"
 					}}
+					placeholder={"不填则为仓库默认分支"}
 					showClear
 					onChange={(value) => {
 						setBranch(value);
