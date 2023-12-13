@@ -20,6 +20,8 @@ package generator
 
 import (
 	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
 	"os/exec"
 )
 
@@ -45,5 +47,9 @@ func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, serviceName, ge
 
 	cwgoCmd.Dir = generatePath
 
-	return cwgoCmd.Run()
+	outBytes, err := cwgoCmd.CombinedOutput()
+
+	logger.Logger.Debug("generate command output", zap.String("output", string(outBytes)))
+
+	return err
 }

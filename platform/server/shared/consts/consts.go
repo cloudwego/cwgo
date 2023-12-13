@@ -43,6 +43,11 @@ const (
 	RdbKeyRegistryService = ProjectName + ":" + "registry:service:%s"
 )
 
+const (
+	TempDirRepo          = "repo"           // repo pull file temp dir
+	TempDirGeneratedCode = "generated_code" // generated code temp dir
+)
+
 var TempDir string
 
 func init() {

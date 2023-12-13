@@ -196,6 +196,7 @@ const (
 	ErrNumCommonCreateTempDir
 	ErrNumCommonGenerateCode
 	ErrNumCommonProcessFolders
+	ErrNumCommonMkdir
 )
 
 const (
@@ -203,6 +204,7 @@ const (
 	ErrMsgCommonCreateTempDir  = "create temp dir failed"
 	ErrMsgCommonGenerateCode   = "generate code failed"
 	ErrMsgCommonProcessFolders = "process folders failed"
+	ErrMsgCommonMkdir          = "mkdir failed"
 )
 
 var (
@@ -210,4 +212,5 @@ var (
 	ErrCommonCreateTempDir  = errx.New(ErrNumCommonCreateTempDir, ErrMsgCommonCreateTempDir)
 	ErrCommonGenerateCode   = errx.New(ErrNumCommonGenerateCode, ErrMsgCommonGenerateCode)
 	ErrCommonProcessFolders = errx.New(ErrNumCommonProcessFolders, ErrMsgCommonProcessFolders)
+	ErrCommonMkdir          = errx.New(ErrNumCommonMkdir, ErrMsgCommonMkdir)
 )
