@@ -11,6 +11,11 @@ export default function App() {
 	const [selectedKey, setSelectedKey] = useState("idlrepo");
 	const navList = [
 		{
+			itemKey: "tokeninfo",
+			text: "令牌管理",
+			icon: <IconCode size="large" />
+		},
+		{
 			itemKey: "idlrepo",
 			text: "IDL 仓库信息管理",
 			icon: <IconGitlabLogo size="large" />
@@ -22,13 +27,8 @@ export default function App() {
 		},
 		{
 			itemKey: "servicerepo",
-			text: "代码产物信息查询",
+			text: "服务代码产物仓库查询",
 			icon: <IconGitlabLogo size="large" />
-		},
-		{
-			itemKey: "tokeninfo",
-			text: "TOKEN 管理",
-			icon: <IconCode size="large" />
 		}
 	];
 

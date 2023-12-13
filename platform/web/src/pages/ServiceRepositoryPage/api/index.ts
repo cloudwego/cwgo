@@ -2,9 +2,8 @@ import { repoFetchOption } from "../../../types";
 import service from "../../../utils/request";
 
 async function getRepo(fetchOption: repoFetchOption) {
-	const repoData = await service.get("/api/repo", {
+	const repoData = await service.get("/api/idl", {
 		params: {
-			store_type: fetchOption.repoType === "idl" ? 1 : 2,
 			page: fetchOption.currentPage,
 			limit: fetchOption.pageSize,
 			order: 0,

@@ -8,9 +8,8 @@ import {
 	Space,
 	// Modal,
 	Table,
-	Toast,
+	Toast
 	// Toast,
-	Tooltip
 } from "@douyinfe/semi-ui";
 import { Dropdown } from "@douyinfe/semi-ui";
 import styles from "./index.module.scss";
@@ -115,54 +114,6 @@ export default function RepositoryPage() {
 			width: 150,
 			render: (value: string) => {
 				return <div>{value}</div>;
-			}
-		},
-		{
-			title: "快捷命令",
-			render: ({
-				commit_hash,
-				service_name,
-				idl_repository
-			}: {
-				commit_hash: string;
-				idl_repository: {
-					repository_domain: string;
-					repository_owner: string;
-					repository_name: string;
-				};
-				service_name: string;
-			}) => {
-				const temp = `go get ${idl_repository.repository_domain}/${idl_repository.repository_owner}/${idl_repository.repository_name}/rpc/${service_name}`;
-				return (
-					<Space>
-						<Tooltip
-							content={temp}
-							style={{
-								maxWidth: "100vw"
-							}}
-						>
-							<Button
-								onClick={() => {
-									navigator.clipboard.writeText(temp);
-									Toast.success({
-										content: "已复制到剪贴板"
-									});
-								}}
-							>
-								复制添加依赖
-							</Button>
-						</Tooltip>
-						<Button
-							onClick={() => {
-								window.open(
-									`https://${idl_repository.repository_domain}/${idl_repository.repository_owner}/${idl_repository.repository_name}/commit/${commit_hash}`
-								);
-							}}
-						>
-							跳转 commit
-						</Button>
-					</Space>
-				);
 			}
 		},
 		{
@@ -346,7 +297,7 @@ export default function RepositoryPage() {
 						<Form.Input
 							showClear
 							field="service_name"
-							label="仓库域名"
+							label="服务名"
 							style={{ width: 180 }}
 						/>
 						<Button

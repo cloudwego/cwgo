@@ -10,12 +10,12 @@ import {
 	Space,
 	Table,
 	Tag,
-	Toast
+	Toast,
+	Tooltip
 } from "@douyinfe/semi-ui";
 import styles from "./index.module.scss";
 // import { ModalReactProps } from "@douyinfe/semi-ui/lib/es/modal";
 import { Data } from "@douyinfe/semi-ui/lib/es/table";
-import { UpdateRepo } from "../../types";
 // import { IconInfoCircle } from "@douyinfe/semi-icons";
 // import ContextHolder from "./contextHolder";
 
@@ -44,7 +44,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		};
 		const curDataSource = await new Promise((res) => {
 			getRepo(fetchOption).then((data) => {
-				res(data.repositories);
+				res(data.idls);
 				setTotal(data.total);
 				console.log(data.total);
 			});
@@ -64,10 +64,10 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 	const columns = [
 		{
 			title: "仓库类型",
-			dataIndex: "repository_type",
+			dataIndex: "idl_repository",
 			width: 100,
-			render: (value: number) => {
-				return value === 1 ? (
+			render: (value: { repository_type: number }) => {
+				return value.repository_type === 1 ? (
 					<Tag color="red" size="large">
 						Gitlab
 					</Tag>
@@ -80,7 +80,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库域名",
-			dataIndex: "repository_domain",
+			dataIndex: "idl_repository.repository_domain",
 			width: 150,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -88,7 +88,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库名",
-			dataIndex: "repository_name",
+			dataIndex: "idl_repository.repository_name",
 			width: 150,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -96,7 +96,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库所有者",
-			dataIndex: "repository_owner",
+			dataIndex: "idl_repository.repository_owner",
 			width: 120,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -104,7 +104,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "分支",
-			dataIndex: "repository_branch",
+			dataIndex: "idl_repository.repository_branch",
 			width: 120,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -112,7 +112,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库最后更新时间",
-			dataIndex: "last_update_time",
+			dataIndex: "idl_repository.last_update_time",
 			width: 180,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -132,7 +132,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "仓库最后同步时间",
-			dataIndex: "last_sync_time",
+			dataIndex: "idl_repository.last_sync_time",
 			width: 180,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -152,7 +152,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "状态",
-			dataIndex: "status",
+			dataIndex: "idl_repository.status",
 			width: 100,
 			render: (value: number) => {
 				return value === 2 ? (
@@ -167,8 +167,63 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 			}
 		},
 		{
+			title: "快捷命令",
+			render: ({
+				commit_hash,
+				service_name,
+				idl_repository
+			}: {
+				commit_hash: string;
+				idl_repository: {
+					repository_domain: string;
+					repository_owner: string;
+					repository_name: string;
+				};
+				service_name: string;
+			}) => {
+				const temp = `go get ${idl_repository.repository_domain}/${idl_repository.repository_owner}/${idl_repository.repository_name}/rpc/${service_name}`;
+				return (
+					<Space>
+						<Tooltip
+							content={temp}
+							style={{
+								maxWidth: "100vw"
+							}}
+						>
+							<Button
+								onClick={() => {
+									navigator.clipboard.writeText(temp);
+									Toast.success({
+										content: "已复制到剪贴板"
+									});
+								}}
+							>
+								复制添加依赖
+							</Button>
+						</Tooltip>
+						<Button
+							onClick={() => {
+								window.open(
+									`https://${idl_repository.repository_domain}/${idl_repository.repository_owner}/${idl_repository.repository_name}/commit/${commit_hash}`
+								);
+							}}
+						>
+							跳转 commit
+						</Button>
+					</Space>
+				);
+			}
+		},
+		{
 			title: "操作",
-			render: ({ id }: UpdateRepo) => {
+			render: ({
+				idl_repository: { id }
+			}: {
+				idl_repository: {
+					id: number;
+					status: number;
+				};
+			}) => {
 				return (
 					<Space>
 						<Popconfirm
@@ -241,7 +296,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "记录更新时间",
-			dataIndex: "update_time",
+			dataIndex: "idl_repository.update_time",
 			width: 150,
 			render: (value: string) => {
 				return <div>{value}</div>;
@@ -261,7 +316,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		},
 		{
 			title: "创建时间",
-			dataIndex: "create_time",
+			dataIndex: "idl_repository.create_time",
 			width: 150,
 			render: (value: string) => {
 				return <div>{value}</div>;
