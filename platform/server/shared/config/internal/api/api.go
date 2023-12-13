@@ -64,7 +64,7 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, store
 		server.WithExitWaitTime(5*time.Second),
 		server.WithMaxKeepBodySize(1<<20*4),
 		server.WithKeepAlive(true),
-		server.WithH2C(true),
+		server.WithH2C(false),
 		server.WithReadBufferSize(1<<10*4),
 	)
 
