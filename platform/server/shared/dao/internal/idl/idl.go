@@ -360,14 +360,14 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, pa
 
 	var total int64
 
-	db := m.db.WithContext(ctx)
+	db := m.db.WithContext(ctx).Debug()
 
 	if idlModel.ServiceName != "" {
-		db = db.Where("`idl.service_name` LIKE ?", fmt.Sprintf("%%%s%%", idlModel.ServiceName))
+		db = db.Where("`idl`.`service_name` LIKE ?", fmt.Sprintf("%%%s%%", idlModel.ServiceName))
 	}
 
 	err := db.
-		Model(&entity.MysqlIDL{}).
+		Model(&entity.MysqlIDLWithRepositoryInfo{}).
 		Count(&total).Error
 	if err != nil {
 		return nil, -1, err
