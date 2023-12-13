@@ -46,3 +46,8 @@ type MysqlIDL struct {
 func (*MysqlIDL) TableName() string {
 	return TableNameMysqlIDL
 }
+
+type MysqlIDLWithServiceRepositoryInfo struct {
+	MysqlIDL
+	ServiceRepository MysqlRepository `gorm:"foreignKey:service_repository_id;references:id"`
+}

@@ -39,8 +39,8 @@ type IIdlDaoManager interface {
 	UpdateIDL(ctx context.Context, idlModel model.IDL) error
 	Sync(ctx context.Context, idlModel model.IDL) error
 
-	GetIDL(ctx context.Context, id int64) (*model.IDL, error)
-	GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDL, int64, error)
+	GetIDL(ctx context.Context, id int64) (*model.IDLWithServiceRepositorInfo, error)
+	GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDLWithServiceRepositorInfo, int64, error)
 	CheckMainIdlIfExist(ctx context.Context, repositoryId int64, mainIdlPath string) (bool, error)
 }
 
@@ -269,10 +269,11 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 	return err
 }
 
-func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDL, error) {
-	var mainIdlEntity entity.MysqlIDL
+func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDLWithServiceRepositorInfo, error) {
+	var mainIdlEntity entity.MysqlIDLWithServiceRepositoryInfo
 
 	err := m.db.WithContext(ctx).
+		Joins("ServiceRepository").
 		Where("`id` = ? AND `parent_idl_id` = 0", id).
 		Take(&mainIdlEntity).Error
 	if err != nil {
@@ -302,22 +303,39 @@ func (m *MysqlIDLManager) GetIDL(ctx context.Context, id int64) (*model.IDL, err
 		}
 	}
 
-	return &model.IDL{
+	return &model.IDLWithServiceRepositorInfo{
 		Id:                  mainIdlEntity.ID,
 		IdlRepositoryId:     mainIdlEntity.IdlRepositoryID,
 		ServiceRepositoryId: mainIdlEntity.ServiceRepositoryID,
-		MainIdlPath:         mainIdlEntity.IdlPath,
-		CommitHash:          mainIdlEntity.CommitHash,
-		ImportIdls:          importIdlModels,
-		ServiceName:         mainIdlEntity.ServiceName,
-		LastSyncTime:        mainIdlEntity.LastSyncTime.Format(time.DateTime),
-		IsDeleted:           false,
-		CreateTime:          mainIdlEntity.CreateTime.Format(time.DateTime),
-		UpdateTime:          mainIdlEntity.UpdateTime.Format(time.DateTime),
+		ServiceRepository: &model.Repository{
+			Id:               mainIdlEntity.ServiceRepository.ID,
+			RepositoryType:   mainIdlEntity.ServiceRepository.RepositoryType,
+			RepositoryDomain: mainIdlEntity.ServiceRepository.Domain,
+			RepositoryOwner:  mainIdlEntity.ServiceRepository.Owner,
+			RepositoryName:   mainIdlEntity.ServiceRepository.RepositoryName,
+			RepositoryBranch: mainIdlEntity.ServiceRepository.Branch,
+			StoreType:        mainIdlEntity.ServiceRepository.StoreType,
+			TokenId:          mainIdlEntity.ServiceRepository.TokenId,
+			Status:           mainIdlEntity.ServiceRepository.Status,
+			LastUpdateTime:   mainIdlEntity.ServiceRepository.LastUpdateTime.Format(time.DateTime),
+			LastSyncTime:     mainIdlEntity.ServiceRepository.LastSyncTime.Format(time.DateTime),
+			IsDeleted:        false,
+			CreateTime:       mainIdlEntity.ServiceRepository.CreateTime.Format(time.DateTime),
+			UpdateTime:       mainIdlEntity.ServiceRepository.UpdateTime.Format(time.DateTime),
+		},
+		MainIdlPath:  mainIdlEntity.IdlPath,
+		CommitHash:   mainIdlEntity.CommitHash,
+		ImportIdls:   importIdlModels,
+		ServiceName:  mainIdlEntity.ServiceName,
+		LastSyncTime: mainIdlEntity.LastSyncTime.Format(time.DateTime),
+		Status:       mainIdlEntity.Status,
+		IsDeleted:    false,
+		CreateTime:   mainIdlEntity.CreateTime.Format(time.DateTime),
+		UpdateTime:   mainIdlEntity.UpdateTime.Format(time.DateTime),
 	}, nil
 }
 
-func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDL, int64, error) {
+func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, page, limit, order int32, orderBy string) ([]*model.IDLWithServiceRepositorInfo, int64, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -342,7 +360,7 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, pa
 		return nil, total, nil
 	}
 
-	var idlEntities []*entity.MysqlIDL
+	var idlEntities []*entity.MysqlIDLWithServiceRepositoryInfo
 
 	// default sort field to 'update_time' if not provided
 	if orderBy == "" {
@@ -358,6 +376,7 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, pa
 
 	err = db.
 		Where("`parent_idl_id` = 0").
+		Joins("ServiceRepository").
 		Offset(int(offset)).
 		Limit(int(limit)).
 		Order(orderBy).
@@ -367,23 +386,40 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, pa
 	}
 
 	var wg sync.WaitGroup
-	idlModels := make([]*model.IDL, len(idlEntities))
+	idlModels := make([]*model.IDLWithServiceRepositorInfo, len(idlEntities))
 	for i, idl := range idlEntities {
 		wg.Add(1)
-		idlModels[i] = &model.IDL{
+		idlModels[i] = &model.IDLWithServiceRepositorInfo{
 			Id:                  idl.ID,
 			IdlRepositoryId:     idl.IdlRepositoryID,
 			ServiceRepositoryId: idl.ServiceRepositoryID,
-			MainIdlPath:         idl.IdlPath,
-			CommitHash:          idl.CommitHash,
-			ImportIdls:          nil,
-			ServiceName:         idl.ServiceName,
-			LastSyncTime:        idl.LastSyncTime.Format(time.DateTime),
-			IsDeleted:           false,
-			CreateTime:          idl.CreateTime.Format(time.DateTime),
-			UpdateTime:          idl.UpdateTime.Format(time.DateTime),
+			ServiceRepository: &model.Repository{
+				Id:               idl.ServiceRepository.ID,
+				RepositoryType:   idl.ServiceRepository.RepositoryType,
+				RepositoryDomain: idl.ServiceRepository.Domain,
+				RepositoryOwner:  idl.ServiceRepository.Owner,
+				RepositoryName:   idl.ServiceRepository.RepositoryName,
+				RepositoryBranch: idl.ServiceRepository.Branch,
+				StoreType:        idl.ServiceRepository.StoreType,
+				TokenId:          idl.ServiceRepository.TokenId,
+				Status:           idl.ServiceRepository.Status,
+				LastUpdateTime:   idl.ServiceRepository.LastUpdateTime.Format(time.DateTime),
+				LastSyncTime:     idl.ServiceRepository.LastSyncTime.Format(time.DateTime),
+				IsDeleted:        false,
+				CreateTime:       idl.ServiceRepository.CreateTime.Format(time.DateTime),
+				UpdateTime:       idl.ServiceRepository.UpdateTime.Format(time.DateTime),
+			},
+			MainIdlPath:  idl.IdlPath,
+			CommitHash:   idl.CommitHash,
+			ImportIdls:   nil,
+			ServiceName:  idl.ServiceName,
+			LastSyncTime: idl.LastSyncTime.Format(time.DateTime),
+			Status:       idl.Status,
+			IsDeleted:    false,
+			CreateTime:   idl.CreateTime.Format(time.DateTime),
+			UpdateTime:   idl.UpdateTime.Format(time.DateTime),
 		}
-		go func(i int, idl *entity.MysqlIDL) {
+		go func(i int, idl *entity.MysqlIDLWithServiceRepositoryInfo) {
 			defer wg.Done()
 
 			var importIdlEntities []*entity.MysqlIDL

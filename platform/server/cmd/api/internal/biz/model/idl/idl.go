@@ -1780,15 +1780,15 @@ func (p *GetIDLsRes) String() string {
 }
 
 type GetIDLsResData struct {
-	Idls  []*model.IDL `thrift:"idls,1" form:"idls" json:"idls" query:"idls"`
-	Total int32        `thrift:"total,2" form:"total" json:"total" query:"total"`
+	Idls  []*model.IDLWithServiceRepositorInfo `thrift:"idls,1" form:"idls" json:"idls" query:"idls"`
+	Total int32                                `thrift:"total,2" form:"total" json:"total" query:"total"`
 }
 
 func NewGetIDLsResData() *GetIDLsResData {
 	return &GetIDLsResData{}
 }
 
-func (p *GetIDLsResData) GetIdls() (v []*model.IDL) {
+func (p *GetIDLsResData) GetIdls() (v []*model.IDLWithServiceRepositorInfo) {
 	return p.Idls
 }
 
@@ -1875,9 +1875,9 @@ func (p *GetIDLsResData) ReadField1(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	p.Idls = make([]*model.IDL, 0, size)
+	p.Idls = make([]*model.IDLWithServiceRepositorInfo, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := model.NewIDL()
+		_elem := model.NewIDLWithServiceRepositorInfo()
 		if err := _elem.Read(iprot); err != nil {
 			return err
 		}

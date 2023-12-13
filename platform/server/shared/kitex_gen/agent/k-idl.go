@@ -1949,9 +1949,9 @@ func (p *GetIDLsResData) FastReadField1(buf []byte) (int, error) {
 	if err != nil {
 		return offset, err
 	}
-	p.Idls = make([]*model.IDL, 0, size)
+	p.Idls = make([]*model.IDLWithServiceRepositorInfo, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := model.NewIDL()
+		_elem := model.NewIDLWithServiceRepositorInfo()
 		if l, err := _elem.FastRead(buf[offset:]); err != nil {
 			return offset, err
 		} else {

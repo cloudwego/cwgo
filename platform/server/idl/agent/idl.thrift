@@ -46,7 +46,7 @@ struct GetIDLsRes{
     3: GetIDLsResData data
 }
 struct GetIDLsResData{
-    1: list<idl.IDL> idls
+    1: list<idl.IDLWithServiceRepositorInfo> idls
     2: i32 total
 }
 

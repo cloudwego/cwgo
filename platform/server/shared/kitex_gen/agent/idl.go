@@ -2301,8 +2301,8 @@ func (p *GetIDLsRes) Field3DeepEqual(src *GetIDLsResData) bool {
 }
 
 type GetIDLsResData struct {
-	Idls  []*model.IDL `thrift:"idls,1" frugal:"1,default,list<model.IDL>" json:"idls"`
-	Total int32        `thrift:"total,2" frugal:"2,default,i32" json:"total"`
+	Idls  []*model.IDLWithServiceRepositorInfo `thrift:"idls,1" frugal:"1,default,list<model.IDLWithServiceRepositorInfo>" json:"idls"`
+	Total int32                                `thrift:"total,2" frugal:"2,default,i32" json:"total"`
 }
 
 func NewGetIDLsResData() *GetIDLsResData {
@@ -2313,14 +2313,14 @@ func (p *GetIDLsResData) InitDefault() {
 	*p = GetIDLsResData{}
 }
 
-func (p *GetIDLsResData) GetIdls() (v []*model.IDL) {
+func (p *GetIDLsResData) GetIdls() (v []*model.IDLWithServiceRepositorInfo) {
 	return p.Idls
 }
 
 func (p *GetIDLsResData) GetTotal() (v int32) {
 	return p.Total
 }
-func (p *GetIDLsResData) SetIdls(val []*model.IDL) {
+func (p *GetIDLsResData) SetIdls(val []*model.IDLWithServiceRepositorInfo) {
 	p.Idls = val
 }
 func (p *GetIDLsResData) SetTotal(val int32) {
@@ -2406,9 +2406,9 @@ func (p *GetIDLsResData) ReadField1(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	p.Idls = make([]*model.IDL, 0, size)
+	p.Idls = make([]*model.IDLWithServiceRepositorInfo, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := model.NewIDL()
+		_elem := model.NewIDLWithServiceRepositorInfo()
 		if err := _elem.Read(iprot); err != nil {
 			return err
 		}
@@ -2527,7 +2527,7 @@ func (p *GetIDLsResData) DeepEqual(ano *GetIDLsResData) bool {
 	return true
 }
 
-func (p *GetIDLsResData) Field1DeepEqual(src []*model.IDL) bool {
+func (p *GetIDLsResData) Field1DeepEqual(src []*model.IDLWithServiceRepositorInfo) bool {
 
 	if len(p.Idls) != len(src) {
 		return false

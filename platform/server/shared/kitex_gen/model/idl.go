@@ -1068,3 +1068,908 @@ func (p *ImportIDL) Field2DeepEqual(src string) bool {
 	}
 	return true
 }
+
+type IDLWithServiceRepositorInfo struct {
+	Id                  int64        `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+	IdlRepositoryId     int64        `thrift:"idl_repository_id,2" frugal:"2,default,i64" json:"idl_repository_id"`
+	ServiceRepositoryId int64        `thrift:"service_repository_id,3" frugal:"3,default,i64" json:"service_repository_id"`
+	ServiceRepository   *Repository  `thrift:"service_repository,4" frugal:"4,default,Repository" json:"service_repository"`
+	MainIdlPath         string       `thrift:"main_idl_path,5" frugal:"5,default,string" json:"main_idl_path"`
+	CommitHash          string       `thrift:"commit_hash,6" frugal:"6,default,string" json:"commit_hash"`
+	ImportIdls          []*ImportIDL `thrift:"import_idls,7" frugal:"7,default,list<ImportIDL>" json:"import_idls"`
+	ServiceName         string       `thrift:"service_name,8" frugal:"8,default,string" json:"service_name"`
+	LastSyncTime        string       `thrift:"last_sync_time,9" frugal:"9,default,string" json:"last_sync_time"`
+	Status              int32        `thrift:"status,10" frugal:"10,default,i32" json:"status"`
+	IsDeleted           bool         `thrift:"is_deleted,11" frugal:"11,default,bool" json:"is_deleted"`
+	CreateTime          string       `thrift:"create_time,12" frugal:"12,default,string" json:"create_time"`
+	UpdateTime          string       `thrift:"update_time,13" frugal:"13,default,string" json:"update_time"`
+}
+
+func NewIDLWithServiceRepositorInfo() *IDLWithServiceRepositorInfo {
+	return &IDLWithServiceRepositorInfo{}
+}
+
+func (p *IDLWithServiceRepositorInfo) InitDefault() {
+	*p = IDLWithServiceRepositorInfo{}
+}
+
+func (p *IDLWithServiceRepositorInfo) GetId() (v int64) {
+	return p.Id
+}
+
+func (p *IDLWithServiceRepositorInfo) GetIdlRepositoryId() (v int64) {
+	return p.IdlRepositoryId
+}
+
+func (p *IDLWithServiceRepositorInfo) GetServiceRepositoryId() (v int64) {
+	return p.ServiceRepositoryId
+}
+
+var IDLWithServiceRepositorInfo_ServiceRepository_DEFAULT *Repository
+
+func (p *IDLWithServiceRepositorInfo) GetServiceRepository() (v *Repository) {
+	if !p.IsSetServiceRepository() {
+		return IDLWithServiceRepositorInfo_ServiceRepository_DEFAULT
+	}
+	return p.ServiceRepository
+}
+
+func (p *IDLWithServiceRepositorInfo) GetMainIdlPath() (v string) {
+	return p.MainIdlPath
+}
+
+func (p *IDLWithServiceRepositorInfo) GetCommitHash() (v string) {
+	return p.CommitHash
+}
+
+func (p *IDLWithServiceRepositorInfo) GetImportIdls() (v []*ImportIDL) {
+	return p.ImportIdls
+}
+
+func (p *IDLWithServiceRepositorInfo) GetServiceName() (v string) {
+	return p.ServiceName
+}
+
+func (p *IDLWithServiceRepositorInfo) GetLastSyncTime() (v string) {
+	return p.LastSyncTime
+}
+
+func (p *IDLWithServiceRepositorInfo) GetStatus() (v int32) {
+	return p.Status
+}
+
+func (p *IDLWithServiceRepositorInfo) GetIsDeleted() (v bool) {
+	return p.IsDeleted
+}
+
+func (p *IDLWithServiceRepositorInfo) GetCreateTime() (v string) {
+	return p.CreateTime
+}
+
+func (p *IDLWithServiceRepositorInfo) GetUpdateTime() (v string) {
+	return p.UpdateTime
+}
+func (p *IDLWithServiceRepositorInfo) SetId(val int64) {
+	p.Id = val
+}
+func (p *IDLWithServiceRepositorInfo) SetIdlRepositoryId(val int64) {
+	p.IdlRepositoryId = val
+}
+func (p *IDLWithServiceRepositorInfo) SetServiceRepositoryId(val int64) {
+	p.ServiceRepositoryId = val
+}
+func (p *IDLWithServiceRepositorInfo) SetServiceRepository(val *Repository) {
+	p.ServiceRepository = val
+}
+func (p *IDLWithServiceRepositorInfo) SetMainIdlPath(val string) {
+	p.MainIdlPath = val
+}
+func (p *IDLWithServiceRepositorInfo) SetCommitHash(val string) {
+	p.CommitHash = val
+}
+func (p *IDLWithServiceRepositorInfo) SetImportIdls(val []*ImportIDL) {
+	p.ImportIdls = val
+}
+func (p *IDLWithServiceRepositorInfo) SetServiceName(val string) {
+	p.ServiceName = val
+}
+func (p *IDLWithServiceRepositorInfo) SetLastSyncTime(val string) {
+	p.LastSyncTime = val
+}
+func (p *IDLWithServiceRepositorInfo) SetStatus(val int32) {
+	p.Status = val
+}
+func (p *IDLWithServiceRepositorInfo) SetIsDeleted(val bool) {
+	p.IsDeleted = val
+}
+func (p *IDLWithServiceRepositorInfo) SetCreateTime(val string) {
+	p.CreateTime = val
+}
+func (p *IDLWithServiceRepositorInfo) SetUpdateTime(val string) {
+	p.UpdateTime = val
+}
+
+var fieldIDToName_IDLWithServiceRepositorInfo = map[int16]string{
+	1:  "id",
+	2:  "idl_repository_id",
+	3:  "service_repository_id",
+	4:  "service_repository",
+	5:  "main_idl_path",
+	6:  "commit_hash",
+	7:  "import_idls",
+	8:  "service_name",
+	9:  "last_sync_time",
+	10: "status",
+	11: "is_deleted",
+	12: "create_time",
+	13: "update_time",
+}
+
+func (p *IDLWithServiceRepositorInfo) IsSetServiceRepository() bool {
+	return p.ServiceRepository != nil
+}
+
+func (p *IDLWithServiceRepositorInfo) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 2:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField5(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 6:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField6(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 7:
+			if fieldTypeId == thrift.LIST {
+				if err = p.ReadField7(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 8:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField8(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 9:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField9(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 10:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField10(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 11:
+			if fieldTypeId == thrift.BOOL {
+				if err = p.ReadField11(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 12:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField12(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 13:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField13(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_IDLWithServiceRepositorInfo[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.Id = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.IdlRepositoryId = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField3(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.ServiceRepositoryId = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField4(iprot thrift.TProtocol) error {
+	p.ServiceRepository = NewRepository()
+	if err := p.ServiceRepository.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField5(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.MainIdlPath = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField6(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.CommitHash = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField7(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return err
+	}
+	p.ImportIdls = make([]*ImportIDL, 0, size)
+	for i := 0; i < size; i++ {
+		_elem := NewImportIDL()
+		if err := _elem.Read(iprot); err != nil {
+			return err
+		}
+
+		p.ImportIdls = append(p.ImportIdls, _elem)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField8(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.ServiceName = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField9(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.LastSyncTime = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField10(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.Status = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField11(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadBool(); err != nil {
+		return err
+	} else {
+		p.IsDeleted = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField12(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.CreateTime = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) ReadField13(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.UpdateTime = v
+	}
+	return nil
+}
+
+func (p *IDLWithServiceRepositorInfo) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("IDLWithServiceRepositorInfo"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
+			goto WriteFieldError
+		}
+		if err = p.writeField6(oprot); err != nil {
+			fieldId = 6
+			goto WriteFieldError
+		}
+		if err = p.writeField7(oprot); err != nil {
+			fieldId = 7
+			goto WriteFieldError
+		}
+		if err = p.writeField8(oprot); err != nil {
+			fieldId = 8
+			goto WriteFieldError
+		}
+		if err = p.writeField9(oprot); err != nil {
+			fieldId = 9
+			goto WriteFieldError
+		}
+		if err = p.writeField10(oprot); err != nil {
+			fieldId = 10
+			goto WriteFieldError
+		}
+		if err = p.writeField11(oprot); err != nil {
+			fieldId = 11
+			goto WriteFieldError
+		}
+		if err = p.writeField12(oprot); err != nil {
+			fieldId = 12
+			goto WriteFieldError
+		}
+		if err = p.writeField13(oprot); err != nil {
+			fieldId = 13
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.Id); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("idl_repository_id", thrift.I64, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.IdlRepositoryId); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_repository_id", thrift.I64, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.ServiceRepositoryId); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_repository", thrift.STRUCT, 4); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.ServiceRepository.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("main_idl_path", thrift.STRING, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.MainIdlPath); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField6(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("commit_hash", thrift.STRING, 6); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.CommitHash); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField7(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("import_idls", thrift.LIST, 7); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.ImportIdls)); err != nil {
+		return err
+	}
+	for _, v := range p.ImportIdls {
+		if err := v.Write(oprot); err != nil {
+			return err
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 7 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField8(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("service_name", thrift.STRING, 8); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.ServiceName); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 8 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 8 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField9(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("last_sync_time", thrift.STRING, 9); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.LastSyncTime); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 9 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 9 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField10(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("status", thrift.I32, 10); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Status); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 10 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 10 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField11(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("is_deleted", thrift.BOOL, 11); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteBool(p.IsDeleted); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 11 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 11 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField12(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 12); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.CreateTime); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 12 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 12 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) writeField13(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 13); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.UpdateTime); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 13 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 13 end error: ", p), err)
+}
+
+func (p *IDLWithServiceRepositorInfo) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("IDLWithServiceRepositorInfo(%+v)", *p)
+}
+
+func (p *IDLWithServiceRepositorInfo) DeepEqual(ano *IDLWithServiceRepositorInfo) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.IdlRepositoryId) {
+		return false
+	}
+	if !p.Field3DeepEqual(ano.ServiceRepositoryId) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.ServiceRepository) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.MainIdlPath) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.CommitHash) {
+		return false
+	}
+	if !p.Field7DeepEqual(ano.ImportIdls) {
+		return false
+	}
+	if !p.Field8DeepEqual(ano.ServiceName) {
+		return false
+	}
+	if !p.Field9DeepEqual(ano.LastSyncTime) {
+		return false
+	}
+	if !p.Field10DeepEqual(ano.Status) {
+		return false
+	}
+	if !p.Field11DeepEqual(ano.IsDeleted) {
+		return false
+	}
+	if !p.Field12DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field13DeepEqual(ano.UpdateTime) {
+		return false
+	}
+	return true
+}
+
+func (p *IDLWithServiceRepositorInfo) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field2DeepEqual(src int64) bool {
+
+	if p.IdlRepositoryId != src {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field3DeepEqual(src int64) bool {
+
+	if p.ServiceRepositoryId != src {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field4DeepEqual(src *Repository) bool {
+
+	if !p.ServiceRepository.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.MainIdlPath, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field6DeepEqual(src string) bool {
+
+	if strings.Compare(p.CommitHash, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field7DeepEqual(src []*ImportIDL) bool {
+
+	if len(p.ImportIdls) != len(src) {
+		return false
+	}
+	for i, v := range p.ImportIdls {
+		_src := src[i]
+		if !v.DeepEqual(_src) {
+			return false
+		}
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field8DeepEqual(src string) bool {
+
+	if strings.Compare(p.ServiceName, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field9DeepEqual(src string) bool {
+
+	if strings.Compare(p.LastSyncTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field10DeepEqual(src int32) bool {
+
+	if p.Status != src {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field11DeepEqual(src bool) bool {
+
+	if p.IsDeleted != src {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field12DeepEqual(src string) bool {
+
+	if strings.Compare(p.CreateTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *IDLWithServiceRepositorInfo) Field13DeepEqual(src string) bool {
+
+	if strings.Compare(p.UpdateTime, src) != 0 {
+		return false
+	}
+	return true
+}
