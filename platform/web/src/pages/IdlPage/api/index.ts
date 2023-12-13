@@ -1,12 +1,13 @@
 import service from "../../../utils/request";
 
-async function getIdl(currentPage = 1, pageSize = 10) {
+async function getIdl(currentPage = 1, pageSize = 10, service_name = "") {
 	const idlData = await service.get("/api/idl", {
 		params: {
 			page: currentPage,
 			limit: pageSize,
 			order: 0,
-			order_by: "create_time"
+			order_by: "create_time",
+			service_name: service_name ? service_name : ""
 		}
 	});
 	return idlData.data.idls;

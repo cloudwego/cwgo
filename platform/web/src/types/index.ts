@@ -1,3 +1,12 @@
+export interface repoFetchOption {
+	currentPage: number;
+	pageSize: number;
+	repoType: string;
+	repository_domain?: string;
+	repository_name?: string;
+	service_name?: string;
+}
+
 export interface IdlRes {
 	id: number;
 	repository_id: number;
@@ -19,7 +28,7 @@ export interface AddRepo {
 
 export interface UpdateRepo {
 	id: number;
-	token: string;
+	repository_branch: string;
 	status: number;
 }
 

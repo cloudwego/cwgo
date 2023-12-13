@@ -5,10 +5,15 @@ import viteEslint from "vite-plugin-eslint";
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [react(), viteEslint()],
+	resolve: {
+		alias: {
+			"@": "/src"
+		}
+	},
 	server: {
 		proxy: {
 			"/api": {
-				target: "http://localhost:8089",
+				target: "http://cwgo.stellaris.wang:8089",
 				changeOrigin: true,
 				rewrite: (path) => path.replace(/^\/api/, "/api")
 			}

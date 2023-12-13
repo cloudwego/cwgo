@@ -5,8 +5,7 @@ import { createRepo } from "../api";
 export default function ContextHolder({ update }: { update: () => void }) {
 	// 表单状态
 	const [url, setUrl] = useState("");
-	const [token, setToken] = useState("");
-	const [storeType, setStoreType] = useState(1);
+	const [branch, setBranch] = useState("");
 	const [repoType, setRepoType] = useState(1);
 
 	return (
@@ -25,6 +24,11 @@ export default function ContextHolder({ update }: { update: () => void }) {
 					}}
 					showClear
 					onChange={(value) => {
+						if (value.includes("github")) {
+							setRepoType(2);
+						} else if (value.includes("gitlab")) {
+							setRepoType(1);
+						}
 						setUrl(value);
 					}}
 				></Input>
@@ -41,48 +45,18 @@ export default function ContextHolder({ update }: { update: () => void }) {
 						width: "5rem"
 					}}
 				>
-					token
+					分支
 				</div>
 				<Input
 					style={{
 						width: "30rem"
 					}}
+					placeholder={"不填则为仓库默认分支"}
 					showClear
 					onChange={(value) => {
-						setToken(value);
+						setBranch(value);
 					}}
 				></Input>
-			</Space>
-			<Space
-				style={{
-					display: "flex",
-					justifyContent: "space-between",
-					width: "100%"
-				}}
-			>
-				<div
-					style={{
-						width: "5rem"
-					}}
-				>
-					存储类型
-				</div>
-				<div
-					style={{
-						width: "30rem"
-					}}
-				>
-					<Select
-						defaultValue={1}
-						style={{ width: 120 }}
-						onChange={(value) => {
-							setStoreType(value as number);
-						}}
-					>
-						<Select.Option value={1}>IDL 文件</Select.Option>
-						<Select.Option value={2}>服务代码</Select.Option>
-					</Select>
-				</div>
 			</Space>
 			<Space
 				style={{
@@ -104,7 +78,8 @@ export default function ContextHolder({ update }: { update: () => void }) {
 					}}
 				>
 					<Select
-						defaultValue={1}
+						value={repoType}
+						defaultValue={repoType}
 						style={{ width: 120 }}
 						onChange={(value) => {
 							setRepoType(value as number);
@@ -122,17 +97,17 @@ export default function ContextHolder({ update }: { update: () => void }) {
 				}}
 				type="primary"
 				onClick={() => {
-					if (!url || !token) {
+					if (!url) {
 						Toast.error({
 							content: "请填写完整信息"
 						});
 						return;
 					}
 					const toast = Toast.info({
-						content: "正在更新仓库",
+						content: "正在添加仓库",
 						duration: 0
 					});
-					createRepo(repoType, url, token, storeType)
+					createRepo(repoType, url, branch)
 						.then((res) => {
 							Toast.success({
 								content: res
