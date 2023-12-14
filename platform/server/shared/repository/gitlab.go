@@ -190,7 +190,7 @@ func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error
 
 func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
 	// Delete the original code before pushing it
-	err := a.DeleteDirs(owner, repoName, "kitex_gen", "rpc")
+	err := a.DeleteDirs(owner, repoName, "kitex_gen", "rpc", "go.mod", "go.sum")
 	if err != nil {
 		return err
 	}
