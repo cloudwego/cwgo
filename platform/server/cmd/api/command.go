@@ -18,10 +18,13 @@
 
 package api
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/cloudwego/cwgo/platform/server/cmd/internal/options"
+	"github.com/spf13/cobra"
+)
 
 func NewCommand() *cobra.Command {
-	opt := newSetupOptions()
+	opt := options.NewApiOptions()
 	cmd := &cobra.Command{
 		Use:   "api",
 		Short: "api service",

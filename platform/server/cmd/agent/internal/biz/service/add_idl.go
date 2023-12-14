@@ -213,10 +213,6 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}
 	}
 
-	if req.ServiceRepositoryName == "" {
-		req.ServiceRepositoryName = "cwgo_" + repoName
-	}
-
 	isPrivacy, err := repoClient.GetRepositoryPrivacy(owner, repoName)
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRepoCreate, zap.Error(err))
@@ -276,16 +272,12 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	// TODO: is async?
-	res, err := s.agentService.GenerateCode(s.ctx, &agent.GenerateCodeReq{
-		IdlId: mainIdlId,
-	})
-	if res.Code != 0 {
-		return &agent.AddIDLRes{
-			Code: res.Code,
-			Msg:  res.Msg,
-		}, nil
-	}
+	// async generate code
+	go func() {
+		_, _ = s.agentService.GenerateCode(s.ctx, &agent.GenerateCodeReq{
+			IdlId: mainIdlId,
+		})
+	}()
 
 	return &agent.AddIDLRes{
 		Code: 0,

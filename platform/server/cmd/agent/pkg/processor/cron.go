@@ -88,9 +88,8 @@ type Processor struct {
 	// worker pool (read only)
 	// get available worker's task chan
 	// and push task into this chan
-	isDynamicWorker bool
-	workerPool      chan chan model.Task
-	workerList      []Worker
+	workerPool chan chan model.Task
+	workerList []Worker
 
 	stopChan chan struct{} // stop signal
 }
@@ -109,10 +108,8 @@ var ProcessorInstance *Processor
 
 func InitProcessor(service agent.AgentService) {
 	workerNum := config.GetManager().Config.Agent.WorkerNum
-	var isDynamicWorker bool
 
 	if workerNum == 0 {
-		isDynamicWorker = true
 		workerNum = defaultWorkerNum
 	}
 
@@ -128,39 +125,18 @@ func InitProcessor(service agent.AgentService) {
 	}
 
 	ProcessorInstance = &Processor{
-		service:         service,
-		taskList:        nil,
-		isDynamicWorker: isDynamicWorker,
-		workerPool:      workerPool,
-		workerList:      workerList,
-		stopChan:        make(chan struct{}),
+		service:    service,
+		taskList:   nil,
+		workerPool: workerPool,
+		workerList: workerList,
+		stopChan:   make(chan struct{}),
 	}
 }
 
 // Start dispatch tasks from current task list
 func (c *Processor) Start() {
 	var startTime time.Time
-	var taskProcessedNum int64
-	if c.isDynamicWorker {
-		go func() {
-			// worker adjust
-			for {
-				time.Sleep(adjustTimeDuration)
-				if c.taskList == nil || len(c.taskList) == 0 {
-					continue
-				}
 
-				if time.Since(startTime).Nanoseconds()/taskProcessedNum*int64(len(c.taskList)) > maxSyncTime.Nanoseconds() {
-					if len(c.workerList) <= maxWorkerNum {
-						// add worker when sync time exceed the max sync time
-						worker := NewWorker(c.service, c.workerPool)
-						c.workerList = append(c.workerList, worker)
-						worker.Start()
-					}
-				}
-			}
-		}()
-	}
 	go func() {
 		// send task
 		for {
@@ -174,15 +150,6 @@ func (c *Processor) Start() {
 				default:
 					taskChan := <-c.workerPool // get available worker's task chan
 					taskChan <- t              // push task into task chan
-					taskProcessedNum++
-				}
-			}
-
-			if c.isDynamicWorker {
-				if time.Since(startTime) < minSyncTime && len(c.workerList) > defaultWorkerNum {
-					// reduce worker
-					c.workerList[0].Stop()
-					c.workerList = c.workerList[1:]
 				}
 			}
 

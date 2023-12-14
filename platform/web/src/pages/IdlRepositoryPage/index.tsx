@@ -407,6 +407,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 							style={{ width: 180 }}
 						/>
 						<Button
+							htmlType="submit"
 							onClick={() => {
 								const toast = Toast.info({
 									content: "正在搜索仓库",

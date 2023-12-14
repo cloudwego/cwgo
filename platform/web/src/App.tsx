@@ -8,7 +8,9 @@ import Footer from "./components/Footer";
 
 export default function App() {
 	const { Sider, Content } = Layout;
-	const [selectedKey, setSelectedKey] = useState("idlrepo");
+	// 获取当前的路由参数
+	const navigatePath = window.location.pathname.split("/")[1];
+	const [selectedKey, setSelectedKey] = useState(navigatePath || "tokeninfo");
 	const navList = [
 		{
 			itemKey: "tokeninfo",

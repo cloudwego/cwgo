@@ -20,6 +20,7 @@ package api
 
 import (
 	"errors"
+	"github.com/cloudwego/cwgo/platform/server/cmd/internal/options"
 	"os"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
@@ -28,7 +29,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 )
 
-func run(opts *setupOptions) error {
+func run(opts *options.ApiOptions) error {
 	var (
 		serverMode     consts.ServerMode
 		configType     consts.ConfigType

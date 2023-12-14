@@ -196,6 +196,12 @@ func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 		return err
 	}
 
+	// Delete the original code before pushing it
+	err = a.DeleteDirs(owner, repoName, "kitex_gen", "rpc")
+	if err != nil {
+		return err
+	}
+
 	// create a new Tree object for the file to be pushed
 	var treeEntries []*github.TreeEntry
 	for filePath, content := range files {

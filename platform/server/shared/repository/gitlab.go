@@ -189,6 +189,12 @@ func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error
 }
 
 func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
+	// Delete the original code before pushing it
+	err := a.DeleteDirs(owner, repoName, "kitex_gen", "rpc")
+	if err != nil {
+		return err
+	}
+
 	// pushFilesToRepository implementation for GitLab
 	for filePath, content := range files {
 		contentStr := string(content)
@@ -199,7 +205,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 		}
 
 		// create files in the repository
-		_, _, err := a.client.RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
+		_, _, err = a.client.RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
 		if err != nil {
 			return err
 		}
@@ -258,9 +264,7 @@ func (a *GitLabApi) DeleteDirs(owner, repoName string, folderPaths ...string) er
 	for _, folderPath := range folderPaths {
 		// attempt to delete the specified folder
 		_, err := a.client.RepositoryFiles.DeleteFile(pid, folderPath, &gitlab.DeleteFileOptions{
-			Branch:        gitlab.String("main"),             // set the branch where the folder is located
-			AuthorEmail:   gitlab.String("test@example.com"), // replace with your email
-			AuthorName:    gitlab.String("test"),             // replace with your name
+			Branch:        gitlab.String("main"), // set the branch where the folder is located
 			CommitMessage: gitlab.String(fmt.Sprintf("Delete folder %s", folderPath)),
 		})
 

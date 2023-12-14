@@ -173,7 +173,14 @@ func ValidateTokenForRepoGitLab(client *gitlab.Client, owner, repoName string) (
 		return false, err
 	}
 
-	return project.Permissions.ProjectAccess.AccessLevel >= 30, nil
+	if project.Permissions.ProjectAccess != nil {
+		return project.Permissions.ProjectAccess.AccessLevel >= 30, nil
+	}
+	if project.Permissions.GroupAccess != nil {
+		return project.Permissions.GroupAccess.AccessLevel >= 30, nil
+	}
+
+	return false, nil
 }
 
 func ValidateTokenForRepoGitHub(client *github.Client, owner, repoName string) (bool, error) {

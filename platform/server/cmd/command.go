@@ -25,15 +25,15 @@ import (
 )
 
 func main() {
-	cmd := &cobra.Command{
+	var cmd = &cobra.Command{
+		Use:     "cwgo-platform",
+		Example: "cwgo-platform command [command options]",
 		Version: "v0.1.0",
-		Use:     "cwgo platform",
 	}
 
 	cmd.AddCommand(
 		api.NewCommand(),
 		agent.NewCommand(),
-		// NewHelpCommand(),
 	)
 
 	if err := cmd.Execute(); err != nil {

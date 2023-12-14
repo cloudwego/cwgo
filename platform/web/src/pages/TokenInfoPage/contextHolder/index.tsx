@@ -4,7 +4,7 @@ import { createIdl } from "../api";
 
 export default function ContextHolder({ update }: { update: () => void }) {
 	// 表单状态
-	const [repoType, setRepoType] = useState(0);
+	const [repoType, setRepoType] = useState(1);
 	const [repoDomain, setRepoDomain] = useState("");
 	const [tokenValue, setTokenValue] = useState("");
 

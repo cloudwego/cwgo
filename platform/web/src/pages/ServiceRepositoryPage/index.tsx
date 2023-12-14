@@ -86,11 +86,24 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 			}
 		},
 		{
-			title: "仓库名",
-			dataIndex: "service_repository.repository_name",
+			title: "服务名",
 			width: 150,
-			render: (value: string) => {
-				return <div>{value}</div>;
+			render: (value: {
+				service_repository: {
+					repository_domain: string;
+					repository_owner: string;
+					repository_name: string;
+				};
+				service_name: string;
+			}) => {
+				return (
+					<a
+						target="__blank"
+						href={`https://${value.service_repository.repository_domain}/${value.service_repository.repository_owner}/${value.service_repository.repository_name}`}
+					>
+						{value.service_name}
+					</a>
+				);
 			}
 		},
 		{
@@ -169,10 +182,16 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 			title: "快捷命令",
 			render: ({
 				commit_hash,
+				idl_repository,
 				service_repository,
 				service_name
 			}: {
 				commit_hash: string;
+				idl_repository: {
+					repository_domain: string;
+					repository_owner: string;
+					repository_name: string;
+				};
 				service_repository: {
 					repository_domain: string;
 					repository_owner: string;
@@ -203,14 +222,14 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 						<Button
 							onClick={() => {
 								window.open(
-									`https://${service_repository.repository_domain}/${service_repository.repository_owner}/${service_repository.repository_name}/commit/${commit_hash}`
+									`https://${idl_repository.repository_domain}/${idl_repository.repository_owner}/${idl_repository.repository_name}/commit/${commit_hash}`
 								);
 							}}
 						>
 							跳转 commit
 						</Button>
 						<Tooltip
-							content={`import "${service_repository.repository_domain}/${service_repository.repository_owner}/rpc/${service_name}"`}
+							content={`import "${service_repository.repository_domain}/${service_repository.repository_owner}/${service_repository.repository_name}/rpc/${service_name}"`}
 							style={{
 								maxWidth: "100vw"
 							}}
@@ -218,14 +237,14 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 							<Button
 								onClick={() => {
 									navigator.clipboard.writeText(
-										`import "${service_repository.repository_domain}/${service_repository.repository_owner}/rpc/${service_name}"`
+										`import "${service_repository.repository_domain}/${service_repository.repository_owner}/${service_repository.repository_name}/rpc/${service_name}"`
 									);
 									Toast.success({
 										content: "已复制到剪贴板"
 									});
 								}}
 							>
-								复制添加依赖
+								import 路径
 							</Button>
 						</Tooltip>
 					</Space>
@@ -403,6 +422,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 							style={{ width: 180 }}
 						/>
 						<Button
+							htmlType="submit"
 							onClick={() => {
 								const toast = Toast.info({
 									content: "正在搜索仓库",

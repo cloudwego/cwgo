@@ -21,6 +21,7 @@ package agent
 import (
 	"context"
 	"errors"
+	"github.com/cloudwego/cwgo/platform/server/cmd/internal/options"
 	"os"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/handler"
@@ -36,7 +37,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func run(opts *setupOptions) error {
+func run(opts *options.AgentOptions) error {
 	var (
 		serverMode consts.ServerMode
 		configType consts.ConfigType
