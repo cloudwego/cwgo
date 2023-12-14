@@ -218,19 +218,13 @@ func (a *GitLabApi) GetRepositoryArchive(owner, repoName, ref string) ([]byte, e
 	// generate the project ID by combining owner and repoName
 	pid := fmt.Sprintf("%s/%s", owner, repoName)
 
-	// get lasted commit to get archive
-	commitSHA, _, err := a.client.Branches.GetBranch(pid, ref)
-	if err != nil {
-		return nil, err
-	}
-
 	// specify the desired archive format
 	format := "tar"
 
 	// set archive options
 	archiveOptions := &gitlab.ArchiveOptions{
 		Format: &format, // Choose the archive format
-		SHA:    &commitSHA.Commit.ID,
+		SHA:    &ref,
 	}
 
 	// request the archive from the GitLab API
