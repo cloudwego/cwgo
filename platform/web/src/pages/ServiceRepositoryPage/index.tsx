@@ -1,11 +1,11 @@
-import { deleteRepo, getRepo, updateRepo } from "./api";
+import { deleteRepo, getRepo } from "./api";
 import { useState, useEffect } from "react";
 import {
 	Button,
 	ConfigProvider,
 	Form,
 	// Modal,
-	Popconfirm,
+	// Popconfirm,
 	Select,
 	Space,
 	Table,
@@ -25,7 +25,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 	const [currentPage, setPage] = useState(1);
 	// const [modal, contextHolder] = Modal.useModal();
 	const [total, setTotal] = useState(0);
-	const [statusActive, setStatusActive] = useState(1);
+	// const [statusActive, setStatusActive] = useState(1);
 	const [searchInfo, setSearchInfo] = useState({
 		service_name: ""
 	});
@@ -162,22 +162,22 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 				return aTime - bTime;
 			}
 		},
-		{
-			title: "状态",
-			dataIndex: "service_repository.status",
-			width: 100,
-			render: (value: number) => {
-				return value === 2 ? (
-					<Tag color="green" size="large">
-						激活
-					</Tag>
-				) : (
-					<Tag color="red" size="large">
-						未激活
-					</Tag>
-				);
-			}
-		},
+		// {
+		// 	title: "状态",
+		// 	dataIndex: "service_repository.status",
+		// 	width: 100,
+		// 	render: (value: number) => {
+		// 		return value === 2 ? (
+		// 			<Tag color="green" size="large">
+		// 				激活
+		// 			</Tag>
+		// 		) : (
+		// 			<Tag color="red" size="large">
+		// 				未激活
+		// 			</Tag>
+		// 		);
+		// 	}
+		// },
 		{
 			title: "快捷命令",
 			render: ({
@@ -263,7 +263,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 			}) => {
 				return (
 					<Space>
-						<Popconfirm
+						{/* <Popconfirm
 							title="修改仓库状态"
 							content={
 								<div>
@@ -304,7 +304,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 							}}
 						>
 							<Button type="warning">修改仓库状态</Button>
-						</Popconfirm>
+						</Popconfirm> */}
 						<Button
 							type="danger"
 							onClick={() => {

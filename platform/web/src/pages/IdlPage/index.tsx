@@ -4,10 +4,12 @@ import {
 	Button,
 	ConfigProvider,
 	Form,
+	Popconfirm,
 	Select,
 	Space,
 	// Modal,
 	Table,
+	Tag,
 	Toast
 	// Toast,
 } from "@douyinfe/semi-ui";
@@ -15,6 +17,7 @@ import { Dropdown } from "@douyinfe/semi-ui";
 import styles from "./index.module.scss";
 // import { ModalReactProps } from "@douyinfe/semi-ui/lib/es/modal";
 import { Data } from "@douyinfe/semi-ui/lib/es/table";
+import { updateRepo } from "../ServiceRepositoryPage/api";
 // import { IconInfoCircle } from "@douyinfe/semi-icons";
 // import ContextHolder from "./contextHolder";
 
@@ -32,6 +35,7 @@ export default function RepositoryPage() {
 	const [searchInfo, setSearchInfo] = useState({
 		service_name: ""
 	});
+	const [statusActive, setStatusActive] = useState(1);
 	// const pageSize = 10;
 	const [pageSize, setPageSize] = useState(5);
 	// let destroyFn = () => {};
@@ -133,6 +137,22 @@ export default function RepositoryPage() {
 			}
 		},
 		{
+			title: "状态",
+			dataIndex: "service_repository.status",
+			width: 100,
+			render: (value: number) => {
+				return value === 2 ? (
+					<Tag color="green" size="large">
+						激活
+					</Tag>
+				) : (
+					<Tag color="red" size="large">
+						未激活
+					</Tag>
+				);
+			}
+		},
+		{
 			title: "import idls",
 			width: 150,
 			render: ({
@@ -171,9 +191,61 @@ export default function RepositoryPage() {
 		},
 		{
 			title: "操作",
-			render: ({ id, service_name }: { id: number; service_name: string }) => {
+			render: ({
+				id,
+				service_repository,
+				service_name
+			}: {
+				id: number;
+				service_repository: {
+					id: number;
+				};
+				service_name: string;
+			}) => {
 				return (
 					<Space>
+						<Popconfirm
+							title="修改仓库状态"
+							content={
+								<div>
+									<Select
+										defaultValue={1}
+										style={{ width: 120 }}
+										onChange={(value) => {
+											setStatusActive(value as number);
+										}}
+									>
+										<Select.Option value={1}>未激活</Select.Option>
+										<Select.Option value={2}>激活</Select.Option>
+									</Select>
+								</div>
+							}
+							onConfirm={() => {
+								const toast = Toast.info({
+									content: "正在修改仓库状态",
+									duration: 0
+								});
+								updateRepo(service_repository.id, "", statusActive)
+									.then((res) => {
+										Toast.success(res);
+										fetchData(currentPage);
+									})
+									.catch((err) => {
+										Toast.error({
+											content: err.response.data.msg
+										});
+									})
+									.finally(() => {
+										setStatusActive(1);
+										Toast.close(toast);
+									});
+							}}
+							onCancel={() => {
+								setStatusActive(1);
+							}}
+						>
+							<Button type="warning">更改同步状态</Button>
+						</Popconfirm>
 						<Button
 							type="warning"
 							onClick={() => {
