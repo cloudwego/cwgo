@@ -77,6 +77,7 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) (int64
 				CommitHash:          idlModel.CommitHash,
 				ServiceName:         idlModel.ServiceName,
 				LastSyncTime:        now,
+				Status:              idlModel.Status,
 			}
 
 			err = tx.Clauses(
@@ -106,6 +107,7 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) (int64
 					CommitHash:          importIdl.CommitHash,
 					ServiceName:         idlModel.ServiceName,
 					LastSyncTime:        now,
+					Status:              0,
 				}
 			}
 			err = tx.WithContext(ctx).
@@ -364,6 +366,12 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, pa
 
 	if idlModel.ServiceName != "" {
 		db = db.Where("`idl`.`service_name` LIKE ?", fmt.Sprintf("%%%s%%", idlModel.ServiceName))
+	}
+
+	if idlModel.Status != 0 {
+		if _, ok := consts.IdlStatusNumMap[int(idlModel.Status)]; ok {
+			db = db.Where("`idl`.`status` = ?", idlModel.Status)
+		}
 	}
 
 	err := db.

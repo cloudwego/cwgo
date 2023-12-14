@@ -4,9 +4,8 @@ package model
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/apache/thrift/lib/go/thrift"
+	"strings"
 )
 
 type IDL struct {

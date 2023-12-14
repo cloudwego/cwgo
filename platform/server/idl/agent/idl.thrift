@@ -11,6 +11,10 @@ struct AddIDLReq{
 struct AddIDLRes{
     1: i32 code
     2: string msg
+    3: AddIDLResData data
+}
+struct AddIDLResData{
+    1: i64 idl_id
 }
 
 struct DeleteIDLsReq{

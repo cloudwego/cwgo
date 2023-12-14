@@ -50,9 +50,9 @@ type Manager struct {
 
 	agents []*service.Service
 
-	syncAgentServiceInterval time.Duration
-	syncRepositoryInterval   time.Duration
-	syncIdlInterval          time.Duration
+	SyncAgentServiceInterval time.Duration
+	SyncRepositoryInterval   time.Duration
+	SyncIdlInterval          time.Duration
 
 	daoManager *dao.Manager
 	dispatcher dispatcher.IDispatcher
@@ -69,9 +69,9 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 
 		agents: make([]*service.Service, 0),
 
-		syncAgentServiceInterval: appConf.GetSyncAgentServiceInterval(),
-		syncRepositoryInterval:   appConf.GetSyncRepositoryInterval(),
-		syncIdlInterval:          appConf.GetSyncIdlInterval(),
+		SyncAgentServiceInterval: appConf.GetSyncAgentServiceInterval(),
+		SyncRepositoryInterval:   appConf.GetSyncRepositoryInterval(),
+		SyncIdlInterval:          appConf.GetSyncIdlInterval(),
 
 		daoManager: daoManager,
 		dispatcher: dispatcher,
@@ -80,10 +80,10 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 	}
 
 	// get all task from database
-	if manager.syncIdlInterval != 0 {
+	if manager.SyncIdlInterval != 0 {
 		page := 1
 		for {
-			idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(), model.IDL{}, int32(page), 1000, consts.OrderNumDec, "update_time")
+			idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(), model.IDL{Status: consts.IdlStatusNumActive}, int32(page), 1000, consts.OrderNumDec, "update_time")
 			if err != nil {
 				panic(fmt.Sprintf("get idl list failed, err: %v", err))
 			}
@@ -91,7 +91,7 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 				err = manager.AddTask(
 					task.NewTask(
 						model.Type_sync_idl_data,
-						manager.syncIdlInterval.String(),
+						manager.SyncIdlInterval.String(),
 						&model.Data{
 							SyncIdlData: &model.SyncIdlData{
 								IdlId: idlModel.Id,
@@ -152,6 +152,19 @@ func (m *Manager) AddTask(t *model.Task) error {
 	return nil
 }
 
+func (m *Manager) DeleteTask(taskId string) error {
+	err := m.dispatcher.RemoveTask(taskId)
+	if err != nil {
+		return fmt.Errorf("delete task in dispatcher failed, err: %v", err)
+	}
+
+	m.Lock()
+	m.currentUpdateTaskTime = time.Now()
+	m.Unlock()
+
+	return nil
+}
+
 func (m *Manager) UpdateAgentTasks() {
 	var wg sync.WaitGroup
 	for _, svr := range m.agents {
@@ -191,7 +204,7 @@ func (m *Manager) UpdateAgentTasks() {
 func (m *Manager) StartUpdate() {
 	go func() {
 		for {
-			time.Sleep(m.syncAgentServiceInterval)
+			time.Sleep(m.SyncAgentServiceInterval)
 			m.SyncService()
 		}
 	}()

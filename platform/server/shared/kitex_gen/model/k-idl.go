@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/apache/thrift/lib/go/thrift"
+
 	"github.com/cloudwego/kitex/pkg/protocol/bthrift"
 )
 

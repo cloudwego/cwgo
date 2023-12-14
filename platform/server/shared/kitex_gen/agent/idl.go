@@ -4,10 +4,9 @@ package agent
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/apache/thrift/lib/go/thrift"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"strings"
 )
 
 type AddIDLReq struct {
@@ -352,8 +351,9 @@ func (p *AddIDLReq) Field4DeepEqual(src string) bool {
 }
 
 type AddIDLRes struct {
-	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Code int32          `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string         `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *AddIDLResData `thrift:"data,3" frugal:"3,default,AddIDLResData" json:"data"`
 }
 
 func NewAddIDLRes() *AddIDLRes {
@@ -371,16 +371,33 @@ func (p *AddIDLRes) GetCode() (v int32) {
 func (p *AddIDLRes) GetMsg() (v string) {
 	return p.Msg
 }
+
+var AddIDLRes_Data_DEFAULT *AddIDLResData
+
+func (p *AddIDLRes) GetData() (v *AddIDLResData) {
+	if !p.IsSetData() {
+		return AddIDLRes_Data_DEFAULT
+	}
+	return p.Data
+}
 func (p *AddIDLRes) SetCode(val int32) {
 	p.Code = val
 }
 func (p *AddIDLRes) SetMsg(val string) {
 	p.Msg = val
 }
+func (p *AddIDLRes) SetData(val *AddIDLResData) {
+	p.Data = val
+}
 
 var fieldIDToName_AddIDLRes = map[int16]string{
 	1: "code",
 	2: "msg",
+	3: "data",
+}
+
+func (p *AddIDLRes) IsSetData() bool {
+	return p.Data != nil
 }
 
 func (p *AddIDLRes) Read(iprot thrift.TProtocol) (err error) {
@@ -415,6 +432,16 @@ func (p *AddIDLRes) Read(iprot thrift.TProtocol) (err error) {
 		case 2:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -470,6 +497,14 @@ func (p *AddIDLRes) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *AddIDLRes) ReadField3(iprot thrift.TProtocol) error {
+	p.Data = NewAddIDLResData()
+	if err := p.Data.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *AddIDLRes) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("AddIDLRes"); err != nil {
@@ -482,6 +517,10 @@ func (p *AddIDLRes) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
 			goto WriteFieldError
 		}
 
@@ -537,6 +576,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
+func (p *AddIDLRes) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Data.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
 func (p *AddIDLRes) String() string {
 	if p == nil {
 		return "<nil>"
@@ -556,6 +612,9 @@ func (p *AddIDLRes) DeepEqual(ano *AddIDLRes) bool {
 	if !p.Field2DeepEqual(ano.Msg) {
 		return false
 	}
+	if !p.Field3DeepEqual(ano.Data) {
+		return false
+	}
 	return true
 }
 
@@ -569,6 +628,177 @@ func (p *AddIDLRes) Field1DeepEqual(src int32) bool {
 func (p *AddIDLRes) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddIDLRes) Field3DeepEqual(src *AddIDLResData) bool {
+
+	if !p.Data.DeepEqual(src) {
+		return false
+	}
+	return true
+}
+
+type AddIDLResData struct {
+	IdlId int64 `thrift:"idl_id,1" frugal:"1,default,i64" json:"idl_id"`
+}
+
+func NewAddIDLResData() *AddIDLResData {
+	return &AddIDLResData{}
+}
+
+func (p *AddIDLResData) InitDefault() {
+	*p = AddIDLResData{}
+}
+
+func (p *AddIDLResData) GetIdlId() (v int64) {
+	return p.IdlId
+}
+func (p *AddIDLResData) SetIdlId(val int64) {
+	p.IdlId = val
+}
+
+var fieldIDToName_AddIDLResData = map[int16]string{
+	1: "idl_id",
+}
+
+func (p *AddIDLResData) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AddIDLResData[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AddIDLResData) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.IdlId = v
+	}
+	return nil
+}
+
+func (p *AddIDLResData) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AddIDLResData"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AddIDLResData) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("idl_id", thrift.I64, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.IdlId); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AddIDLResData) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AddIDLResData(%+v)", *p)
+}
+
+func (p *AddIDLResData) DeepEqual(ano *AddIDLResData) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.IdlId) {
+		return false
+	}
+	return true
+}
+
+func (p *AddIDLResData) Field1DeepEqual(src int64) bool {
+
+	if p.IdlId != src {
 		return false
 	}
 	return true

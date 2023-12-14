@@ -24,8 +24,11 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/task"
 	"go.uber.org/zap"
+	"strconv"
 )
 
 const (
@@ -80,6 +83,29 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 			Code: rpcRes.Code,
 			Msg:  rpcRes.Msg,
 		}
+	}
+
+	switch req.Status {
+	case consts.IdlStatusNumInactive:
+		go func() {
+			// delete task
+			_ = l.svcCtx.Manager.DeleteTask(strconv.FormatInt(req.ID, 10))
+		}()
+	case consts.IdlStatusNumActive:
+		go func() {
+			// delete task
+			_ = l.svcCtx.Manager.AddTask(
+				task.NewTask(
+					model.Type_sync_idl_data,
+					l.svcCtx.Manager.SyncIdlInterval.String(),
+					&model.Data{
+						SyncIdlData: &model.SyncIdlData{
+							IdlId: req.ID,
+						},
+					},
+				),
+			)
+		}()
 	}
 
 	return &idl.UpdateIDLRes{

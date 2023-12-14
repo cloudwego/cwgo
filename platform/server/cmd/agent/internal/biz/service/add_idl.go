@@ -264,6 +264,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		ServiceName:         req.ServiceName,
 		ImportIdls:          importIDLs,
 		CommitHash:          mainIdlHash,
+		Status:              consts.IdlStatusNumActive,
 	})
 	if err != nil {
 		return &agent.AddIDLRes{
@@ -282,5 +283,8 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	return &agent.AddIDLRes{
 		Code: 0,
 		Msg:  "add idl successfully",
+		Data: &agent.AddIDLResData{
+			IdlId: mainIdlId,
+		},
 	}, nil
 }

@@ -20,6 +20,8 @@ package idl
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"github.com/cloudwego/cwgo/platform/server/shared/task"
 	"net/url"
 	"strings"
 
@@ -97,6 +99,21 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 			Msg:  rpcRes.Msg,
 		}
 	}
+
+	go func() {
+		// add task
+		_ = l.svcCtx.Manager.AddTask(
+			task.NewTask(
+				model.Type_sync_idl_data,
+				l.svcCtx.Manager.SyncIdlInterval.String(),
+				&model.Data{
+					SyncIdlData: &model.SyncIdlData{
+						IdlId: rpcRes.Data.IdlId,
+					},
+				},
+			),
+		)
+	}()
 
 	return &idl.AddIDLRes{
 		Code: 0,
