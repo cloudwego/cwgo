@@ -117,6 +117,8 @@ var (
 )
 
 var (
+	envGoImports = []string{"os", "strings"}
+
 	etcdServerAddr        = []string{"127.0.0.1:2379"}
 	nacosServerAddr       = []string{"127.0.0.1:8848"}
 	consulServerAddr      = []string{"127.0.0.1:8500"}
@@ -187,7 +189,7 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: {{range .DefaultRegistryAddress}}
+  address: {{range .RegistryAddress}}
 	- {{.}}{{end}}
 {{end}}
 `,
@@ -217,7 +219,7 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: {{range .DefaultRegistryAddress}}
+  address: {{range .RegistryAddress}}
 	- {{.}}{{end}}
 {{end}}`,
 	},
@@ -246,7 +248,7 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: {{range .DefaultRegistryAddress}}
+  address: {{range .RegistryAddress}}
 	- {{.}}{{end}}
 {{end}}`,
 	},

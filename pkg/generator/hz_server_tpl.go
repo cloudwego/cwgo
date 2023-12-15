@@ -142,7 +142,7 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: {{range .DefaultRegistryAddress}}
+  address: {{range .RegistryAddress}}
 	- {{.}}{{end}}
 {{end}}`,
 	},
@@ -176,7 +176,7 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: {{range .DefaultRegistryAddress}}
+  address: {{range .RegistryAddress}}
 	- {{.}}{{end}}
 {{end}}`,
 	},
@@ -210,7 +210,7 @@ redis:
   db: 0
 {{if ne .RegistryName ""}}
 registry:
-  address: {{range .DefaultRegistryAddress}}
+  address: {{range .RegistryAddress}}
 	- {{.}}{{end}}
 {{end}}`,
 	},

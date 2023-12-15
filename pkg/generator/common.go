@@ -22,6 +22,8 @@ import (
 )
 
 type CommonGenerator struct {
+	OutDir string
+
 	communicationType string // rpc or http
 	templateDir       string // for generating kitex extensions.yaml
 

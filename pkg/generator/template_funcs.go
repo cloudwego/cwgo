@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package utils
+package generator
 
-import (
-	"strings"
+import "strings"
 
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-)
-
-func SnakeToCamel(snake string) string {
-	words := strings.Split(snake, "_")
-	for i, word := range words {
-		caser := cases.Title(language.English)
-		words[i] = caser.String(word)
+var (
+	TemplateCustomFuncMap = map[string]interface{}{
+		"Sub":     func(a, b int) int { return a - b },
+		"ToUpper": strings.ToUpper,
 	}
-	return strings.Join(words, "")
-}
+)

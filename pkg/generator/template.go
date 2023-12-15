@@ -29,9 +29,30 @@ import (
 )
 
 type Template struct {
-	Path   string
-	Delims [2]string
-	Body   string
+	Path         string
+	Delims       [2]string
+	Body         string
+	IsPathRender bool
+	CustomFunc   template.FuncMap
+	UpdateBehavior
+}
+
+type UpdateBehavior struct {
+	Type string // skip/cover/append/replaceFuncBody default:skip
+	Append
+	ReplaceFunc
+	AppendRender map[string]interface{}
+}
+
+type Append struct {
+	AppendContent string
+	AppendImport  []string
+}
+
+type ReplaceFunc struct {
+	ReplaceFuncName   []string
+	ReplaceFuncBody   []string
+	ReplaceFuncImport [][]string
 }
 
 type TemplateGenerator struct {
@@ -87,7 +108,7 @@ func GenerateClient(clientGen *ClientGenerator) error {
 	return nil
 }
 
-func (tg *TemplateGenerator) renderServer(serverGen *ServerGenerator) error {
+func (tg *TemplateGenerator) renderServer(serverGen *ServerGenerator) (err error) {
 	var mvcTemplates []Template
 
 	switch serverGen.communicationType {
@@ -100,15 +121,9 @@ func (tg *TemplateGenerator) renderServer(serverGen *ServerGenerator) error {
 	}
 
 	for _, tpl := range mvcTemplates {
-		buffer := &bytes.Buffer{}
-		name := filepath.Base(tpl.Path)
-		t := template.Must(template.New(name).Parse(tpl.Body))
-		if err := t.Execute(buffer, serverGen.ServerRender); err != nil {
+		if err = tg.renderPathBody(&tpl, serverGen.ServerRender); err != nil {
 			return err
 		}
-
-		file := File{Path: tpl.Path, Content: buffer.Bytes()}
-		tg.files = append(tg.files, file)
 	}
 
 	return nil
@@ -126,44 +141,222 @@ func (tg *TemplateGenerator) renderClient(clientGen *ClientGenerator) error {
 		return errTypeInput
 	}
 
-	for index, tpl := range mvcTemplates {
-		// render init.go
-		if index == consts.HzClientInitFileIndex && clientGen.communicationType == consts.HTTP {
-			for _, name := range clientGen.SnakeServiceNames {
-				clientGen.CurrentIDLServiceName = name
+	if clientGen.isNew {
+		for index, tpl := range mvcTemplates {
+			// render init.go
+			if index == consts.ClientInitFileIndex {
+				bizDir := ""
+				if clientGen.communicationType == consts.HTTP {
+					bizDir = clientGen.OutDir
+				} else {
+					bizDir = filepath.Join(clientGen.OutDir, consts.DefaultKitexClientDir)
+				}
 
-				// render path
-				bufferPath := &bytes.Buffer{}
-				t := template.Must(template.New(name).Parse(tpl.Path))
-				if err := t.Execute(bufferPath, clientGen); err != nil {
+				subDirs, err := utils.GetSubDirs(bizDir)
+				if err != nil {
 					return err
 				}
 
-				// render body
-				bufferBody := &bytes.Buffer{}
-				t = template.Must(template.New(name + "body").Parse(tpl.Body))
-				if err := t.Execute(bufferBody, clientGen); err != nil {
-					return err
-				}
+				for _, name := range subDirs {
+					clientGen.InitOptsPackage = filepath.Base(name)
 
-				file := File{Path: bufferPath.String(), Content: bufferBody.Bytes()}
-				tg.files = append(tg.files, file)
+					// render body
+					data, err := render(name, tpl.Body, clientGen.ClientRender, &tpl)
+					if err != nil {
+						return err
+					}
+
+					file := File{Path: filepath.Join(name, consts.InitGo), Content: data.Bytes()}
+					tg.files = append(tg.files, file)
+				}
+				continue
 			}
-			continue
-		}
 
-		buffer := &bytes.Buffer{}
-		name := filepath.Base(tpl.Path)
-		t := template.Must(template.New(name).Parse(tpl.Body))
-		if err := t.Execute(buffer, clientGen); err != nil {
-			return err
+			if err := tg.renderPathBody(&tpl, clientGen.ClientRender); err != nil {
+				return err
+			}
 		}
+	} else {
+		for _, tpl := range mvcTemplates {
+			// handle append render
+			if tpl.Type == consts.Append || tpl.Type == consts.ReplaceFuncBody {
+				tpl.AppendRender["GoModule"] = clientGen.GoModule
+				tpl.AppendRender["ServiceName"] = clientGen.ServiceName
+				if clientGen.ResolverName != "" {
+					tpl.AppendRender["ResolverName"] = clientGen.ResolverName
+				}
+				if clientGen.ResolverAddress != nil {
+					tpl.AppendRender["ResolverAddress"] = clientGen.ResolverAddress
+				}
+			}
 
-		file := File{Path: tpl.Path, Content: buffer.Bytes()}
-		tg.files = append(tg.files, file)
+			// skip
+			if tpl.Type == consts.Skip || tpl.Type == "" {
+				continue
+			}
+
+			// cover
+			if tpl.Type == consts.Cover {
+				if err := tg.renderPathBody(&tpl, clientGen.ClientRender); err != nil {
+					return err
+				}
+				continue
+			}
+
+			// append
+			if tpl.Type == consts.Append {
+				if err := tg.renderAppend(&tpl, clientGen.ClientRender); err != nil {
+					return err
+				}
+				continue
+			}
+
+			// replaceFuncBody
+			if tpl.Type == consts.ReplaceFuncBody {
+				if err := tg.renderReplaceFuncBody(&tpl, clientGen.ClientRender); err != nil {
+					return err
+				}
+				continue
+			}
+		}
 	}
 
 	return nil
+}
+
+func (tg *TemplateGenerator) renderAppend(tpl *Template, renderObj any) error {
+	// render path
+	if tpl.IsPathRender {
+		data, err := render(filepath.Base(tpl.Path)+"path", tpl.Path, renderObj, tpl)
+		if err != nil {
+			return err
+		}
+
+		tpl.Path = data.String()
+	}
+
+	// render append body
+	if len(tpl.AppendRender) != 0 {
+		data, err := render(filepath.Base(tpl.Path)+"body", tpl.AppendContent, tpl.AppendRender, tpl)
+		if err != nil {
+			return err
+		}
+
+		tpl.AppendContent = data.String()
+	}
+
+	// read file content
+	if isExist, _ := utils.PathExist(tpl.Path); !isExist {
+		return fmt.Errorf("file %v does not exist", tpl.Path)
+	}
+	fileContent, err := utils.ReadFileContent(tpl.Path)
+	if err != nil {
+		return err
+	}
+
+	// append imports
+	importedContent, err := appendGoFileImports(string(fileContent), tpl.AppendImport)
+	if err != nil {
+		return err
+	}
+
+	// append body
+	importedContent += consts.LineBreak + tpl.AppendContent
+
+	file := File{Path: tpl.Path, Content: []byte(importedContent)}
+	tg.files = append(tg.files, file)
+
+	return nil
+}
+
+func (tg *TemplateGenerator) renderReplaceFuncBody(tpl *Template, renderObj any) error {
+	// render path
+	if tpl.IsPathRender {
+		data, err := render(filepath.Base(tpl.Path)+"path", tpl.Path, renderObj, tpl)
+		if err != nil {
+			return err
+		}
+
+		tpl.Path = data.String()
+	}
+
+	// render append body
+	if len(tpl.AppendRender) != 0 {
+		for index, body := range tpl.ReplaceFuncBody {
+			data, err := render(filepath.Base(tpl.Path)+"body", body, tpl.AppendRender, tpl)
+			if err != nil {
+				return err
+			}
+
+			tpl.ReplaceFuncBody[index] = data.String()
+		}
+	}
+
+	// read file content
+	if isExist, _ := utils.PathExist(tpl.Path); !isExist {
+		return fmt.Errorf("file %v does not exist", tpl.Path)
+	}
+	fileContent, err := utils.ReadFileContent(tpl.Path)
+	if err != nil {
+		return err
+	}
+
+	replaceFuncImpts := make([]string, 0, 10)
+	for _, impt := range tpl.ReplaceFuncImport {
+		replaceFuncImpts = append(replaceFuncImpts, impt...)
+	}
+	content, err := appendGoFileImports(string(fileContent), replaceFuncImpts)
+	if err != nil {
+		return err
+	}
+	
+	content, err = replaceFuncBody(content, tpl.ReplaceFuncName, tpl.ReplaceFuncBody)
+	if err != nil {
+		return err
+	}
+
+	file := File{Path: tpl.Path, Content: []byte(content)}
+	tg.files = append(tg.files, file)
+
+	return nil
+}
+
+func (tg *TemplateGenerator) renderPathBody(tpl *Template, renderObj any) (err error) {
+	// render path
+	if tpl.IsPathRender {
+		data, err := render(filepath.Base(tpl.Path)+"path", tpl.Path, renderObj, tpl)
+		if err != nil {
+			return err
+		}
+
+		tpl.Path = data.String()
+	}
+
+	// render body
+	data, err := render(filepath.Base(tpl.Path)+"body", tpl.Body, renderObj, tpl)
+	if err != nil {
+		return err
+	}
+
+	file := File{Path: tpl.Path, Content: data.Bytes()}
+	tg.files = append(tg.files, file)
+
+	return nil
+}
+
+func render(name, parseBody string, data any, tpl *Template) (*bytes.Buffer, error) {
+	buffer := &bytes.Buffer{}
+	var t *template.Template
+	if tpl.CustomFunc == nil {
+		t = template.Must(template.New(name).Delims(tpl.Delims[0], tpl.Delims[1]).Parse(parseBody))
+	} else {
+		t = template.Must(template.New(name).Delims(tpl.Delims[0], tpl.Delims[1]).Funcs(tpl.CustomFunc).Parse(parseBody))
+	}
+	if err := t.Execute(buffer, data); err != nil {
+		return nil, err
+	}
+
+	return buffer, nil
 }
 
 func (tg *TemplateGenerator) persist() error {
@@ -178,8 +371,10 @@ func (tg *TemplateGenerator) persist() error {
 			return err
 		}
 
-		// create rendered file
 		abPath := filepath.Join(outPath, data.Path)
+		if filepath.IsAbs(data.Path) {
+			abPath = data.Path
+		}
 		abDir := filepath.Dir(abPath)
 		isExist, err := utils.PathExist(abDir)
 		if err != nil {
@@ -191,24 +386,7 @@ func (tg *TemplateGenerator) persist() error {
 			}
 		}
 
-		err = func() error {
-			file, err := os.OpenFile(abPath, os.O_CREATE|os.O_TRUNC|os.O_RDWR, os.FileMode(0o755))
-			defer func() {
-				closeErr := file.Close()
-				if err == nil {
-					err = closeErr
-				}
-			}()
-			if err != nil {
-				return fmt.Errorf("open file '%s' failed, err: %v", abPath, err.Error())
-			}
-			if _, err = file.Write(data.Content); err != nil {
-				return fmt.Errorf("write file '%s' failed, err: %v", abPath, err.Error())
-			}
-
-			return nil
-		}()
-		if err != nil {
+		if err = utils.CreateFile(abPath, string(data.Content)); err != nil {
 			return err
 		}
 

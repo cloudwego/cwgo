@@ -18,6 +18,7 @@ package utils
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -95,6 +96,45 @@ func FormatGoFile(filePath string) error {
 		}
 	case <-time.After(time.Minute):
 		return fmt.Errorf("format go file time out")
+	}
+
+	return nil
+}
+
+// GetSubDirs gets all subdirectories under the specified directory
+func GetSubDirs(dir string) (dirs []string, err error) {
+	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() && path != dir {
+			dirs = append(dirs, path)
+		}
+		return nil
+	})
+
+	return dirs, err
+}
+
+func ReadFileContent(filePath string) (content []byte, err error) {
+	file, err := os.Open(filePath)
+	defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return ioutil.ReadAll(file)
+}
+
+func CreateFile(path, content string) (err error) {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_RDWR, os.FileMode(0o755))
+	defer file.Close()
+	if err != nil {
+		return err
+	}
+
+	if _, err = file.WriteString(content); err != nil {
+		return err
 	}
 
 	return nil

@@ -36,8 +36,7 @@ type ClientArgument struct {
 	GoPkg    string
 	GoPath   string
 
-	Resolver          string
-	SnakeServiceNames []string
+	Resolver string
 }
 
 func NewClientArgument() *ClientArgument {
@@ -53,7 +52,6 @@ func (c *ClientArgument) ParseCli(ctx *cli.Context) error {
 	c.Verbose = ctx.Bool(consts.Verbose)
 	c.SliceParam.ProtoSearchPath = ctx.StringSlice(consts.ProtoSearchPath)
 	c.SliceParam.Pass = ctx.StringSlice(consts.Pass)
-	c.SnakeServiceNames = ctx.StringSlice(consts.SnakeServiceName)
 	c.CustomExtension = ctx.String(consts.CustomExtension)
 	return nil
 }

@@ -20,22 +20,26 @@ import (
 	"github.com/cloudwego/cwgo/pkg/consts"
 )
 
-// related to basic options
-var (
-	kitexClientBasicImports = []string{}
-
-	kitexClientBasicOpts = ``
-)
-
 // related to service resolver
 var (
-	kitexCommonResolverBody = `options = append(options, client.WithResolver(r))`
+	kitexNilResolverFuncBody = "{\n\treturn\n}"
+
+	kitexAppendResolverFunc = `func GetResolverAddress() []string {
+		e := os.Getenv("GO_KITEX_RESOLVER_[[ToUpper .ServiceName]]")
+		if len(e) == 0 {
+		  return []string{[[$lenSlice := len .ResolverAddress]][[range $key, $value := .ResolverAddress]]"[[$value]]"[[if eq $key (Sub $lenSlice 1)]][[else]], [[end]][[end]]}
+	    }
+	    return strings.Fields(e)
+      }`
+
+	kitexCommonResolverBody = `options = append(options, client.WithResolver(r))
+	return nil`
 
 	kitexEtcdClientImports = []string{"github.com/kitex-contrib/registry-etcd"}
 
 	kitexEtcdClient = `r, err := etcd.NewEtcdResolver(conf.GetConf().Resolver.Address)
 	if err != nil {
-		klog.Fatal(err)
+		return err
 	}` + consts.LineBreak + kitexCommonResolverBody
 
 	kitexZKClientImports = []string{
@@ -45,21 +49,22 @@ var (
 
 	kitexZKClient = `r, err := resolver.NewZookeeperResolver(conf.GetConf().Resolver.Address, 40*time.Second)
     if err != nil {
-		klog.Fatal(err)
+		return err
     }` + consts.LineBreak + kitexCommonResolverBody
 
 	kitexNacosClientImports = []string{"github.com/kitex-contrib/registry-nacos/resolver"}
 
 	kitexNacosClient = `r, err := resolver.NewDefaultNacosResolver()
 	if err != nil {
-		klog.Fatal(err)
+		return err
 	}` + consts.LineBreak + kitexCommonResolverBody
 
 	kitexPolarisClientImports = []string{
 		"github.com/kitex-contrib/polaris",
 	}
 
-	kitexPolarisClient = `options = append(options, client.WithSuite(polaris.NewDefaultClientSuite()))`
+	kitexPolarisClient = `options = append(options, client.WithSuite(polaris.NewDefaultClientSuite()))
+	return nil`
 
 	kitexEurekaClientImports = []string{"github.com/kitex-contrib/registry-eureka/resolver"}
 
@@ -70,151 +75,124 @@ var (
 
 	kitexConsulClient = `r, err := consul.NewConsulResolver(conf.GetConf().Resolver.Address[0])
 	if err != nil {
-		klog.Fatal(err)
+		return err
 	}` + consts.LineBreak + kitexCommonResolverBody
 
 	kitexServiceCombClientImports = []string{"github.com/kitex-contrib/registry-servicecomb/resolver"}
 
 	kitexServiceCombClient = `r, err := resolver.NewDefaultSCResolver()
     if err != nil {
-        klog.Fatal(err)
+        return err
     }` + consts.LineBreak + kitexCommonResolverBody
 )
 
 var kitexClientMVCTemplates = []Template{
 	{
-		Path:   consts.DevConf,
+		Path:   consts.InitGo,
 		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
-		Body: `kitex_client:
-  service_name: "{{.ServiceName}}"
-{{if ne .ResolverName ""}}
-resolver:
-  address: {{range .DefaultResolverAddress}}
-	- {{.}}{{end}}
-{{end}}`,
+		UpdateBehavior: UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+			ReplaceFunc: ReplaceFunc{
+				ReplaceFuncName:   make([]string, 0, 5),
+				ReplaceFuncImport: make([][]string, 0, 15),
+				ReplaceFuncBody:   make([]string, 0, 5),
+			},
+		},
+		Body: `package {{.InitOptsPackage}}
+  import (
+     {{range $key, $value := .GoFileImports}}
+	 {{if eq $key "init.go"}}
+	 {{range $k, $v := $value}}
+     {{if ne $k ""}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}
+  )
+
+  var (
+  	defaultClient     RPCClient
+  	defaultDstService = "{{.ServiceName}}"
+  	once       sync.Once
+  )
+
+  func init() {
+  	DefaultClient()
+  }
+
+  func DefaultClient() RPCClient {
+  	once.Do(func() {
+  		defaultClient = newClient(defaultDstService)
+  	})
+  	return defaultClient
+  }
+
+  func newClient(dstService string, opts ...client.Option) RPCClient {
+    options, err := initClientOpts()
+      if err != nil {
+      panic("failed to init client options: " + err.Error())
+    }
+  
+    options = append(options, opts...)
+  	c, err := NewRPCClient(dstService, options...)
+  	if err != nil {
+  		panic("failed to init client: " + err.Error())
+  	}
+  	return c
+  }
+
+  func InitClient(dstService string, opts ...client.Option) {
+  	defaultClient = newClient(dstService, opts...)
+  }
+  
+  func initClientOpts() (ops []client.Option, err error) {
+    // todo edit custom config
+  	ops = append(ops, client.WithHostPorts("127.0.0.1:8888"),
+  		{{- if eq .Codec "thrift"}}
+        client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
+        client.WithTransportProtocol(transport.TTHeader),
+        {{- end}}
+  	)
+
+  	if err = initResolver(&ops); err != nil {
+  		panic(err)
+  	}
+
+  	return
+  }
+
+  // If you do not use the service resolver function, do not edit this function.
+  // Otherwise, you can customize and modify it.
+  func initResolver(ops *[]client.Option) (err error) {
+  	{{if ne .ResolverName ""}}
+    {{.ResolverBody}}
+    {{else}}
+    return
+    {{end}}
+  }`,
 	},
 
 	{
-		Path:   consts.OnlineConf,
-		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
-		Body: `kitex_client:
-  service_name: "{{.ServiceName}}"
-{{if ne .ResolverName ""}}
-resolver:
-  address: {{range .DefaultResolverAddress}}
-	- {{.}}{{end}}
-{{end}}`,
-	},
+		Path:   consts.DefaultKitexClientDir + consts.Slash + consts.EnvGo,
+		Delims: [2]string{"[[", "]]"},
+		UpdateBehavior: UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+		},
+		CustomFunc: TemplateCustomFuncMap,
+		Body: `// Code generated by cwgo generator. DO NOT EDIT.
 
-	{
-		Path:   consts.TestConf,
-		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
-		Body: `kitex_client:
-  service_name: "{{.ServiceName}}"
-{{if ne .ResolverName ""}}
-resolver:
-  address: {{range .DefaultResolverAddress}}
-	- {{.}}{{end}}
-{{end}}`,
-	},
-
-	{
-		Path:   consts.ConfGo,
-		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
-		Body: `package conf
-
-      import (
-        {{range $key, $value := .GoFileImports}}
-	    {{if eq $key "conf/conf.go"}}
-	    {{range $k, $v := $value}}
-        {{if ne $k ""}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}
-      )
-
-      var (
-      	conf *Config
-      	once sync.Once
-      )
-
-      type Config struct {
-      	Env string
-
-      	KitexClient KitexClient ` + "`yaml:\"kitex_client\"`" + `
-		{{if ne .ResolverName ""}}
-		Resolver Resolver ` + "`yaml:\"resolver\"`" + `
-		{{end}}
-      }
-
-      type KitexClient struct {
-      	ServiceName       string ` + "`yaml:\"service_name\"`" + `
-      }
-	  {{if ne .ResolverName ""}}
-      type Resolver struct {
-		Address []string  ` + "`yaml:\"address\"`" + `
-      }   
-	  {{end}}
-
-      // GetConf gets configuration instance
-      func GetConf() *Config {
-      	once.Do(initConf)
-      	return conf
-      }
-
-      func initConf() {
-      	prefix := "conf"
-        confFileRelPath := filepath.Join(prefix, filepath.Join(GetEnv(), "conf.yaml"))
-      	content, err := ioutil.ReadFile(confFileRelPath)
-      	if err != nil {
-      		panic(err)
-      	}
-
-      	conf = new(Config)
-      	err = yaml.Unmarshal(content, conf)
-      	if err != nil {
-      		klog.Error("parse yaml error - %v", err)
-      		panic(err)
-      	}
-      	if err := validator.Validate(conf); err != nil {
-      		klog.Error("validate config error - %v", err)
-      		panic(err)
-      	}
-
-      	conf.Env = GetEnv()
-
-      	pretty.Printf("%+v\n", conf)
-      }
-
-      func GetEnv() string {
-      	e := os.Getenv("GO_ENV")
-      	if len(e) == 0 {
-      		return "test"
-      	}
-      	return e
-      }`,
-	},
-
-	{
-		Path:   consts.Main,
-		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
-		Body: `// Code generated by cwgo generator.
-
-      package main
-
+	  package rpc
 	  import (
-        {{range $key, $value := .GoFileImports}}
-	    {{if eq $key "main.go"}}
-	    {{range $k, $v := $value}}
-        {{if ne $k ""}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}
-      )
+		[[range $key, $value := .GoFileImports]]
+	    [[if eq $key "env.go"]]
+	    [[range $k, $v := $value]]
+        [[if ne $k ""]]"[[$k]]"[[end]][[end]][[end]][[end]]
+	  )
 
-	  func main() {
-		cli, err := {{.ServiceName}}.NewRPCClient(conf.GetConf().KitexClient.ServiceName)
-		if err != nil {
-		  panic(err)
-    	}
-
-		fmt.Printf("%v\n", cli)
-		
-		// todo your custom code
-	  }`,
+      [[if ne .ResolverName ""]]
+      func GetResolverAddress() []string {
+		e := os.Getenv("GO_KITEX_RESOLVER_[[ToUpper .ServiceName]]")
+	    if len(e) == 0 {
+		  return []string{[[$lenSlice := len .ResolverAddress]][[range $key, $value := .ResolverAddress]]"[[$value]]"[[if eq $key (Sub $lenSlice 1)]][[else]], [[end]][[end]]}
+	    }
+		return strings.Fields(e)
+      }
+	  [[end]]`,
 	},
 }

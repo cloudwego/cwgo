@@ -35,6 +35,5 @@ func clientFlags() []cli.Flag {
 		&cli.StringSliceFlag{Name: consts.ProtoSearchPath, Aliases: []string{"I"}, Usage: "Add an IDL search path for includes. (Valid only if idl is protobuf)"},
 		&cli.StringSliceFlag{Name: consts.Pass, Usage: "pass param to hz or kitex"},
 		&cli.BoolFlag{Name: consts.Verbose, Usage: "Turn on verbose mode."},
-		&cli.StringSliceFlag{Name: consts.SnakeServiceName, Usage: "Specify the snake service names in the thrift or protobuf file."},
 	}
 }

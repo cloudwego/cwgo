@@ -52,11 +52,11 @@ type ServerExtension struct {
 }
 
 type Registry struct {
-	RegistryName           string   `yaml:"registry_name,omitempty"`
-	RegistryImports        []string `yaml:"registry_imports,omitempty"`
-	RegistryBody           string   `yaml:"registry_body,omitempty"`
-	DefaultRegistryAddress []string `yaml:"default_registry_address,omitempty"`
-	RegistryDocker         string   `yaml:"registry_docker"`
+	RegistryName    string   `yaml:"registry_name,omitempty"`
+	RegistryImports []string `yaml:"registry_imports,omitempty"`
+	RegistryBody    string   `yaml:"registry_body,omitempty"`
+	RegistryAddress []string `yaml:"registry_address,omitempty"`
+	RegistryDocker  string   `yaml:"registry_docker"`
 }
 
 func NewServerGenerator(types string) (*ServerGenerator, error) {
@@ -355,7 +355,7 @@ func (serverGen *ServerGenerator) handleRegistry(registryName string) (err error
 }
 
 func (serverGen *ServerGenerator) handleRPCRegistry(body, docker string, addr, imports []string) (err error) {
-	serverGen.DefaultRegistryAddress = addr
+	serverGen.RegistryAddress = addr
 	serverGen.RegistryDocker = docker
 
 	if err = serverGen.GoFileImports.appendImports(consts.KitexExtensionServer, imports); err != nil {
@@ -370,7 +370,7 @@ func (serverGen *ServerGenerator) handleRPCRegistry(body, docker string, addr, i
 
 func (serverGen *ServerGenerator) handleHTTPRegistry(body, docker string, addr, imports []string) (err error) {
 	serverGen.RegistryBody = body
-	serverGen.DefaultRegistryAddress = addr
+	serverGen.RegistryAddress = addr
 	serverGen.RegistryDocker = docker
 
 	if err = serverGen.GoFileImports.appendImports(consts.Main, imports); err != nil {

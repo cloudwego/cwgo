@@ -48,10 +48,6 @@ func check(ca *config.ClientArgument) error {
 		return errors.New("must specify service name when using resolver")
 	}
 
-	if ca.Type == consts.HTTP && ca.SnakeServiceNames == nil {
-		return errors.New("must specify snake service names in idl file")
-	}
-
 	if ca.CustomExtension != "" {
 		if isExist, _ := utils.PathExist(ca.CustomExtension); !isExist {
 			return errors.New("must specify correct custom extension file path")

@@ -84,22 +84,12 @@ var (
 	}
 
 	kitexClientInitImports = map[string]map[string]struct{}{
-		consts.ConfGo: {
-			"io/ioutil":                           struct{}{},
-			"os":                                  struct{}{},
-			"path/filepath":                       struct{}{},
-			"sync":                                struct{}{},
-			"github.com/cloudwego/kitex/pkg/klog": struct{}{},
-			"github.com/kr/pretty":                struct{}{},
-			"gopkg.in/validator.v2":               struct{}{},
-			"gopkg.in/yaml.v2":                    struct{}{},
+		consts.InitGo: {
+			"sync":                              struct{}{},
+			"github.com/cloudwego/kitex/client": struct{}{},
 		},
 
-		consts.Main: {
-			"fmt": struct{}{},
-		},
-
-		consts.KitexExtensionClient: {},
+		consts.EnvGo: {},
 	}
 
 	hzServerInitImports = map[string]map[string]struct{}{
@@ -134,19 +124,6 @@ var (
 	hzClientInitImports = map[string]map[string]struct{}{
 		consts.InitGo: {},
 
-		consts.ConfGo: {
-			"io/ioutil":     struct{}{},
-			"os":            struct{}{},
-			"path/filepath": struct{}{},
-			"sync":          struct{}{},
-			"github.com/cloudwego/hertz/pkg/common/hlog": struct{}{},
-			"github.com/kr/pretty":                       struct{}{},
-			"gopkg.in/validator.v2":                      struct{}{},
-			"gopkg.in/yaml.v2":                           struct{}{},
-		},
-
-		consts.Main: {
-			"fmt": struct{}{},
-		},
+		consts.EnvGo: {},
 	}
 )

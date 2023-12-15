@@ -61,6 +61,19 @@ func Client(c *config.ClientArgument) error {
 			return err
 		}
 
+		out := new(bytes.Buffer)
+		cmd := args.BuildCmd(out)
+		err = cmd.Run()
+		if err != nil {
+			if args.Use != "" {
+				out := strings.TrimSpace(out.String())
+				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
+					utils.ReplaceThriftVersion()
+				}
+			}
+			os.Exit(1)
+		}
+
 		if c.Template == "" {
 			// initialize cwgo side generator parameters
 			clientGen, err := generator.NewClientGenerator(consts.RPC)
@@ -78,18 +91,6 @@ func Client(c *config.ClientArgument) error {
 			}
 		}
 
-		out := new(bytes.Buffer)
-		cmd := args.BuildCmd(out)
-		err = cmd.Run()
-		if err != nil {
-			if args.Use != "" {
-				out := strings.TrimSpace(out.String())
-				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
-					utils.ReplaceThriftVersion()
-				}
-			}
-			os.Exit(1)
-		}
 		utils.ReplaceThriftVersion()
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
@@ -97,18 +98,6 @@ func Client(c *config.ClientArgument) error {
 		err = convertHzArgument(c, args)
 		if err != nil {
 			return err
-		}
-
-		var clientGen *generator.ClientGenerator
-		if c.Template == "" {
-			// initialize cwgo side generator parameters
-			clientGen, err = generator.NewClientGenerator(consts.HTTP)
-			if err != nil {
-				return err
-			}
-			if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
-				return err
-			}
 		}
 
 		module, path, ok := utils.SearchGoMod(consts.CurrentDir, false)
@@ -127,18 +116,27 @@ func Client(c *config.ClientArgument) error {
 
 		utils.ReplaceThriftVersion()
 
-		if c.Template == "" {
-			// generate cwgo side files
-			if err = generator.GenerateClient(clientGen); err != nil {
-				return cli.Exit(err, consts.GenerateCwgoError)
-			}
-		}
-
 		args.CmdType = meta.CmdClient
 		logs.Debugf("Args: %#v\n", args)
 		err = app.TriggerPlugin(args)
 		if err != nil {
 			return cli.Exit(err, meta.PluginError)
+		}
+
+		if c.Template == "" {
+			// initialize cwgo side generator parameters
+			clientGen, err := generator.NewClientGenerator(consts.HTTP)
+			if err != nil {
+				return err
+			}
+			if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
+				return err
+			}
+
+			// generate cwgo side files
+			if err = generator.GenerateClient(clientGen); err != nil {
+				return cli.Exit(err, consts.GenerateCwgoError)
+			}
 		}
 	}
 	return nil

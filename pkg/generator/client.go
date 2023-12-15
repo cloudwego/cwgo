@@ -17,35 +17,32 @@
 package generator
 
 import (
+	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"path"
-	"path/filepath"
-	"strings"
-
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/meta"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/kitex/tool/internal_pkg/generator"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 type ClientGenerator struct {
 	CommonGenerator // common generator params
 
 	ClientRender // for template render
+
+	optionFileInfo
 }
 
 type ClientRender struct {
 	GoModule    string
 	ServiceName string
+	Codec       string
 
-	OutDir                string
-	CurrentIDLServiceName string
-	SnakeServiceNames     []string
-	CamelServiceNames     []string
+	InitOptsPackage string
 
 	GoFileImports ImportsMap // handle .go files imports
 
@@ -57,10 +54,17 @@ type ClientExtension struct {
 }
 
 type Resolver struct {
-	ResolverName           string   `yaml:"resolver_name,omitempty"`
-	ResolverImports        []string `yaml:"resolver_imports,omitempty"`
-	ResolverBody           string   `yaml:"resolver_body,omitempty"`
-	DefaultResolverAddress []string `yaml:"default_resolver_address,omitempty"`
+	ResolverName    string   `yaml:"resolver_name,omitempty"`
+	ResolverImports []string `yaml:"resolver_imports,omitempty"`
+	ResolverBody    string   `yaml:"resolver_body,omitempty"`
+	ResolverAddress []string `yaml:"resolver_address,omitempty"`
+}
+
+type optionFileInfo struct {
+	initGoContents []string
+	initGoPaths    []string
+	envGoContent   string
+	envGoPath      string
 }
 
 func NewClientGenerator(types string) (*ClientGenerator, error) {
@@ -72,14 +76,14 @@ func NewClientGenerator(types string) (*ClientGenerator, error) {
 		}
 		return &ClientGenerator{
 			CommonGenerator: CommonGenerator{
-				kitexExtension: &generator.TemplateExtension{
-					Dependencies: map[string]string{},
-					ExtendClient: &generator.APIExtension{},
-				},
 				manifest: new(meta.Manifest),
 			},
 			ClientRender: ClientRender{
 				GoFileImports: imports,
+			},
+			optionFileInfo: optionFileInfo{
+				initGoPaths:    make([]string, 0, 5),
+				initGoContents: make([]string, 0, 5),
 			},
 		}, nil
 
@@ -93,9 +97,11 @@ func NewClientGenerator(types string) (*ClientGenerator, error) {
 				manifest: new(meta.Manifest),
 			},
 			ClientRender: ClientRender{
-				SnakeServiceNames: make([]string, 0, 5),
-				CamelServiceNames: make([]string, 0, 5),
-				GoFileImports:     imports,
+				GoFileImports: imports,
+			},
+			optionFileInfo: optionFileInfo{
+				initGoPaths:    make([]string, 0, 5),
+				initGoContents: make([]string, 0, 5),
 			},
 		}, nil
 
@@ -110,7 +116,7 @@ func ConvertClientGenerator(clientGen *ClientGenerator, args *config.ClientArgum
 		return err
 	}
 
-	// handle initial go files imports
+	// handle initial go files imports when new
 	if err = clientGen.handleInitImports(); err != nil {
 		return err
 	}
@@ -130,43 +136,28 @@ func ConvertClientGenerator(clientGen *ClientGenerator, args *config.ClientArgum
 	return nil
 }
 
-func (clientGen *ClientGenerator) setKitexExtension(key, extendOption string) (err error) {
-	if _, ok := clientGen.GoFileImports[key]; !ok {
-		return errKeyInput
-	}
-
-	for impt := range clientGen.GoFileImports[key] {
-		value := strings.Split(impt, consts.Slash)
-		// To avoid reporting errors in special circumstances, for example: registry-etcd.
-		valueFinal := strings.Split(value[len(value)-1], consts.TheCrossed)
-		if _, ok := clientGen.kitexExtension.Dependencies[impt]; ok {
-			continue
-		}
-		clientGen.kitexExtension.Dependencies[impt] = valueFinal[len(valueFinal)-1]
-		clientGen.kitexExtension.ExtendClient.ImportPaths = append(clientGen.kitexExtension.ExtendClient.ImportPaths, impt)
-	}
-
-	if clientGen.kitexExtension.ExtendClient.ExtendOption == "" {
-		clientGen.kitexExtension.ExtendClient.ExtendOption = extendOption
-	} else {
-		clientGen.kitexExtension.ExtendClient.ExtendOption += consts.LineBreak + extendOption
-	}
-
-	return nil
-}
-
 func (clientGen *ClientGenerator) handleInitArguments(args *config.ClientArgument) (err error) {
 	clientGen.GoModule = args.GoMod
 	clientGen.ServiceName = args.Service
 	clientGen.communicationType = args.Type
 	clientGen.CustomExtensionFile = args.CustomExtension
+	clientGen.OutDir = args.OutDir
+	clientGen.Codec, err = utils.GetIdlType(args.IdlPath)
+	if err != nil {
+		return err
+	}
 
-	// handle manifest
-	isNew := utils.IsCwgoNew(args.OutDir)
+	// handle manifest and determine if .cwgo exists
+	dir, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("get current path failed: %s", err)
+	}
+
+	isNew := utils.IsCwgoNew(dir)
 	if isNew {
 		clientGen.isNew = true
 	} else {
-		if err = clientGen.manifest.InitAndValidate(args.OutDir); err != nil {
+		if err = clientGen.manifest.InitAndValidate(dir); err != nil {
 			return err
 		}
 
@@ -177,45 +168,48 @@ func (clientGen *ClientGenerator) handleInitArguments(args *config.ClientArgumen
 
 	// handle custom extension
 	if clientGen.CustomExtensionFile != "" {
+		// parse custom extension file from yaml to go struct
 		if err = clientGen.fromYAMLFile(clientGen.CustomExtensionFile); err != nil {
 			return err
 		}
+		// check custom extension file
+		if err = clientGen.checkCustomExtensionFile(); err != nil {
+			return err
+		}
 	}
-	if !clientGen.isNew && clientGen.CustomExtensionFile == "" {
-		clientGen.CustomExtensionFile = clientGen.manifest.CustomExtensionFile
-		if clientGen.CustomExtensionFile != "" {
-			if err = clientGen.fromYAMLFile(clientGen.CustomExtensionFile); err != nil {
-				return err
+
+	if !clientGen.isNew {
+		bizDir := ""
+		if clientGen.communicationType == consts.HTTP {
+			bizDir = clientGen.OutDir
+		} else {
+			bizDir = filepath.Join(clientGen.OutDir, consts.DefaultKitexClientDir)
+		}
+
+		subDirs, err := utils.GetSubDirs(bizDir)
+		if err != nil {
+			return err
+		}
+		for _, subDir := range subDirs {
+			filePath := filepath.Join(subDir, consts.InitGo)
+			if isExist, _ := utils.PathExist(filePath); isExist {
+				content, err := utils.ReadFileContent(filePath)
+				if err != nil {
+					return err
+				}
+				clientGen.initGoContents = append(clientGen.initGoContents, string(content))
+				clientGen.initGoPaths = append(clientGen.initGoPaths, filePath)
 			}
 		}
-	}
 
-	switch clientGen.communicationType {
-	case consts.RPC:
-		clientGen.templateDir = args.TemplateDir
-	case consts.HTTP:
-		// get current dir
-		currentDir, err := os.Getwd()
-		if err != nil {
-			return fmt.Errorf("get current path failed: %s", err)
+		clientGen.envGoPath = filepath.Join(bizDir, consts.EnvGo)
+		if isExist, _ := utils.PathExist(clientGen.envGoPath); isExist {
+			content, err := utils.ReadFileContent(clientGen.envGoPath)
+			if err != nil {
+				return err
+			}
+			clientGen.envGoContent = string(content)
 		}
-
-		// get relative out dir
-		dir, err := filepath.Rel(currentDir, args.OutDir)
-		if err != nil {
-			return fmt.Errorf("get relative out path to current path failed: %s", err)
-		}
-		if utils.IsWindows() {
-			dir = strings.ReplaceAll(dir, consts.BackSlash, consts.Slash)
-		}
-		clientGen.OutDir = dir
-
-		clientGen.SnakeServiceNames = args.SnakeServiceNames
-		for _, s := range clientGen.SnakeServiceNames {
-			clientGen.CamelServiceNames = append(clientGen.CamelServiceNames, utils.SnakeToCamel(s))
-		}
-	default:
-		return errTypeInput
 	}
 
 	return
@@ -224,45 +218,17 @@ func (clientGen *ClientGenerator) handleInitArguments(args *config.ClientArgumen
 func (clientGen *ClientGenerator) handleInitImports() (err error) {
 	switch clientGen.communicationType {
 	case consts.RPC:
-		// set initial main.go imports
-		mainExtraImports := []string{
-			clientGen.GoModule + "/conf",
-			clientGen.GoModule + "/biz/rpc/" + clientGen.ServiceName,
-		}
-		if err = clientGen.GoFileImports.appendImports(consts.Main, mainExtraImports); err != nil {
-			return err
-		}
-
-		// set initial conf.go imports
-		confExtraImports := []string{""}
-		if err = clientGen.GoFileImports.appendImports(consts.ConfGo, confExtraImports); err != nil {
-			return err
-		}
-
-		// set kitex client basic options for client.go
-		if err = clientGen.GoFileImports.appendImports(consts.KitexExtensionClient, kitexClientBasicImports); err != nil {
-			return err
-		}
-		if err = clientGen.setKitexExtension(consts.KitexExtensionClient, kitexClientBasicOpts); err != nil {
-			return err
+		// set initial init.go imports
+		if clientGen.Codec == "thrift" {
+			initExtraImports := []string{
+				"github.com/cloudwego/kitex/pkg/transmeta",
+				"github.com/cloudwego/kitex/transport",
+			}
+			if err = clientGen.GoFileImports.appendImports(consts.InitGo, initExtraImports); err != nil {
+				return err
+			}
 		}
 	case consts.HTTP:
-		// set initial main.go imports
-		mainExtraImports := []string{
-			clientGen.GoModule + "/conf",
-		}
-		for _, name := range clientGen.SnakeServiceNames {
-			mainExtraImports = append(mainExtraImports, clientGen.GoModule+consts.Slash+clientGen.OutDir+consts.Slash+name)
-		}
-		if err = clientGen.GoFileImports.appendImports(consts.Main, mainExtraImports); err != nil {
-			return err
-		}
-
-		// set initial conf.go imports
-		confExtraImports := []string{""}
-		if err = clientGen.GoFileImports.appendImports(consts.ConfGo, confExtraImports); err != nil {
-			return err
-		}
 	default:
 		return errTypeInput
 	}
@@ -271,113 +237,97 @@ func (clientGen *ClientGenerator) handleInitImports() (err error) {
 }
 
 func (clientGen *ClientGenerator) handleResolver(resolverName string) (err error) {
+	if clientGen.isNew {
+		if err = clientGen.handleNewResolver(resolverName); err != nil {
+			return err
+		}
+	} else {
+		if err = clientGen.handleUpdateResolver(resolverName); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (clientGen *ClientGenerator) handleNewResolver(resolverName string) (err error) {
 	// custom server resolver
 	if clientGen.CustomExtensionFile != "" && clientGen.ResolverName != "" {
-		switch clientGen.communicationType {
-		case consts.RPC:
-			if err = clientGen.GoFileImports.appendImports(consts.KitexExtensionClient, clientGen.ResolverImports); err != nil {
-				return
-			}
-			if err = clientGen.setKitexExtension(consts.KitexExtensionClient, clientGen.ResolverBody); err != nil {
-				return
-			}
-
-			p := path.Join(clientGen.templateDir, consts.KitexExtensionYaml)
-			if err = clientGen.kitexExtension.ToYAMLFile(p); err != nil {
-				return
-			}
-
-		case consts.HTTP:
-			if err = clientGen.GoFileImports.appendImports(consts.InitGo, clientGen.ResolverImports); err != nil {
-				return
-			}
-
-		default:
-			return errTypeInput
+		if err = clientGen.GoFileImports.appendImports(consts.InitGo, clientGen.ResolverImports); err != nil {
+			return
 		}
-
 		return
 	}
 
 	clientGen.ResolverName = resolverName
 
-	if !clientGen.isNew && clientGen.ResolverName == "" {
-		clientGen.ResolverName = clientGen.manifest.Resolver
-	}
-
 	switch clientGen.communicationType {
 	case consts.RPC:
 		switch clientGen.ResolverName {
 		case consts.Nacos:
-			if err = clientGen.handleRPCResolver(kitexNacosClient, nacosServerAddr, kitexNacosClientImports, false, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(kitexNacosClient, nacosServerAddr, kitexNacosClientImports); err != nil {
 				return
 			}
 		case consts.Consul:
-			if err = clientGen.handleRPCResolver(kitexConsulClient, consulServerAddr, kitexConsulClientImports, true, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(kitexConsulClient, consulServerAddr, kitexConsulClientImports); err != nil {
 				return
 			}
 		case consts.Etcd:
-			if err = clientGen.handleRPCResolver(kitexEtcdClient, etcdServerAddr, kitexEtcdClientImports, true, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(kitexEtcdClient, etcdServerAddr, kitexEtcdClientImports); err != nil {
 				return
 			}
 		case consts.Eureka:
-			if err = clientGen.handleRPCResolver(kitexEurekaClient, eurekaServerAddr, kitexEurekaClientImports, true, false); err != nil {
+			if err = clientGen.handleNewResolverTemplate(kitexEurekaClient, eurekaServerAddr, kitexEurekaClientImports); err != nil {
 				return
 			}
 		case consts.Polaris:
-			if err = clientGen.handleRPCResolver(kitexPolarisClient, polarisServerAddr, kitexPolarisClientImports, false, false); err != nil {
+			if err = clientGen.handleNewResolverTemplate(kitexPolarisClient, polarisServerAddr, kitexPolarisClientImports); err != nil {
 				return
 			}
 		case consts.ServiceComb:
-			if err = clientGen.handleRPCResolver(kitexServiceCombClient, serviceCombServerAddr, kitexServiceCombClientImports, false, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(kitexServiceCombClient, serviceCombServerAddr, kitexServiceCombClientImports); err != nil {
 				return
 			}
 		case consts.Zk:
-			if err = clientGen.handleRPCResolver(kitexZKClient, zkServerAddr, kitexZKClientImports, true, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(kitexZKClient, zkServerAddr, kitexZKClientImports); err != nil {
 				return
 			}
 		default:
-			utils.RemoveKitexExtension()
-			return
-		}
-
-		p := path.Join(clientGen.templateDir, consts.KitexExtensionYaml)
-		if err = clientGen.kitexExtension.ToYAMLFile(p); err != nil {
-			return
 		}
 
 	case consts.HTTP:
 		switch clientGen.ResolverName {
 		case consts.Nacos:
-			if err = clientGen.handleHTTPResolver(hzNacosClient, nacosServerAddr, hzNacosClientImports, false); err != nil {
+			if err = clientGen.handleNewResolverTemplate(hzNacosClient, nacosServerAddr, hzNacosClientImports); err != nil {
 				return
 			}
 		case consts.Consul:
-			if err = clientGen.handleHTTPResolver(hzConsulClient, consulServerAddr, hzConsulClientImports, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(hzConsulClient, consulServerAddr, hzConsulClientImports); err != nil {
 				return
 			}
 		case consts.Etcd:
-			if err = clientGen.handleHTTPResolver(hzEtcdClient, etcdServerAddr, hzEtcdClientImports, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(hzEtcdClient, etcdServerAddr, hzEtcdClientImports); err != nil {
 				return
 			}
 		case consts.Eureka:
-			if err = clientGen.handleHTTPResolver(hzEurekaClient, eurekaServerAddr, hzEurekaClientImports, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(hzEurekaClient, eurekaServerAddr, hzEurekaClientImports); err != nil {
 				return
 			}
 		case consts.Polaris:
-			if err = clientGen.handleHTTPResolver(hzPolarisClient, polarisServerAddr, hzPolarisClientImports, false); err != nil {
+			if err = clientGen.handleNewResolverTemplate(hzPolarisClient, polarisServerAddr, hzPolarisClientImports); err != nil {
 				return
 			}
 		case consts.ServiceComb:
-			if err = clientGen.handleHTTPResolver(hzServiceCombClient, serviceCombServerAddr, hzServiceCombClientImports, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(hzServiceCombClient, serviceCombServerAddr, hzServiceCombClientImports); err != nil {
 				return
 			}
 		case consts.Zk:
-			if err = clientGen.handleHTTPResolver(hzZKClient, zkServerAddr, hzZKClientImports, true); err != nil {
+			if err = clientGen.handleNewResolverTemplate(hzZKClient, zkServerAddr, hzZKClientImports); err != nil {
 				return
 			}
 		default:
 		}
+
 	default:
 		return errTypeInput
 	}
@@ -385,37 +335,152 @@ func (clientGen *ClientGenerator) handleResolver(resolverName string) (err error
 	return
 }
 
-func (clientGen *ClientGenerator) handleRPCResolver(body string, addr, imports []string, needConf, needKlog bool) (err error) {
-	clientGen.DefaultResolverAddress = addr
+func (clientGen *ClientGenerator) handleNewResolverTemplate(body string, addr, imports []string) (err error) {
+	clientGen.ResolverBody = body
+	clientGen.ResolverAddress = addr
 
-	if needKlog {
-		imports = append(imports, "github.com/cloudwego/kitex/pkg/klog")
+	if clientGen.communicationType == consts.HTTP {
+		imports = append(imports, clientGen.GoModule+consts.Slash+consts.DefaultHZClientDir)
+	} else {
+		imports = append(imports, clientGen.GoModule+consts.Slash+consts.DefaultKitexClientDir)
 	}
-	if needConf {
-		imports = append(imports, clientGen.GoModule+"/conf")
+	if err = clientGen.GoFileImports.appendImports(consts.InitGo, imports); err != nil {
+		return err
 	}
-	if err = clientGen.GoFileImports.appendImports(consts.KitexExtensionClient, imports); err != nil {
-		return
-	}
-	if err = clientGen.setKitexExtension(consts.KitexExtensionClient, body); err != nil {
-		return
+
+	if err = clientGen.GoFileImports.appendImports(consts.EnvGo, envGoImports); err != nil {
+		return err
 	}
 
 	return
 }
 
-func (clientGen *ClientGenerator) handleHTTPResolver(body string, addr, imports []string, needConf bool) (err error) {
-	clientGen.ResolverBody = body
-	clientGen.DefaultResolverAddress = addr
-
-	if needConf {
-		imports = append(imports, clientGen.GoModule+"/conf")
-	}
-	if err = clientGen.GoFileImports.appendImports(consts.InitGo, imports); err != nil {
+func (clientGen *ClientGenerator) handleUpdateResolver(resolverName string) (err error) {
+	if clientGen.CustomExtensionFile != "" && clientGen.ResolverName != "" {
+		if err = clientGen.handleUpdateResolverTemplate(clientGen.ResolverBody, clientGen.ResolverAddress, clientGen.ResolverImports); err != nil {
+			return err
+		}
 		return
 	}
 
-	return
+	clientGen.ResolverName = resolverName
+
+	switch clientGen.communicationType {
+	case consts.RPC:
+	case consts.HTTP:
+		switch clientGen.ResolverName {
+		case consts.Nacos:
+			if err = clientGen.handleUpdateResolverTemplate(hzNacosClient, nacosServerAddr, hzNacosClientImports); err != nil {
+				return err
+			}
+		case consts.Consul:
+			if err = clientGen.handleUpdateResolverTemplate(hzConsulClient, consulServerAddr, hzConsulClientImports); err != nil {
+				return err
+			}
+		case consts.Etcd:
+			if err = clientGen.handleUpdateResolverTemplate(hzEtcdClient, etcdServerAddr, hzEtcdClientImports); err != nil {
+				return err
+			}
+		case consts.Eureka:
+			if err = clientGen.handleUpdateResolverTemplate(hzEurekaClient, eurekaServerAddr, hzEurekaClientImports); err != nil {
+				return err
+			}
+		case consts.Polaris:
+			if err = clientGen.handleUpdateResolverTemplate(hzPolarisClient, polarisServerAddr, hzPolarisClientImports); err != nil {
+				return err
+			}
+		case consts.ServiceComb:
+			if err = clientGen.handleUpdateResolverTemplate(hzServiceCombClient, serviceCombServerAddr, hzServiceCombClientImports); err != nil {
+				return err
+			}
+		case consts.Zk:
+			if err = clientGen.handleUpdateResolverTemplate(hzZKClient, zkServerAddr, hzZKClientImports); err != nil {
+				return err
+			}
+		default:
+		}
+	default:
+		return errTypeInput
+	}
+
+	return nil
+}
+
+func (clientGen *ClientGenerator) handleUpdateResolverTemplate(body string, addr, imports []string) error {
+	clientGen.ResolverAddress = addr
+
+	var (
+		mvcTemplates        []Template
+		nilResolverFuncBody string
+		appendResolverFunc  string
+	)
+	if clientGen.communicationType == consts.RPC {
+		imports = append(imports, clientGen.GoModule+consts.Slash+consts.DefaultKitexClientDir)
+		mvcTemplates = kitexClientMVCTemplates
+		nilResolverFuncBody = kitexNilResolverFuncBody
+		appendResolverFunc = kitexAppendResolverFunc
+	} else {
+		imports = append(imports, clientGen.GoModule+consts.Slash+consts.DefaultHZClientDir)
+		mvcTemplates = hzClientMVCTemplates
+		nilResolverFuncBody = hzNilResolverFuncBody
+		appendResolverFunc = hzAppendResolverFunc
+	}
+
+	flag := 0
+	for index, content := range clientGen.initGoContents {
+		equal, err := isFuncBodyEqual(content, consts.FuncInitResolver, nilResolverFuncBody)
+		if err != nil {
+			return err
+		}
+
+		if equal {
+			if index == 0 {
+				mvcTemplates[consts.ClientInitFileIndex].Path = clientGen.initGoPaths[index]
+				mvcTemplates[consts.ClientInitFileIndex].Type = consts.ReplaceFuncBody
+				mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncName = append(mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncName, consts.FuncInitResolver)
+				mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncImport = append(mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncImport, imports)
+				mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncBody = append(mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncBody, body)
+			} else {
+				template := Template{
+					Path: clientGen.initGoPaths[index],
+					UpdateBehavior: UpdateBehavior{
+						Type: consts.ReplaceFuncBody,
+						ReplaceFunc: ReplaceFunc{
+							ReplaceFuncName:   []string{consts.FuncInitResolver},
+							ReplaceFuncImport: [][]string{imports},
+							ReplaceFuncBody:   []string{body},
+						},
+						AppendRender: map[string]interface{}{},
+					},
+				}
+				mvcTemplates = append(mvcTemplates, template)
+			}
+
+			if flag == 0 {
+				isExist, err := isFuncExist(clientGen.envGoContent, consts.GetResolverAddress)
+				if err != nil {
+					return err
+				}
+
+				if !isExist {
+					hzClientMVCTemplates[consts.ClientEnvFileIndex].Path = clientGen.envGoPath
+					hzClientMVCTemplates[consts.ClientEnvFileIndex].Type = consts.Append
+					hzClientMVCTemplates[consts.ClientEnvFileIndex].AppendContent = appendResolverFunc
+					hzClientMVCTemplates[consts.ClientEnvFileIndex].AppendImport = envGoImports
+				}
+
+				flag++
+			}
+		}
+	}
+
+	if clientGen.communicationType == consts.RPC {
+		kitexClientMVCTemplates = mvcTemplates
+	} else {
+		hzClientMVCTemplates = mvcTemplates
+	}
+
+	return nil
 }
 
 func (c *ClientExtension) fromYAMLFile(filename string) error {
@@ -427,6 +492,20 @@ func (c *ClientExtension) fromYAMLFile(filename string) error {
 		return err
 	}
 	return yaml.Unmarshal(data, c)
+}
+
+func (c *ClientExtension) checkCustomExtensionFile() (err error) {
+	// check resolver
+	if c.ResolverName != "" {
+		if c.ResolverImports == nil {
+			return errors.New("please input ResolverImports")
+		}
+		if c.ResolverBody == "" {
+			return errors.New("please input ResolverImports")
+		}
+	}
+
+	return nil
 }
 
 func (clientGen *ClientGenerator) initManifest(commandType string) {
