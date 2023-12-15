@@ -6,6 +6,7 @@ body: |-
 
   import (
     "net"
+    "time"
 
     "github.com/cloudwego/kitex/pkg/klog"
     "github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -16,6 +17,7 @@ body: |-
     kitexlogrus "github.com/kitex-contrib/obs-opentelemetry/logging/logrus"
     "{{.Module}}/conf"
     "{{.ImportPath}}/{{ToLower .ServiceName}}"
+    "go.uber.org/zap/zapcore"
     "gopkg.in/natefinch/lumberjack.v2"
   )
 
@@ -52,11 +54,18 @@ body: |-
     logger := kitexlogrus.NewLogger()
     klog.SetLogger(logger)
     klog.SetLevel(conf.LogLevel())
-    klog.SetOutput(&lumberjack.Logger{
-          		Filename:   conf.GetConf().Kitex.LogFileName,
-          		MaxSize:    conf.GetConf().Kitex.LogMaxSize,
-          		MaxBackups: conf.GetConf().Kitex.LogMaxBackups,
-          		MaxAge:     conf.GetConf().Kitex.LogMaxAge,
-          	})
+    asyncWriter := &zapcore.BufferedWriteSyncer{
+        WS: zapcore.AddSync(&lumberjack.Logger{
+            Filename:   conf.GetConf().Kitex.LogFileName,
+            MaxSize:    conf.GetConf().Kitex.LogMaxSize,
+            MaxBackups: conf.GetConf().Kitex.LogMaxBackups,
+            MaxAge:     conf.GetConf().Kitex.LogMaxAge,
+        }),
+        FlushInterval: time.Minute,
+    }
+    klog.SetOutput(asyncWriter)
+    server.RegisterShutdownHook(func() {
+        asyncWriter.Sync()
+    })
     return
   }

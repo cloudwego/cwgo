@@ -4,8 +4,6 @@ update_behavior:
 body: |-
   package {{ ReplaceString (ReplaceString .RealServiceName "." "_" -1) "/" "_" -1 }}
   import (
-      "context"
-
       {{- range $path, $aliases := .Imports}}
       	{{- if not $aliases }}
       		"{{$path}}"
@@ -25,17 +23,13 @@ body: |-
   type RPCClient interface {
   	KitexClient() {{ToLower .ServiceName}}.Client
   	Service() string
-  {{range .AllMethods}}
+  {{- range .AllMethods}}
   {{- if or .ClientStreaming .ServerStreaming}}
-      {{.Name}}({{if not .ClientStreaming}}{{range .Args}}{{LowerFirst .Name}} {{.Type}}, {{end}}{{end}}stream {{.PkgRefName}}.{{.ServiceName}}_{{.RawName}}Server) (err error)
+  {{.Name}}(ctx context.Context {{if not .ClientStreaming}}{{range .Args}}, {{.RawName}} {{.Type}}{{end}}{{end}}, callOptions ...callopt.Option ) (stream {{ToLower .ServiceName}}.{{.ServiceName}}_{{.RawName}}Client, err error)
   {{- else}}
-  {{- if .Oneway}}
-      {{.Name}}(ctx context.Context {{- range .Args}}, {{LowerFirst .Name}} {{.Type}}{{end}}, callOptions ...callopt.Option) (err error)
-  {{else -}}
-      {{.Name}}(ctx context.Context {{range .Args}}, {{LowerFirst .Name}} {{.Type}}{{end}}, callOptions ...callopt.Option) (resp {{.Resp.Type}}, err error)
-  {{end}}
-  {{end}}
-  {{end}}
+  {{.Name}}(ctx context.Context {{range .Args}}, {{.RawName}} {{.Type}}{{end}}, callOptions ...callopt.Option ) ({{if not .Void}}r {{.Resp.Type}}, {{end}}err error)
+  {{- end}}
+  {{- end}}
   }
 
   func NewRPCClient(dstService string, opts ...client.Option) (RPCClient, error) {
@@ -63,21 +57,14 @@ body: |-
   func (c *clientImpl) KitexClient() {{ToLower .ServiceName}}.Client {
   	return c.kitexClient
   }
-
   {{range .AllMethods}}
   {{- if or .ClientStreaming .ServerStreaming}}
-     func(c *clientImpl) {{.Name}}({{if not .ClientStreaming}}{{range .Args}}{{LowerFirst .Name}} {{.Type}}, {{end}}{{end}}stream {{.PkgRefName}}.{{.ServiceName}}_{{.RawName}}Server) (err error){
-         return c.kitexClient.{{.Name}}(ctx, {{- range .Args}} {{LowerFirst .Name}},{{end}} callOptions...)
-     }
+  func (c *clientImpl) {{.Name}}(ctx context.Context {{if not .ClientStreaming}}{{range .Args}}, {{.RawName}} {{.Type}}{{end}}{{end}}, callOptions ...callopt.Option ) (stream {{ToLower .ServiceName}}.{{.ServiceName}}_{{.RawName}}Client, err error) {
+  return c.kitexClient.{{.Name}}(ctx{{if not .ClientStreaming}}{{range .Args}}, {{.RawName}}{{end}}{{end}}, callOptions...)
+  }
   {{- else}}
-  {{- if .Oneway}}
-      func(c *clientImpl) {{.Name}}(ctx context.Context {{- range .Args}}, {{LowerFirst .Name}} {{.Type}}{{end}}, callOptions ...callopt.Option) (err error){
-         return c.kitexClient.{{.Name}}(ctx, {{- range .Args}} {{LowerFirst .Name}}, {{end}} callOptions...)
-      }
-  {{else -}}
-      func(c *clientImpl) {{.Name}}(ctx context.Context {{range .Args}}, {{LowerFirst .Name}} {{.Type}}{{end}}, callOptions ...callopt.Option) (resp {{.Resp.Type}}, err error){
-        return c.kitexClient.{{.Name}}(ctx, {{- range .Args}} {{LowerFirst .Name}}, {{end}} callOptions...)
-      }
-  {{end}}
-  {{end}}
+  func (c *clientImpl) {{.Name}}(ctx context.Context {{range .Args}}, {{.RawName}} {{.Type}}{{end}}, callOptions ...callopt.Option ) ({{if not .Void}}r {{.Resp.Type}}, {{end}}err error) {
+  return c.kitexClient.{{.Name}}(ctx{{range .Args}}, {{.RawName}}{{end}}, callOptions...)
+  }
+  {{- end}}
   {{end}}
