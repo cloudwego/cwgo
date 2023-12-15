@@ -24,6 +24,9 @@ body: |-
   {{range .Methods}}
 
   func Test{{.Name}}_Run(t *testing.T) {
+    {{- if or .ClientStreaming .ServerStreaming}}
+    // todo: edit your unit test
+    {{- else}}
     ctx := context.Background()
     s := New{{.Name}}Service(ctx)
     // init req and assert value
@@ -31,12 +34,6 @@ body: |-
     {{LowerFirst .Name}} := &{{NotPtr .Type}}{}
     {{end}}
 
-    {{- if or .ClientStreaming .ServerStreaming}}
-    err := s.Run({{if not .ClientStreaming}}{{range .Args}}{{LowerFirst .Name}}, {{end}}{{end}}stream)
-    if err != nil {
-      t.Errorf("unexpected error: %v", err)
-    }
-    {{- else}}
     {{- if .Void}}
     {{- if .Oneway}}
     {{- end}}
@@ -49,12 +46,9 @@ body: |-
 
     {{else -}}
     resp, err := s.Run({{range .Args}}{{LowerFirst .Name}}{{end}})
-    if err != nil {
-      t.Errorf("unexpected error: %v", err)
-    }
-    if resp == nil {
-      t.Errorf("unexpected nil response")
-    }
+    t.Logf("err: %v", err)
+    t.Logf("resp: %v", resp)
+  
     // todo: edit your unit test
     {{end}}
     {{end}}

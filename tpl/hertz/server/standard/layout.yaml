@@ -10,6 +10,7 @@ layouts:
 
       import (
         "context"
+      	"time"
 
         "github.com/cloudwego/hertz/pkg/app"
       	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
@@ -24,6 +25,7 @@ layouts:
       	"github.com/hertz-contrib/pprof"
       	"{{.GoModule}}/biz/router"
       	"{{.GoModule}}/conf"
+      	"go.uber.org/zap/zapcore"
       	"gopkg.in/natefinch/lumberjack.v2"
       )
 
@@ -50,12 +52,19 @@ layouts:
       	logger := hertzlogrus.NewLogger()
       	hlog.SetLogger(logger)
       	hlog.SetLevel(conf.LogLevel())
-      	hlog.SetOutput(&lumberjack.Logger{
-      		Filename:   conf.GetConf().Hertz.LogFileName,
-      		MaxSize:    conf.GetConf().Hertz.LogMaxSize,
-      		MaxBackups: conf.GetConf().Hertz.LogMaxBackups,
-      		MaxAge:     conf.GetConf().Hertz.LogMaxAge,
-      	})
+        asyncWriter := &zapcore.BufferedWriteSyncer{
+            WS: zapcore.AddSync(&lumberjack.Logger{
+                Filename:   conf.GetConf().Hertz.LogFileName,
+                MaxSize:    conf.GetConf().Hertz.LogMaxSize,
+                MaxBackups: conf.GetConf().Hertz.LogMaxBackups,
+                MaxAge:     conf.GetConf().Hertz.LogMaxAge,
+            }),
+            FlushInterval: time.Minute,
+        }
+        hlog.SetOutput(asyncWriter)
+        h.OnShutdown = append(h.OnShutdown, func(ctx context.Context) {
+            asyncWriter.Sync()
+        })
 
       	// pprof
       	if conf.GetConf().Hertz.EnablePprof {
