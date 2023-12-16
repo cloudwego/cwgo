@@ -433,10 +433,10 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 			}
 			select {
 			case <-rc.stopChan:
-				logger.Logger.Debug("stop update service in registry")
+				logger.Logger.Debug("stop update service to registry")
 				return
 			default:
-				logger.Logger.Debug("updating service in registry")
+				logger.Logger.Debug("updating service to registry")
 				err = rc.Update(serviceId)
 				if err != nil {
 					if err == ErrServiceNotFound {
@@ -452,7 +452,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 				} else {
 					errNum = 0
 				}
-				logger.Logger.Debug("update service in registry successfully")
+				logger.Logger.Debug("update service to registry successfully")
 			}
 		}
 	}()

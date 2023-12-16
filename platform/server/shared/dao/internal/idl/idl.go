@@ -237,6 +237,11 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 				return err
 			}
 
+			err = tx.Find(&mainIdlEntity).Error
+			if err != nil {
+				return err
+			}
+
 			// update import idls
 			if len(idlModel.ImportIdls) != 0 {
 				importedIdlEntities := make([]*entity.MysqlIDL, len(idlModel.ImportIdls))
@@ -248,6 +253,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 						IdlPath:             importIdl.IdlPath,
 						CommitHash:          importIdl.CommitHash,
 						ServiceName:         mainIdlEntity.ServiceName,
+						Status:              consts.IdlStatusNumActive,
 						LastSyncTime:        time.Now(),
 					}
 				}

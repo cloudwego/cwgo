@@ -51,8 +51,8 @@ func NewSyncIDLsByIdService(ctx context.Context, svcCtx *svc.ServiceContext, age
 
 // Run create note info
 func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncIDLsByIdRes, err error) {
-	for _, v := range req.Ids {
-		idlModel, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, v)
+	for _, syncMainIdlId := range req.Ids {
+		idlEntityWithRepoInfo, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, syncMainIdlId)
 		if err != nil {
 			if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 				return &agent.SyncIDLsByIdRes{
@@ -67,7 +67,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		repoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idlModel.IdlRepositoryId)
+		idlRepoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idlEntityWithRepoInfo.IdlRepositoryId)
 		if err != nil {
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumDatabase,
@@ -75,7 +75,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		repoClient, err := s.svcCtx.RepoManager.GetClient(repoModel.Id)
+		repoClient, err := s.svcCtx.RepoManager.GetClient(idlRepoModel.Id)
 		if err != nil {
 			if errx.GetCode(err) == consts.ErrNumTokenInvalid {
 				// repo token is invalid or expired
@@ -85,7 +85,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 				}, nil
 			}
 
-			logger.Logger.Error(consts.ErrMsgRepoGetClient, zap.Error(err), zap.Int64("repo_id", repoModel.Id))
+			logger.Logger.Error(consts.ErrMsgRepoGetClient, zap.Error(err), zap.Int64("repo_id", idlRepoModel.Id))
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumRepoGetClient,
 				Msg:  consts.ErrMsgRepoGetClient,
@@ -94,14 +94,14 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 
 		idlPid, owner, repoName, err := repoClient.ParseFileUrl(
 			utils.GetRepoFullUrl(
-				repoModel.RepositoryType,
+				idlRepoModel.RepositoryType,
 				fmt.Sprintf("https://%s/%s/%s",
-					repoModel.RepositoryDomain,
-					repoModel.RepositoryOwner,
-					repoModel.RepositoryName,
+					idlRepoModel.RepositoryDomain,
+					idlRepoModel.RepositoryOwner,
+					idlRepoModel.RepositoryName,
 				),
-				repoModel.RepositoryBranch,
-				idlModel.MainIdlPath,
+				idlRepoModel.RepositoryBranch,
+				idlEntityWithRepoInfo.MainIdlPath,
 			),
 		)
 		if err != nil {
@@ -112,26 +112,18 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		_, err = repoClient.GetFile(owner, repoName, idlPid, repoModel.RepositoryBranch)
+		// get the entire repository archive
+		archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, idlRepoModel.RepositoryBranch)
 		if err != nil {
-			logger.Logger.Error(consts.ErrMsgRepoGetFile, zap.Error(err))
+			logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
-				Code: consts.ErrNumRepoGetFile,
-				Msg:  consts.ErrMsgRepoGetFile,
-			}, nil
-		}
-
-		// determine the idl type for subsequent calculations of different types
-		idlType, err := utils.DetermineIdlType(idlPid)
-		if err != nil {
-			return &agent.SyncIDLsByIdRes{
-				Code: consts.ErrNumIdlFileExtension,
-				Msg:  consts.ErrMsgIdlFileExtension,
+				Code: consts.ErrNumRepoGetArchive,
+				Msg:  consts.ErrMsgRepoGetArchive,
 			}, nil
 		}
 
 		// create temp dir
-		tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
+		tempDir, err := os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
 		if err != nil {
 			if os.IsNotExist(err) {
 				err = os.Mkdir(consts.TempDir, 0o700)
@@ -143,7 +135,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 					}, nil
 				}
 
-				tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(repoModel.Id, 10))
+				tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
 				if err != nil {
 					logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 					return &agent.SyncIDLsByIdRes{
@@ -161,24 +153,16 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		}
 		defer os.RemoveAll(tempDir)
 
-		// get the entire repository archive
-		archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, repoModel.RepositoryBranch)
-		if err != nil {
-			logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
-			return &agent.SyncIDLsByIdRes{
-				Code: consts.ErrNumRepoGetArchive,
-				Msg:  consts.ErrMsgRepoGetArchive,
-			}, nil
-		}
+		tempDirRepo := tempDir + "/" + consts.TempDirRepo
 
 		// the archive type of GitHub is tarball instead of tar
 		isTarBall := false
-		if repoModel.RepositoryType == consts.RepositoryTypeNumGithub {
+		if idlRepoModel.RepositoryType == consts.RepositoryTypeNumGithub {
 			isTarBall = true
 		}
 
 		// extract the tar package and persist it to a temporary file
-		archiveName, err := utils.UnTar(archiveData, tempDir, isTarBall)
+		archiveName, err := utils.UnTar(archiveData, tempDirRepo, isTarBall)
 		if err != nil {
 			logger.Logger.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
@@ -187,12 +171,21 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
+		// determine the idl type for subsequent calculations of different types
+		idlType, err := utils.DetermineIdlType(idlPid)
+		if err != nil {
+			return &agent.SyncIDLsByIdRes{
+				Code: consts.ErrNumIdlFileExtension,
+				Msg:  consts.ErrMsgIdlFileExtension,
+			}, nil
+		}
+
 		// obtain dependent file paths
 		var importPaths []string
 		switch idlType {
 		case consts.IdlTypeNumThrift:
 			thriftFile := &parser.ThriftFile{}
-			importPaths, err = thriftFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
+			importPaths, err = thriftFile.GetDependentFilePaths(tempDirRepo + "/" + archiveName + idlPid)
 			if err != nil {
 				return &agent.SyncIDLsByIdRes{
 					Code: consts.ErrNumIdlGetDependentFilePath,
@@ -201,61 +194,18 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}
 		case consts.IdlTypeNumProto:
 			protoFile := &parser.ProtoFile{}
-			importPaths, err = protoFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
+			importPaths, err = protoFile.GetDependentFilePaths(tempDirRepo + "/" + archiveName + idlPid)
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumIdlGetDependentFilePath,
 				Msg:  consts.ErrMsgIdlGetDependentFilePath,
 			}, nil
 		}
 
+		needToSync := false
 		importIDLs := make([]*model.ImportIDL, 0)
 
-		mainIdlDir := filepath.Dir(idlPid)
-		// calculate the hash value and add it to the importIDLs slice
-		for _, importPath := range importPaths {
-			calculatedPath := filepath.ToSlash(filepath.Join(mainIdlDir, importPath))
-			commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, repoModel.RepositoryBranch)
-			if err != nil {
-				return &agent.SyncIDLsByIdRes{
-					Code: consts.ErrNumRepoGetCommitHash,
-					Msg:  "cannot get depended idl latest commit hash",
-				}, nil
-			}
-
-			importIDL := &model.ImportIDL{
-				IdlPath:    calculatedPath,
-				CommitHash: commitHash,
-			}
-
-			importIDLs = append(importIDLs, importIDL)
-		}
-
-		// use a bool value to judge whether to sync
-		needToSync := false
-		if len(importIDLs) == len(idlModel.ImportIdls) {
-			// create a map to find imports
-			existingImportIDLsMap := make(map[string]struct{})
-			for _, importIDL := range importIDLs {
-				// use IdlPath as key
-				existingImportIDLsMap[importIDL.CommitHash] = struct{}{}
-			}
-
-			// compare import idl
-			for _, dbImportIDL := range idlModel.ImportIdls {
-				if _, ok := existingImportIDLsMap[dbImportIDL.CommitHash]; ok {
-					// importIDL exist in importIDLs then continue
-					continue
-				} else {
-					needToSync = true
-					break
-				}
-			}
-		} else {
-			needToSync = true
-		}
-
 		// compare main idl
-		hash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, repoModel.RepositoryBranch)
+		hash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, idlRepoModel.RepositoryBranch)
 		if err != nil {
 			logger.Logger.Error("get latest commit hash failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
@@ -264,18 +214,71 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		if hash != idlModel.CommitHash {
+		if hash != idlEntityWithRepoInfo.CommitHash {
 			needToSync = true
-		}
+		} else {
+			// if mail idl is not changed
+			// then compare imported idl files
 
-		needToSync = true // TODO: delete
+			mainIdlDir := filepath.Dir(idlPid)
+			// calculate the hash value and add it to the importIDLs slice
+			for _, importPath := range importPaths {
+				calculatedPath := filepath.ToSlash(filepath.Join(mainIdlDir, importPath))
+				commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, idlRepoModel.RepositoryBranch)
+				if err != nil {
+					return &agent.SyncIDLsByIdRes{
+						Code: consts.ErrNumRepoGetCommitHash,
+						Msg:  "cannot get depended idl latest commit hash",
+					}, nil
+				}
+
+				importIDL := &model.ImportIDL{
+					IdlPath:    calculatedPath,
+					CommitHash: commitHash,
+				}
+
+				importIDLs = append(importIDLs, importIDL)
+			}
+
+			// use a bool value to judge whether to sync
+			if len(importIDLs) == len(idlEntityWithRepoInfo.ImportIdls) {
+				// create a map to find imports
+				existingImportIDLsMap := make(map[string]struct{})
+				for _, importIDL := range importIDLs {
+					// use IdlPath as key
+					existingImportIDLsMap[importIDL.CommitHash] = struct{}{}
+				}
+
+				// compare import idl
+				for _, dbImportIDL := range idlEntityWithRepoInfo.ImportIdls {
+					if _, ok := existingImportIDLsMap[dbImportIDL.CommitHash]; ok {
+						// importIDL exist in importIDLs then continue
+						continue
+					} else {
+						needToSync = true
+						break
+					}
+				}
+			} else {
+				needToSync = true
+			}
+		}
 
 		if !needToSync {
 			continue
 		}
 
+		err = s.svcCtx.GenerateCode(s.ctx, repoClient,
+			tempDir, idlEntityWithRepoInfo, idlRepoModel, archiveName)
+		if err != nil {
+			return &agent.SyncIDLsByIdRes{
+				Code: errx.GetCode(err),
+				Msg:  err.Error(),
+			}, nil
+		}
+
 		err = s.svcCtx.DaoManager.Idl.Sync(s.ctx, model.IDL{
-			Id:         idlModel.Id,
+			Id:         idlEntityWithRepoInfo.Id,
 			CommitHash: hash,
 			ImportIdls: importIDLs,
 		})
@@ -284,16 +287,6 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumDatabase,
 				Msg:  consts.ErrMsgDatabase,
-			}, nil
-		}
-
-		res, err := s.agentService.GenerateCode(s.ctx, &agent.GenerateCodeReq{
-			IdlId: v,
-		})
-		if res.Code != 0 {
-			return &agent.SyncIDLsByIdRes{
-				Code: res.Code,
-				Msg:  res.Msg,
 			}, nil
 		}
 

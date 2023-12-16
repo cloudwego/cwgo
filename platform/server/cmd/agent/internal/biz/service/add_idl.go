@@ -81,14 +81,6 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	_, err = repoClient.GetFile(owner, repoName, idlPid, repoClient.GetBranch())
-	if err != nil {
-		return &agent.AddIDLRes{
-			Code: consts.ErrNumRepoGetFile,
-			Msg:  consts.ErrMsgRepoGetFile,
-		}, nil
-	}
-
 	// obtain the commit hash for the main IDL
 	mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, repoClient.GetBranch())
 	if err != nil {
@@ -98,21 +90,22 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	// determine the idl type for subsequent calculations of different types
-	idlType, err := utils.DetermineIdlType(idlPid)
-	if err != nil {
-		return &agent.AddIDLRes{
-			Code: consts.ErrNumIdlFileExtension,
-			Msg:  consts.ErrMsgIdlFileExtension,
-		}, nil
-	}
-
 	idlRepoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.RepositoryId)
 	if err != nil {
 		logger.Logger.Error("get repository failed", zap.Error(err))
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
+		}, nil
+	}
+
+	// get the entire repository archive
+	archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, repoClient.GetBranch())
+	if err != nil {
+		logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
+		return &agent.AddIDLRes{
+			Code: consts.ErrNumRepoGetArchive,
+			Msg:  consts.ErrMsgRepoGetArchive,
 		}, nil
 	}
 
@@ -144,17 +137,8 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			}, nil
 		}
 	}
-	defer os.RemoveAll(tempDir)
 
-	// get the entire repository archive
-	archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, repoClient.GetBranch())
-	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
-		return &agent.AddIDLRes{
-			Code: consts.ErrNumRepoGetArchive,
-			Msg:  consts.ErrMsgRepoGetArchive,
-		}, nil
-	}
+	tempDirRepo := tempDir + "/" + consts.TempDirRepo
 
 	// the archive type of GitHub is tarball instead of tar
 	isTarBall := false
@@ -163,7 +147,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	// extract the tar package and persist it to a temporary file
-	archiveName, err := utils.UnTar(archiveData, tempDir, isTarBall)
+	archiveName, err := utils.UnTar(archiveData, tempDirRepo, isTarBall)
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
 		return &agent.AddIDLRes{
@@ -172,12 +156,21 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
+	// determine the idl type for subsequent calculations of different types
+	idlType, err := utils.DetermineIdlType(idlPid)
+	if err != nil {
+		return &agent.AddIDLRes{
+			Code: consts.ErrNumIdlFileExtension,
+			Msg:  consts.ErrMsgIdlFileExtension,
+		}, nil
+	}
+
 	// obtain dependent file paths
 	var importPaths []string
 	switch idlType {
 	case consts.IdlTypeNumThrift:
 		thriftFile := &parser.ThriftFile{}
-		importPaths, err = thriftFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
+		importPaths, err = thriftFile.GetDependentFilePaths(tempDirRepo + "/" + archiveName + idlPid)
 		if err != nil {
 			return &agent.AddIDLRes{
 				Code: consts.ErrNumIdlGetDependentFilePath,
@@ -186,7 +179,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}
 	case consts.IdlTypeNumProto:
 		protoFile := &parser.ProtoFile{}
-		importPaths, err = protoFile.GetDependentFilePaths(tempDir + "/" + archiveName + idlPid)
+		importPaths, err = protoFile.GetDependentFilePaths(tempDirRepo + "/" + archiveName + idlPid)
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumIdlGetDependentFilePath,
 			Msg:  consts.ErrMsgIdlGetDependentFilePath,
@@ -275,9 +268,18 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	// async generate code
 	go func() {
-		_, _ = s.agentService.GenerateCode(s.ctx, &agent.GenerateCodeReq{
-			IdlId: mainIdlId,
-		})
+		idlEntityWithRepoInfo, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, mainIdlId)
+		if err != nil {
+			return
+		}
+
+		err = s.svcCtx.GenerateCode(s.ctx, repoClient,
+			tempDir, idlEntityWithRepoInfo, idlRepoModel, archiveName)
+		if err != nil {
+			return
+		}
+
+		os.RemoveAll(tempDir)
 	}()
 
 	return &agent.AddIDLRes{
