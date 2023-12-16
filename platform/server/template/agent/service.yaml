@@ -1,0 +1,99 @@
+path: internal/biz/service/{{ SnakeString (index .Methods 0).Name }}.go
+loop_method: true
+update_behavior:
+  type: skip
+body: |-
+  /*
+  *
+  *  * Copyright 2022 CloudWeGo Authors
+  *  *
+  *  * Licensed under the Apache License, Version 2.0 (the "License");
+  *  * you may not use this file except in compliance with the License.
+  *  * You may obtain a copy of the License at
+  *  *
+  *  *     http://www.apache.org/licenses/LICENSE-2.0
+  *  *
+  *  * Unless required by applicable law or agreed to in writing, software
+  *  * distributed under the License is distributed on an "AS IS" BASIS,
+  *  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  *  * See the License for the specific language governing permissions and
+  *  * limitations under the License.
+  *
+  */
+  
+  package service
+
+  import (
+    "context"
+
+  	{{- range $path, $aliases := ( FilterImports .Imports .Methods )}}
+  		{{- if not $aliases }}
+  			"{{$path}}"
+        {{- else if or (eq $path "github.com/cloudwego/kitex/client") (eq $path "github.com/cloudwego/kitex/pkg/serviceinfo")}}
+  		{{- else}}
+  			{{- range $alias, $is := $aliases}}
+  				{{$alias}} "{{$path}}"
+  			{{- end}}
+  		{{- end}}
+  	{{- end}}
+    "{{.Module}}/internal/svc"
+  )
+
+  {{range .Methods}}
+
+  type {{.Name}}Service struct {
+    ctx context.Context
+    svcCtx *svc.ServiceContext
+  }
+
+  {{- if or .ClientStreaming .ServerStreaming}}
+
+  // New{{.Name}}Service new {{.Name}}Service
+  func New{{.Name}}Service(ctx context.Context, svcCtx *svc.ServiceContext) *{{.Name}}Service {
+    return &{{.Name}}Service{
+      ctx: ctx,
+      svcCtx: svcCtx,
+    }
+  }
+
+  func (s *{{.Name}}Service) Run({{if not .ClientStreaming}}{{range .Args}}{{LowerFirst .Name}} {{.Type}}, {{end}}{{end}}stream {{.PkgRefName}}.{{.ServiceName}}_{{.RawName}}Server) (err error) {
+    return
+  }
+  {{- else}}
+  {{- if .Void}}
+  {{- if .Oneway}}
+  {{- end}}
+  
+  // New{{.Name}}Service new {{.Name}}Service
+  func New{{.Name}}Service(ctx context.Context, svcCtx *svc.ServiceContext) *{{.Name}}Service {
+    return &{{.Name}}Service{
+      ctx: ctx,
+      svcCtx: svcCtx,
+    }
+  }
+
+  // Run create note info
+  func (s *{{.Name}}Service) Run({{range .Args}}{{LowerFirst .Name}} {{.Type}}{{end}}) error {
+    // Finish your business logic.
+
+    return nil
+  }
+  {{else -}}
+  
+  // New{{.Name}}Service new {{.Name}}Service
+  func New{{.Name}}Service(ctx context.Context, svcCtx *svc.ServiceContext) *{{.Name}}Service {
+    return &{{.Name}}Service{
+      ctx: ctx,
+      svcCtx: svcCtx,
+    }
+  }
+
+  // Run create note info
+  func (s *{{.Name}}Service) Run({{range .Args}}{{LowerFirst .Name}} {{.Type}}{{end}}) (resp {{.Resp.Type}}, err error) {
+    // Finish your business logic.
+
+    return
+  }
+  {{end}}
+  {{end}}
+  {{end}}
