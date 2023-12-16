@@ -193,26 +193,90 @@ func (a *GitLabApi) GetFile(owner, repoName, filePath, ref string) (*File, error
 }
 
 func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoName, branch, commitMessage string) error {
-	// Delete the original code before pushing it
-	err := a.DeleteDirs(owner, repoName, "kitex_gen", "rpc", "go.mod", "go.sum")
+	repoPid := fmt.Sprintf("%s/%s", owner, repoName)
+
+	// create temp branch
+	tempBranch := fmt.Sprintf("cwgo-temp-%d", time.Now().UnixNano())
+	_, _, err := a.client.Branches.CreateBranch(repoPid, &gitlab.CreateBranchOptions{
+		Branch: &tempBranch,
+		Ref:    &branch,
+	})
 	if err != nil {
+		logger.Logger.Warn("create repo temp branch failed",
+			zap.String("repo_pid", repoPid),
+			zap.String("base_branch", branch),
+			zap.String("temp_branch", tempBranch),
+		)
 		return err
 	}
 
-	// pushFilesToRepository implementation for GitLab
-	for filePath, content := range files {
-		contentStr := string(content)
-		opts := &gitlab.CreateFileOptions{
-			Branch:        gitlab.String(branch),
-			CommitMessage: gitlab.String(commitMessage),
-			Content:       &contentStr,
-		}
+	// delete all file in temp branch
+	err = a.DeleteFiles(owner, repoName, tempBranch, "kitex_gen", "rpc", "go.mod", "go.sum")
+	if err != nil {
+		logger.Logger.Warn("delete all file in temp branch failed",
+			zap.String("repo_pid", repoPid),
+			zap.String("branch", tempBranch),
+		)
+		return err
+	}
 
-		// create files in the repository
-		_, _, err = a.client.RepositoryFiles.CreateFile(fmt.Sprintf("%s/%s", owner, repoName), filePath, opts)
-		if err != nil {
-			return err
+	opts := &gitlab.CreateCommitOptions{
+		Branch:        &tempBranch,
+		CommitMessage: &commitMessage,
+	}
+
+	commitActionOptions := make([]*gitlab.CommitActionOptions, len(files))
+
+	i := 0
+	for filePath, content := range files {
+		commitActionOptions[i] = &gitlab.CommitActionOptions{
+			Action:   gitlab.FileAction(gitlab.FileCreate),
+			FilePath: gitlab.String(filePath),
+			Content:  gitlab.String(string(content)),
 		}
+		i++
+	}
+
+	opts.Actions = commitActionOptions
+
+	// create commit(push all file) into temp branch
+	_, _, err = a.client.Commits.CreateCommit(repoPid, opts)
+	if err != nil {
+		logger.Logger.Warn("create commit into temp branch failed",
+			zap.String("repo_pid", repoPid),
+			zap.String("branch", tempBranch),
+		)
+		return err
+	}
+
+	// create merge request
+	createMergeRequestRes, _, err := a.client.MergeRequests.CreateMergeRequest(repoPid, &gitlab.CreateMergeRequestOptions{
+		Title:        gitlab.String("cwgo mr"),
+		SourceBranch: &tempBranch,
+		TargetBranch: &branch,
+	})
+	if err != nil {
+		logger.Logger.Warn("create merge request from temp branch to source branch failed",
+			zap.String("repo_pid", repoPid),
+			zap.String("temp_branch", tempBranch),
+			zap.String("source_branch", branch),
+		)
+	}
+
+	// approve merge request
+	_, _, err = a.client.MergeRequests.AcceptMergeRequest(repoPid, createMergeRequestRes.IID, &gitlab.AcceptMergeRequestOptions{
+		MergeCommitMessage:       gitlab.String(commitMessage),
+		SquashCommitMessage:      gitlab.String(commitMessage),
+		Squash:                   gitlab.Bool(true),
+		ShouldRemoveSourceBranch: gitlab.Bool(true),
+	})
+	if err != nil {
+		logger.Logger.Warn("approve merge request failed",
+			zap.Int("mr_iid", createMergeRequestRes.IID),
+			zap.String("repo_pid", repoPid),
+			zap.String("temp_branch", tempBranch),
+			zap.String("source_branch", branch),
+		)
 	}
 
 	return nil
@@ -254,22 +318,34 @@ func (a *GitLabApi) GetLatestCommitHash(owner, repoName, filePath, ref string) (
 	return fileContent.LastCommitID, nil
 }
 
-func (a *GitLabApi) DeleteDirs(owner, repoName string, folderPaths ...string) error {
+func (a *GitLabApi) DeleteFiles(owner, repoName, branch string, filePaths ...string) error {
 	// generate the project ID by combining owner and repoName
-	pid := fmt.Sprintf("%s/%s", owner, repoName)
+	repoPid := fmt.Sprintf("%s/%s", owner, repoName)
 
-	// iterate over the folder paths and delete each one
-	for _, folderPath := range folderPaths {
-		// attempt to delete the specified folder
-		_, err := a.client.RepositoryFiles.DeleteFile(pid, folderPath, &gitlab.DeleteFileOptions{
-			Branch:        gitlab.String("main"), // set the branch where the folder is located
-			CommitMessage: gitlab.String(fmt.Sprintf("Delete folder %s", folderPath)),
-		})
+	opts := &gitlab.CreateCommitOptions{
+		Branch:        &branch,
+		CommitMessage: gitlab.String(fmt.Sprintf("delete file")),
+	}
 
-		// check for errors, but ignore if it's a "file not found" error
-		if err != nil && !utils.IsFileNotFoundError(err) {
-			return err
+	commitActionOptions := make([]*gitlab.CommitActionOptions, len(filePaths))
+
+	for i, path := range filePaths {
+		commitActionOptions[i] = &gitlab.CommitActionOptions{
+			Action:   gitlab.FileAction(gitlab.FileDelete),
+			FilePath: gitlab.String(path),
 		}
+	}
+
+	opts.Actions = commitActionOptions
+
+	// create commit(push all file) into temp branch
+	_, _, err := a.client.Commits.CreateCommit(repoPid, opts)
+	if err != nil {
+		logger.Logger.Warn("create commit into branch failed",
+			zap.String("repo_pid", repoPid),
+			zap.String("branch", branch),
+		)
+		return err
 	}
 
 	return nil

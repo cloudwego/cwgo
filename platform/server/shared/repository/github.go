@@ -201,7 +201,7 @@ func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	}
 
 	// Delete the original code before pushing it
-	err = a.DeleteDirs(owner, repoName, "kitex_gen", "rpc")
+	err = a.DeleteFiles(owner, repoName, "kitex_gen", "rpc")
 	if err != nil {
 		return err
 	}
@@ -314,7 +314,7 @@ func (a *GitHubApi) GetLatestCommitHash(owner, repoName, filePath, ref string) (
 	return *fileContent.SHA, nil
 }
 
-func (a *GitHubApi) DeleteDirs(owner, repoName string, folderPaths ...string) error {
+func (a *GitHubApi) DeleteFiles(owner, repoName, branch string, folderPaths ...string) error {
 	for _, folderPath := range folderPaths {
 		// define the file path for a .gitkeep file within the folder.
 		filePath := fmt.Sprintf("%s/%s", folderPath, ".gitkeep")
@@ -322,7 +322,7 @@ func (a *GitHubApi) DeleteDirs(owner, repoName string, folderPaths ...string) er
 		// configure options for committing the delete operation.
 		commitOpts := &github.RepositoryContentFileOptions{
 			Message: github.String(fmt.Sprintf("Delete folder %s", folderPath)),
-			Branch:  github.String("main"), // Set the branch where the folder deletion should occur
+			Branch:  github.String(branch), // Set the branch where the folder deletion should occur
 		}
 
 		// attempt to delete the .gitkeep file, effectively removing the folder.

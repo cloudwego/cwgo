@@ -50,7 +50,6 @@ func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext, agentServ
 
 // Run create note info
 func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
-	// check main idl path
 	repoClient, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
 	if err != nil {
 		return &agent.AddIDLRes{
@@ -67,6 +66,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
+	// check main idl path
 	isExist, err := s.svcCtx.DaoManager.Idl.CheckMainIdlIfExist(s.ctx, req.RepositoryId, idlPid)
 	if err != nil {
 		return &agent.AddIDLRes{
@@ -82,6 +82,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	}
 
 	// obtain the commit hash for the main IDL
+	// check main idl if exist in repo at the same time
 	mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, repoClient.GetBranch())
 	if err != nil {
 		return &agent.AddIDLRes{

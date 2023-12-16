@@ -38,7 +38,6 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"UpdateTemplateItem": kitex.NewMethodInfo(updateTemplateItemHandler, newAgentServiceUpdateTemplateItemArgs, newAgentServiceUpdateTemplateItemResult, false),
 		"GetTemplateItems":   kitex.NewMethodInfo(getTemplateItemsHandler, newAgentServiceGetTemplateItemsArgs, newAgentServiceGetTemplateItemsResult, false),
 		"UpdateTasks":        kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
-		"GenerateCode":       kitex.NewMethodInfo(generateCodeHandler, newAgentServiceGenerateCodeArgs, newAgentServiceGenerateCodeResult, false),
 		"AddToken":           kitex.NewMethodInfo(addTokenHandler, newAgentServiceAddTokenArgs, newAgentServiceAddTokenResult, false),
 		"DeleteToken":        kitex.NewMethodInfo(deleteTokenHandler, newAgentServiceDeleteTokenArgs, newAgentServiceDeleteTokenResult, false),
 		"GetToken":           kitex.NewMethodInfo(getTokenHandler, newAgentServiceGetTokenArgs, newAgentServiceGetTokenResult, false),
@@ -399,24 +398,6 @@ func newAgentServiceUpdateTasksResult() interface{} {
 	return agent.NewAgentServiceUpdateTasksResult()
 }
 
-func generateCodeHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*agent.AgentServiceGenerateCodeArgs)
-	realResult := result.(*agent.AgentServiceGenerateCodeResult)
-	success, err := handler.(agent.AgentService).GenerateCode(ctx, realArg.Req)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newAgentServiceGenerateCodeArgs() interface{} {
-	return agent.NewAgentServiceGenerateCodeArgs()
-}
-
-func newAgentServiceGenerateCodeResult() interface{} {
-	return agent.NewAgentServiceGenerateCodeResult()
-}
-
 func addTokenHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*agent.AgentServiceAddTokenArgs)
 	realResult := result.(*agent.AgentServiceAddTokenResult)
@@ -666,16 +647,6 @@ func (p *kClient) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq) (r
 	_args.Req = req
 	var _result agent.AgentServiceUpdateTasksResult
 	if err = p.c.Call(ctx, "UpdateTasks", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq) (r *agent.GenerateCodeRes, err error) {
-	var _args agent.AgentServiceGenerateCodeArgs
-	_args.Req = req
-	var _result agent.AgentServiceGenerateCodeResult
-	if err = p.c.Call(ctx, "GenerateCode", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

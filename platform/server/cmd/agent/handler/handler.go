@@ -74,13 +74,6 @@ func (s *AgentServiceImpl) UpdateTasks(ctx context.Context, req *agent.UpdateTas
 	return resp, err
 }
 
-// GenerateCode implements the AgentServiceImpl interface.
-func (s *AgentServiceImpl) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq) (resp *agent.GenerateCodeRes, err error) {
-	resp, err = service.NewGenerateCodeService(ctx, s.svcCtx).Run(req)
-
-	return resp, err
-}
-
 // GetRepositories implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq) (resp *agent.GetRepositoriesRes, err error) {
 	resp, err = service.NewGetRepositoriesService(ctx, s.svcCtx).Run(req)

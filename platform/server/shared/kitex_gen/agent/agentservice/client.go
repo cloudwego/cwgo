@@ -30,7 +30,6 @@ type Client interface {
 	UpdateTemplateItem(ctx context.Context, req *agent.UpdateTemplateItemReq, callOptions ...callopt.Option) (r *agent.UpdateTemplateItemRes, err error)
 	GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq, callOptions ...callopt.Option) (r *agent.GetTemplateItemsRes, err error)
 	UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error)
-	GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error)
 	AddToken(ctx context.Context, req *agent.AddTokenReq, callOptions ...callopt.Option) (r *agent.AddTokenRes, err error)
 	DeleteToken(ctx context.Context, req *agent.DeleteTokenReq, callOptions ...callopt.Option) (r *agent.DeleteTokenRes, err error)
 	GetToken(ctx context.Context, req *agent.GetTokenReq, callOptions ...callopt.Option) (r *agent.GetTokenRes, err error)
@@ -158,11 +157,6 @@ func (p *kAgentServiceClient) GetTemplateItems(ctx context.Context, req *agent.G
 func (p *kAgentServiceClient) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.UpdateTasks(ctx, req)
-}
-
-func (p *kAgentServiceClient) GenerateCode(ctx context.Context, req *agent.GenerateCodeReq, callOptions ...callopt.Option) (r *agent.GenerateCodeRes, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.GenerateCode(ctx, req)
 }
 
 func (p *kAgentServiceClient) AddToken(ctx context.Context, req *agent.AddTokenReq, callOptions ...callopt.Option) (r *agent.AddTokenRes, err error) {

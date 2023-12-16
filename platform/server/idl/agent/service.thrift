@@ -29,7 +29,6 @@ service AgentService {
     template.GetTemplateItemsRes GetTemplateItems(1: template.GetTemplateItemsReq req)
 
     agent.UpdateTasksRes UpdateTasks(1: agent.UpdateTasksReq req)
-    agent.GenerateCodeRes GenerateCode(1: agent.GenerateCodeReq req)
 
     token.AddTokenRes AddToken(1: token.AddTokenReq req)
     token.DeleteTokenRes DeleteToken(1: token.DeleteTokenReq req)
