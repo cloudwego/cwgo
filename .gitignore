@@ -28,8 +28,13 @@ output/*
 # Vscode files
 .vscode
 
+# mac
+.DS_Store
+
+# platform
 /platform/server/log/
 /platform/manifest/config/config-dev.yaml
 /platform/manifest/config/config-pro.yaml
-# mac
-.DS_Store
+/platform/dist/
+
+
