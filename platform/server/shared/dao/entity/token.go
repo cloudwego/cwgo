@@ -28,12 +28,14 @@ const TableNameMysqlToken = "token"
 
 // MysqlToken mapped from table <token>
 type MysqlToken struct {
-	ID               int64                 `gorm:"column:id;primaryKey;autoIncrement;comment:id" json:"id"`                                                     // id
-	Owner            string                `gorm:"column:owner;not null;comment:repository owner" json:"owner"`                                                 // repository owner
+	ID               int64                 `gorm:"column:id;primaryKey;autoIncrement:true;comment:id" json:"id"`                                                // id
+	Owner            string                `gorm:"column:owner;not null;comment:token owner" json:"owner"`                                                      // token owner
+	OwnerID          int64                 `gorm:"column:owner_id;comment:token owner id" json:"owner_id"`                                                      // token owner id
 	RepositoryType   int32                 `gorm:"column:repository_type;not null;comment:repository type (1: gitlab, 2: github)" json:"repository_type"`       // repository type (1: gitlab, 2: github)
 	RepositoryDomain string                `gorm:"column:repository_domain;not null;comment:repository api domain" json:"repository_domain"`                    // repository api domain
+	Status           int32                 `gorm:"column:status;not null;comment:token status (1: expired, 2: valid)" json:"status"`                            // token status (1: expired, 2: valid)
+	TokenType        int32                 `gorm:"column:token_type;not null;comment:token type (1:  personal, 2: organization)" json:"token_type"`             // token type (1:  personal, 2: organization)
 	Token            string                `gorm:"column:token;not null;comment:repository token" json:"token"`                                                 // repository token
-	Status           int32                 `gorm:"column:status;not null;comment:token status (0: expired, 1: valid)" json:"status"`                            // token status (0: expired, 1: valid)
 	ExpirationTime   time.Time             `gorm:"column:expiration_time;comment:token expiration time" json:"expiration_time"`                                 // token expiration time
 	IsDeleted        soft_delete.DeletedAt `gorm:"column:is_deleted;softDelete:flag;not null;comment:is deleted" json:"is_deleted"`                             // is deleted
 	CreateTime       time.Time             `gorm:"column:create_time;autoCreateTime;not null;default:CURRENT_TIMESTAMP;comment:create time" json:"create_time"` // create time

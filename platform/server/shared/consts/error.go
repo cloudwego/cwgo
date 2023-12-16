@@ -113,16 +113,19 @@ var (
 const (
 	ErrNumToken = iota + 40000
 	ErrNumTokenInvalid
+	ErrNumTokenInvalidType
 )
 
 const (
-	ErrMsgToken        = "token err"
-	ErrMsgTokenInvalid = "token is invalid"
+	ErrMsgToken            = "token err"
+	ErrMsgTokenInvalid     = "token is invalid"
+	ErrMsgTokenInvalidType = "invalid token type"
 )
 
 var (
-	ErrToken        = errx.New(ErrNumToken, ErrMsgToken)
-	ErrTokenInvalid = errx.New(ErrNumTokenInvalid, ErrMsgTokenInvalid)
+	ErrToken            = errx.New(ErrNumToken, ErrMsgToken)
+	ErrTokenInvalid     = errx.New(ErrNumTokenInvalid, ErrMsgTokenInvalid)
+	ErrTokenInvalidType = errx.New(ErrNumTokenInvalidType, ErrMsgTokenInvalidType)
 )
 
 // idl err

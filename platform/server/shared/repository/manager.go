@@ -92,19 +92,10 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 			return err
 		}
 
-		waitChan := make(chan struct{})
-		exitChan := make(chan struct {
-			RepositoryClient IRepository
-			TokenId          int64
-		})
-
+		// use token which it's owner is same with repo owner
 		for _, tokenModel := range tokenModels {
-			go func(tokenModel *model.Token) {
-				defer func() {
-					waitChan <- struct{}{}
-				}()
-
-				internalRepositoryClient, err := NewGitLabApi(
+			if tokenModel.Owner == repositoryModel.RepositoryOwner {
+				repositoryClient, err = NewGitLabApi(
 					tokenModel.RepositoryDomain,
 					tokenModel.Token,
 					repositoryModel.RepositoryOwner,
@@ -112,30 +103,64 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 					repositoryModel.RepositoryBranch,
 				)
 				if err != nil {
-					logger.Logger.Error("init repo client failed", zap.Error(err))
-					return
+					repositoryClient = nil
 				}
-
-				logger.Logger.Debug("get token for repo",
-					zap.Int64("repo_id", repositoryModel.Id),
-					zap.Int64("token_id", tokenModel.Id),
-				)
-
-				exitChan <- struct {
-					RepositoryClient IRepository
-					TokenId          int64
-				}{RepositoryClient: internalRepositoryClient, TokenId: tokenModel.Id}
-			}(tokenModel)
+			}
 		}
 
-		for i := 0; i < len(tokenModels); i++ {
-			select {
-			case <-waitChan:
+		if repositoryClient == nil {
+			// if there is no token corresponding to the repo owner
+			// then check all token corresponding to the repo domain
+			waitChan := make(chan struct{})
+			exitChan := make(chan struct {
+				RepositoryClient IRepository
+				TokenId          int64
+			})
 
-			case chanRes := <-exitChan:
-				repositoryClient = chanRes.RepositoryClient
-				repositoryModel.TokenId = chanRes.TokenId
-				break
+			goNum := 0
+			for _, tokenModel := range tokenModels {
+				if tokenModel.Owner == repositoryModel.RepositoryOwner {
+					continue
+				}
+
+				goNum++
+				go func(tokenModel *model.Token) {
+					defer func() {
+						waitChan <- struct{}{}
+					}()
+
+					internalRepositoryClient, err := NewGitLabApi(
+						tokenModel.RepositoryDomain,
+						tokenModel.Token,
+						repositoryModel.RepositoryOwner,
+						repositoryModel.RepositoryName,
+						repositoryModel.RepositoryBranch,
+					)
+					if err != nil {
+						return
+					}
+
+					logger.Logger.Debug("get token for repo",
+						zap.Int64("repo_id", repositoryModel.Id),
+						zap.Int64("token_id", tokenModel.Id),
+					)
+
+					exitChan <- struct {
+						RepositoryClient IRepository
+						TokenId          int64
+					}{RepositoryClient: internalRepositoryClient, TokenId: tokenModel.Id}
+				}(tokenModel)
+			}
+
+			for i := 0; i < goNum; i++ {
+				select {
+				case <-waitChan:
+
+				case chanRes := <-exitChan:
+					repositoryClient = chanRes.RepositoryClient
+					repositoryModel.TokenId = chanRes.TokenId
+					break
+				}
 			}
 		}
 	}

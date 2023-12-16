@@ -40,7 +40,9 @@ type GitHubApi struct {
 	client              *github.Client
 	repoApiDomain       string
 	token               string
+	tokenType           int32
 	tokenOwner          string
+	tokenOwnerId        int64
 	repoOwner           string
 	repoName            string
 	branch              string
@@ -54,7 +56,7 @@ func NewGitHubApi(token, repoOwner, repoName, branch string) (*GitHubApi, error)
 	}
 
 	// get token info
-	tokenOwner, tokenExpirationTime, err := utils.GetGitHubTokenInfo(client)
+	tokenOwner, tokenOwnerId, tokenType, tokenExpirationTime, err := utils.GetGitHubTokenInfo(client)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +76,9 @@ func NewGitHubApi(token, repoOwner, repoName, branch string) (*GitHubApi, error)
 		client:              client,
 		repoApiDomain:       consts.GitHubDomain,
 		token:               token,
+		tokenType:           tokenType,
 		tokenOwner:          tokenOwner,
+		tokenOwnerId:        tokenOwnerId,
 		repoOwner:           repoOwner,
 		repoName:            repoName,
 		branch:              branch,

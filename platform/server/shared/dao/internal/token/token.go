@@ -59,8 +59,10 @@ func (m *MysqlTokenManager) AddToken(ctx context.Context, tokenModel model.Token
 
 	tokenEntity := entity.MysqlToken{
 		Owner:            tokenModel.Owner,
+		OwnerID:          tokenModel.OwnerId,
 		RepositoryType:   tokenModel.RepositoryType,
 		RepositoryDomain: tokenModel.RepositoryDomain,
+		TokenType:        tokenModel.TokenType,
 		Token:            tokenModel.Token,
 		Status:           tokenModel.Status,
 		ExpirationTime:   expirationTime,
@@ -101,11 +103,17 @@ func (m *MysqlTokenManager) GetTokenList(ctx context.Context, tokenModel model.T
 	if tokenModel.Owner != "" {
 		db = db.Where("`owner` = ?", tokenModel.Owner)
 	}
+	if tokenModel.OwnerId != 0 {
+		db = db.Where("`owner_id` = ?", tokenModel.OwnerId)
+	}
 	if tokenModel.RepositoryType != 0 {
 		db = db.Where("`repository_type` = ?", tokenModel.RepositoryType)
 	}
 	if tokenModel.RepositoryDomain != "" {
 		db = db.Where("`repository_domain` LIKE ?", fmt.Sprintf("%%%s%%", tokenModel.RepositoryDomain))
+	}
+	if tokenModel.TokenType != 0 {
+		db = db.Where("`token_type` = ?", tokenModel.TokenType)
 	}
 
 	err := db.
@@ -148,8 +156,10 @@ func (m *MysqlTokenManager) GetTokenList(ctx context.Context, tokenModel model.T
 		tokenModels[i] = &model.Token{
 			Id:               tokenEntity.ID,
 			Owner:            tokenEntity.Owner,
+			OwnerId:          tokenEntity.OwnerID,
 			RepositoryType:   tokenEntity.RepositoryType,
 			RepositoryDomain: tokenEntity.RepositoryDomain,
+			TokenType:        tokenEntity.TokenType,
 			Token:            tokenEntity.Token,
 			Status:           tokenEntity.Status,
 			ExpirationTime:   tokenEntity.ExpirationTime.Format(time.DateTime),
@@ -184,13 +194,14 @@ func (m *MysqlTokenManager) GetActiveTokenForDomain(ctx context.Context, domain 
 	}
 
 	tokenModels := make([]*model.Token, len(tokenEntities))
-
 	for i, tokenEntity := range tokenEntities {
 		tokenModels[i] = &model.Token{
 			Id:               tokenEntity.ID,
-			Owner:            tokenEntity.Token,
+			Owner:            tokenEntity.Owner,
+			OwnerId:          tokenEntity.OwnerID,
 			RepositoryType:   tokenEntity.RepositoryType,
 			RepositoryDomain: tokenEntity.RepositoryDomain,
+			TokenType:        tokenEntity.TokenType,
 			Token:            tokenEntity.Token,
 			Status:           tokenEntity.Status,
 			ExpirationTime:   tokenEntity.ExpirationTime.Format(time.DateTime),
@@ -216,8 +227,10 @@ func (m *MysqlTokenManager) GetTokenById(ctx context.Context, id int64) (*model.
 	return &model.Token{
 		Id:               tokenEntity.ID,
 		Owner:            tokenEntity.Token,
+		OwnerId:          tokenEntity.OwnerID,
 		RepositoryType:   tokenEntity.RepositoryType,
 		RepositoryDomain: tokenEntity.RepositoryDomain,
+		TokenType:        tokenEntity.TokenType,
 		Token:            tokenEntity.Token,
 		Status:           tokenEntity.Status,
 		ExpirationTime:   tokenEntity.ExpirationTime.Format(time.DateTime),

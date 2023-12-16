@@ -23,7 +23,17 @@ const (
 	TokenStatusNumValid
 )
 
-var TokenStatusNumMap = map[int]struct{}{
+var TokenStatusNumMap = map[int32]struct{}{
 	TokenStatusNumExpired: {},
 	TokenStatusNumValid:   {},
+}
+
+const (
+	TokenTypeNumPersonal = iota + 1
+	TokenTypeNumOrganization
+)
+
+var TokenTypeNumMap = map[int32]struct{}{
+	TokenTypeNumPersonal:     {},
+	TokenTypeNumOrganization: {},
 }

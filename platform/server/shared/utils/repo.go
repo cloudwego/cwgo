@@ -60,18 +60,20 @@ func NewGitlabClient(token, baseURL string) (client *gitlab.Client, err error) {
 	return client, nil
 }
 
-func GetGitLabTokenInfo(client *gitlab.Client) (owner string, expirationTime time.Time, err error) {
+func GetGitLabTokenInfo(client *gitlab.Client) (owner string, ownerId int64, tokenType int32, expirationTime time.Time, err error) {
+	// get token info
 	token, _, err := client.PersonalAccessTokens.GetSinglePersonalAccessToken()
 	if err != nil {
 		if strings.Contains(err.Error(), "401 Unauthorized") {
-			return "", time.Time{}, consts.ErrTokenInvalid
+			return "", 0, 0, time.Time{}, consts.ErrTokenInvalid
 		}
 
-		return "", time.Time{}, err
+		return "", 0, 0, time.Time{}, err
 	}
 
+	// check token if is valid
 	if token.Revoked || !token.Active {
-		return "", time.Time{}, consts.ErrTokenInvalid
+		return "", 0, 0, time.Time{}, consts.ErrTokenInvalid
 	}
 
 	// whether if have scope: api
@@ -83,20 +85,55 @@ func GetGitLabTokenInfo(client *gitlab.Client) (owner string, expirationTime tim
 	}
 
 	if !hasApi {
-		return "", time.Time{}, consts.ErrTokenInvalid
+		return "", 0, 0, time.Time{}, consts.ErrTokenInvalid
 	}
 
+	// check token if expired
 	expirationTime, err = time.ParseInLocation("2006-01-02", token.ExpiresAt.String(), consts.TimeZone)
 	if err != nil {
-		return "", time.Time{}, err
+		return "", 0, 0, time.Time{}, err
 	}
 
+	// get user info by token
 	user, _, err := client.Users.GetUser(token.UserID, gitlab.GetUsersOptions{})
 	if err != nil {
-		return "", time.Time{}, err
+		return "", 0, 0, time.Time{}, err
 	}
 
-	return user.Username, expirationTime, nil
+	// get namespace info by token
+	namespaces, _, err := client.Namespaces.ListNamespaces(&gitlab.ListNamespacesOptions{})
+	if err != nil {
+		return "", 0, 0, time.Time{}, err
+	}
+
+	// check user if is bot
+	if user.Bot {
+		// if is bot, then token is group access token (https://docs.gitlab.com/ee/user/group/settings/group_access_tokens.html)
+
+		for _, namespace := range namespaces {
+			if namespace.Kind == "group" {
+				owner = namespace.Name
+				ownerId = int64(namespace.ID)
+				tokenType = consts.TokenTypeNumOrganization
+				break
+			}
+		}
+		if owner == "" {
+			// probably token is project token
+			return "", 0, 0, time.Time{}, consts.ErrTokenInvalidType
+		}
+	} else {
+		for _, namespace := range namespaces {
+			if namespace.Path == user.Username {
+				ownerId = int64(namespace.ID)
+				break
+			}
+		}
+		owner = user.Username
+		tokenType = consts.TokenTypeNumPersonal
+	}
+
+	return owner, ownerId, tokenType, expirationTime, nil
 }
 
 func NewGithubClient(token string) (client *github.Client, err error) {
@@ -112,25 +149,25 @@ func NewGithubClient(token string) (client *github.Client, err error) {
 	return client, nil
 }
 
-func GetGitHubTokenInfo(client *github.Client) (owner string, expirationTime time.Time, err error) {
+func GetGitHubTokenInfo(client *github.Client) (owner string, ownerId int64, tokenType int32, expirationTime time.Time, err error) {
 	user, res, err := client.Users.Get(context.Background(), "")
 	if err != nil {
 		if githubErr, ok := err.(*github.ErrorResponse); ok {
 			if githubErr.Message == "Bad credentials" {
-				return "", time.Time{}, consts.ErrTokenInvalid
+				return "", 0, 0, time.Time{}, consts.ErrTokenInvalid
 			}
 		}
 
-		return "", time.Time{}, err
+		return "", 0, 0, time.Time{}, err
 	}
 
 	expirationTimeStr := res.Header.Get("github-authentication-token-expiration")
 	expirationTime, err = time.ParseInLocation("2006-01-02 15:04:05 MST", expirationTimeStr, consts.TimeZone)
 	if err != nil {
-		return "", time.Time{}, err
+		return "", 0, 0, time.Time{}, err
 	}
 
-	return *user.Login, expirationTime, nil
+	return *user.Login, *user.ID, consts.TokenTypeNumPersonal, expirationTime, nil
 }
 
 func GetRepoFullUrl(repoType int32, repoUrl, ref, filePid string) string {
@@ -174,10 +211,10 @@ func ValidateTokenForRepoGitLab(client *gitlab.Client, owner, repoName string) (
 	}
 
 	if project.Permissions.ProjectAccess != nil {
-		return project.Permissions.ProjectAccess.AccessLevel >= 30, nil
+		return project.Permissions.ProjectAccess.AccessLevel >= 40, nil
 	}
 	if project.Permissions.GroupAccess != nil {
-		return project.Permissions.GroupAccess.AccessLevel >= 30, nil
+		return project.Permissions.GroupAccess.AccessLevel >= 40, nil
 	}
 
 	return false, nil

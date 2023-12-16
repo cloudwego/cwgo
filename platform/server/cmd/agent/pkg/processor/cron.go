@@ -107,7 +107,7 @@ const (
 
 	// sync time that controls current worker num
 	maxSyncTime        = 60 * time.Minute // all task max sync time
-	minSyncTime        = 10 * time.Second // all task min sync time
+	minSyncTime        = 30 * time.Second // all task min sync time
 	adjustTimeDuration = 1 * time.Minute
 )
 

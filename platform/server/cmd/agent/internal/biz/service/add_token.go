@@ -44,6 +44,8 @@ func NewAddTokenService(ctx context.Context, svcCtx *svc.ServiceContext) *AddTok
 // Run create note info
 func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, err error) {
 	var owner string
+	var ownerId int64
+	var tokenType int32
 	var expirationTime time.Time
 
 	switch req.RepositoryType {
@@ -57,7 +59,7 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, 
 			}, nil
 		}
 
-		owner, expirationTime, err = utils.GetGitLabTokenInfo(client)
+		owner, ownerId, tokenType, expirationTime, err = utils.GetGitLabTokenInfo(client)
 		if err != nil {
 			return &agent.AddTokenRes{
 				Code: errx.GetCode(err),
@@ -75,7 +77,7 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, 
 			}, nil
 		}
 
-		owner, expirationTime, err = utils.GetGitHubTokenInfo(client)
+		owner, ownerId, tokenType, expirationTime, err = utils.GetGitHubTokenInfo(client)
 		if err != nil {
 			return &agent.AddTokenRes{
 				Code: errx.GetCode(err),
@@ -89,6 +91,8 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, 
 		RepositoryType:   req.RepositoryType,
 		RepositoryDomain: req.RepositoryDomain,
 		Owner:            owner,
+		OwnerId:          ownerId,
+		TokenType:        tokenType,
 		Token:            req.Token,
 		Status:           consts.TokenStatusNumValid,
 		ExpirationTime:   expirationTime.String(),

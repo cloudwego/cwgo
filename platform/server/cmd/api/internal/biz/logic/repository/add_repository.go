@@ -73,6 +73,15 @@ func (l *AddRepositoryLogic) AddRepository(req *repository.AddRepositoryReq) (re
 		}
 	}
 
+	if req.RepositoryType == consts.RepositoryTypeNumGithub {
+		if domain != consts.GitHubDomain {
+			return &repository.AddRepositoryRes{
+				Code: consts.ErrNumParamRepositoryUrl,
+				Msg:  "invalid github repository url",
+			}
+		}
+	}
+
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))

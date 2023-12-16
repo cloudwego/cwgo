@@ -77,13 +77,12 @@ func (c *ConsistentHashDispatcher) AddService(serviceId string) error {
 	members := c.hasher.GetMembers()
 
 	serviceWithTasks := make(map[string]map[string]*model.Task, len(members))
+	for _, m := range c.hasher.GetMembers() {
+		serviceWithTasks[m.String()] = make(map[string]*model.Task)
+	}
 
 	for taskId, t := range c.Tasks {
 		m := c.hasher.LocateKey([]byte(taskId)).String()
-		_, ok := serviceWithTasks[m]
-		if !ok {
-			serviceWithTasks[m] = make(map[string]*model.Task)
-		}
 
 		serviceWithTasks[m][taskId] = t
 	}

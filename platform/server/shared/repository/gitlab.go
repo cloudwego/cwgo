@@ -34,7 +34,9 @@ type GitLabApi struct {
 	client              *gitlab.Client
 	repoApiDomain       string
 	token               string
+	tokenType           int32
 	tokenOwner          string
+	tokenOwnerId        int64
 	repoOwner           string
 	repoName            string
 	branch              string
@@ -52,7 +54,7 @@ func NewGitLabApi(domain, token, repoOwner, repoName, branch string) (*GitLabApi
 	}
 
 	// get token info
-	tokenOwner, tokenExpirationTime, err := utils.GetGitLabTokenInfo(client)
+	tokenOwner, tokenOwnerId, tokenType, tokenExpirationTime, err := utils.GetGitLabTokenInfo(client)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +74,9 @@ func NewGitLabApi(domain, token, repoOwner, repoName, branch string) (*GitLabApi
 		client:              client,
 		repoApiDomain:       domain,
 		token:               token,
+		tokenType:           tokenType,
 		tokenOwner:          tokenOwner,
+		tokenOwnerId:        tokenOwnerId,
 		repoOwner:           repoOwner,
 		repoName:            repoName,
 		branch:              branch,
@@ -290,6 +294,7 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 				Description:          gitlab.String("generate by cwgo"),
 				InitializeWithReadme: gitlab.Bool(true),
 				DefaultBranch:        gitlab.String(consts.MainRef),
+				NamespaceID:          gitlab.Int(int(a.tokenOwnerId)),
 			})
 			if err != nil {
 				return "", err

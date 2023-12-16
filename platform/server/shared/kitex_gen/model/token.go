@@ -13,12 +13,14 @@ type Token struct {
 	RepositoryType   int32  `thrift:"repository_type,2" frugal:"2,default,i32" json:"repository_type"`
 	RepositoryDomain string `thrift:"repository_domain,3" frugal:"3,default,string" json:"repository_domain"`
 	Owner            string `thrift:"owner,4" frugal:"4,default,string" json:"owner"`
-	Token            string `thrift:"token,5" frugal:"5,default,string" json:"token"`
-	Status           int32  `thrift:"status,6" frugal:"6,default,i32" json:"status"`
-	ExpirationTime   string `thrift:"expiration_time,7" frugal:"7,default,string" json:"expiration_time"`
-	IsDeleted        bool   `thrift:"is_deleted,8" frugal:"8,default,bool" json:"is_deleted"`
-	CreateTime       string `thrift:"create_time,9" frugal:"9,default,string" json:"create_time"`
-	UpdateTime       string `thrift:"update_time,10" frugal:"10,default,string" json:"update_time"`
+	OwnerId          int64  `thrift:"owner_id,5" frugal:"5,default,i64" json:"owner_id"`
+	TokenType        int32  `thrift:"token_type,6" frugal:"6,default,i32" json:"token_type"`
+	Token            string `thrift:"token,7" frugal:"7,default,string" json:"token"`
+	Status           int32  `thrift:"status,8" frugal:"8,default,i32" json:"status"`
+	ExpirationTime   string `thrift:"expiration_time,9" frugal:"9,default,string" json:"expiration_time"`
+	IsDeleted        bool   `thrift:"is_deleted,10" frugal:"10,default,bool" json:"is_deleted"`
+	CreateTime       string `thrift:"create_time,11" frugal:"11,default,string" json:"create_time"`
+	UpdateTime       string `thrift:"update_time,12" frugal:"12,default,string" json:"update_time"`
 }
 
 func NewToken() *Token {
@@ -43,6 +45,14 @@ func (p *Token) GetRepositoryDomain() (v string) {
 
 func (p *Token) GetOwner() (v string) {
 	return p.Owner
+}
+
+func (p *Token) GetOwnerId() (v int64) {
+	return p.OwnerId
+}
+
+func (p *Token) GetTokenType() (v int32) {
+	return p.TokenType
 }
 
 func (p *Token) GetToken() (v string) {
@@ -80,6 +90,12 @@ func (p *Token) SetRepositoryDomain(val string) {
 func (p *Token) SetOwner(val string) {
 	p.Owner = val
 }
+func (p *Token) SetOwnerId(val int64) {
+	p.OwnerId = val
+}
+func (p *Token) SetTokenType(val int32) {
+	p.TokenType = val
+}
 func (p *Token) SetToken(val string) {
 	p.Token = val
 }
@@ -104,12 +120,14 @@ var fieldIDToName_Token = map[int16]string{
 	2:  "repository_type",
 	3:  "repository_domain",
 	4:  "owner",
-	5:  "token",
-	6:  "status",
-	7:  "expiration_time",
-	8:  "is_deleted",
-	9:  "create_time",
-	10: "update_time",
+	5:  "owner_id",
+	6:  "token_type",
+	7:  "token",
+	8:  "status",
+	9:  "expiration_time",
+	10: "is_deleted",
+	11: "create_time",
+	12: "update_time",
 }
 
 func (p *Token) Read(iprot thrift.TProtocol) (err error) {
@@ -172,7 +190,7 @@ func (p *Token) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 5:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -202,7 +220,7 @@ func (p *Token) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 8:
-			if fieldTypeId == thrift.BOOL {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField8(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -222,8 +240,28 @@ func (p *Token) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 10:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.BOOL {
 				if err = p.ReadField10(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 11:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField11(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 12:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField12(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -298,10 +336,10 @@ func (p *Token) ReadField4(iprot thrift.TProtocol) error {
 }
 
 func (p *Token) ReadField5(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
+	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.Token = v
+		p.OwnerId = v
 	}
 	return nil
 }
@@ -310,7 +348,7 @@ func (p *Token) ReadField6(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
-		p.Status = v
+		p.TokenType = v
 	}
 	return nil
 }
@@ -319,16 +357,16 @@ func (p *Token) ReadField7(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.ExpirationTime = v
+		p.Token = v
 	}
 	return nil
 }
 
 func (p *Token) ReadField8(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadBool(); err != nil {
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
-		p.IsDeleted = v
+		p.Status = v
 	}
 	return nil
 }
@@ -337,12 +375,30 @@ func (p *Token) ReadField9(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
-		p.CreateTime = v
+		p.ExpirationTime = v
 	}
 	return nil
 }
 
 func (p *Token) ReadField10(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadBool(); err != nil {
+		return err
+	} else {
+		p.IsDeleted = v
+	}
+	return nil
+}
+
+func (p *Token) ReadField11(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.CreateTime = v
+	}
+	return nil
+}
+
+func (p *Token) ReadField12(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -395,6 +451,14 @@ func (p *Token) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField10(oprot); err != nil {
 			fieldId = 10
+			goto WriteFieldError
+		}
+		if err = p.writeField11(oprot); err != nil {
+			fieldId = 11
+			goto WriteFieldError
+		}
+		if err = p.writeField12(oprot); err != nil {
+			fieldId = 12
 			goto WriteFieldError
 		}
 
@@ -485,10 +549,10 @@ WriteFieldEndError:
 }
 
 func (p *Token) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("token", thrift.STRING, 5); err != nil {
+	if err = oprot.WriteFieldBegin("owner_id", thrift.I64, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Token); err != nil {
+	if err := oprot.WriteI64(p.OwnerId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -502,10 +566,10 @@ WriteFieldEndError:
 }
 
 func (p *Token) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.I32, 6); err != nil {
+	if err = oprot.WriteFieldBegin("token_type", thrift.I32, 6); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Status); err != nil {
+	if err := oprot.WriteI32(p.TokenType); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -519,10 +583,10 @@ WriteFieldEndError:
 }
 
 func (p *Token) writeField7(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("expiration_time", thrift.STRING, 7); err != nil {
+	if err = oprot.WriteFieldBegin("token", thrift.STRING, 7); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.ExpirationTime); err != nil {
+	if err := oprot.WriteString(p.Token); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -536,10 +600,10 @@ WriteFieldEndError:
 }
 
 func (p *Token) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("is_deleted", thrift.BOOL, 8); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.I32, 8); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteBool(p.IsDeleted); err != nil {
+	if err := oprot.WriteI32(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -553,10 +617,10 @@ WriteFieldEndError:
 }
 
 func (p *Token) writeField9(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 9); err != nil {
+	if err = oprot.WriteFieldBegin("expiration_time", thrift.STRING, 9); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.CreateTime); err != nil {
+	if err := oprot.WriteString(p.ExpirationTime); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -570,10 +634,10 @@ WriteFieldEndError:
 }
 
 func (p *Token) writeField10(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 10); err != nil {
+	if err = oprot.WriteFieldBegin("is_deleted", thrift.BOOL, 10); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.UpdateTime); err != nil {
+	if err := oprot.WriteBool(p.IsDeleted); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -584,6 +648,40 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 10 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 10 end error: ", p), err)
+}
+
+func (p *Token) writeField11(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("create_time", thrift.STRING, 11); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.CreateTime); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 11 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 11 end error: ", p), err)
+}
+
+func (p *Token) writeField12(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("update_time", thrift.STRING, 12); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.UpdateTime); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 12 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 12 end error: ", p), err)
 }
 
 func (p *Token) String() string {
@@ -611,22 +709,28 @@ func (p *Token) DeepEqual(ano *Token) bool {
 	if !p.Field4DeepEqual(ano.Owner) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.Token) {
+	if !p.Field5DeepEqual(ano.OwnerId) {
 		return false
 	}
-	if !p.Field6DeepEqual(ano.Status) {
+	if !p.Field6DeepEqual(ano.TokenType) {
 		return false
 	}
-	if !p.Field7DeepEqual(ano.ExpirationTime) {
+	if !p.Field7DeepEqual(ano.Token) {
 		return false
 	}
-	if !p.Field8DeepEqual(ano.IsDeleted) {
+	if !p.Field8DeepEqual(ano.Status) {
 		return false
 	}
-	if !p.Field9DeepEqual(ano.CreateTime) {
+	if !p.Field9DeepEqual(ano.ExpirationTime) {
 		return false
 	}
-	if !p.Field10DeepEqual(ano.UpdateTime) {
+	if !p.Field10DeepEqual(ano.IsDeleted) {
+		return false
+	}
+	if !p.Field11DeepEqual(ano.CreateTime) {
+		return false
+	}
+	if !p.Field12DeepEqual(ano.UpdateTime) {
 		return false
 	}
 	return true
@@ -660,42 +764,56 @@ func (p *Token) Field4DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *Token) Field5DeepEqual(src string) bool {
+func (p *Token) Field5DeepEqual(src int64) bool {
 
-	if strings.Compare(p.Token, src) != 0 {
+	if p.OwnerId != src {
 		return false
 	}
 	return true
 }
 func (p *Token) Field6DeepEqual(src int32) bool {
 
-	if p.Status != src {
+	if p.TokenType != src {
 		return false
 	}
 	return true
 }
 func (p *Token) Field7DeepEqual(src string) bool {
 
-	if strings.Compare(p.ExpirationTime, src) != 0 {
+	if strings.Compare(p.Token, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *Token) Field8DeepEqual(src bool) bool {
+func (p *Token) Field8DeepEqual(src int32) bool {
 
-	if p.IsDeleted != src {
+	if p.Status != src {
 		return false
 	}
 	return true
 }
 func (p *Token) Field9DeepEqual(src string) bool {
 
+	if strings.Compare(p.ExpirationTime, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *Token) Field10DeepEqual(src bool) bool {
+
+	if p.IsDeleted != src {
+		return false
+	}
+	return true
+}
+func (p *Token) Field11DeepEqual(src string) bool {
+
 	if strings.Compare(p.CreateTime, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *Token) Field10DeepEqual(src string) bool {
+func (p *Token) Field12DeepEqual(src string) bool {
 
 	if strings.Compare(p.UpdateTime, src) != 0 {
 		return false
