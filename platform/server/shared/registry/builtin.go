@@ -419,7 +419,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 		return err
 	}
 
-	logger.Logger.Info("start update service in registry")
+	logger.Logger.Debug("start update service in registry")
 	go func() {
 		errNum := 0
 
@@ -433,7 +433,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 			}
 			select {
 			case <-rc.stopChan:
-				logger.Logger.Info("stop update service in registry")
+				logger.Logger.Debug("stop update service in registry")
 				return
 			default:
 				logger.Logger.Debug("updating service in registry")

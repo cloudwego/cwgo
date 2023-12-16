@@ -97,7 +97,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 			_ = l.svcCtx.Manager.AddTask(
 				task.NewTask(
 					model.Type_sync_idl_data,
-					l.svcCtx.Manager.SyncIdlInterval.String(),
+					"",
 					&model.Data{
 						SyncIdlData: &model.SyncIdlData{
 							IdlId: req.ID,

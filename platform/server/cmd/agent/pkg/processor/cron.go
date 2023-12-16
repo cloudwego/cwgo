@@ -18,6 +18,8 @@ package processor
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
 	"time"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
@@ -54,6 +56,11 @@ func (w Worker) Start() {
 			select {
 			case t := <-w.taskChan:
 				// process task with certain task type by calling service method
+				logger.Logger.Debug("process task",
+					zap.String("task_type", t.Type.String()),
+					zap.String("task_id", t.Id),
+					zap.String("task_data", t.Data.String()),
+				)
 				switch t.Type {
 				case model.Type_sync_idl_data:
 					_, _ = w.service.SyncIDLsById(context.Background(), &agent.SyncIDLsByIdReq{

@@ -50,9 +50,9 @@ type Manager struct {
 
 	agents []*service.Service
 
-	SyncAgentServiceInterval time.Duration
-	SyncRepositoryInterval   time.Duration
-	SyncIdlInterval          time.Duration
+	syncAgentServiceInterval time.Duration
+	syncRepositoryInterval   time.Duration
+	syncIdlInterval          time.Duration
 
 	daoManager *dao.Manager
 	dispatcher dispatcher.IDispatcher
@@ -69,9 +69,9 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 
 		agents: make([]*service.Service, 0),
 
-		SyncAgentServiceInterval: appConf.GetSyncAgentServiceInterval(),
-		SyncRepositoryInterval:   appConf.GetSyncRepositoryInterval(),
-		SyncIdlInterval:          appConf.GetSyncIdlInterval(),
+		syncAgentServiceInterval: appConf.GetSyncAgentServiceInterval(),
+		syncRepositoryInterval:   appConf.GetSyncRepositoryInterval(),
+		syncIdlInterval:          appConf.GetSyncIdlInterval(),
 
 		daoManager: daoManager,
 		dispatcher: dispatcher,
@@ -81,10 +81,15 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 
 	go func() {
 		// get all task from database
-		if manager.SyncIdlInterval != 0 {
+		if manager.syncIdlInterval != 0 {
+			logger.Logger.Info("acquiring all sync task from database")
 			page := 1
 			for {
-				idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(), model.IDL{Status: consts.IdlStatusNumActive}, int32(page), 1000, consts.OrderNumDec, "update_time")
+				idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(),
+					model.IDL{
+						Status: consts.IdlStatusNumActive,
+					},
+					int32(page), 1000, consts.OrderNumDec, "update_time")
 				if err != nil {
 					panic(fmt.Sprintf("get idl list failed, err: %v", err))
 				}
@@ -92,7 +97,7 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 					err = manager.AddTask(
 						task.NewTask(
 							model.Type_sync_idl_data,
-							manager.SyncIdlInterval.String(),
+							manager.syncIdlInterval.String(),
 							&model.Data{
 								SyncIdlData: &model.SyncIdlData{
 									IdlId: idlModel.Id,
@@ -108,6 +113,7 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 				}
 				page++
 			}
+			logger.Logger.Info("acquire all sync task complete")
 		}
 	}()
 
@@ -142,6 +148,13 @@ func (m *Manager) GetAgentClientByServiceId(serviceId string) (agentservice.Clie
 }
 
 func (m *Manager) AddTask(t *model.Task) error {
+	switch t.Type {
+	case model.Type_sync_idl_data:
+		if m.syncIdlInterval == 0 {
+			return nil
+		}
+		t.ScheduleTime = m.syncIdlInterval.String()
+	}
 	err := m.dispatcher.AddTask(t)
 	if err != nil {
 		return fmt.Errorf("add task to dispatcher failed, err: %v", err)
@@ -169,6 +182,7 @@ func (m *Manager) DeleteTask(taskId string) error {
 
 func (m *Manager) UpdateAgentTasks() {
 	var wg sync.WaitGroup
+	logger.Logger.Debug("start update agent tasks")
 	for _, svr := range m.agents {
 		// push tasks to each agent
 		wg.Add(1)
@@ -182,22 +196,17 @@ func (m *Manager) UpdateAgentTasks() {
 
 			tasks := m.dispatcher.GetTaskByServiceId(serviceId)
 
-			tasksModels := make([]*model.Task, len(tasks))
-			for i, t := range tasks {
-				tasksModels[i] = &model.Task{
-					Id:           t.Id,
-					Type:         t.Type,
-					ScheduleTime: t.ScheduleTime,
-					Data:         t.Data,
-				}
-			}
-
-			rpcRes, err := c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasksModels})
+			rpcRes, err := c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasks})
 			if err != nil {
 				logger.Logger.Error("update tasks to rpc client failed", zap.Error(err))
 			} else if rpcRes.Code != 0 {
 				logger.Logger.Error("update tasks failed", zap.String("err", rpcRes.Msg))
 			}
+
+			logger.Logger.Debug("update tasks to agent service successfully",
+				zap.String("service_id", serviceId),
+				zap.Reflect("tasks", tasks),
+			)
 		}(svr.Id)
 	}
 	wg.Wait()
@@ -206,7 +215,7 @@ func (m *Manager) UpdateAgentTasks() {
 func (m *Manager) StartUpdate() {
 	go func() {
 		for {
-			time.Sleep(m.SyncAgentServiceInterval)
+			time.Sleep(m.syncAgentServiceInterval)
 			m.SyncService()
 		}
 	}()
@@ -218,6 +227,7 @@ func (m *Manager) StartUpdate() {
 			m.Lock()
 			if m.lastUpdateTaskTime != m.currentUpdateTaskTime {
 				if m.currentUpdateTaskTime.Add(m.updateTaskInterval).After(time.Now()) {
+					logger.Logger.Debug("task changed, stat update agent tasks")
 					m.UpdateAgentTasks()
 					m.lastUpdateTaskTime = m.currentUpdateTaskTime
 				}
@@ -230,6 +240,7 @@ func (m *Manager) StartUpdate() {
 // SyncService
 // sync service from registry
 func (m *Manager) SyncService() {
+	logger.Logger.Debug("start sync service")
 	services, err := m.registry.GetAllService()
 	if err != nil {
 		return
@@ -273,6 +284,8 @@ func (m *Manager) SyncService() {
 	}
 
 	m.agents = services
+
+	logger.Logger.Debug("sync service complete", zap.Reflect("services", services))
 
 	if len(addServiceIds) != 0 || len(delServicesIds) != 0 {
 		// service changed, update cron

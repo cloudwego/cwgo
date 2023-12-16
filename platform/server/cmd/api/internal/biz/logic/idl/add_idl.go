@@ -105,7 +105,7 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 		_ = l.svcCtx.Manager.AddTask(
 			task.NewTask(
 				model.Type_sync_idl_data,
-				l.svcCtx.Manager.SyncIdlInterval.String(),
+				"",
 				&model.Data{
 					SyncIdlData: &model.SyncIdlData{
 						IdlId: rpcRes.Data.IdlId,

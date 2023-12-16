@@ -42,7 +42,7 @@ func (m member) String() string {
 }
 
 type ConsistentHashDispatcher struct {
-	mutex sync.Mutex
+	sync.Mutex
 
 	hasher           *consistent.Consistent
 	Tasks            map[string]*model.Task
@@ -61,7 +61,7 @@ func NewConsistentHashDispatcher() *ConsistentHashDispatcher {
 	)
 
 	return &ConsistentHashDispatcher{
-		mutex:            sync.Mutex{},
+		Mutex:            sync.Mutex{},
 		hasher:           consistentHasher,
 		Tasks:            make(map[string]*model.Task),
 		ServiceWithTasks: make(map[string]map[string]*model.Task),
@@ -69,8 +69,8 @@ func NewConsistentHashDispatcher() *ConsistentHashDispatcher {
 }
 
 func (c *ConsistentHashDispatcher) AddService(serviceId string) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	c.hasher.Add(member(serviceId))
 
@@ -93,8 +93,8 @@ func (c *ConsistentHashDispatcher) AddService(serviceId string) error {
 }
 
 func (c *ConsistentHashDispatcher) DelService(serviceId string) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	if _, ok := c.ServiceWithTasks[serviceId]; !ok {
 		return errors.New("service not found")
@@ -118,8 +118,8 @@ func (c *ConsistentHashDispatcher) DelService(serviceId string) error {
 }
 
 func (c *ConsistentHashDispatcher) AddTask(task *model.Task) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	c.Tasks[task.Id] = task
 	m := c.hasher.LocateKey([]byte(task.Id))
@@ -131,8 +131,8 @@ func (c *ConsistentHashDispatcher) AddTask(task *model.Task) error {
 }
 
 func (c *ConsistentHashDispatcher) RemoveTask(taskId string) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	delete(c.Tasks, taskId)
 	m := c.hasher.LocateKey([]byte(taskId))
@@ -144,8 +144,8 @@ func (c *ConsistentHashDispatcher) RemoveTask(taskId string) error {
 }
 
 func (c *ConsistentHashDispatcher) DelTask(taskId string) error {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	delete(c.Tasks, taskId)
 	m := c.hasher.LocateKey([]byte(taskId))
