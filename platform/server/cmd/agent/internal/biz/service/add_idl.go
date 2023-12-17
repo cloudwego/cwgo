@@ -270,6 +270,9 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			return
 		}
 
+		if idlType != consts.IdlTypeNumProto {
+			importBaseDirPath = ""
+		}
 		err = s.svcCtx.GenerateCode(s.ctx, repoClient,
 			tempDir, importBaseDirPath, idlEntityWithRepoInfo, idlRepoModel, archiveName)
 		if err != nil {

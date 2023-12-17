@@ -351,6 +351,7 @@ func (a *GitLabApi) DeleteFiles(owner, repoName, branch string, filePaths ...str
 	_, _, err := a.client.Commits.CreateCommit(repoPid, opts)
 	if err != nil {
 		logger.Logger.Warn("create commit into branch failed",
+			zap.Error(err),
 			zap.String("repo_pid", repoPid),
 			zap.String("branch", branch),
 		)

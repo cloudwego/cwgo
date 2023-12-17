@@ -265,6 +265,9 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 
 		idlEntityWithRepoInfo.ImportIdls = importIDLs
 
+		if idlType != consts.IdlTypeNumProto {
+			importBaseDirPath = ""
+		}
 		err = s.svcCtx.GenerateCode(s.ctx, repoClient,
 			tempDir, importBaseDirPath, idlEntityWithRepoInfo, idlRepoModel, archiveName)
 		if err != nil {
