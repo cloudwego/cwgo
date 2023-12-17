@@ -226,6 +226,7 @@ func (m *MysqlIDLManager) Sync(ctx context.Context, idlModel model.IDL) error {
 	mainIdlEntity := entity.MysqlIDL{
 		ID:           idlModel.Id,
 		ParentIdlID:  0,
+		Status:       consts.IdlStatusNumActive,
 		CommitHash:   idlModel.CommitHash,
 		LastSyncTime: time.Now(),
 	}
