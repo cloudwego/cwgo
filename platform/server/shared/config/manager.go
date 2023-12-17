@@ -104,6 +104,8 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 	}
 
+	config.SetUp()
+
 	var err error
 
 	// init consts in config
