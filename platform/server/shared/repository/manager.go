@@ -103,7 +103,13 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 					repositoryModel.RepositoryBranch,
 				)
 				if err != nil {
+					if errx.GetCode(err) != consts.ErrNumTokenInvalid {
+						return err
+					}
 					repositoryClient = nil
+				} else {
+					repositoryModel.TokenId = tokenModel.Id
+					break
 				}
 			}
 		}

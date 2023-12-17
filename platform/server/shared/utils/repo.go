@@ -67,6 +67,9 @@ func GetGitLabTokenInfo(client *gitlab.Client) (owner string, ownerId int64, tok
 		if strings.Contains(err.Error(), "401 Unauthorized") {
 			return "", 0, 0, time.Time{}, consts.ErrTokenInvalid
 		}
+		if strings.Contains(err.Error(), "404 page not found") {
+			return "", 0, 0, time.Time{}, consts.ErrCommonRepoApiService
+		}
 
 		return "", 0, 0, time.Time{}, err
 	}
