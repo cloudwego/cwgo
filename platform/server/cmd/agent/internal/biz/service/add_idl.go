@@ -253,7 +253,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		MainIdlPath:         idlPid,
 		ServiceName:         req.ServiceName,
 		ImportIdls:          importIDLs,
-		CommitHash:          mainIdlHash,
+		CommitHash:          "", // not update commit hash because when the following generated code failed, it can retry again
 		Status:              consts.IdlStatusNumActive,
 	})
 	if err != nil {
@@ -265,7 +265,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	// async generate code
 	go func() {
-		idlEntityWithRepoInfo, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, mainIdlId)
+		idlEntityWithRepoInfo, err := s.svcCtx.DaoManager.Idl.GetIDL(context.Background(), mainIdlId)
 		if err != nil {
 			return
 		}
@@ -273,13 +273,18 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		if idlType != consts.IdlTypeNumProto {
 			importBaseDirPath = ""
 		}
-		err = s.svcCtx.GenerateCode(s.ctx, repoClient,
+		err = s.svcCtx.GenerateCode(context.Background(), repoClient,
 			tempDir, importBaseDirPath, idlEntityWithRepoInfo, idlRepoModel, archiveName)
 		if err != nil {
 			return
 		}
 
 		os.RemoveAll(tempDir)
+
+		err = s.svcCtx.DaoManager.Idl.UpdateIDL(context.Background(), model.IDL{CommitHash: mainIdlHash})
+		if err != nil {
+			return
+		}
 	}()
 
 	return &agent.AddIDLRes{
