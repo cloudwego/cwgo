@@ -369,7 +369,7 @@ func (m *MysqlIDLManager) GetIDLList(ctx context.Context, idlModel model.IDL, pa
 
 	var total int64
 
-	db := m.db.WithContext(ctx).Debug()
+	db := m.db.WithContext(ctx)
 
 	if idlModel.ServiceName != "" {
 		db = db.Where("`idl`.`service_name` LIKE ?", fmt.Sprintf("%%%s%%", idlModel.ServiceName))
