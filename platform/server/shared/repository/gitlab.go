@@ -269,6 +269,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 			zap.String("temp_branch", tempBranch),
 			zap.String("source_branch", branch),
 		)
+		return err
 	}
 
 	// approve merge request
@@ -286,6 +287,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 			zap.String("temp_branch", tempBranch),
 			zap.String("source_branch", branch),
 		)
+		return err
 	}
 
 	return nil
