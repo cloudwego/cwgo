@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/apache/thrift v0.13.0
-	github.com/avast/retry-go v3.0.0+incompatible
+	github.com/avast/retry-go/v4 v4.5.1
 	github.com/buraksezer/consistent v0.10.0
 	github.com/bytedance/gopkg v0.0.0-20230728082804-614d0af6619b
 	github.com/cloudwego/hertz v0.7.0
