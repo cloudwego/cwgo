@@ -379,12 +379,14 @@ func (a *GitLabApi) AutoCreateRepository(owner, repoName string, isPrivate bool)
 				v = gitlab.PublicVisibility
 			}
 			repo, _, err = a.client.Projects.CreateProject(&gitlab.CreateProjectOptions{
-				Name:                        gitlab.String(repoName),
-				Visibility:                  &v,
-				Description:                 gitlab.String("generate by cwgo"),
-				InitializeWithReadme:        gitlab.Bool(true),
-				DefaultBranch:               gitlab.String(consts.MainRef),
-				AllowMergeOnSkippedPipeline: gitlab.Bool(true),
+				Name:                         gitlab.String(repoName),
+				Visibility:                   &v,
+				Description:                  gitlab.String("generate by cwgo"),
+				InitializeWithReadme:         gitlab.Bool(true),
+				DefaultBranch:                gitlab.String(consts.MainRef),
+				AllowMergeOnSkippedPipeline:  gitlab.Bool(true),
+				MergePipelinesEnabled:        gitlab.Bool(false),
+				RemoveSourceBranchAfterMerge: gitlab.Bool(true),
 				// TODO: if repo is org's repo and token is personal token, it will create personal repo
 				NamespaceID: gitlab.Int(int(a.tokenOwnerId)),
 			})
