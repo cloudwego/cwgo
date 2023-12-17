@@ -37,6 +37,14 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/re
     && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
     && echo ${TZ} > /etc/timezone
 
+# install protoc
+RUN wget https://github.com/protocolbuffers/protobuf/releases/download/v25.1/protoc-25.1-linux-x86_64.zip \
+    && unzip protoc-25.1-linux-x86_64.zip \
+    && cp bin/protoc /usr/local/bin/protoc \
+    && mkdir -p /usr/local/include/google \
+    && cp -r include/google /usr/local/include/google
+
+# install go clis
 RUN go install github.com/cloudwego/cwgo@latest \
     && go install github.com/cloudwego/thriftgo@latest
 
