@@ -19,8 +19,9 @@
 package app
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"time"
+
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 )
 
 type Config struct {

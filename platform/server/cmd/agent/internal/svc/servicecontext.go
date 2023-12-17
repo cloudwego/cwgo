@@ -21,6 +21,9 @@ package svc
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/generator"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
@@ -29,8 +32,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
-	"os"
-	"path/filepath"
 )
 
 type ServiceContext struct {
@@ -52,6 +53,9 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 			idlModelWithRepoInfo.MainIdlPath,
 		),
 	)
+	if err != nil {
+		return err
+	}
 
 	var idlSearchPath string
 
@@ -61,7 +65,7 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 		idlSearchPath = filepath.Clean(filepath.Join(tempDirRepo, importBaseDirPath))
 	}
 
-	err = os.Mkdir(tempDir+"/"+consts.TempDirGeneratedCode, 0755)
+	err = os.Mkdir(tempDir+"/"+consts.TempDirGeneratedCode, 0o755)
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgCommonMkdir, zap.Error(err))
 		return consts.ErrCommonMkdir

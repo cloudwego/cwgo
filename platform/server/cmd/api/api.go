@@ -20,8 +20,9 @@ package api
 
 import (
 	"errors"
-	"github.com/cloudwego/cwgo/platform/server/cmd/internal/options"
 	"os"
+
+	"github.com/cloudwego/cwgo/platform/server/cmd/internal/options"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"

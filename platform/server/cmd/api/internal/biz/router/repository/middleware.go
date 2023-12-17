@@ -27,16 +27,6 @@ func rootMw() []app.HandlerFunc {
 	return nil
 }
 
-func _repoMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _syncrepositoryMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
 func _deleterepositoryMw() []app.HandlerFunc {
 	// your code...
 	return nil

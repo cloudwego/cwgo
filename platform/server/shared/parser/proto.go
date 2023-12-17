@@ -19,11 +19,12 @@
 package parser
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
+
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
 type ProtoParser struct{}

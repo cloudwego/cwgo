@@ -21,8 +21,9 @@ package agent
 import (
 	"context"
 	"errors"
-	"github.com/cloudwego/cwgo/platform/server/cmd/internal/options"
 	"os"
+
+	"github.com/cloudwego/cwgo/platform/server/cmd/internal/options"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/handler"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"

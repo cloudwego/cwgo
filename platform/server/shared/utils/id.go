@@ -30,11 +30,6 @@ type (
 func (servicePrefix) Type() string { return "service" }
 func (taskPrefix) Type() string    { return "task" }
 
-type (
-	serviceId struct{ typeid.TypeID[servicePrefix] }
-	taskId    struct{ typeid.TypeID[taskId] }
-)
-
 func NewServiceId() (string, error) {
 	id, err := typeid.New[servicePrefix]()
 	return id.String(), err

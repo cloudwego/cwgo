@@ -20,10 +20,11 @@ package generator
 
 import (
 	"fmt"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
-	"go.uber.org/zap"
 	"os/exec"
 	"strings"
+
+	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"go.uber.org/zap"
 )
 
 type CwgoGenerator struct{}

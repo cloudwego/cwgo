@@ -86,6 +86,9 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) (int64
 					UpdateAll: true,
 				},
 			).Create(&mainIdlEntity).Error
+			if err != nil {
+				return err
+			}
 
 			// insert import idls
 			err = tx.

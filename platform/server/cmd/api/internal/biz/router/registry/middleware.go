@@ -37,11 +37,6 @@ func _registerMw() []app.HandlerFunc {
 	return nil
 }
 
-func _unregisterMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
 func _updateMw() []app.HandlerFunc {
 	// your code...
 	return nil

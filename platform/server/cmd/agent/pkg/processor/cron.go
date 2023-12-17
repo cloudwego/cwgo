@@ -18,9 +18,10 @@ package processor
 
 import (
 	"context"
+	"time"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
-	"time"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"

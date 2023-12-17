@@ -20,10 +20,11 @@ package idl
 
 import (
 	"context"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/task"
 	"net/url"
 	"strings"
+
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
+	"github.com/cloudwego/cwgo/platform/server/shared/task"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"

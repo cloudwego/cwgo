@@ -151,6 +151,10 @@ func (r *BuiltinRegistry) scanServiceKeysAndUpdate(rdb *redis.Client) error {
 
 		for i, cmd := range cmds {
 			ipPort, err := cmd.(*redis.StringCmd).Result()
+			if err != nil {
+				return err
+			}
+
 			ip, port, err := net.SplitHostPort(ipPort)
 			if err != nil {
 				logger.Logger.Error("parse host port string failed", zap.Error(err), zap.String("val", ipPort))

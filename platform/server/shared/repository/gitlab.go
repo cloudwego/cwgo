@@ -20,9 +20,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/avast/retry-go"
 	"strings"
 	"time"
+
+	"github.com/avast/retry-go"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
@@ -365,7 +366,7 @@ func (a *GitLabApi) DeleteFiles(owner, repoName, branch string, filePaths ...str
 
 	opts := &gitlab.CreateCommitOptions{
 		Branch:        &branch,
-		CommitMessage: gitlab.String(fmt.Sprintf("delete file")),
+		CommitMessage: gitlab.String("delete file"),
 	}
 
 	commitActionOptions := make([]*gitlab.CommitActionOptions, len(filePaths))

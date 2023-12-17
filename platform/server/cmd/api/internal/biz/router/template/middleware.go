@@ -67,11 +67,6 @@ func _gettemplatesMw() []app.HandlerFunc {
 	return nil
 }
 
-func _addtemplateMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
 func _apiMw() []app.HandlerFunc {
 	// your code...
 	return nil

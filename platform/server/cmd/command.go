@@ -25,7 +25,7 @@ import (
 )
 
 func main() {
-	var cmd = &cobra.Command{
+	cmd := &cobra.Command{
 		Use:     "cwgo-platform",
 		Example: "cwgo-platform command [command options]",
 		Version: "v0.1.0",
