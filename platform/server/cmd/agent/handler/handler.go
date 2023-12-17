@@ -46,13 +46,6 @@ func (s *AgentServiceImpl) AddRepository(ctx context.Context, req *agent.AddRepo
 	return resp, err
 }
 
-// SyncRepositoryById implements the AgentServiceImpl interface.
-func (s *AgentServiceImpl) SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq) (resp *agent.SyncRepositoryByIdRes, err error) {
-	resp, err = service.NewSyncRepositoryByIdService(ctx, s.svcCtx).Run(req)
-
-	return resp, err
-}
-
 // AddIDL implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) AddIDL(ctx context.Context, req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
 	resp, err = service.NewAddIDLService(ctx, s.svcCtx, s).Run(req)

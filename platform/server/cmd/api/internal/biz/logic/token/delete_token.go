@@ -30,7 +30,7 @@ import (
 )
 
 const (
-	successMsgDeleteToken = "delete token successfully" // TODO: to be filled...
+	successMsgDeleteToken = "delete token successfully"
 )
 
 type DeleteTokenLogic struct {

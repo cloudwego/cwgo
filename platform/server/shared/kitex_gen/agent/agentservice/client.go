@@ -15,7 +15,6 @@ type Client interface {
 	DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq, callOptions ...callopt.Option) (r *agent.DeleteRepositoriesRes, err error)
 	UpdateRepository(ctx context.Context, req *agent.UpdateRepositoryReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryRes, err error)
 	GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq, callOptions ...callopt.Option) (r *agent.GetRepositoriesRes, err error)
-	SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error)
 	AddIDL(ctx context.Context, req *agent.AddIDLReq, callOptions ...callopt.Option) (r *agent.AddIDLRes, err error)
 	DeleteIDL(ctx context.Context, req *agent.DeleteIDLsReq, callOptions ...callopt.Option) (r *agent.DeleteIDLsRes, err error)
 	UpdateIDL(ctx context.Context, req *agent.UpdateIDLReq, callOptions ...callopt.Option) (r *agent.UpdateIDLRes, err error)
@@ -82,11 +81,6 @@ func (p *kAgentServiceClient) UpdateRepository(ctx context.Context, req *agent.U
 func (p *kAgentServiceClient) GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq, callOptions ...callopt.Option) (r *agent.GetRepositoriesRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetRepositories(ctx, req)
-}
-
-func (p *kAgentServiceClient) SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq, callOptions ...callopt.Option) (r *agent.SyncRepositoryByIdRes, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.SyncRepositoryById(ctx, req)
 }
 
 func (p *kAgentServiceClient) AddIDL(ctx context.Context, req *agent.AddIDLReq, callOptions ...callopt.Option) (r *agent.AddIDLRes, err error) {

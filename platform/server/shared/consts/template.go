@@ -27,3 +27,15 @@ var TemplateTypeNumMap = map[int]struct{}{
 	TemplateTypeNumHz:    {},
 	TemplateTypeNumKitex: {},
 }
+
+const (
+	TemplateHzTplTypeLayout     = "layout.yaml"
+	TemplateHzTplTypeRenderData = "render_data.json"
+	TemplateHzTplTypePackage    = "package.yaml"
+)
+
+var TemplateHzTplTypeMap = map[string]struct{}{
+	TemplateHzTplTypeLayout:     {},
+	TemplateHzTplTypeRenderData: {},
+	TemplateHzTplTypePackage:    {},
+}

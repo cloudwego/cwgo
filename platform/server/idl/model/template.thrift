@@ -18,3 +18,8 @@ struct TemplateItem{
     6: string create_time
     7: string update_time
 }
+
+struct TemplateWithItemInfo{
+    1: Template template
+    2: list<TemplateItem> items
+}

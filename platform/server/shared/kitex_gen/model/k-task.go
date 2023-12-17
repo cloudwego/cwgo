@@ -424,136 +424,6 @@ func (p *SyncIdlData) field1Length() int {
 	return l
 }
 
-func (p *SyncRepoData) FastRead(buf []byte) (int, error) {
-	var err error
-	var offset int
-	var l int
-	var fieldTypeId thrift.TType
-	var fieldId int16
-	_, l, err = bthrift.Binary.ReadStructBegin(buf)
-	offset += l
-	if err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, l, err = bthrift.Binary.ReadFieldBegin(buf[offset:])
-		offset += l
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.I64 {
-				l, err = p.FastReadField1(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
-			offset += l
-			if err != nil {
-				goto SkipFieldError
-			}
-		}
-
-		l, err = bthrift.Binary.ReadFieldEnd(buf[offset:])
-		offset += l
-		if err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	l, err = bthrift.Binary.ReadStructEnd(buf[offset:])
-	offset += l
-	if err != nil {
-		goto ReadStructEndError
-	}
-
-	return offset, nil
-ReadStructBeginError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SyncRepoData[fieldId]), err)
-SkipFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-ReadFieldEndError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *SyncRepoData) FastReadField1(buf []byte) (int, error) {
-	offset := 0
-
-	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-
-		p.RepositoryId = v
-
-	}
-	return offset, nil
-}
-
-// for compatibility
-func (p *SyncRepoData) FastWrite(buf []byte) int {
-	return 0
-}
-
-func (p *SyncRepoData) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
-	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "SyncRepoData")
-	if p != nil {
-		offset += p.fastWriteField1(buf[offset:], binaryWriter)
-	}
-	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
-	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
-	return offset
-}
-
-func (p *SyncRepoData) BLength() int {
-	l := 0
-	l += bthrift.Binary.StructBeginLength("SyncRepoData")
-	if p != nil {
-		l += p.field1Length()
-	}
-	l += bthrift.Binary.FieldStopLength()
-	l += bthrift.Binary.StructEndLength()
-	return l
-}
-
-func (p *SyncRepoData) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
-	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "RepositoryId", thrift.I64, 1)
-	offset += bthrift.Binary.WriteI64(buf[offset:], p.RepositoryId)
-
-	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
-	return offset
-}
-
-func (p *SyncRepoData) field1Length() int {
-	l := 0
-	l += bthrift.Binary.FieldBeginLength("RepositoryId", thrift.I64, 1)
-	l += bthrift.Binary.I64Length(p.RepositoryId)
-
-	l += bthrift.Binary.FieldEndLength()
-	return l
-}
-
 func (p *Data) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
@@ -579,20 +449,6 @@ func (p *Data) FastRead(buf []byte) (int, error) {
 		case 1:
 			if fieldTypeId == thrift.STRUCT {
 				l, err = p.FastReadField1(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 2:
-			if fieldTypeId == thrift.STRUCT {
-				l, err = p.FastReadField2(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -652,19 +508,6 @@ func (p *Data) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *Data) FastReadField2(buf []byte) (int, error) {
-	offset := 0
-
-	tmp := NewSyncRepoData()
-	if l, err := tmp.FastRead(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-	}
-	p.SyncRepoData = tmp
-	return offset, nil
-}
-
 // for compatibility
 func (p *Data) FastWrite(buf []byte) int {
 	return 0
@@ -681,7 +524,6 @@ func (p *Data) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) in
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "Data")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
-		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -701,7 +543,6 @@ func (p *Data) BLength() int {
 	l += bthrift.Binary.StructBeginLength("Data")
 	if p != nil {
 		l += p.field1Length()
-		l += p.field2Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -720,31 +561,11 @@ func (p *Data) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) in
 	return offset
 }
 
-func (p *Data) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
-	offset := 0
-	if p.IsSetSyncRepoData() {
-		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "syncRepoData", thrift.STRUCT, 2)
-		offset += p.SyncRepoData.FastWriteNocopy(buf[offset:], binaryWriter)
-		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
-	}
-	return offset
-}
-
 func (p *Data) field1Length() int {
 	l := 0
 	if p.IsSetSyncIdlData() {
 		l += bthrift.Binary.FieldBeginLength("syncIdlData", thrift.STRUCT, 1)
 		l += p.SyncIdlData.BLength()
-		l += bthrift.Binary.FieldEndLength()
-	}
-	return l
-}
-
-func (p *Data) field2Length() int {
-	l := 0
-	if p.IsSetSyncRepoData() {
-		l += bthrift.Binary.FieldBeginLength("syncRepoData", thrift.STRUCT, 2)
-		l += p.SyncRepoData.BLength()
 		l += bthrift.Binary.FieldEndLength()
 	}
 	return l

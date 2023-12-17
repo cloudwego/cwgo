@@ -11,7 +11,6 @@ service AgentService {
     repository.DeleteRepositoriesRes DeleteRepositories(1: repository.DeleteRepositoriesReq req)
     repository.UpdateRepositoryRes UpdateRepository(1: repository.UpdateRepositoryReq req)
     repository.GetRepositoriesRes GetRepositories(1: repository.GetRepositoriesReq req)
-    repository.SyncRepositoryByIdRes SyncRepositoryById(1: repository.SyncRepositoryByIdReq req)
 
     idl.AddIDLRes AddIDL(1: idl.AddIDLReq req)
     idl.DeleteIDLsRes DeleteIDL(1: idl.DeleteIDLsReq req)

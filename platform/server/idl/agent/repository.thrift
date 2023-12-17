@@ -53,11 +53,3 @@ struct GetRepositoriesResData{
     1: list<repository.Repository> repositories
     2: i32 total
 }
-
-struct SyncRepositoryByIdReq{
-    1: list<i64> ids
-}
-struct SyncRepositoryByIdRes{
-    1: i32 code
-    2: string msg
-}

@@ -23,7 +23,6 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"DeleteRepositories": kitex.NewMethodInfo(deleteRepositoriesHandler, newAgentServiceDeleteRepositoriesArgs, newAgentServiceDeleteRepositoriesResult, false),
 		"UpdateRepository":   kitex.NewMethodInfo(updateRepositoryHandler, newAgentServiceUpdateRepositoryArgs, newAgentServiceUpdateRepositoryResult, false),
 		"GetRepositories":    kitex.NewMethodInfo(getRepositoriesHandler, newAgentServiceGetRepositoriesArgs, newAgentServiceGetRepositoriesResult, false),
-		"SyncRepositoryById": kitex.NewMethodInfo(syncRepositoryByIdHandler, newAgentServiceSyncRepositoryByIdArgs, newAgentServiceSyncRepositoryByIdResult, false),
 		"AddIDL":             kitex.NewMethodInfo(addIDLHandler, newAgentServiceAddIDLArgs, newAgentServiceAddIDLResult, false),
 		"DeleteIDL":          kitex.NewMethodInfo(deleteIDLHandler, newAgentServiceDeleteIDLArgs, newAgentServiceDeleteIDLResult, false),
 		"UpdateIDL":          kitex.NewMethodInfo(updateIDLHandler, newAgentServiceUpdateIDLArgs, newAgentServiceUpdateIDLResult, false),
@@ -126,24 +125,6 @@ func newAgentServiceGetRepositoriesArgs() interface{} {
 
 func newAgentServiceGetRepositoriesResult() interface{} {
 	return agent.NewAgentServiceGetRepositoriesResult()
-}
-
-func syncRepositoryByIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*agent.AgentServiceSyncRepositoryByIdArgs)
-	realResult := result.(*agent.AgentServiceSyncRepositoryByIdResult)
-	success, err := handler.(agent.AgentService).SyncRepositoryById(ctx, realArg.Req)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newAgentServiceSyncRepositoryByIdArgs() interface{} {
-	return agent.NewAgentServiceSyncRepositoryByIdArgs()
-}
-
-func newAgentServiceSyncRepositoryByIdResult() interface{} {
-	return agent.NewAgentServiceSyncRepositoryByIdResult()
 }
 
 func addIDLHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -497,16 +478,6 @@ func (p *kClient) GetRepositories(ctx context.Context, req *agent.GetRepositorie
 	_args.Req = req
 	var _result agent.AgentServiceGetRepositoriesResult
 	if err = p.c.Call(ctx, "GetRepositories", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) SyncRepositoryById(ctx context.Context, req *agent.SyncRepositoryByIdReq) (r *agent.SyncRepositoryByIdRes, err error) {
-	var _args agent.AgentServiceSyncRepositoryByIdArgs
-	_args.Req = req
-	var _result agent.AgentServiceSyncRepositoryByIdResult
-	if err = p.c.Call(ctx, "SyncRepositoryById", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

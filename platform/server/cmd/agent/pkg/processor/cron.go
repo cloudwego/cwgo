@@ -66,10 +66,6 @@ func (w Worker) Start() {
 					_, _ = w.service.SyncIDLsById(context.Background(), &agent.SyncIDLsByIdReq{
 						Ids: []int64{t.Data.SyncIdlData.IdlId},
 					})
-				case model.Type_sync_repo_data:
-					_, _ = w.service.SyncRepositoryById(context.Background(), &agent.SyncRepositoryByIdReq{
-						Ids: []int64{t.Data.SyncRepoData.RepositoryId},
-					})
 				default:
 
 				}

@@ -284,49 +284,6 @@ func (p *GetRepositoriesResData) String() string {
 	return fmt.Sprintf("GetRepositoriesResData(%+v)", *p)
 }
 
-type SyncRepositoryByIdReq struct {
-	Ids []int64 `thrift:"ids,1" form:"ids,required" json:"ids,required" vd:"len($)>0"`
-}
-
-func NewSyncRepositoryByIdReq() *SyncRepositoryByIdReq {
-	return &SyncRepositoryByIdReq{}
-}
-
-func (p *SyncRepositoryByIdReq) GetIds() (v []int64) {
-	return p.Ids
-}
-
-func (p *SyncRepositoryByIdReq) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("SyncRepositoryByIdReq(%+v)", *p)
-}
-
-type SyncRepositoryByIdRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
-}
-
-func NewSyncRepositoryByIdRes() *SyncRepositoryByIdRes {
-	return &SyncRepositoryByIdRes{}
-}
-
-func (p *SyncRepositoryByIdRes) GetCode() (v int32) {
-	return p.Code
-}
-
-func (p *SyncRepositoryByIdRes) GetMsg() (v string) {
-	return p.Msg
-}
-
-func (p *SyncRepositoryByIdRes) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("SyncRepositoryByIdRes(%+v)", *p)
-}
-
 type RepositoryService interface {
 	AddRepository(ctx context.Context, req *AddRepositoryReq) (r *AddRepositoryRes, err error)
 
@@ -335,6 +292,4 @@ type RepositoryService interface {
 	UpdateRepository(ctx context.Context, req *UpdateRepositoryReq) (r *UpdateRepositoryRes, err error)
 
 	GetRepositories(ctx context.Context, req *GetRepositoriesReq) (r *GetRepositoriesRes, err error)
-
-	SyncRepository(ctx context.Context, req *SyncRepositoryByIdReq) (r *SyncRepositoryByIdRes, err error)
 }

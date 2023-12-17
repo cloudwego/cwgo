@@ -52,19 +52,9 @@ struct GetRepositoriesResData{
     2: i32 total
 }
 
-struct SyncRepositoryByIdReq{
-    1: list<i64> ids (api.body="ids,required",api.vd="len($)>0")
-}
-struct SyncRepositoryByIdRes{
-    1: i32 code
-    2: string msg
-}
-
 service RepositoryService {
     AddRepositoryRes AddRepository(1: AddRepositoryReq req) (api.post="/api/repo")
     DeleteRepositoriesRes DeleteRepository(1: DeleteRepositoriesReq req) (api.delete="/api/repo")
     UpdateRepositoryRes UpdateRepository(1: UpdateRepositoryReq req) (api.patch="/api/repo")
     GetRepositoriesRes GetRepositories(1: GetRepositoriesReq req) (api.get="/api/repo")
-
-    SyncRepositoryByIdRes SyncRepository(1: SyncRepositoryByIdReq req) (api.post="/api/repo/sync")
 }

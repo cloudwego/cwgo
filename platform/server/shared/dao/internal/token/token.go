@@ -91,6 +91,11 @@ func (m *MysqlTokenManager) DeleteToken(ctx context.Context, ids []int64) error 
 }
 
 func (m *MysqlTokenManager) GetTokenList(ctx context.Context, tokenModel model.Token, page, limit, order int32, orderBy string) ([]*model.Token, int64, error) {
+	_ = m.db.WithContext(ctx).
+		Model(&entity.MysqlToken{}).
+		Where("`expiration_time` <= ?", time.Now()).
+		UpdateColumn("status", consts.TokenStatusNumExpired).Error
+
 	if page < 1 {
 		page = 1
 	}

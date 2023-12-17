@@ -36,9 +36,7 @@ func Register(r *route.RouterGroup) {
 	root := r.Group("/", rootMw()...)
 	{
 		_api := root.Group("/api", _apiMw()...)
-		_api.POST("/repo", append(_repoMw(), repository.AddRepository)...)
-		_repo := _api.Group("/repo", _repoMw()...)
-		_repo.POST("/sync", append(_syncrepositoryMw(), repository.SyncRepository)...)
+		_api.POST("/repo", append(_addrepositoryMw(), repository.AddRepository)...)
 		_api.DELETE("/repo", append(_deleterepositoryMw(), repository.DeleteRepository)...)
 		_api.PATCH("/repo", append(_updaterepositoryMw(), repository.UpdateRepository)...)
 		_api.GET("/repo", append(_getrepositoriesMw(), repository.GetRepositories)...)
