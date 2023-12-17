@@ -274,10 +274,11 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 
 	// approve merge request
 	_, _, err = a.client.MergeRequests.AcceptMergeRequest(repoPid, createMergeRequestRes.IID, &gitlab.AcceptMergeRequestOptions{
-		MergeCommitMessage:       gitlab.String(commitMessage),
-		SquashCommitMessage:      gitlab.String(commitMessage),
-		Squash:                   gitlab.Bool(true),
-		ShouldRemoveSourceBranch: gitlab.Bool(true),
+		MergeCommitMessage:        gitlab.String(commitMessage),
+		SquashCommitMessage:       gitlab.String(commitMessage),
+		MergeWhenPipelineSucceeds: gitlab.Bool(false),
+		Squash:                    gitlab.Bool(true),
+		ShouldRemoveSourceBranch:  gitlab.Bool(true),
 	})
 	if err != nil {
 		logger.Logger.Warn("approve merge request failed",
