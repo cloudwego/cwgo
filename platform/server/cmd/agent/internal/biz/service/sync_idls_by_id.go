@@ -180,21 +180,17 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		// obtain dependent file paths
+		idlParser := parser.NewParser(idlType)
+		if idlParser == nil {
+			return &agent.SyncIDLsByIdRes{
+				Code: consts.ErrNumIdlFileExtension,
+				Msg:  consts.ErrMsgIdlFileExtension,
+			}, nil
+		}
 		var importPaths []string
-		switch idlType {
-		case consts.IdlTypeNumThrift:
-			thriftFile := &parser.ThriftFile{}
-			importPaths, err = thriftFile.GetDependentFilePaths(tempDirRepo + "/" + archiveName + idlPid)
-			if err != nil {
-				return &agent.SyncIDLsByIdRes{
-					Code: consts.ErrNumIdlGetDependentFilePath,
-					Msg:  consts.ErrMsgIdlGetDependentFilePath,
-				}, nil
-			}
-		case consts.IdlTypeNumProto:
-			protoFile := &parser.ProtoFile{}
-			importPaths, err = protoFile.GetDependentFilePaths(tempDirRepo + "/" + archiveName + idlPid)
+		var importBaseDirPath string
+		importBaseDirPath, importPaths, err = idlParser.GetDependentFilePaths(tempDirRepo+"/"+archiveName, idlPid)
+		if err != nil {
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumIdlGetDependentFilePath,
 				Msg:  consts.ErrMsgIdlGetDependentFilePath,
@@ -205,7 +201,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		importIDLs := make([]*model.ImportIDL, 0)
 
 		// compare main idl
-		hash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, idlRepoModel.RepositoryBranch)
+		mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, idlRepoModel.RepositoryBranch)
 		if err != nil {
 			logger.Logger.Error("get latest commit hash failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
@@ -214,16 +210,15 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		if hash != idlEntityWithRepoInfo.CommitHash {
+		if mainIdlHash != idlEntityWithRepoInfo.CommitHash {
 			needToSync = true
 		} else {
 			// if mail idl is not changed
 			// then compare imported idl files
 
-			mainIdlDir := filepath.Dir(idlPid)
-			// calculate the hash value and add it to the importIDLs slice
+			// calculate the mainIdlHa value and add it to the importIDLs slice
 			for _, importPath := range importPaths {
-				calculatedPath := filepath.ToSlash(filepath.Join(mainIdlDir, importPath))
+				calculatedPath := filepath.ToSlash(filepath.Join(importBaseDirPath, importPath))
 				commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, idlRepoModel.RepositoryBranch)
 				if err != nil {
 					return &agent.SyncIDLsByIdRes{
@@ -268,8 +263,10 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			continue
 		}
 
+		idlEntityWithRepoInfo.ImportIdls = importIDLs
+
 		err = s.svcCtx.GenerateCode(s.ctx, repoClient,
-			tempDir, idlEntityWithRepoInfo, idlRepoModel, archiveName)
+			tempDir, importBaseDirPath, idlEntityWithRepoInfo, idlRepoModel, archiveName)
 		if err != nil {
 			return &agent.SyncIDLsByIdRes{
 				Code: errx.GetCode(err),
@@ -279,7 +276,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 
 		err = s.svcCtx.DaoManager.Idl.Sync(s.ctx, model.IDL{
 			Id:         idlEntityWithRepoInfo.Id,
-			CommitHash: hash,
+			CommitHash: mainIdlHash,
 			ImportIdls: importIDLs,
 		})
 		if err != nil {

@@ -30,6 +30,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
 	"os"
+	"path/filepath"
 )
 
 type ServiceContext struct {
@@ -38,7 +39,7 @@ type ServiceContext struct {
 	Generator   generator.Generator
 }
 
-func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient repository.IRepository, tempDir string, idlEntityWithRepoInfo *model.IDLWithRepositoryInfo, idlRepoModel *model.Repository, archiveName string) error {
+func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient repository.IRepository, tempDir, importBaseDirPath string, idlModelWithRepoInfo *model.IDLWithRepositoryInfo, idlRepoModel *model.Repository, archiveName string) error {
 	idlPid, owner, _, err := repoClient.ParseFileUrl(
 		utils.GetRepoFullUrl(
 			idlRepoModel.RepositoryType,
@@ -48,11 +49,17 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 				idlRepoModel.RepositoryName,
 			),
 			idlRepoModel.RepositoryBranch,
-			idlEntityWithRepoInfo.MainIdlPath,
+			idlModelWithRepoInfo.MainIdlPath,
 		),
 	)
 
-	tempDirRepo := tempDir + "/" + consts.TempDirRepo
+	var idlSearchPath string
+
+	tempDirRepo := tempDir + "/" + consts.TempDirRepo + "/" + archiveName
+
+	if importBaseDirPath != "" {
+		idlSearchPath = filepath.Clean(filepath.Join(tempDirRepo, importBaseDirPath))
+	}
 
 	err = os.Mkdir(tempDir+"/"+consts.TempDirGeneratedCode, 0755)
 	if err != nil {
@@ -61,13 +68,15 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 	}
 
 	tempDirGeneratedCode := tempDir + "/" + consts.TempDirGeneratedCode
+	mainIdlFilePath := tempDirRepo + idlPid
 
 	// generate code using cwgo
 	err = svc.Generator.Generate(
 		idlRepoModel.RepositoryDomain,
 		idlRepoModel.RepositoryOwner,
-		tempDirRepo+"/"+archiveName+idlPid,
-		idlEntityWithRepoInfo.ServiceName,
+		mainIdlFilePath,
+		idlSearchPath,
+		idlModelWithRepoInfo.ServiceName,
 		tempDirGeneratedCode,
 	)
 	if err != nil {
@@ -86,7 +95,7 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 	}
 
 	// push files to the repository
-	serviceRepositoryModel, err := svc.DaoManager.Repository.GetRepository(ctx, idlEntityWithRepoInfo.ServiceRepositoryId)
+	serviceRepositoryModel, err := svc.DaoManager.Repository.GetRepository(ctx, idlModelWithRepoInfo.ServiceRepositoryId)
 	if err != nil {
 		return consts.ErrDatabase
 	}

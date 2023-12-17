@@ -107,7 +107,7 @@ func (m *MysqlIDLManager) AddIDL(ctx context.Context, idlModel model.IDL) (int64
 					CommitHash:          importIdl.CommitHash,
 					ServiceName:         idlModel.ServiceName,
 					LastSyncTime:        now,
-					Status:              0,
+					Status:              idlModel.Status,
 				}
 			}
 			err = tx.WithContext(ctx).

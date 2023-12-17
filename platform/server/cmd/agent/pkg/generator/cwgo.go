@@ -23,6 +23,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
 	"os/exec"
+	"strings"
 )
 
 type CwgoGenerator struct{}
@@ -31,19 +32,27 @@ func NewCwgoGenerator() *CwgoGenerator {
 	return &CwgoGenerator{}
 }
 
-func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, serviceName, generatePath string) error {
+func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, idlSearchPath, serviceName, generatePath string) error {
 	// Fixed options were used to generate code, which can be optimized to be optional in the future
-	cwgoCmd := exec.Command("sh", "-c",
+	var build strings.Builder
+	build.WriteString(
 		fmt.Sprintf("cwgo client "+
 			"--idl %s "+
 			"--type %s "+
 			"--service %s "+
-			"--module %s "+
-			"&& "+
-			"go mod tidy",
+			"--module %s ",
 			idlPath, "rpc", serviceName, fmt.Sprintf("%s/%s/%s", repoDomain, repoOwner, serviceName),
 		),
-	) //ignore_security_alert RCE
+	)
+	if idlSearchPath != "" {
+		build.WriteString(
+			fmt.Sprintf("--proto_search_path %s ",
+				idlSearchPath,
+			),
+		)
+	}
+	build.WriteString("&& go mod tidy")
+	cwgoCmd := exec.Command("sh", "-c", build.String())
 
 	cwgoCmd.Dir = generatePath
 

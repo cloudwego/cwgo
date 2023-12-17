@@ -203,6 +203,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	})
 	if err != nil {
 		logger.Logger.Warn("create repo temp branch failed",
+			zap.Error(err),
 			zap.String("repo_pid", repoPid),
 			zap.String("base_branch", branch),
 			zap.String("temp_branch", tempBranch),
@@ -213,11 +214,16 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	// delete all file in temp branch
 	err = a.DeleteFiles(owner, repoName, tempBranch, "kitex_gen", "rpc", "go.mod", "go.sum")
 	if err != nil {
-		logger.Logger.Warn("delete all file in temp branch failed",
-			zap.String("repo_pid", repoPid),
-			zap.String("branch", tempBranch),
-		)
-		return err
+		if !strings.Contains(err.Error(), "doesn't exist") {
+			logger.Logger.Warn("delete all file in temp branch failed",
+				zap.Error(err),
+				zap.String("repo_pid", repoPid),
+				zap.String("branch", tempBranch),
+			)
+			return err
+		}
+		// ignore err
+		// because if in this case, there is no generate code in repo
 	}
 
 	opts := &gitlab.CreateCommitOptions{
@@ -243,6 +249,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	_, _, err = a.client.Commits.CreateCommit(repoPid, opts)
 	if err != nil {
 		logger.Logger.Warn("create commit into temp branch failed",
+			zap.Error(err),
 			zap.String("repo_pid", repoPid),
 			zap.String("branch", tempBranch),
 		)
@@ -257,6 +264,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	})
 	if err != nil {
 		logger.Logger.Warn("create merge request from temp branch to source branch failed",
+			zap.Error(err),
 			zap.String("repo_pid", repoPid),
 			zap.String("temp_branch", tempBranch),
 			zap.String("source_branch", branch),
@@ -272,6 +280,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	})
 	if err != nil {
 		logger.Logger.Warn("approve merge request failed",
+			zap.Error(err),
 			zap.Int("mr_iid", createMergeRequestRes.IID),
 			zap.String("repo_pid", repoPid),
 			zap.String("temp_branch", tempBranch),

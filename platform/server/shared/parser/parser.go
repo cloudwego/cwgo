@@ -18,6 +18,19 @@
 
 package parser
 
+import "github.com/cloudwego/cwgo/platform/server/shared/consts"
+
 type Parser interface {
-	GetDependentFilePaths(mainIdlPath string) ([]string, error) // Obtain string slices that rely on main idl
+	GetDependentFilePaths(baseDirPath, mainIdlPath string) (string, []string, error) // Obtain string slices that rely on main idl
+}
+
+func NewParser(idlType int32) Parser {
+	switch idlType {
+	case consts.IdlTypeNumThrift:
+		return NewThriftParser()
+	case consts.IdlTypeNumProto:
+		return NewProtoParser()
+	default:
+		return nil
+	}
 }

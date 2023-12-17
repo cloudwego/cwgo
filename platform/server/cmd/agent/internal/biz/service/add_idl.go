@@ -166,32 +166,28 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}, nil
 	}
 
-	// obtain dependent file paths
+	idlParser := parser.NewParser(idlType)
+	if idlParser == nil {
+		return &agent.AddIDLRes{
+			Code: consts.ErrNumIdlFileExtension,
+			Msg:  consts.ErrMsgIdlFileExtension,
+		}, nil
+	}
 	var importPaths []string
-	switch idlType {
-	case consts.IdlTypeNumThrift:
-		thriftFile := &parser.ThriftFile{}
-		importPaths, err = thriftFile.GetDependentFilePaths(tempDirRepo + "/" + archiveName + idlPid)
-		if err != nil {
-			return &agent.AddIDLRes{
-				Code: consts.ErrNumIdlGetDependentFilePath,
-				Msg:  consts.ErrMsgIdlGetDependentFilePath,
-			}, nil
-		}
-	case consts.IdlTypeNumProto:
-		protoFile := &parser.ProtoFile{}
-		importPaths, err = protoFile.GetDependentFilePaths(tempDirRepo + "/" + archiveName + idlPid)
+	var importBaseDirPath string
+	importBaseDirPath, importPaths, err = idlParser.GetDependentFilePaths(tempDirRepo+"/"+archiveName, idlPid)
+	if err != nil {
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumIdlGetDependentFilePath,
 			Msg:  consts.ErrMsgIdlGetDependentFilePath,
 		}, nil
 	}
+
 	importIDLs := make([]*model.ImportIDL, len(importPaths))
 
-	mainIdlDir := filepath.Dir(idlPid)
 	// calculate the hash value and add it to the importIDLs slice
 	for i, importPath := range importPaths {
-		calculatedPath := filepath.ToSlash(filepath.Join(mainIdlDir, importPath))
+		calculatedPath := filepath.ToSlash(filepath.Join(importBaseDirPath, importPath))
 		commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, repoClient.GetBranch())
 		if err != nil {
 			logger.Logger.Error(consts.ErrMsgRepoGetCommitHash, zap.Error(err))
@@ -275,7 +271,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}
 
 		err = s.svcCtx.GenerateCode(s.ctx, repoClient,
-			tempDir, idlEntityWithRepoInfo, idlRepoModel, archiveName)
+			tempDir, importBaseDirPath, idlEntityWithRepoInfo, idlRepoModel, archiveName)
 		if err != nil {
 			return
 		}

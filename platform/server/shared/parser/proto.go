@@ -19,22 +19,26 @@
 package parser
 
 import (
+	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
 )
 
-type ProtoFile struct{}
+type ProtoParser struct{}
 
-func (*ProtoFile) GetDependentFilePaths(mainIdlPath string) ([]string, error) {
+func NewProtoParser() *ProtoParser {
+	return &ProtoParser{}
+}
+
+func (*ProtoParser) GetDependentFilePaths(baseDirPath, mainIdlPath string) (string, []string, error) {
 	// create maps to keep track of processed and related paths
 	processedPaths := make(map[string]bool)
 	relatedPaths := make(map[string]bool)
 	var resultPaths []string
 
-	// get the base directory of the main IDL file
-	baseDir := filepath.Dir(mainIdlPath)
+	var importBaseDirPath string
 
 	// define a function to process each file recursively
 	var processFile func(filePath string) error
@@ -45,14 +49,14 @@ func (*ProtoFile) GetDependentFilePaths(mainIdlPath string) ([]string, error) {
 		}
 
 		// read the content of the Thrift file
-		thriftContent, err := ioutil.ReadFile(filePath)
+		protoContent, err := ioutil.ReadFile(filePath)
 		if err != nil {
 			return err
 		}
 		regex := regexp.MustCompile(importPattern)
 
 		// find all import statements in the Thrift file
-		matches := regex.FindAllStringSubmatch(string(thriftContent), -1)
+		matches := regex.FindAllStringSubmatch(string(protoContent), -1)
 		var includePaths []string
 
 		// extract the paths from the import statements
@@ -60,7 +64,14 @@ func (*ProtoFile) GetDependentFilePaths(mainIdlPath string) ([]string, error) {
 			if len(match) >= 2 {
 				includePath := match[1]
 				// obtain the fields in the import here and process them
-				absolutePath := filepath.Clean(filepath.Join(baseDir, includePath))
+				if importBaseDirPath == "" {
+					importBaseDirPath = utils.FindRootPath(filePath, includePath)
+					if importBaseDirPath == "" {
+						continue
+					}
+				}
+
+				absolutePath := filepath.Clean(filepath.Join(importBaseDirPath, includePath))
 				_, err := os.Stat(absolutePath)
 				if err != nil {
 					continue
@@ -88,17 +99,23 @@ func (*ProtoFile) GetDependentFilePaths(mainIdlPath string) ([]string, error) {
 	}
 
 	// start the recursive processing with the main IDL file
-	err := processFile(mainIdlPath)
+	mainAbsPath := baseDirPath + mainIdlPath
+	err := processFile(mainAbsPath)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
-	// calculate the relative paths to the main IDL file
-	mainIdlDir := filepath.Dir(mainIdlPath)
+	// calculate the relative paths to the base dir path
 	relativePaths := make([]string, len(resultPaths))
 	for i, path := range resultPaths {
-		relativePaths[i], _ = filepath.Rel(mainIdlDir, path)
+		relativePath, _ := filepath.Rel(importBaseDirPath, path)
+		relativePaths[i] = filepath.ToSlash(relativePath)
 	}
 
-	return relativePaths, nil
+	rel, err := filepath.Rel(baseDirPath, importBaseDirPath)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return rel, relativePaths, nil
 }

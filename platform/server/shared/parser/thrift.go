@@ -24,9 +24,13 @@ import (
 	"regexp"
 )
 
-type ThriftFile struct{}
+type ThriftParser struct{}
 
-func (*ThriftFile) GetDependentFilePaths(mainIdlPath string) ([]string, error) {
+func NewThriftParser() *ThriftParser {
+	return &ThriftParser{}
+}
+
+func (*ThriftParser) GetDependentFilePaths(baseDirPath, mainIdlPath string) (string, []string, error) {
 	// create maps to keep track of processed and related paths
 	processedPaths := make(map[string]bool)
 	relatedPaths := make(map[string]bool)
@@ -81,18 +85,24 @@ func (*ThriftFile) GetDependentFilePaths(mainIdlPath string) ([]string, error) {
 	}
 
 	// start the recursive processing with the main IDL file
-	err := processFile(mainIdlPath)
+	mainAbsPath := baseDirPath + mainIdlPath
+	err := processFile(mainAbsPath)
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 
 	// calculate the relative paths to the main IDL file
-	mainIdlDir := filepath.Dir(mainIdlPath)
+	mainIdlDir := filepath.Dir(mainAbsPath)
 	relativePaths := make([]string, len(resultPaths))
 	for i, path := range resultPaths {
 		relativePath, _ := filepath.Rel(mainIdlDir, path)
 		relativePaths[i] = filepath.ToSlash(relativePath)
 	}
 
-	return relativePaths, nil
+	rel, err := filepath.Rel(baseDirPath, mainIdlDir)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return rel, relativePaths, nil
 }
