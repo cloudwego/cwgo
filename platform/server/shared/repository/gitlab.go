@@ -20,6 +20,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/avast/retry-go"
 	"strings"
 	"time"
 
@@ -273,21 +274,48 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	}
 
 	// approve merge request
-	_, _, err = a.client.MergeRequests.AcceptMergeRequest(repoPid, createMergeRequestRes.IID, &gitlab.AcceptMergeRequestOptions{
-		MergeCommitMessage:        gitlab.String(commitMessage),
-		SquashCommitMessage:       gitlab.String(commitMessage),
-		MergeWhenPipelineSucceeds: gitlab.Bool(false),
-		Squash:                    gitlab.Bool(true),
-		ShouldRemoveSourceBranch:  gitlab.Bool(true),
-	})
+	err = retry.Do(
+		// if merge a request immediately after create a mr
+		// gitlab will return 405
+		// so here set a retry mechanism
+		func() error {
+			_, _, err = a.client.MergeRequests.AcceptMergeRequest(repoPid, createMergeRequestRes.IID, &gitlab.AcceptMergeRequestOptions{
+				MergeCommitMessage:        gitlab.String(commitMessage),
+				SquashCommitMessage:       gitlab.String(commitMessage),
+				MergeWhenPipelineSucceeds: gitlab.Bool(false),
+				Squash:                    gitlab.Bool(true),
+				ShouldRemoveSourceBranch:  gitlab.Bool(true),
+			})
+			if err != nil {
+				logger.Logger.Warn("approve merge request failed",
+					zap.Error(err),
+					zap.Int("mr_iid", createMergeRequestRes.IID),
+					zap.String("repo_pid", repoPid),
+					zap.String("temp_branch", tempBranch),
+					zap.String("source_branch", branch),
+				)
+				return err
+			}
+
+			return nil
+		},
+		retry.Attempts(5),
+		retry.Delay(3*time.Second),
+		retry.LastErrorOnly(true),
+	)
 	if err != nil {
-		logger.Logger.Warn("approve merge request failed",
-			zap.Error(err),
-			zap.Int("mr_iid", createMergeRequestRes.IID),
-			zap.String("repo_pid", repoPid),
-			zap.String("temp_branch", tempBranch),
-			zap.String("source_branch", branch),
-		)
+		// if not able to accept a mr
+		// then delete the temp branch
+		go func() {
+			_, err = a.client.Branches.DeleteBranch(repoPid, tempBranch)
+			if err != nil {
+				logger.Logger.Warn("delete temp branch failed",
+					zap.Error(err),
+					zap.String("repo_id", repoPid),
+					zap.String("temp_branch", tempBranch),
+				)
+			}
+		}()
 		return err
 	}
 
