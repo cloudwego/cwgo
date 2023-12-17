@@ -287,13 +287,6 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 				ShouldRemoveSourceBranch:  gitlab.Bool(true),
 			})
 			if err != nil {
-				logger.Logger.Warn("approve merge request failed",
-					zap.Error(err),
-					zap.Int("mr_iid", createMergeRequestRes.IID),
-					zap.String("repo_pid", repoPid),
-					zap.String("temp_branch", tempBranch),
-					zap.String("source_branch", branch),
-				)
 				return err
 			}
 
@@ -304,6 +297,14 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 		retry.LastErrorOnly(true),
 	)
 	if err != nil {
+		logger.Logger.Warn("approve merge request failed",
+			zap.Error(err),
+			zap.Int("mr_iid", createMergeRequestRes.IID),
+			zap.String("repo_pid", repoPid),
+			zap.String("temp_branch", tempBranch),
+			zap.String("source_branch", branch),
+		)
+
 		// if not able to accept a mr
 		// then delete the temp branch
 		go func() {
