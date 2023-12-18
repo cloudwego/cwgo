@@ -35,7 +35,6 @@ type Config struct {
 
 const (
 	defaultSyncAgentServiceInterval = 3 * time.Second
-	defaultSyncRepositoryInterval   = 3 * time.Minute
 	defaultSyncIdlInterval          = 3 * time.Minute
 )
 
@@ -54,15 +53,6 @@ func (conf *Config) GetSyncAgentServiceInterval() time.Duration {
 	}
 
 	return defaultSyncAgentServiceInterval
-}
-
-func (conf *Config) GetSyncRepositoryInterval() time.Duration {
-	duration, err := time.ParseDuration(conf.SyncIdlInterval)
-	if err == nil {
-		return duration
-	}
-
-	return defaultSyncRepositoryInterval
 }
 
 func (conf *Config) GetSyncIdlInterval() time.Duration {
