@@ -22,5 +22,6 @@ var (
 	TemplateCustomFuncMap = map[string]interface{}{
 		"Sub":     func(a, b int) int { return a - b },
 		"ToUpper": strings.ToUpper,
+		"ToLower": strings.ToLower,
 	}
 )

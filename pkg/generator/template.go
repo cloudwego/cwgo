@@ -144,7 +144,7 @@ func (tg *TemplateGenerator) renderClient(clientGen *ClientGenerator) error {
 	if clientGen.isNew {
 		for index, tpl := range mvcTemplates {
 			// render init.go
-			if index == consts.ClientInitFileIndex {
+			if index == consts.FileClientInitIndex {
 				bizDir := ""
 				if clientGen.communicationType == consts.HTTP {
 					bizDir = clientGen.OutDir
@@ -152,7 +152,7 @@ func (tg *TemplateGenerator) renderClient(clientGen *ClientGenerator) error {
 					bizDir = filepath.Join(clientGen.OutDir, consts.DefaultKitexClientDir)
 				}
 
-				subDirs, err := utils.GetSubDirs(bizDir)
+				subDirs, err := utils.GetSubDirs(bizDir, false)
 				if err != nil {
 					return err
 				}
@@ -255,9 +255,12 @@ func (tg *TemplateGenerator) renderAppend(tpl *Template, renderObj any) error {
 	}
 
 	// append imports
-	importedContent, err := appendGoFileImports(string(fileContent), tpl.AppendImport)
-	if err != nil {
-		return err
+	var importedContent string
+	if strings.HasSuffix(tpl.Path, ".go") {
+		importedContent, err = appendGoFileImports(string(fileContent), tpl.AppendImport)
+		if err != nil {
+			return err
+		}
 	}
 
 	// append body
@@ -305,11 +308,12 @@ func (tg *TemplateGenerator) renderReplaceFuncBody(tpl *Template, renderObj any)
 	for _, impt := range tpl.ReplaceFuncImport {
 		replaceFuncImpts = append(replaceFuncImpts, impt...)
 	}
+
 	content, err := appendGoFileImports(string(fileContent), replaceFuncImpts)
 	if err != nil {
 		return err
 	}
-	
+
 	content, err = replaceFuncBody(content, tpl.ReplaceFuncName, tpl.ReplaceFuncBody)
 	if err != nil {
 		return err

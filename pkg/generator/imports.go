@@ -80,7 +80,14 @@ var (
 			"gopkg.in/yaml.v2":                    struct{}{},
 		},
 
-		consts.KitexExtensionServer: {},
+		consts.Main: {
+			"net":                                    struct{}{},
+			"github.com/cloudwego/kitex/pkg/klog":    struct{}{},
+			"github.com/cloudwego/kitex/pkg/rpcinfo": struct{}{},
+			"github.com/cloudwego/kitex/server":      struct{}{},
+			"github.com/kitex-contrib/obs-opentelemetry/logging/logrus": struct{}{},
+			"gopkg.in/natefinch/lumberjack.v2":                          struct{}{},
+		},
 	}
 
 	kitexClientInitImports = map[string]map[string]struct{}{

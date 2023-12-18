@@ -140,3 +140,26 @@ func isFuncBodyEqual(src, funcName, body string) (isExist bool, err error) {
 
 	return buffer.String() == body, nil
 }
+
+func getStructNames(src string) (result []string, err error) {
+	fSet := token.NewFileSet()
+	file, err := parser.ParseFile(fSet, "", src, parser.ParseComments)
+	if err != nil {
+		return nil, err
+	}
+
+	ast.Inspect(file, func(n ast.Node) bool {
+		ts, ok := n.(*ast.TypeSpec)
+		if !ok {
+			return true
+		}
+		_, ok = ts.Type.(*ast.StructType)
+		if !ok {
+			return true
+		}
+		result = append(result, ts.Name.Name)
+		return true
+	})
+
+	return
+}

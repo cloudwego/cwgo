@@ -32,12 +32,12 @@ var (
 	    return strings.Fields(e)
       }`
 
-	kitexCommonResolverBody = `options = append(options, client.WithResolver(r))
+	kitexCommonResolverBody = `*options = append(*options, client.WithResolver(r))
 	return nil`
 
 	kitexEtcdClientImports = []string{"github.com/kitex-contrib/registry-etcd"}
 
-	kitexEtcdClient = `r, err := etcd.NewEtcdResolver(conf.GetConf().Resolver.Address)
+	kitexEtcdClient = `r, err := etcd.NewEtcdResolver(rpc.GetResolverAddress())
 	if err != nil {
 		return err
 	}` + consts.LineBreak + kitexCommonResolverBody
@@ -47,7 +47,7 @@ var (
 		"time",
 	}
 
-	kitexZKClient = `r, err := resolver.NewZookeeperResolver(conf.GetConf().Resolver.Address, 40*time.Second)
+	kitexZKClient = `r, err := resolver.NewZookeeperResolver(rpc.GetResolverAddress(), 40*time.Second)
     if err != nil {
 		return err
     }` + consts.LineBreak + kitexCommonResolverBody
@@ -63,17 +63,17 @@ var (
 		"github.com/kitex-contrib/polaris",
 	}
 
-	kitexPolarisClient = `options = append(options, client.WithSuite(polaris.NewDefaultClientSuite()))
+	kitexPolarisClient = `*options = append(*options, client.WithSuite(polaris.NewDefaultClientSuite()))
 	return nil`
 
 	kitexEurekaClientImports = []string{"github.com/kitex-contrib/registry-eureka/resolver"}
 
-	kitexEurekaClient = `r := resolver.NewEurekaResolver(conf.GetConf().Resolver.Address)` +
+	kitexEurekaClient = `r := resolver.NewEurekaResolver(rpc.GetResolverAddress())` +
 		consts.LineBreak + kitexCommonResolverBody
 
 	kitexConsulClientImports = []string{"github.com/kitex-contrib/registry-consul"}
 
-	kitexConsulClient = `r, err := consul.NewConsulResolver(conf.GetConf().Resolver.Address[0])
+	kitexConsulClient = `r, err := consul.NewConsulResolver(rpc.GetResolverAddress()[0])
 	if err != nil {
 		return err
 	}` + consts.LineBreak + kitexCommonResolverBody
@@ -159,7 +159,7 @@ var kitexClientMVCTemplates = []Template{
 
   // If you do not use the service resolver function, do not edit this function.
   // Otherwise, you can customize and modify it.
-  func initResolver(ops *[]client.Option) (err error) {
+  func initResolver(options *[]client.Option) (err error) {
   	{{if ne .ResolverName ""}}
     {{.ResolverBody}}
     {{else}}

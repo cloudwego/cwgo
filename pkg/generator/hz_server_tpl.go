@@ -20,7 +20,21 @@ import "github.com/cloudwego/cwgo/pkg/consts"
 
 // related to service registration
 var (
-	hzCommonRegistryBody = `opts = append(opts, server.WithRegistry(r, &registry.Info{
+	hzNilRegistryFuncBody = "{\n\treturn\n}"
+
+	hzAppendRegistryFunc = `func GetRegistryAddress() []string {
+		e := os.Getenv("GO_HERTZ_REGISTRY_[[ToUpper .ServiceName]]")
+		if len(e) == 0 {
+		  if conf.GetConf().Registry.Address != nil {
+			return conf.GetConf().Registry.Address
+		  } else {
+			return []string{[[$lenSlice := len .RegistryAddress]][[range $key, $value := .RegistryAddress]]"[[$value]]"[[if eq $key (Sub $lenSlice 1)]][[else]], [[end]][[end]]}
+		  }
+	    }
+	    return strings.Fields(e)
+      }`
+
+	hzCommonRegistryBody = `*opts = append(*opts, server.WithRegistry(r, &registry.Info{
 		ServiceName: conf.GetConf().Hertz.ServiceName,
 		Addr:        utils.NewNetAddr("tcp", conf.GetConf().Hertz.Address),
 		Weight:      10,
@@ -34,9 +48,9 @@ var (
 		"github.com/hertz-contrib/registry/etcd",
 	}
 
-	hzEtcdServer = `r, err := etcd.NewEtcdRegistry(conf.GetConf().Registry.Address)
+	hzEtcdServer = `r, err := etcd.NewEtcdRegistry(conf.GetRegistryAddress())
 	if err != nil {
-		panic(err)
+		return err
 	}` + consts.LineBreak + hzCommonRegistryBody
 
 	hzNacosServerImports = []string{
@@ -46,7 +60,7 @@ var (
 
 	hzNacosServer = `r, err := nacos.NewDefaultNacosRegistry()
     if err != nil {
-        panic(err)
+        return err
     }` + consts.LineBreak + hzCommonRegistryBody
 
 	hzConsulServerImports = []string{
@@ -56,10 +70,10 @@ var (
 	}
 
 	hzConsulServer = `consulConfig := api.DefaultConfig()
-    consulConfig.Address = conf.GetConf().Registry.Address[0]
+    consulConfig.Address = conf.GetRegistryAddress()[0]
     consulClient, err := api.NewClient(consulConfig)
     if err != nil {
-        panic(err)
+        return err
     }
     
     r := consul.NewConsulRegister(consulClient)` + consts.LineBreak + hzCommonRegistryBody
@@ -70,7 +84,7 @@ var (
 		"time",
 	}
 
-	hzEurekaServer = `r := eureka.NewEurekaRegistry(conf.GetConf().Registry.Address, 40*time.Second)` +
+	hzEurekaServer = `r := eureka.NewEurekaRegistry(conf.GetRegistryAddress(), 40*time.Second)` +
 		consts.LineBreak + hzCommonRegistryBody
 
 	hzPolarisServerImports = []string{
@@ -80,11 +94,11 @@ var (
 
 	hzPolarisServer = `r, err := polaris.NewPolarisRegistry()
     if err != nil {
-        panic(err)
+        return err
     }
-	opts = append(opts, server.WithRegistry(r, &registry.Info{
+	*opts = append(*opts, server.WithRegistry(r, &registry.Info{
 		ServiceName: conf.GetConf().Hertz.ServiceName,
-		Addr:        utils.NewNetAddr("tcp", conf.GetConf().Hertz.Address),
+		Addr:        utils.NewNetAddr("tcp", conf.GetRegistryAddress()),
 		Tags: map[string]string{
             "namespace": "Polaris",
         },
@@ -95,9 +109,9 @@ var (
 		"github.com/hertz-contrib/registry/servicecomb",
 	}
 
-	hzServiceCombServer = `r, err := servicecomb.NewDefaultSCRegistry(conf.GetConf().Registry.Address)
+	hzServiceCombServer = `r, err := servicecomb.NewDefaultSCRegistry(conf.GetRegistryAddress())
     if err != nil {
-        panic(err)
+        return err
     }` + consts.LineBreak + hzCommonRegistryBody
 
 	hzZKServerImports = []string{
@@ -106,9 +120,9 @@ var (
 		"time",
 	}
 
-	hzZKServer = `r, err := zookeeper.NewZookeeperRegistry(conf.GetConf().Registry.Address, 40*time.Second)
+	hzZKServer = `r, err := zookeeper.NewZookeeperRegistry(conf.GetRegistryAddress(), 40*time.Second)
     if err != nil {
-        panic(err)
+        return err
     }` + consts.LineBreak + hzCommonRegistryBody
 )
 
@@ -217,13 +231,17 @@ registry:
 
 	{
 		Path:   consts.ConfGo,
-		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		Delims: [2]string{"[[", "]]"},
+		UpdateBehavior: UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+		},
+		CustomFunc: TemplateCustomFuncMap,
 		Body: `package conf
       import (
-        {{range $key, $value := .GoFileImports}}
-	    {{if eq $key "conf/conf.go"}}
-	    {{range $k, $v := $value}}
-        {{if ne $k ""}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}
+        [[range $key, $value := .GoFileImports]]
+	    [[if eq $key "conf/conf.go"]]
+	    [[range $k, $v := $value]]
+        [[if ne $k ""]]"[[$k]]"[[end]][[end]][[end]][[end]]
       )
 
       var (
@@ -239,9 +257,9 @@ registry:
 		Log Log ` + "`yaml:\"log\"`" + `
         MySQL MySQL ` + "`yaml:\"mysql\"`" + `
         Redis Redis ` + "`yaml:\"redis\"`" + `
-		{{if ne .RegistryName ""}}
+		[[if ne .RegistryName ""]]
 		Registry Registry ` + "`yaml:\"registry\"`" + `
-		{{end}}
+		[[end]]
       }
 
       type MySQL struct {
@@ -273,11 +291,11 @@ registry:
       	LogMaxBackups int    ` + "`yaml:\"log_max_backups\"`" + `
       	LogMaxAge     int    ` + "`yaml:\"log_max_age\"`" + `
 	  }
-	  {{if ne .RegistryName ""}}
+	  [[if ne .RegistryName ""]]
       type Registry struct {
 		Address []string  ` + "`yaml:\"address\"`" + `
       }   
-	  {{end}}
+	  [[end]]
 
       // GetConf gets configuration instance
       func GetConf() *Config {
@@ -317,6 +335,20 @@ registry:
       	return e
       }
 
+	  [[if ne .RegistryName ""]]
+	  func GetRegistryAddress() []string {
+		e := os.Getenv("GO_HERTZ_REGISTRY_[[ToUpper .ServiceName]]")
+		if len(e) == 0 {
+		  if conf.GetConf().Registry.Address != nil {
+			return conf.GetConf().Registry.Address
+		  } else {
+			return []string{[[$lenSlice := len .RegistryAddress]][[range $key, $value := .RegistryAddress]]"[[$value]]"[[if eq $key (Sub $lenSlice 1)]][[else]], [[end]][[end]]}
+		  }
+	    }
+	    return strings.Fields(e)
+      }
+	  [[end]]
+
       func LogLevel() hlog.Level {
       	level := GetConf().Log.LogLevel
       	switch level {
@@ -343,6 +375,14 @@ registry:
 	{
 		Path:   consts.Main,
 		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		UpdateBehavior: UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+			ReplaceFunc: ReplaceFunc{
+				ReplaceFuncName:   make([]string, 0, 5),
+				ReplaceFuncImport: make([][]string, 0, 15),
+				ReplaceFuncBody:   make([]string, 0, 5),
+			},
+		},
 		Body: `// Code generated by hertz generator.
 
       package main
@@ -373,14 +413,24 @@ registry:
       }
 
       func initServerOpts() (opts []config.Option) {
-		address := conf.GetConf().Hertz.Address
-		opts = append(opts, server.WithHostPorts(address))
-		{{if ne .RegistryName ""}}
-        {{.RegistryBody}}
-		{{end}}
+		opts = append(opts, server.WithHostPorts(conf.GetConf().Hertz.Address))
+		
+		if err := initRegistry(&opts); err != nil {
+		  panic(err)
+        }
 
 		return opts
       }
+
+	  // If you do not use the service registry function, do not edit this function.
+	  // Otherwise, you can customize and modify it.
+	  func initRegistry(ops *[]config.Option) (err error) {
+		{{if ne .RegistryName ""}}
+		{{.RegistryBody}}
+		{{else}}
+		return
+        {{end}}
+	  }
 
       func registerMiddleware(h *server.Hertz) {
       	// log

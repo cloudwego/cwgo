@@ -83,7 +83,6 @@ func Client(c *config.ClientArgument) error {
 			if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
 				return err
 			}
-			defer utils.RemoveKitexExtension()
 
 			// generate cwgo side files
 			if err = generator.GenerateClient(clientGen); err != nil {

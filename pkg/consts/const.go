@@ -88,7 +88,6 @@ const (
 	ConfGo               = "conf/conf.go"
 	DockerCompose        = "docker-compose.yaml"
 	KitexExtensionServer = "server.go"
-	KitexExtensionClient = "client.go"
 	InitGo               = "init.go"
 	EnvGo                = "env.go"
 )
@@ -164,14 +163,19 @@ const (
 )
 
 const (
-	ClientInitFileIndex = 0
-	ClientEnvFileIndex  = 1
+	FileClientInitIndex          = 0
+	FileClientEnvIndex           = 1
+	FileServerConfGoIndex        = 3
+	FileServerMainIndex          = 4
+	FileServerDockerComposeIndex = 5
 )
 
 // function names
 const (
-	FuncInitResolver   = "initResolver"
-	GetResolverAddress = "GetResolverAddress"
+	FuncInitResolver       = "initResolver"
+	FuncGetResolverAddress = "GetResolverAddress"
+	FuncInitRegistry       = "initResolver"
+	FuncGetRegistryAddress = "GetResolverAddress"
 )
 
 // update behavior

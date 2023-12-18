@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/cwgo/tpl"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 )
 
@@ -63,11 +62,6 @@ func GetIdlType(path string, pbName ...string) (string, error) {
 	}
 }
 
-func RemoveKitexExtension() {
-	extensionYamlPath := tpl.KitexDir + consts.KitexExtensionYaml
-	os.RemoveAll(extensionYamlPath)
-}
-
 func FormatGoFile(filePath string) error {
 	path, err := LookupTool(consts.Gofumpt)
 	if err != nil {
@@ -102,13 +96,19 @@ func FormatGoFile(filePath string) error {
 }
 
 // GetSubDirs gets all subdirectories under the specified directory
-func GetSubDirs(dir string) (dirs []string, err error) {
+func GetSubDirs(dir string, includeCwd bool) (dirs []string, err error) {
 	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if info.IsDir() && path != dir {
-			dirs = append(dirs, path)
+		if info.IsDir() {
+			if includeCwd {
+				dirs = append(dirs, path)
+			} else {
+				if path != dir {
+					dirs = append(dirs, path)
+				}
+			}
 		}
 		return nil
 	})

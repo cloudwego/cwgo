@@ -18,36 +18,29 @@ package generator
 
 import "github.com/cloudwego/cwgo/pkg/consts"
 
-// related to basic options
-var (
-	kitexServiceBasicImports = []string{
-		"net",
-		"github.com/cloudwego/kitex/pkg/klog",
-		"github.com/cloudwego/kitex/pkg/rpcinfo",
-	}
-
-	kitexServiceBasicOpts = `// address
-    addr, err := net.ResolveTCPAddr("tcp", conf.GetConf().Kitex.Address)
-    if err != nil {
-      klog.Fatal(err)
-    }
-    options = append(options, server.WithServiceAddr(addr))
-
-	// service info
-    options = append(options, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
-    	ServiceName: conf.GetConf().Kitex.ServiceName,
-    }))`
-)
-
 // related to service registration
 var (
-	kitexCommonRegisterBody = `options = append(options, server.WithRegistry(r))`
+	kitexNilRegistryFuncBody = "{\n\treturn\n}"
+
+	kitexAppendRegistryFunc = `func GetRegistryAddress() []string {
+		e := os.Getenv("GO_KITEX_REGISTRY_[[ToUpper .ServiceName]]")
+		if len(e) == 0 {
+		  if conf.GetConf().Registry.Address != nil {
+			return conf.GetConf().Registry.Address
+		  } else {
+			return []string{[[$lenSlice := len .RegistryAddress]][[range $key, $value := .RegistryAddress]]"[[$value]]"[[if eq $key (Sub $lenSlice 1)]][[else]], [[end]][[end]]}
+		  }
+	    }
+	    return strings.Fields(e)
+      }`
+
+	kitexCommonRegisterBody = `*ops = append(*ops, server.WithRegistry(r))`
 
 	kitexEtcdServerImports = []string{"github.com/kitex-contrib/registry-etcd"}
 
-	kitexEtcdServer = `r, err := etcd.NewEtcdRegistry(conf.GetConf().Registry.Address)
+	kitexEtcdServer = `r, err := etcd.NewEtcdRegistry(conf.GetRegistryAddress())
 	if err != nil {
-		klog.Fatal(err)
+		return err
 	}` + consts.LineBreak + kitexCommonRegisterBody
 
 	kitexZKServerImports = []string{
@@ -55,16 +48,16 @@ var (
 		"time",
 	}
 
-	kitexZKServer = `r, err := registry.NewZookeeperRegistry(conf.GetConf().Registry.Address, 40*time.Second)
+	kitexZKServer = `r, err := registry.NewZookeeperRegistry(conf.GetRegistryAddress(), 40*time.Second)
     if err != nil{
-        klog.Fatal(err)
+        return err
     }` + consts.LineBreak + kitexCommonRegisterBody
 
 	kitexNacosServerImports = []string{"github.com/kitex-contrib/registry-nacos/registry"}
 
 	kitexNacosServer = `r, err := registry.NewDefaultNacosRegistry()
 	if err != nil {
-		klog.Fatal(err)
+		return err
 	}` + consts.LineBreak + kitexCommonRegisterBody
 
 	kitexPolarisServerImports = []string{
@@ -75,7 +68,7 @@ var (
 	kitexPolarisServer = `so := polaris.ServerOptions{}
 	r, err := polaris.NewPolarisRegistry(so)
 	if err != nil {
-		klog.Fatal(err)
+		return err
 	}
 	info := &registry.Info{
 		ServiceName: conf.GetConf().Kitex.ServiceName,
@@ -83,14 +76,14 @@ var (
 			"namespace": "Polaris",
 		},
 	}
-	options = append(options, server.WithRegistry(r), server.WithRegistryInfo(info))`
+	*ops = append(*ops, server.WithRegistry(r), server.WithRegistryInfo(info))`
 
 	kitexEurekaServerImports = []string{
 		"github.com/kitex-contrib/registry-eureka/registry",
 		"time",
 	}
 
-	kitexEurekaServer = `r := registry.NewEurekaRegistry(conf.GetConf().Registry.Address, 15*time.Second)` +
+	kitexEurekaServer = `r := registry.NewEurekaRegistry(conf.GetRegistryAddress(), 15*time.Second)` +
 		consts.LineBreak + kitexCommonRegisterBody
 
 	kitexConsulServerImports = []string{
@@ -98,21 +91,21 @@ var (
 		"github.com/cloudwego/kitex/pkg/registry",
 	}
 
-	kitexConsulServer = `r, err := consul.NewConsulRegister(conf.GetConf().Registry.Address[0])
+	kitexConsulServer = `r, err := consul.NewConsulRegister(conf.GetRegistryAddress()[0])
 	if err != nil {
-		klog.Fatal(err)
+		return err
 	}
 	info := &registry.Info{
 		ServiceName: conf.GetConf().Kitex.ServiceName,
 		Weight:      1, // weights must be greater than 0 in consul,else received error and exit.
 	}
-	options = append(options, server.WithRegistry(r), server.WithRegistryInfo(info))`
+	*ops = append(*ops, server.WithRegistry(r), server.WithRegistryInfo(info))`
 
 	kitexServiceCombServerImports = []string{"github.com/kitex-contrib/registry-servicecomb/registry"}
 
 	kitexServiceCombServer = `r, err := registry.NewDefaultSCRegistry()
     if err != nil {
-        klog.Fatal(err)
+        return err
     }` + consts.LineBreak + kitexCommonRegisterBody
 )
 
@@ -255,14 +248,18 @@ registry:
 
 	{
 		Path:   consts.ConfGo,
-		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		Delims: [2]string{"[[", "]]"},
+		UpdateBehavior: UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+		},
+		CustomFunc: TemplateCustomFuncMap,
 		Body: `package conf
 
   import (
-    {{range $key, $value := .GoFileImports}}
-	{{if eq $key "conf/conf.go"}}
-	{{range $k, $v := $value}}
-    {{if ne $k ""}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}
+    [[range $key, $value := .GoFileImports]]
+	[[if eq $key "conf/conf.go"]]
+	[[range $k, $v := $value]]
+    [[if ne $k ""]]"[[$k]]"[[end]][[end]][[end]][[end]]
   )
 
   var (
@@ -305,11 +302,11 @@ registry:
     LogMaxBackups   int      ` + "`yaml:\"log_max_backups\"`" + `
     LogMaxAge       int      ` + "`yaml:\"log_max_age\"`" + `
   }
-  {{if ne .RegistryName ""}}
+  [[if ne .RegistryName ""]]
   type Registry struct {
     Address []string  ` + "`yaml:\"address\"`" + `
   }   
-  {{end}}
+  [[end]]
 
   // GetConf gets configuration instance
   func GetConf() *Config {
@@ -346,6 +343,20 @@ registry:
     return e
   }
 
+  [[if ne .RegistryName ""]]
+  func GetRegistryAddress() []string {
+	e := os.Getenv("GO_KITEX_REGISTRY_[[ToUpper .ServiceName]]")
+	if len(e) == 0 {
+	  if conf.GetConf().Registry.Address != nil {
+		return conf.GetConf().Registry.Address
+	  } else {
+		return []string{[[$lenSlice := len .RegistryAddress]][[range $key, $value := .RegistryAddress]]"[[$value]]"[[if eq $key (Sub $lenSlice 1)]][[else]], [[end]][[end]]}
+	  }
+	}
+	return strings.Fields(e)
+  }
+  [[end]]
+
   func LogLevel() klog.Level {
     level := GetConf().Log.LogLevel
     switch level {
@@ -366,6 +377,83 @@ registry:
     default:
       return klog.LevelInfo
     }
+  }`,
+	},
+
+	{
+		Path:   consts.Main,
+		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		UpdateBehavior: UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+			ReplaceFunc: ReplaceFunc{
+				ReplaceFuncName:   make([]string, 0, 5),
+				ReplaceFuncImport: make([][]string, 0, 15),
+				ReplaceFuncBody:   make([]string, 0, 5),
+			},
+		},
+		Body: `package main
+
+  import (
+    {{range $key, $value := .GoFileImports}}
+	{{if eq $key "main.go"}}
+	{{range $k, $v := $value}}
+    {{if ne $k ""}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}
+  )
+
+  func main() {
+    opts := kitexInit()
+
+    svr := {{ToLower .KitexIdlServiceName}}.NewServer(new({{.KitexIdlServiceName}}Impl), opts...)
+
+    err := svr.Run()
+    if err != nil {
+      klog.Error(err.Error())
+    }
+  }
+
+  func kitexInit() (opts []server.Option) {
+    // address
+    addr, err := net.ResolveTCPAddr("tcp", conf.GetConf().Kitex.Address)
+    if err != nil {
+      panic(err)
+    }
+    opts = append(opts, server.WithServiceAddr(addr))
+
+    // service info
+    opts = append(opts, server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{
+	  ServiceName: conf.GetConf().Kitex.ServiceName,
+    }))
+  
+    {{- if eq .Codec "thrift"}}
+    // thrift meta handler
+    opts = append(opts, server.WithMetaHandler(transmeta.ServerTTHeaderHandler))
+    {{- end}}
+
+	if err := initRegistry(&opts); err != nil {
+	  panic(err)
+    }
+
+    // klog
+    logger := kitexlogrus.NewLogger()
+    klog.SetLogger(logger)
+    klog.SetLevel(conf.LogLevel())
+    klog.SetOutput(&lumberjack.Logger{
+          		Filename:   conf.GetConf().Log.LogFileName,
+          		MaxSize:    conf.GetConf().Log.LogMaxSize,
+          		MaxBackups: conf.GetConf().Log.LogMaxBackups,
+          		MaxAge:     conf.GetConf().Log.LogMaxAge,
+          	})
+    return
+  }
+  
+  // If you do not use the service registry function, do not edit this function.
+  // Otherwise, you can customize and modify it.
+  func initRegistry(ops *[]server.Option) (err error) {
+	{{if ne .RegistryName ""}}
+		{{.RegistryBody}}
+		{{else}}
+		return
+        {{end}}
   }`,
 	},
 

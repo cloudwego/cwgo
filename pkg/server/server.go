@@ -66,7 +66,6 @@ func Server(c *config.ServerArgument) error {
 			if err = generator.ConvertServerGenerator(serverGen, c); err != nil {
 				return err
 			}
-			defer utils.RemoveKitexExtension()
 
 			// generate cwgo side files
 			if err = generator.GenerateServer(serverGen); err != nil {

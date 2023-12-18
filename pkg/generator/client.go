@@ -34,7 +34,7 @@ type ClientGenerator struct {
 
 	ClientRender // for template render
 
-	optionFileInfo
+	clientOptionFileInfo
 }
 
 type ClientRender struct {
@@ -60,7 +60,7 @@ type Resolver struct {
 	ResolverAddress []string `yaml:"resolver_address,omitempty"`
 }
 
-type optionFileInfo struct {
+type clientOptionFileInfo struct {
 	initGoContents []string
 	initGoPaths    []string
 	envGoContent   string
@@ -81,7 +81,7 @@ func NewClientGenerator(types string) (*ClientGenerator, error) {
 			ClientRender: ClientRender{
 				GoFileImports: imports,
 			},
-			optionFileInfo: optionFileInfo{
+			clientOptionFileInfo: clientOptionFileInfo{
 				initGoPaths:    make([]string, 0, 5),
 				initGoContents: make([]string, 0, 5),
 			},
@@ -99,7 +99,7 @@ func NewClientGenerator(types string) (*ClientGenerator, error) {
 			ClientRender: ClientRender{
 				GoFileImports: imports,
 			},
-			optionFileInfo: optionFileInfo{
+			clientOptionFileInfo: clientOptionFileInfo{
 				initGoPaths:    make([]string, 0, 5),
 				initGoContents: make([]string, 0, 5),
 			},
@@ -186,7 +186,7 @@ func (clientGen *ClientGenerator) handleInitArguments(args *config.ClientArgumen
 			bizDir = filepath.Join(clientGen.OutDir, consts.DefaultKitexClientDir)
 		}
 
-		subDirs, err := utils.GetSubDirs(bizDir)
+		subDirs, err := utils.GetSubDirs(bizDir, false)
 		if err != nil {
 			return err
 		}
@@ -255,6 +255,9 @@ func (clientGen *ClientGenerator) handleNewResolver(resolverName string) (err er
 	if clientGen.CustomExtensionFile != "" && clientGen.ResolverName != "" {
 		if err = clientGen.GoFileImports.appendImports(consts.InitGo, clientGen.ResolverImports); err != nil {
 			return
+		}
+		if err = clientGen.GoFileImports.appendImports(consts.EnvGo, envGoImports); err != nil {
+			return err
 		}
 		return
 	}
@@ -367,6 +370,38 @@ func (clientGen *ClientGenerator) handleUpdateResolver(resolverName string) (err
 
 	switch clientGen.communicationType {
 	case consts.RPC:
+		switch clientGen.ResolverName {
+		case consts.Nacos:
+			if err = clientGen.handleUpdateResolverTemplate(kitexNacosClient, nacosServerAddr, kitexNacosClientImports); err != nil {
+				return err
+			}
+		case consts.Consul:
+			if err = clientGen.handleUpdateResolverTemplate(kitexConsulClient, consulServerAddr, kitexConsulClientImports); err != nil {
+				return err
+			}
+		case consts.Etcd:
+			if err = clientGen.handleUpdateResolverTemplate(kitexEtcdClient, etcdServerAddr, kitexEtcdClientImports); err != nil {
+				return err
+			}
+		case consts.Eureka:
+			if err = clientGen.handleUpdateResolverTemplate(kitexEurekaClient, eurekaServerAddr, kitexEurekaClientImports); err != nil {
+				return err
+			}
+		case consts.Polaris:
+			if err = clientGen.handleUpdateResolverTemplate(kitexPolarisClient, polarisServerAddr, kitexPolarisClientImports); err != nil {
+				return err
+			}
+		case consts.ServiceComb:
+			if err = clientGen.handleUpdateResolverTemplate(kitexServiceCombClient, serviceCombServerAddr, kitexServiceCombClientImports); err != nil {
+				return err
+			}
+		case consts.Zk:
+			if err = clientGen.handleUpdateResolverTemplate(kitexZKClient, zkServerAddr, kitexZKClientImports); err != nil {
+				return err
+			}
+		default:
+		}
+
 	case consts.HTTP:
 		switch clientGen.ResolverName {
 		case consts.Nacos:
@@ -399,6 +434,7 @@ func (clientGen *ClientGenerator) handleUpdateResolver(resolverName string) (err
 			}
 		default:
 		}
+
 	default:
 		return errTypeInput
 	}
@@ -435,11 +471,11 @@ func (clientGen *ClientGenerator) handleUpdateResolverTemplate(body string, addr
 
 		if equal {
 			if index == 0 {
-				mvcTemplates[consts.ClientInitFileIndex].Path = clientGen.initGoPaths[index]
-				mvcTemplates[consts.ClientInitFileIndex].Type = consts.ReplaceFuncBody
-				mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncName = append(mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncName, consts.FuncInitResolver)
-				mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncImport = append(mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncImport, imports)
-				mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncBody = append(mvcTemplates[consts.ClientInitFileIndex].ReplaceFuncBody, body)
+				mvcTemplates[consts.FileClientInitIndex].Path = clientGen.initGoPaths[index]
+				mvcTemplates[consts.FileClientInitIndex].Type = consts.ReplaceFuncBody
+				mvcTemplates[consts.FileClientInitIndex].ReplaceFuncName = append(mvcTemplates[consts.FileClientInitIndex].ReplaceFuncName, consts.FuncInitResolver)
+				mvcTemplates[consts.FileClientInitIndex].ReplaceFuncImport = append(mvcTemplates[consts.FileClientInitIndex].ReplaceFuncImport, imports)
+				mvcTemplates[consts.FileClientInitIndex].ReplaceFuncBody = append(mvcTemplates[consts.FileClientInitIndex].ReplaceFuncBody, body)
 			} else {
 				template := Template{
 					Path: clientGen.initGoPaths[index],
@@ -457,16 +493,16 @@ func (clientGen *ClientGenerator) handleUpdateResolverTemplate(body string, addr
 			}
 
 			if flag == 0 {
-				isExist, err := isFuncExist(clientGen.envGoContent, consts.GetResolverAddress)
+				isExist, err := isFuncExist(clientGen.envGoContent, consts.FuncGetResolverAddress)
 				if err != nil {
 					return err
 				}
 
 				if !isExist {
-					hzClientMVCTemplates[consts.ClientEnvFileIndex].Path = clientGen.envGoPath
-					hzClientMVCTemplates[consts.ClientEnvFileIndex].Type = consts.Append
-					hzClientMVCTemplates[consts.ClientEnvFileIndex].AppendContent = appendResolverFunc
-					hzClientMVCTemplates[consts.ClientEnvFileIndex].AppendImport = envGoImports
+					mvcTemplates[consts.FileClientEnvIndex].Path = clientGen.envGoPath
+					mvcTemplates[consts.FileClientEnvIndex].Type = consts.Append
+					mvcTemplates[consts.FileClientEnvIndex].AppendContent = appendResolverFunc
+					mvcTemplates[consts.FileClientEnvIndex].AppendImport = envGoImports
 				}
 
 				flag++
