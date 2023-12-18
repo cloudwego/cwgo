@@ -63,10 +63,10 @@ func kitexInit() (opts []server.Option) {
 	klog.SetLogger(logger)
 	klog.SetLevel(conf.LogLevel())
 	klog.SetOutput(&lumberjack.Logger{
-		Filename:	conf.GetConf().Kitex.LogFileName,
-		MaxSize:	conf.GetConf().Kitex.LogMaxSize,
-		MaxBackups:	conf.GetConf().Kitex.LogMaxBackups,
-		MaxAge:		conf.GetConf().Kitex.LogMaxAge,
+		Filename:   conf.GetConf().Kitex.LogFileName,
+		MaxSize:    conf.GetConf().Kitex.LogMaxSize,
+		MaxBackups: conf.GetConf().Kitex.LogMaxBackups,
+		MaxAge:     conf.GetConf().Kitex.LogMaxAge,
 	})
 	return
 }
