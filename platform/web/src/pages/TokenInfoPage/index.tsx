@@ -5,6 +5,7 @@ import {
 	ConfigProvider,
 	Form,
 	Modal,
+	Popconfirm,
 	Select,
 	Space,
 	Table,
@@ -27,7 +28,9 @@ export default function TokenPage() {
 	const [searchInfo, setSearchInfo] = useState({
 		repository_domain: ""
 	});
-	const [pageSize, setPageSize] = useState(5);
+	const [pageSize, setPageSize] = useState(
+		Number(localStorage.getItem("pageSize")) || 10
+	);
 	let destroyFn = () => {};
 
 	/**
@@ -78,6 +81,22 @@ export default function TokenPage() {
 			width: 180,
 			render: (value: string) => {
 				return <div>{value}</div>;
+			}
+		},
+		{
+			title: "令牌类型",
+			dataIndex: "token_type",
+			width: 100,
+			render: (value: number) => {
+				return value === 1 ? (
+					<Tag color="green" size="large">
+						个人
+					</Tag>
+				) : (
+					<Tag color="blue" size="large">
+						组织
+					</Tag>
+				);
 			}
 		},
 		{
@@ -193,9 +212,9 @@ export default function TokenPage() {
 			render: ({ id }: { id: number }) => {
 				return (
 					<Space>
-						<Button
-							type="danger"
-							onClick={() => {
+						<Popconfirm
+							title="确定删除"
+							onConfirm={() => {
 								const toast = Toast.info({
 									content: "正在删除 Token",
 									duration: 0
@@ -213,8 +232,8 @@ export default function TokenPage() {
 									});
 							}}
 						>
-							删除 Token
-						</Button>
+							<Button type="danger">删除 Token</Button>
+						</Popconfirm>
 					</Space>
 				);
 			}
@@ -306,6 +325,7 @@ export default function TokenPage() {
 						}}
 						onChange={(value) => {
 							setPageSize(value as number);
+							localStorage.setItem("pageSize", value as string);
 						}}
 						defaultValue={pageSize}
 					>

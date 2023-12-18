@@ -4,6 +4,7 @@ import {
 	Button,
 	ConfigProvider,
 	Form,
+	Popconfirm,
 	// Modal,
 	// Popconfirm,
 	Select,
@@ -30,7 +31,9 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 		service_name: ""
 	});
 	// let destroyFn = () => {};
-	const [pageSize, setPageSize] = useState(5);
+	const [pageSize, setPageSize] = useState(
+		Number(localStorage.getItem("pageSize")) || 10
+	);
 
 	const fetchData = async (currentPage = 1) => {
 		setLoading(true);
@@ -219,15 +222,6 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 								复制添加依赖
 							</Button>
 						</Tooltip>
-						<Button
-							onClick={() => {
-								window.open(
-									`https://${idl_repository.repository_domain}/${idl_repository.repository_owner}/${idl_repository.repository_name}/commit/${commit_hash}`
-								);
-							}}
-						>
-							跳转 commit
-						</Button>
 						<Tooltip
 							content={`import "${service_repository.repository_domain}/${service_repository.repository_owner}/${service_repository.repository_name}/rpc/${service_name}"`}
 							style={{
@@ -247,6 +241,15 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 								import 路径
 							</Button>
 						</Tooltip>
+						<Button
+							onClick={() => {
+								window.open(
+									`https://${idl_repository.repository_domain}/${idl_repository.repository_owner}/${idl_repository.repository_name}/commit/${commit_hash}`
+								);
+							}}
+						>
+							跳转 commit
+						</Button>
 					</Space>
 				);
 			}
@@ -305,9 +308,9 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 						>
 							<Button type="warning">修改仓库状态</Button>
 						</Popconfirm> */}
-						<Button
-							type="danger"
-							onClick={() => {
+						<Popconfirm
+							title="确定删除"
+							onConfirm={() => {
 								const toast = Toast.info({
 									content: "正在删除仓库",
 									duration: 0
@@ -325,8 +328,8 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 									});
 							}}
 						>
-							删除仓库
-						</Button>
+							<Button type="danger">删除仓库</Button>
+						</Popconfirm>
 					</Space>
 				);
 			}
@@ -463,6 +466,7 @@ export default function RepositoryPage({ repoType }: { repoType: string }) {
 						}}
 						onChange={(value) => {
 							setPageSize(value as number);
+							localStorage.setItem("pageSize", String(value));
 						}}
 						defaultValue={pageSize}
 					>

@@ -37,7 +37,10 @@ export default function RepositoryPage() {
 	});
 	const [statusActive, setStatusActive] = useState(1);
 	// const pageSize = 10;
-	const [pageSize, setPageSize] = useState(5);
+	// 从本地存储中获取 pageSize
+	const [pageSize, setPageSize] = useState(
+		Number(localStorage.getItem("pageSize")) || 10
+	);
 	// let destroyFn = () => {};
 
 	function InnerIdls({
@@ -143,7 +146,7 @@ export default function RepositoryPage() {
 			render: (value: number) => {
 				return value === 2 ? (
 					<Tag color="green" size="large">
-						激活
+						同步
 					</Tag>
 				) : (
 					<Tag color="red" size="large">
@@ -216,7 +219,7 @@ export default function RepositoryPage() {
 										}}
 									>
 										<Select.Option value={1}>未激活</Select.Option>
-										<Select.Option value={2}>激活</Select.Option>
+										<Select.Option value={2}>同步</Select.Option>
 									</Select>
 								</div>
 							}
@@ -268,11 +271,11 @@ export default function RepositoryPage() {
 									});
 							}}
 						>
-							同步 idl
+							强制同步 idl
 						</Button>
-						<Button
-							type="danger"
-							onClick={() => {
+						<Popconfirm
+							title="确定删除"
+							onConfirm={() => {
 								const toast = Toast.info({
 									content: "正在删除 idl",
 									duration: 0
@@ -290,8 +293,8 @@ export default function RepositoryPage() {
 									});
 							}}
 						>
-							删除 idl
-						</Button>
+							<Button type="danger">删除 idl</Button>
+						</Popconfirm>
 					</Space>
 				);
 			}
@@ -408,6 +411,7 @@ export default function RepositoryPage() {
 						}}
 						onChange={(value) => {
 							setPageSize(value as number);
+							localStorage.setItem("pageSize", String(value));
 						}}
 						defaultValue={pageSize}
 					>
