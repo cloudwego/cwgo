@@ -33,6 +33,7 @@ func Init() *cli.App {
 	verboseFlag := cli.BoolFlag{Name: "verbose,vv", Usage: "turn on verbose mode"}
 
 	app := cli.NewApp()
+	app.EnableBashCompletion = true
 	app.Name = meta.Name
 	app.Usage = AppUsage
 	app.Version = meta.Version
