@@ -1,0 +1,26 @@
+.layout {
+	height: 100vh;
+	background-color: var(--semi-color-bg-1);
+	.nav {
+		height: 6vh;
+	}
+	.inner-layout {
+		margin-top: 6vh;
+		height: 94vh;
+		overflow: auto;
+		.content-wrapper {
+			-ms-overflow-style: none;
+			scrollbar-width: none;
+			&::-webkit-scrollbar {
+				display: none;
+			}
+		}
+	}
+	.sider {
+		background-color: var(--semi-color-bg-1);
+		.nav {
+			max-width: 220;
+			height: 100%;
+		}
+	}
+}

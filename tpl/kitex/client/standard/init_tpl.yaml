@@ -7,8 +7,10 @@ body: |-
      "sync"
   
      "github.com/cloudwego/kitex/client"
+    {{- if eq .Codec "thrift"}}
      "github.com/cloudwego/kitex/pkg/transmeta"
      "github.com/cloudwego/kitex/transport"
+    {{- end }}
   )
   var (
   	// todo edit custom config

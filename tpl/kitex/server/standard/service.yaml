@@ -47,7 +47,7 @@ body: |-
   }
 
   // Run create note info
-  func (s *{{.Name}}Service) Run({{range .Args}}{{LowerFirst .Name}} {{.Type}}{{end}}) error {
+  func (s *{{.Name}}Service) Run({{range .Args}}{{LowerFirst .Name}} {{.Type}}, {{end}}) error {
     // Finish your business logic.
 
     return nil
@@ -60,7 +60,7 @@ body: |-
   }
 
   // Run create note info
-  func (s *{{.Name}}Service) Run({{range .Args}}{{LowerFirst .Name}} {{.Type}}{{end}}) (resp {{.Resp.Type}}, err error) {
+  func (s *{{.Name}}Service) Run({{range .Args}}{{LowerFirst .Name}} {{.Type}}, {{end}}) (resp {{.Resp.Type}}, err error) {
     // Finish your business logic.
 
     return

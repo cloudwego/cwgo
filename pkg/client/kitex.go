@@ -74,6 +74,8 @@ func convertKitexArgs(sa *config.ClientArgument, kitexArgument *kargs.Arguments)
 	f.StringVar(&kitexArgument.GenPath, "gen-path", generator.KitexGenPath,
 		"Specify a code gen path.")
 	f.Var(&kitexArgument.ProtobufPlugins, "protobuf-plugin", "Specify protobuf plugin arguments for the protobuf compiler.(plugin_name:options:out_dir)")
+	f.StringVar(&kitexArgument.Protocol, "protocol", "", "Specify a protocol for codec.")
+	f.Var(&kitexArgument.Hessian2Options, "hessian2", "Specify arguments for the hessian2 codec.")
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, `Version %s

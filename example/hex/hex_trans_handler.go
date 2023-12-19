@@ -23,6 +23,7 @@ import (
 	"net"
 	"regexp"
 
+	"cwgo/example/hex/biz/router"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertzServer "github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/utils"
@@ -35,7 +36,6 @@ import (
 	"github.com/cloudwego/kitex/pkg/remote/trans/detection"
 	"github.com/cloudwego/kitex/pkg/remote/trans/netpoll"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2"
-	"cwgo/example/hex/biz/router"
 )
 
 type mixTransHandlerFactory struct {
@@ -106,4 +106,3 @@ var hertzEngine *route.Engine
 func init() {
 	hertzEngine = initHertz()
 }
-

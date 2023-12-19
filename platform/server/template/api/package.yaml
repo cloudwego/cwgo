@@ -1,0 +1,376 @@
+# 以下数据都是 yaml marshal 得到的，所以可能看起来比较乱
+layouts:
+  # path 只表示 handler.go 的模板，具体的 handler 路径由默认路径和 handler_dir 决定
+  - path: handler.go
+    delims:
+      - '{{'
+      - '}}'
+    body: |-
+      /*
+      *
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
+      *
+      */
+
+      package {{.PackageName}}
+
+      import (
+      	"context"
+      	"github.com/cloudwego/hertz/pkg/app"
+        hertzconsts "github.com/cloudwego/hertz/pkg/protocol/consts"
+        "go.uber.org/zap"
+        "github.com/cloudwego/cwgo/platform/server/shared/logger"
+      {{- range $k, $v := .Imports}}
+      	{{$k}}model "{{$v.Package}}"
+        {{$k}}logic "{{$.ProjPackage}}/internal/biz/logic/{{$v.PackageName}}"
+      {{- end}}
+        "{{.ProjPackage}}/internal/consts"
+        "{{.ProjPackage}}/internal/svc"
+        "{{.ProjPackage}}/pkg/model/response"
+      )
+
+      {{range $_, $MethodInfo := .Methods}}
+      {{$MethodInfo.Comment}}
+      func {{$MethodInfo.Name}}(ctx context.Context, rCtx *app.RequestContext) {
+      	var err error
+      	{{if ne $MethodInfo.RequestTypeName "" -}}
+      	var req {{$.PackageName}}model.{{$MethodInfo.Name}}Req
+      	err = rCtx.BindAndValidate(&req)
+      	if err != nil {
+          logger.Logger.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
+          response.Fail(
+            rCtx,
+            hertzconsts.StatusBadRequest,
+            hertzconsts.StatusBadRequest,
+            err.Error(),
+          )
+      	  return
+      	}
+      	{{end}}
+      
+        logger.Logger.Debug("http request args", zap.Reflect("args", req))
+      
+        l := {{$.PackageName}}logic.New{{$MethodInfo.Name}}Logic(ctx, svc.Svc)
+    
+      	res := l.{{$MethodInfo.Name}}(&req)
+      
+        logger.Logger.Debug("http response args", zap.Reflect("args", res))
+      
+        if res.Code != 0 {
+          response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)
+          return
+        }
+      
+        response.OkWithData(rCtx, res.Msg, res.Data)
+      }
+      {{end}}
+  # handler_single 表示单独的 handler 模板，用于 update 的时候更新每一个新增的 handler
+  - path: handler_single.go
+    delims:
+      - '{{'
+      - '}}'
+    body: |+
+      {{.Comment}}
+      func {{.Name}}(ctx context.Context, rCtx *app.RequestContext) {
+      	var err error
+      	{{if ne .RequestTypeName "" -}}
+      	var req {{.ServiceInfo.Name}}model.{{.Name}}Req
+      	err = rCtx.BindAndValidate(&req)
+      	if err != nil {
+          logger.Logger.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
+          response.Fail(
+            rCtx,
+            hertzconsts.StatusBadRequest,
+            hertzconsts.StatusBadRequest,
+            err.Error(),
+          )
+      	  return
+      	}
+      	{{end}}
+      
+        logger.Logger.Debug("http request args", zap.Reflect("args", req))
+      
+        l := {{.ServiceInfo.Name}}logic.New{{.Name}}Logic(ctx, svc.Svc)
+      
+      	res := l.{{.Name}}(&req)
+      
+        logger.Logger.Debug("http response args", zap.Reflect("args", res))
+      
+        if res.Code != 0 {
+          response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)
+          return
+        }
+      
+        response.OkWithData(rCtx, res.Msg, res.Data)
+      }
+  - path: 'internal/biz/logic/{{index (Split (ToSnakeCase .ServiceName) "_") 0}}/{{ToSnakeCase .MethodName}}.go'
+    loop_method: true
+    update_behavior:
+      type: "skip"
+      append_key: "method"
+      insert_key: "Test{{$.Name}}"
+      append_tpl: |-
+    body: |-
+      /*
+      *
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
+      *
+      */
+
+      package {{.FilePackage}}
+
+      import (
+      	"context"
+      {{- range $k, $v := .HttpMethod.Models}}
+      	{{$k}} "{{$v.Package}}"
+      {{- end}}
+        "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+      )
+      
+      const (
+        successMsg{{.HttpMethod.Name}} = "" // TODO: to be filled...
+      )
+      
+      type {{.HttpMethod.Name}}Logic struct{
+        ctx context.Context
+        svcCtx *svc.ServiceContext
+      }
+      
+      func New{{.HttpMethod.Name}}Logic(ctx context.Context, svcCtx *svc.ServiceContext) *{{.HttpMethod.Name}}Logic {
+        return &{{.HttpMethod.Name}}Logic{
+          ctx:    ctx,
+          svcCtx: svcCtx,
+        }
+      }
+      
+      func (l *{{.HttpMethod.Name}}Logic) {{.HttpMethod.Name}}({{if ne .HttpMethod.RequestTypeName "" -}}req *{{.HttpMethod.RequestTypeName}}{{end}}) (res *{{.HttpMethod.ReturnTypeName}}) {
+        // TODO: to be filled...
+      
+        return &{{.HttpMethod.ReturnTypeName}}{
+          Code: 0,
+          Msg: successMsg{{.HttpMethod.Name}},
+        }
+      }
+  # path 只表示 router.go 的模板，其路径固定在:biz/router/namespace/
+  - path: router.go
+    delims:
+      - '{{'
+      - '}}'
+    body: |-
+      /*
+      *
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
+      *
+      */
+
+      package {{$.PackageName}}
+
+      import (
+      	"github.com/cloudwego/hertz/pkg/app/server"
+
+      	{{range $k, $v := .HandlerPackages}}{{$k}} "{{$v}}"{{end}}
+      )
+
+      /*
+       This file will register all the routes of the services in the master idl.
+       And it will update automatically when you use the "update" command for the idl.
+       So don't modify the contents of the file, or your code will be deleted when it is updated.
+       */
+
+      {{define "g"}}
+      {{- if eq .Path "/"}}r
+      {{- else}}{{.GroupName}}{{end}}
+      {{- end}}
+
+      {{define "G"}}
+      {{- if ne .Handler ""}}
+      	{{- .GroupName}}.{{.HttpMethod}}("{{.Path}}", append({{.MiddleWare}}Mw(), {{.Handler}})...)
+      {{- end}}
+      {{- if ne (len .Children) 0}}
+      {{.MiddleWare}} := {{template "g" .}}.Group("{{.Path}}", {{.MiddleWare}}Mw()...)
+      {{- end}}
+      {{- range $_, $router := .Children}}
+      {{- if ne .Handler ""}}
+      	{{template "G" $router}}
+      {{- else}}
+      	{	{{template "G" $router}}
+      	}
+      {{- end}}
+      {{- end}}
+      {{- end}}
+
+      // Register register routes based on the IDL 'api.${HTTP Method}' annotation.
+      func Register(r *route.RouterGroup) {
+      {{template "G" .Router}}
+      }
+  # path 只表示 register.go 的模板，register 的路径固定为 biz/router/register.go
+  - path: register.go
+    delims:
+      - ""
+      - ""
+    body: |-
+      /*
+      *
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
+      *
+      */
+
+      package router
+
+      import (
+      	"github.com/cloudwego/hertz/pkg/app/server"
+      	"{{$.DepPkg}}"
+      )
+
+      // GeneratedRegister registers routers generated by IDL.
+      func GeneratedRegister(r *server.Hertz){
+      	//INSERT_POINT: DO NOT DELETE THIS LINE!
+      	{{$.DepPkgAlias}}.Register(g)
+      }
+  - path: model.go
+    delims:
+      - ""
+      - ""
+    body: ""
+  # path 只表示 middleware.go 的模板，middleware 的路径和 router.go 一样为：biz/router/namespace/
+  - path: middleware.go
+    delims:
+      - '{{'
+      - '}}'
+    body: |-
+      /*
+      *
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
+      *
+      */
+
+      package {{$.PackageName}}
+
+      import (
+      	"github.com/cloudwego/hertz/pkg/app"
+      )
+
+      {{define "M"}}
+      func {{.MiddleWare}}Mw() []app.HandlerFunc {
+      	// your code...
+      	return nil
+      }
+      {{range $_, $router := $.Children}}{{template "M" $router}}{{end}}
+      {{- end}}
+
+      {{template "M" .Router}}
+  # middleware_single 表示单独的 middleware 模板，用于 update 的时候更新每一个新增的 middleware_single
+  - path: middleware_single.go
+    delims:
+      - '{{'
+      - '}}'
+    body: |+
+      func {{.MiddleWare}}Mw() []app.HandlerFunc {
+      	// your code...
+      	return nil
+      }
+  # path 只表示 client.go 的模板，client 代码的生成路径由用户指定"${client_dir}"
+  - path: client.go
+    delims:
+      - '{{'
+      - '}}'
+    body: |-
+      /*
+      *
+      * Copyright 2023 CloudWeGo Authors
+      *
+      * Licensed under the Apache License, Version 2.0 (the "License");
+      * you may not use this file except in compliance with the License.
+      * You may obtain a copy of the License at
+      *
+      *     http://www.apache.org/licenses/LICENSE-2.0
+      *
+      * Unless required by applicable law or agreed to in writing, software
+      * distributed under the License is distributed on an "AS IS" BASIS,
+      * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      * See the License for the specific language governing permissions and
+      * limitations under the License.
+      *
+      */
+
+      package {{$.PackageName}}
+
+      import (
+          "github.com/cloudwego/hertz/pkg/app/client"
+      	  "github.com/cloudwego/hertz/pkg/common/config"
+      )
+
+      type {{.ServiceName}}Client struct {
+      	client * client.Client
+      }
+
+      func New{{.ServiceName}}Client(opt ...config.ClientOption) (*{{.ServiceName}}Client, error) {
+      	c, err := client.NewClient(opt...)
+      	if err != nil {
+      		return nil, err
+      	}
+
+      	return &{{.ServiceName}}Client{
+      		client: c,
+      	}, nil
+      }
