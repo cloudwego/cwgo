@@ -51,7 +51,6 @@ type Manager struct {
 	agents []*service.Service
 
 	syncAgentServiceInterval time.Duration
-	syncRepositoryInterval   time.Duration
 	syncIdlInterval          time.Duration
 
 	daoManager *dao.Manager
