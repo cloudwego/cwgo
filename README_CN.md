@@ -33,18 +33,39 @@ GOPROXY=https://goproxy.cn/,direct go install github.com/cloudwego/cwgo@latest
 ```
 
 ## 详细文档
-### [快速开始](https://www.cloudwego.io/zh/docs/cwgo/getting-started/)
+### [快速开始](https://www.cloudwego.io/zh/docs/cwgo/cli/getting-started/)
 ### 命令行工具
-包含命令行工具形式及使用，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/cli/)
+包含命令行工具形式及使用，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/cli/tutorials/cli/)
 ### Layout
-Layout 生成及 Layout 介绍，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/layout/)
+Layout 生成及 Layout 介绍，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/cli/tutorials/layout/)
 ### Client
-包含封装后的 Client 的生成和使用，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/client/)
+包含封装后的 Client 的生成和使用，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/cli/tutorials/client/)
 ### DB
-包含如何使用 cwgo 工具生成 CURD 代码，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/db/)
+包含如何使用 cwgo 工具生成 CURD 代码，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/cli/tutorials/db/)
 ### 模版扩展
-包含如何自定义模板，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/templete-extension/)
+包含如何自定义模板，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/cli/tutorials/templete-extension/)
 
+## 一站式 RPC/HTTP 调用代码生成平台
+
+本项目还提供了一站式 RPC/HTTP 调用代码生成平台，
+
+平台主要提供了 IDL 信息管理和生成代码仓库信息管理，可以让用户配置 IDL 并生成 kitex/hertz 的客户端调用包，方便用户使用。
+
+![平台界面](/images/cwgo_platform.png)
+
+- 平台界面友好
+
+  用户只需在平台界面就可实现仓库及 IDL 信息的管理，平台界面支持亮色和暗色主题。
+
+- 单一接入点，整合各组件功能，简化开发者使用过程
+
+  提供一个统一的入口，将原来分散的 IDL 管理、代码生成等功能整合在一个平台中实现，开发者可以在这个平台完成所有的相关操作。调用服务时与平台交互,无需考虑后端技术细节。
+
+- 自动化生成、同步代码，动态生成服务调用包。
+
+  提供 IDL 变更监测，支持动态改变 IDL，当 IDL 有变更后，平台能及时感知并同步更新生成调用代码，实现代接口定义与调用代码同步更新。
+
+详见[文档]((https://www.cloudwego.io/zh/docs/cwgo/platform/))
 
 ## 开源许可
 

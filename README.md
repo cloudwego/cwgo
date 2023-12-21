@@ -46,27 +46,55 @@ GOPROXY=https://goproxy.cn/,direct go install github.com/cloudwego/cwgo@latest
 
 ## Detailed Documentation
 
-### [Quick Start](https://www.cloudwego.io/docs/cwgo/getting-started/)
+### [Quick Start](https://www.cloudwego.io/docs/cwgo/cli/getting-started/)
 
 ### Command Line Tool
 
-Contains detailed documentation on how cwgo CLI works, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/cli/)
+Contains detailed documentation on how cwgo CLI works, see this [document](https://www.cloudwego.io/docs/cwgo/cli/tutorials/cli/)
 
 ### Layout
 
-This documents explains Layouts discussing how layout are generated, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/layout/).
+This documents explains Layouts discussing how layout are generated, see this [document](https://www.cloudwego.io/docs/cwgo/cli/tutorials/layout/).
 
 ### Client
 
-The document details on how Generated Clients that have been Encapsulated Can be used, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/client/)
+The document details on how Generated Clients that have been Encapsulated Can be used, see this [document](https://www.cloudwego.io/docs/cwgo/cli/tutorials/client/)
 
 ### DB
 
-Details information containing HOW TO Use cwgo TOOL GEN To Generate Curd Codes, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/db/)
+Details information containing HOW TO Use cwgo TOOL GEN To Generate Curd Codes, see this [document](https://www.cloudwego.io/docs/cwgo/cli/tutorials/db/)
 
 ### Template Extension
 
-Instructions on how to customize templates can be found in the [document](https://www.cloudwego.io/docs/cwgo/tutorials/templete-extension/).
+Instructions on how to customize templates can be found in the [document](https://www.cloudwego.io/docs/cwgo/cli/tutorials/templete-extension/).
+
+## One-stop RPC/HTTP call code generation platform
+
+Cwgo also provice One-stop RPC/HTTP call code generation platform.
+
+The platform mainly provides IDL information management and code repository information management, which allows users
+to configure IDL and generate kitex/hertz client call packages, making it convenient for users.
+
+![Platform Interface](/images/cwgo_platform.png)
+
+- friendly user interface
+
+  Users only need to manage repo and IDL information on the platform, which supports bright and dark themes.
+
+- Single access point, integrating the functions of various components, simplifying the development process for
+    developers
+
+  Provide a unified entry point to integrate IDL management, code generation, and other functions
+    into one platform, allowing developers to complete all related operations on the platform. Developers only need to
+    interact with the platform without considering backend technical details when use client/server call code.
+
+- Automatically generate and synchronize code, and dynamically generate service call packages.
+
+  Support IDL dynamic change monitoring. When IDL file is changed, the platform can
+    timely perceive and synchronously update the generated calling code, realizing the synchronization of interface
+    definition and calling code updates.
+
+See this [document]((https://www.cloudwego.io/docs/cwgo/platform/))
 
 ## Open Source License
 
