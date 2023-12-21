@@ -38,14 +38,14 @@ body: |-
     {{- if .Oneway}}
     {{- end}}
 
-    err := s.Run({{range .Args}}{{LowerFirst .Name}}{{end}})
+    err := s.Run({{range .Args}}{{LowerFirst .Name}}, {{end}})
     if err != nil {
       t.Errorf("unexpected error: %v", err)
     }
     // todo: edit your unit test
 
     {{else -}}
-    resp, err := s.Run({{range .Args}}{{LowerFirst .Name}}{{end}})
+    resp, err := s.Run({{range .Args}}{{LowerFirst .Name}}, {{end}})
     t.Logf("err: %v", err)
     t.Logf("resp: %v", resp)
   
