@@ -70,7 +70,7 @@ Instructions on how to customize templates can be found in the [document](https:
 
 ## One-stop RPC/HTTP call code generation platform
 
-Cwgo also provice One-stop RPC/HTTP call code generation platform.
+Cwgo also provide One-stop RPC/HTTP call code generation platform.
 
 The platform mainly provides IDL information management and code repository information management, which allows users
 to configure IDL and generate kitex/hertz client call packages, making it convenient for users.
