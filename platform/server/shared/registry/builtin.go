@@ -349,6 +349,10 @@ type BuiltinKitexRegistryClient struct {
 	updateInterval time.Duration
 }
 
+const (
+	defaultClientUpdateInterval = 10 * time.Second
+)
+
 func NewBuiltinKitexRegistryClient(addr string) (*BuiltinKitexRegistryClient, error) {
 	httpRes, err := http.Get(fmt.Sprintf("http://%s/api/ping", addr))
 	if err != nil {
@@ -375,7 +379,7 @@ func NewBuiltinKitexRegistryClient(addr string) (*BuiltinKitexRegistryClient, er
 	return &BuiltinKitexRegistryClient{
 		addr:           addr,
 		stopChan:       make(chan struct{}),
-		updateInterval: 10 * time.Second,
+		updateInterval: defaultClientUpdateInterval,
 	}, nil
 }
 

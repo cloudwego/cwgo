@@ -29,12 +29,11 @@ type Config struct {
 	Timezone                 string `mapstructure:"timezone"`
 	ProxyUrl                 string `mapstructure:"proxyUrl"`
 	SyncAgentServiceInterval string `mapstructure:"syncAgentServiceInterval"`
-	SyncRepositoryInterval   string `mapstructure:"syncRepositoryInterval"`
 	SyncIdlInterval          string `mapstructure:"syncIdlInterval"`
 }
 
 const (
-	defaultSyncAgentServiceInterval = 3 * time.Second
+	defaultSyncAgentServiceInterval = 10 * time.Second
 	defaultSyncIdlInterval          = 3 * time.Minute
 )
 

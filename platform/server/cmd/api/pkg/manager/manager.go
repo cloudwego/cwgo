@@ -70,7 +70,6 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 		agents: make([]*service.Service, 0),
 
 		syncAgentServiceInterval: appConf.GetSyncAgentServiceInterval(),
-		syncRepositoryInterval:   appConf.GetSyncRepositoryInterval(),
 		syncIdlInterval:          appConf.GetSyncIdlInterval(),
 
 		daoManager: daoManager,

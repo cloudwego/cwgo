@@ -7,11 +7,10 @@ app:
 api:
   host: '0.0.0.0' # api service listening host
   port: 8089 # api service listening port
-  updateInterval: '3s' # interval that get service change from registry and push tasks change to agent services
 
 agent:
   addr: '0.0.0.0:11010' # agent service listening address
-  workerNum: 1 # worker num that process sync tasks. set to 0 to enable dynamic adjust worker num
+  workerNum: 1 # worker num that process sync tasks
 
 registry:
   builtin:
