@@ -75,27 +75,6 @@ Cwgo also provice One-stop RPC/HTTP call code generation platform.
 The platform mainly provides IDL information management and code repository information management, which allows users
 to configure IDL and generate kitex/hertz client call packages, making it convenient for users.
 
-![Platform Interface](/images/cwgo_platform.png)
-
-- friendly user interface
-
-  Users only need to manage repo and IDL information on the platform, which supports bright and dark themes.
-
-- Single access point, integrating the functions of various components, simplifying the development process for
-    developers
-
-  Provide a unified entry point to integrate IDL management, code generation, and other functions
-    into one platform, allowing developers to complete all related operations on the platform. Developers only need to
-    interact with the platform without considering backend technical details when use client/server call code.
-
-- Automatically generate and synchronize code, and dynamically generate service call packages.
-
-  Support IDL dynamic change monitoring. When IDL file is changed, the platform can
-    timely perceive and synchronously update the generated calling code, realizing the synchronization of interface
-    definition and calling code updates.
-
-See this [document]((https://www.cloudwego.io/docs/cwgo/platform/))
-
 ### How to enable auto-completion
 #### Supported in Bash
 First download Bash [autocomplete script](https://github.com/urfave/cli/blob/v2-maint/autocomplete/bash_autocomplete), assuming it is downloaded to the autocomplete/ folder in the root directory of the project (you can Define location)
@@ -137,6 +116,27 @@ Add a line inside:
 & path/to/autocomplete/cwgo.ps1
 ```
 Note that the name and path of the ps1 script must be correctly configured here, and then permanent auto-completion can be performed.
+
+![Platform Interface](/images/cwgo_platform.png)
+
+- friendly user interface
+
+  Users only need to manage repo and IDL information on the platform, which supports bright and dark themes.
+
+- Single access point, integrating the functions of various components, simplifying the development process for
+  developers
+
+  Provide a unified entry point to integrate IDL management, code generation, and other functions
+  into one platform, allowing developers to complete all related operations on the platform. Developers only need to
+  interact with the platform without considering backend technical details when use client/server call code.
+
+- Automatically generate and synchronize code, and dynamically generate service call packages.
+
+  Support IDL dynamic change monitoring. When IDL file is changed, the platform can
+  timely perceive and synchronously update the generated calling code, realizing the synchronization of interface
+  definition and calling code updates.
+
+See this [document]((https://www.cloudwego.io/docs/cwgo/platform/))
 
 ## Open Source License
 
