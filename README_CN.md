@@ -45,6 +45,48 @@ Layout 生成及 Layout 介绍，详见[文档](https://www.cloudwego.io/zh/docs
 ### 模版扩展
 包含如何自定义模板，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/cli/tutorials/templete-extension/)
 
+### 如何启用自动补全功能
+#### 在 Bash 中支持
+首先下载 Bash [自动补全脚本](https://github.com/urfave/cli/blob/v2-maint/autocomplete/bash_autocomplete)，假设下载到项目的根目录下的 autocomplete/ 文件夹内（可自定义位置）
+##### 临时支持补全
+```shell
+PROG=cwgo 
+
+source ./autocomplete/bash_autocomplete
+```
+##### 永久支持补全
+```shell
+sudo cp autocomplete/bash_autocomplete /etc/bash_completion.d/cwgo
+
+source /etc/bash_completion.d/cwgo
+```
+#### 在 Zsh 中支持
+首先下载 Zsh [自动补全脚本](https://github.com/urfave/cli/blob/v2-maint/autocomplete/zsh_autocomplete)，假设下载到项目的根目录下的 autocomplete/ 文件夹内（可自定义位置）
+##### 临时支持补全
+```shell
+PROG=cwgo 
+
+source ./autocomplete/zsh_autocomplete
+```
+#### 在 PowerShell 中支持
+首先下载 PowerShell [自动补全脚本](https://github.com/urfave/cli/blob/v2-maint/autocomplete/powershell_autocomplete.ps1)，假设下载到项目的根目录下的 autocomplete/ 文件夹内（可自定义位置）
+##### 临时支持补全
+首先将下载的 powershell_autocomplete.ps1 改名为 cwgo.ps1。
+
+然后执行：
+```shell
+& autocomplete/cwgo.ps1
+```
+
+##### 永久支持补全
+我们打开 $profile。
+
+在里面添加一行：
+```shell
+& path/to/autocomplete/cwgo.ps1
+```
+注意这里要正确配置 ps1 脚本的名字和路径，然后就可以进行永久的自动补全了。
+
 ## 一站式 RPC/HTTP 调用代码生成平台
 
 本项目还提供了一站式 RPC/HTTP 调用代码生成平台，
