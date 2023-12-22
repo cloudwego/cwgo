@@ -1,6 +1,6 @@
-# 以下数据都是 yaml marshal 得到的，所以可能看起来比较乱
 layouts:
-  # path 只表示 handler.go 的模板，具体的 handler 路径由默认路径和 handler_dir 决定
+  # path only represent it's a template of handler.go
+  # handler file path is decided by handler_dir
   - path: handler.go
     delims:
       - '{{'
@@ -76,7 +76,8 @@ layouts:
         response.OkWithData(rCtx, res.Msg, res.Data)
       }
       {{end}}
-  # handler_single 表示单独的 handler 模板，用于 update 的时候更新每一个新增的 handler
+  # handler_single only represent it's a single handler template
+  # it's used to update every handler when use hz update
   - path: handler_single.go
     delims:
       - '{{'
@@ -175,7 +176,8 @@ layouts:
           Msg: successMsg{{.HttpMethod.Name}},
         }
       }
-  # path 只表示 router.go 的模板，其路径固定在:biz/router/namespace/
+  # path represent it's a template of router.go
+  # the file path is fixed in biz/router/namespace/
   - path: router.go
     delims:
       - '{{'
@@ -239,7 +241,8 @@ layouts:
       func Register(r *route.RouterGroup) {
       {{template "G" .Router}}
       }
-  # path 只表示 register.go 的模板，register 的路径固定为 biz/router/register.go
+  # path represent it's a template of register.go
+  # the file path is fixed in biz/router/register.go
   - path: register.go
     delims:
       - ""
@@ -280,7 +283,8 @@ layouts:
       - ""
       - ""
     body: ""
-  # path 只表示 middleware.go 的模板，middleware 的路径和 router.go 一样为：biz/router/namespace/
+  # path only represent it's a template of middleware.go
+  # the path of middleware and router.go is in biz/router/namespace/
   - path: middleware.go
     delims:
       - '{{'
@@ -319,7 +323,8 @@ layouts:
       {{- end}}
 
       {{template "M" .Router}}
-  # middleware_single 表示单独的 middleware 模板，用于 update 的时候更新每一个新增的 middleware_single
+  # middleware_single represent it's a template of single middleware
+  # it will update every middleware_single when use hz update
   - path: middleware_single.go
     delims:
       - '{{'
@@ -329,7 +334,8 @@ layouts:
       	// your code...
       	return nil
       }
-  # path 只表示 client.go 的模板，client 代码的生成路径由用户指定"${client_dir}"
+  # path only represent it's a template of client.go
+  # client file generate path is specified by ${client_dir}"
   - path: client.go
     delims:
       - '{{'

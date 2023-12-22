@@ -29,13 +29,11 @@ type Config struct {
 	Timezone                 string `mapstructure:"timezone"`
 	ProxyUrl                 string `mapstructure:"proxyUrl"`
 	SyncAgentServiceInterval string `mapstructure:"syncAgentServiceInterval"`
-	SyncRepositoryInterval   string `mapstructure:"syncRepositoryInterval"`
 	SyncIdlInterval          string `mapstructure:"syncIdlInterval"`
 }
 
 const (
-	defaultSyncAgentServiceInterval = 3 * time.Second
-	defaultSyncRepositoryInterval   = 3 * time.Minute
+	defaultSyncAgentServiceInterval = 10 * time.Second
 	defaultSyncIdlInterval          = 3 * time.Minute
 )
 
@@ -54,15 +52,6 @@ func (conf *Config) GetSyncAgentServiceInterval() time.Duration {
 	}
 
 	return defaultSyncAgentServiceInterval
-}
-
-func (conf *Config) GetSyncRepositoryInterval() time.Duration {
-	duration, err := time.ParseDuration(conf.SyncIdlInterval)
-	if err == nil {
-		return duration
-	}
-
-	return defaultSyncRepositoryInterval
 }
 
 func (conf *Config) GetSyncIdlInterval() time.Duration {

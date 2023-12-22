@@ -51,7 +51,6 @@ type Manager struct {
 	agents []*service.Service
 
 	syncAgentServiceInterval time.Duration
-	syncRepositoryInterval   time.Duration
 	syncIdlInterval          time.Duration
 
 	daoManager *dao.Manager
@@ -70,7 +69,6 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 		agents: make([]*service.Service, 0),
 
 		syncAgentServiceInterval: appConf.GetSyncAgentServiceInterval(),
-		syncRepositoryInterval:   appConf.GetSyncRepositoryInterval(),
 		syncIdlInterval:          appConf.GetSyncIdlInterval(),
 
 		daoManager: daoManager,

@@ -23,12 +23,11 @@ import (
 )
 
 type Config struct {
-	Host           string            `mapstructure:"host"`
-	Port           int               `mapstructure:"port"`
-	Tracing        TracerConf        `mapstructure:"tracing"`
-	MetricsUrl     string            `mapstructure:"metricsUrl"`
-	Dispatcher     dispatcher.Config `mapstructure:"dispatcher"`
-	UpdateInterval string            `mapstructure:"updateInterval"`
+	Host       string            `mapstructure:"host"`
+	Port       int               `mapstructure:"port"`
+	Tracing    TracerConf        `mapstructure:"tracing"`
+	MetricsUrl string            `mapstructure:"metricsUrl"`
+	Dispatcher dispatcher.Config `mapstructure:"dispatcher"`
 }
 
 type TracerConf struct {
