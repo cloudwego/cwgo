@@ -17,7 +17,6 @@
 package static
 
 import (
-	"github.com/cloudwego/cwgo/cmd/dynamic"
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/meta"
 	"github.com/cloudwego/cwgo/pkg/client"
@@ -47,11 +46,6 @@ func Init() *cli.App {
 
 	// Commands
 	app.Commands = []*cli.Command{
-		{
-			Name:   InitName,
-			Usage:  InitUsage,
-			Action: dynamic.Terminal,
-		},
 		{
 			Name:  ServerName,
 			Usage: ServerUsage,
@@ -134,10 +128,6 @@ Examples:
   # Generate DB model code 
   cwgo  model --db_type mysql --dsn "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8mb4&parseTime=True&loc=Local"
 `
-
-	InitName  = "init"
-	InitUsage = `interactive terminals provide a more user-friendly experience for generating code`
-
 	FallbackName  = "fallback"
 	FallbackUsage = "fallback to hz or kitex"
 )
