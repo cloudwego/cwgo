@@ -191,6 +191,9 @@ func (a *GitHubApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	tempBranch := fmt.Sprintf("cwgo-temp-%d", time.Now().UnixNano())
 
 	ref, _, err := a.client.Git.GetRef(context.TODO(), owner, repoName, "refs/heads/"+branch)
+	if err != nil {
+		return err
+	}
 
 	tempRef, _, err := a.client.Git.CreateRef(context.TODO(), owner, repoName, &github.Reference{
 		Ref:    github.String("refs/heads/" + tempBranch),
@@ -355,6 +358,9 @@ func (a *GitHubApi) DeleteAllFiles(owner, repoName, branch string) error {
 			Ref: branch,
 		},
 	)
+	if err != nil {
+		return err
+	}
 
 	deleteOpts := make([]*github.RepositoryContentFileOptions, len(directoryContent))
 

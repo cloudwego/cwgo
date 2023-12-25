@@ -47,11 +47,6 @@ func _updatetemplateitemMw() []app.HandlerFunc {
 	return nil
 }
 
-func _gettemplateitemsMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
 func _deletetemplateMw() []app.HandlerFunc {
 	// your code...
 	return nil
@@ -68,10 +63,6 @@ func _gettemplatesMw() []app.HandlerFunc {
 }
 
 func _apiMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-func _addtemplateMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
