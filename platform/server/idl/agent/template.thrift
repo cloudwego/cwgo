@@ -6,9 +6,13 @@ struct AddTemplateReq{
     1: string name
     2: i32 type
 }
+struct AddTemplateResData{
+    1: i64 id
+}
 struct AddTemplateRes{
     1: i32 code
     2: string msg
+    3: AddTemplateResData data
 }
 
 struct DeleteTemplateReq{
@@ -28,29 +32,18 @@ struct UpdateTemplateRes{
     2: string msg
 }
 
-struct GetTemplatesReq{
-    1: i32 page
-    2: i32 limit
-    3: i32 order
-    4: string order_by
-}
-struct GetTemplatesRes{
-    1: i32 code
-    2: string msg
-    3: GetTemplatesResData data
-}
-struct GetTemplatesResData{
-    1: list<template.Template> templates
-}
-
 struct AddTemplateItemReq{
     1: i64 template_id
     2: string name
     3: string content
 }
+struct AddTemplateItemResData{
+    1: i64 id
+}
 struct AddTemplateItemRes{
     1: i32 code
     2: string msg
+    3: AddTemplateItemResData data
 }
 
 struct DeleteTemplateItemReq{
@@ -71,18 +64,20 @@ struct UpdateTemplateItemRes{
     2: string msg
 }
 
-struct GetTemplateItemsReq{
-    1: i64 template_id
-    2: i32 page
-    3: i32 limit
-    4: i32 order
-    5: string order_by
+struct GetTemplatesReq{
+    1: i32 page
+    2: i32 limit
+    3: i32 order
+    4: string order_by
+    5: i32 type
+    6: string name
 }
-struct GetTemplateItemsRes{
+struct GetTemplatesRes{
     1: i32 code
     2: string msg
-    3: GetTemplateItemsResData data
+    3: GetTemplatesResData data
 }
-struct GetTemplateItemsResData{
-    1: list<template.TemplateItem> template_items
+struct GetTemplatesResData{
+    1: list<template.TemplateWithInfo> templates
+    2: i32 total
 }

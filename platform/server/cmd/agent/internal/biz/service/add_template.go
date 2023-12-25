@@ -40,7 +40,7 @@ func NewAddTemplateService(ctx context.Context, svcCtx *svc.ServiceContext) *Add
 
 // Run create note info
 func (s *AddTemplateService) Run(req *agent.AddTemplateReq) (resp *agent.AddTemplateRes, err error) {
-	err = s.svcCtx.DaoManager.Template.AddTemplate(s.ctx, model.Template{
+	templateId, err := s.svcCtx.DaoManager.Template.AddTemplate(s.ctx, model.Template{
 		Name: req.Name,
 		Type: req.Type,
 	})
@@ -54,5 +54,8 @@ func (s *AddTemplateService) Run(req *agent.AddTemplateReq) (resp *agent.AddTemp
 	return &agent.AddTemplateRes{
 		Code: 0,
 		Msg:  "add template successfully",
+		Data: &agent.AddTemplateResData{
+			Id: templateId,
+		},
 	}, nil
 }

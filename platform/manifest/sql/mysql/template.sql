@@ -23,14 +23,16 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Table structure for template
 -- ----------------------------
 DROP TABLE IF EXISTS `template`;
-CREATE TABLE `template` (
+CREATE TABLE `template`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'template id',
-  `name` varchar(255) NOT NULL COMMENT 'template name',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'template name',
   `type` tinyint(4) NOT NULL COMMENT 'template type',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is deleted',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'is deleted',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='template table';
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `type`(`type`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'template table' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
+

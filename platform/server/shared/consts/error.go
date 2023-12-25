@@ -200,6 +200,8 @@ const (
 	ErrNumCommonGenerateCode
 	ErrNumCommonProcessFolders
 	ErrNumCommonMkdir
+	ErrNumCommonCreateFile
+	ErrNumCommonWriteFile
 	ErrNumCommonRepoApiService
 )
 
@@ -209,6 +211,8 @@ const (
 	ErrMsgCommonGenerateCode   = "generate code failed"
 	ErrMsgCommonProcessFolders = "process folders failed"
 	ErrMsgCommonMkdir          = "mkdir failed"
+	ErrMsgCommonCreateFile     = "create file failed"
+	ErrMsgCommonWriteFile      = "write file failed"
 	ErrMsgCommonRepoApiService = "repo api service is down"
 )
 
@@ -218,5 +222,7 @@ var (
 	ErrCommonGenerateCode   = errx.New(ErrNumCommonGenerateCode, ErrMsgCommonGenerateCode)
 	ErrCommonProcessFolders = errx.New(ErrNumCommonProcessFolders, ErrMsgCommonProcessFolders)
 	ErrCommonMkdir          = errx.New(ErrNumCommonMkdir, ErrMsgCommonMkdir)
+	ErrCommonCreateFile     = errx.New(ErrNumCommonCreateFile, ErrMsgCommonCreateFile)
+	ErrCommonWriteFile      = errx.New(ErrNumCommonWriteFile, ErrMsgCommonWriteFile)
 	ErrCommonRepoApiService = errx.New(ErrNumCommonRepoApiService, ErrMsgCommonRepoApiService)
 )

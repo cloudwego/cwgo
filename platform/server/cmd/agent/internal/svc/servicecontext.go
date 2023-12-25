@@ -40,7 +40,7 @@ type ServiceContext struct {
 	Generator   generator.Generator
 }
 
-func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient repository.IRepository, tempDir, importBaseDirPath string, idlModelWithRepoInfo *model.IDLWithRepositoryInfo, idlRepoModel *model.Repository, archiveName string) error {
+func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient repository.IRepository, tempDir, importBaseDirPath string, idlWithInfoModel *model.IDLWithInfo, idlRepoModel *model.Repository, archiveName string) error {
 	idlPid, owner, _, err := repoClient.ParseFileUrl(
 		utils.GetRepoFullUrl(
 			idlRepoModel.RepositoryType,
@@ -50,19 +50,54 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 				idlRepoModel.RepositoryName,
 			),
 			idlRepoModel.RepositoryBranch,
-			idlModelWithRepoInfo.MainIdlPath,
+			idlWithInfoModel.MainIdlPath,
 		),
 	)
 	if err != nil {
 		return err
 	}
 
+	// get idl search path
 	var idlSearchPath string
 
 	tempDirRepo := tempDir + "/" + consts.TempDirRepo + "/" + archiveName
 
 	if importBaseDirPath != "" {
 		idlSearchPath = filepath.Clean(filepath.Join(tempDirRepo, importBaseDirPath))
+	}
+
+	// get template
+	var templatePath string
+	if idlWithInfoModel.TemplateId != 0 && idlWithInfoModel.TemplateId != -1 {
+		templateWithInfoModel, err := svc.DaoManager.Template.GetTemplate(context.TODO(), idlWithInfoModel.TemplateId)
+		if err != nil {
+			return err
+		}
+
+		tempDirTemplate := tempDir + "/" + consts.TempDirTemplate
+		templatePath = tempDirTemplate
+
+		err = os.Mkdir(tempDir+"/"+consts.TempDirTemplate, 0o755)
+		if err != nil {
+			logger.Logger.Error(consts.ErrMsgCommonMkdir, zap.Error(err))
+			return consts.ErrCommonMkdir
+		}
+
+		for _, templateItem := range templateWithInfoModel.Items {
+			file, err := os.OpenFile(tempDirTemplate+"/"+templateItem.Name, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o755)
+			if err != nil {
+				logger.Logger.Error(consts.ErrMsgCommonCreateFile, zap.Error(err))
+				return err
+			}
+
+			_, err = file.WriteString(templateItem.Content)
+			if err != nil {
+				logger.Logger.Error(consts.ErrMsgCommonWriteFile, zap.Error(err))
+				return err
+			}
+
+			_ = file.Close()
+		}
 	}
 
 	err = os.Mkdir(tempDir+"/"+consts.TempDirGeneratedCode, 0o755)
@@ -80,7 +115,8 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 		idlRepoModel.RepositoryOwner,
 		mainIdlFilePath,
 		idlSearchPath,
-		idlModelWithRepoInfo.ServiceName,
+		templatePath,
+		idlWithInfoModel.ServiceName,
 		tempDirGeneratedCode,
 	)
 	if err != nil {
@@ -93,13 +129,12 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 	if err := utils.ProcessFolders(
 		fileContentMap,
 		tempDirGeneratedCode,
-		"kitex_gen", "rpc", "go.mod", "go.sum",
 	); err != nil {
 		return consts.ErrCommonProcessFolders
 	}
 
 	// push files to the repository
-	serviceRepositoryModel, err := svc.DaoManager.Repository.GetRepository(ctx, idlModelWithRepoInfo.ServiceRepositoryId)
+	serviceRepositoryModel, err := svc.DaoManager.Repository.GetRepository(ctx, idlWithInfoModel.ServiceRepositoryId)
 	if err != nil {
 		return consts.ErrDatabase
 	}

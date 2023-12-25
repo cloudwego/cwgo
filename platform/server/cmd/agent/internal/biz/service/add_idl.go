@@ -265,7 +265,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	// async generate code
 	go func() {
-		idlEntityWithRepoInfo, err := s.svcCtx.DaoManager.Idl.GetIDL(context.Background(), mainIdlId)
+		idlWithInfoEntity, err := s.svcCtx.DaoManager.Idl.GetIDL(context.Background(), mainIdlId)
 		if err != nil {
 			return
 		}
@@ -274,7 +274,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			importBaseDirPath = ""
 		}
 		err = s.svcCtx.GenerateCode(context.Background(), repoClient,
-			tempDir, importBaseDirPath, idlEntityWithRepoInfo, idlRepoModel, archiveName)
+			tempDir, importBaseDirPath, idlWithInfoEntity, idlRepoModel, archiveName)
 		if err != nil {
 			return
 		}

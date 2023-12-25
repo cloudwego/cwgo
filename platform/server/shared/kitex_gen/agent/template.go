@@ -232,9 +232,174 @@ func (p *AddTemplateReq) Field2DeepEqual(src int32) bool {
 	return true
 }
 
+type AddTemplateResData struct {
+	Id int64 `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+}
+
+func NewAddTemplateResData() *AddTemplateResData {
+	return &AddTemplateResData{}
+}
+
+func (p *AddTemplateResData) InitDefault() {
+	*p = AddTemplateResData{}
+}
+
+func (p *AddTemplateResData) GetId() (v int64) {
+	return p.Id
+}
+func (p *AddTemplateResData) SetId(val int64) {
+	p.Id = val
+}
+
+var fieldIDToName_AddTemplateResData = map[int16]string{
+	1: "id",
+}
+
+func (p *AddTemplateResData) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AddTemplateResData[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AddTemplateResData) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.Id = v
+	}
+	return nil
+}
+
+func (p *AddTemplateResData) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AddTemplateResData"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AddTemplateResData) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.Id); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AddTemplateResData) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AddTemplateResData(%+v)", *p)
+}
+
+func (p *AddTemplateResData) DeepEqual(ano *AddTemplateResData) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	return true
+}
+
+func (p *AddTemplateResData) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+
 type AddTemplateRes struct {
-	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Code int32               `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string              `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *AddTemplateResData `thrift:"data,3" frugal:"3,default,AddTemplateResData" json:"data"`
 }
 
 func NewAddTemplateRes() *AddTemplateRes {
@@ -252,16 +417,33 @@ func (p *AddTemplateRes) GetCode() (v int32) {
 func (p *AddTemplateRes) GetMsg() (v string) {
 	return p.Msg
 }
+
+var AddTemplateRes_Data_DEFAULT *AddTemplateResData
+
+func (p *AddTemplateRes) GetData() (v *AddTemplateResData) {
+	if !p.IsSetData() {
+		return AddTemplateRes_Data_DEFAULT
+	}
+	return p.Data
+}
 func (p *AddTemplateRes) SetCode(val int32) {
 	p.Code = val
 }
 func (p *AddTemplateRes) SetMsg(val string) {
 	p.Msg = val
 }
+func (p *AddTemplateRes) SetData(val *AddTemplateResData) {
+	p.Data = val
+}
 
 var fieldIDToName_AddTemplateRes = map[int16]string{
 	1: "code",
 	2: "msg",
+	3: "data",
+}
+
+func (p *AddTemplateRes) IsSetData() bool {
+	return p.Data != nil
 }
 
 func (p *AddTemplateRes) Read(iprot thrift.TProtocol) (err error) {
@@ -296,6 +478,16 @@ func (p *AddTemplateRes) Read(iprot thrift.TProtocol) (err error) {
 		case 2:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -351,6 +543,14 @@ func (p *AddTemplateRes) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *AddTemplateRes) ReadField3(iprot thrift.TProtocol) error {
+	p.Data = NewAddTemplateResData()
+	if err := p.Data.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *AddTemplateRes) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("AddTemplateRes"); err != nil {
@@ -363,6 +563,10 @@ func (p *AddTemplateRes) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
 			goto WriteFieldError
 		}
 
@@ -418,6 +622,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
+func (p *AddTemplateRes) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Data.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
 func (p *AddTemplateRes) String() string {
 	if p == nil {
 		return "<nil>"
@@ -437,6 +658,9 @@ func (p *AddTemplateRes) DeepEqual(ano *AddTemplateRes) bool {
 	if !p.Field2DeepEqual(ano.Msg) {
 		return false
 	}
+	if !p.Field3DeepEqual(ano.Data) {
+		return false
+	}
 	return true
 }
 
@@ -450,6 +674,13 @@ func (p *AddTemplateRes) Field1DeepEqual(src int32) bool {
 func (p *AddTemplateRes) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddTemplateRes) Field3DeepEqual(src *AddTemplateResData) bool {
+
+	if !p.Data.DeepEqual(src) {
 		return false
 	}
 	return true
@@ -1315,826 +1546,6 @@ func (p *UpdateTemplateRes) Field2DeepEqual(src string) bool {
 	return true
 }
 
-type GetTemplatesReq struct {
-	Page    int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
-	Limit   int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
-	Order   int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
-	OrderBy string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
-}
-
-func NewGetTemplatesReq() *GetTemplatesReq {
-	return &GetTemplatesReq{}
-}
-
-func (p *GetTemplatesReq) InitDefault() {
-	*p = GetTemplatesReq{}
-}
-
-func (p *GetTemplatesReq) GetPage() (v int32) {
-	return p.Page
-}
-
-func (p *GetTemplatesReq) GetLimit() (v int32) {
-	return p.Limit
-}
-
-func (p *GetTemplatesReq) GetOrder() (v int32) {
-	return p.Order
-}
-
-func (p *GetTemplatesReq) GetOrderBy() (v string) {
-	return p.OrderBy
-}
-func (p *GetTemplatesReq) SetPage(val int32) {
-	p.Page = val
-}
-func (p *GetTemplatesReq) SetLimit(val int32) {
-	p.Limit = val
-}
-func (p *GetTemplatesReq) SetOrder(val int32) {
-	p.Order = val
-}
-func (p *GetTemplatesReq) SetOrderBy(val string) {
-	p.OrderBy = val
-}
-
-var fieldIDToName_GetTemplatesReq = map[int16]string{
-	1: "page",
-	2: "limit",
-	3: "order",
-	4: "order_by",
-}
-
-func (p *GetTemplatesReq) Read(iprot thrift.TProtocol) (err error) {
-
-	var fieldTypeId thrift.TType
-	var fieldId int16
-
-	if _, err = iprot.ReadStructBegin(); err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 2:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 3:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 4:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField4(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		}
-
-		if err = iprot.ReadFieldEnd(); err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	if err = iprot.ReadStructEnd(); err != nil {
-		goto ReadStructEndError
-	}
-
-	return nil
-ReadStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetTemplatesReq[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-
-ReadFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *GetTemplatesReq) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		p.Page = v
-	}
-	return nil
-}
-
-func (p *GetTemplatesReq) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		p.Limit = v
-	}
-	return nil
-}
-
-func (p *GetTemplatesReq) ReadField3(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		p.Order = v
-	}
-	return nil
-}
-
-func (p *GetTemplatesReq) ReadField4(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		p.OrderBy = v
-	}
-	return nil
-}
-
-func (p *GetTemplatesReq) Write(oprot thrift.TProtocol) (err error) {
-	var fieldId int16
-	if err = oprot.WriteStructBegin("GetTemplatesReq"); err != nil {
-		goto WriteStructBeginError
-	}
-	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
-			goto WriteFieldError
-		}
-		if err = p.writeField4(oprot); err != nil {
-			fieldId = 4
-			goto WriteFieldError
-		}
-
-	}
-	if err = oprot.WriteFieldStop(); err != nil {
-		goto WriteFieldStopError
-	}
-	if err = oprot.WriteStructEnd(); err != nil {
-		goto WriteStructEndError
-	}
-	return nil
-WriteStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
-WriteFieldStopError:
-	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
-WriteStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *GetTemplatesReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page", thrift.I32, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.Page); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *GetTemplatesReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("limit", thrift.I32, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.Limit); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *GetTemplatesReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("order", thrift.I32, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.Order); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
-}
-
-func (p *GetTemplatesReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("order_by", thrift.STRING, 4); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.OrderBy); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
-}
-
-func (p *GetTemplatesReq) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("GetTemplatesReq(%+v)", *p)
-}
-
-func (p *GetTemplatesReq) DeepEqual(ano *GetTemplatesReq) bool {
-	if p == ano {
-		return true
-	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field1DeepEqual(ano.Page) {
-		return false
-	}
-	if !p.Field2DeepEqual(ano.Limit) {
-		return false
-	}
-	if !p.Field3DeepEqual(ano.Order) {
-		return false
-	}
-	if !p.Field4DeepEqual(ano.OrderBy) {
-		return false
-	}
-	return true
-}
-
-func (p *GetTemplatesReq) Field1DeepEqual(src int32) bool {
-
-	if p.Page != src {
-		return false
-	}
-	return true
-}
-func (p *GetTemplatesReq) Field2DeepEqual(src int32) bool {
-
-	if p.Limit != src {
-		return false
-	}
-	return true
-}
-func (p *GetTemplatesReq) Field3DeepEqual(src int32) bool {
-
-	if p.Order != src {
-		return false
-	}
-	return true
-}
-func (p *GetTemplatesReq) Field4DeepEqual(src string) bool {
-
-	if strings.Compare(p.OrderBy, src) != 0 {
-		return false
-	}
-	return true
-}
-
-type GetTemplatesRes struct {
-	Code int32                `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string               `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
-	Data *GetTemplatesResData `thrift:"data,3" frugal:"3,default,GetTemplatesResData" json:"data"`
-}
-
-func NewGetTemplatesRes() *GetTemplatesRes {
-	return &GetTemplatesRes{}
-}
-
-func (p *GetTemplatesRes) InitDefault() {
-	*p = GetTemplatesRes{}
-}
-
-func (p *GetTemplatesRes) GetCode() (v int32) {
-	return p.Code
-}
-
-func (p *GetTemplatesRes) GetMsg() (v string) {
-	return p.Msg
-}
-
-var GetTemplatesRes_Data_DEFAULT *GetTemplatesResData
-
-func (p *GetTemplatesRes) GetData() (v *GetTemplatesResData) {
-	if !p.IsSetData() {
-		return GetTemplatesRes_Data_DEFAULT
-	}
-	return p.Data
-}
-func (p *GetTemplatesRes) SetCode(val int32) {
-	p.Code = val
-}
-func (p *GetTemplatesRes) SetMsg(val string) {
-	p.Msg = val
-}
-func (p *GetTemplatesRes) SetData(val *GetTemplatesResData) {
-	p.Data = val
-}
-
-var fieldIDToName_GetTemplatesRes = map[int16]string{
-	1: "code",
-	2: "msg",
-	3: "data",
-}
-
-func (p *GetTemplatesRes) IsSetData() bool {
-	return p.Data != nil
-}
-
-func (p *GetTemplatesRes) Read(iprot thrift.TProtocol) (err error) {
-
-	var fieldTypeId thrift.TType
-	var fieldId int16
-
-	if _, err = iprot.ReadStructBegin(); err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 2:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 3:
-			if fieldTypeId == thrift.STRUCT {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		}
-
-		if err = iprot.ReadFieldEnd(); err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	if err = iprot.ReadStructEnd(); err != nil {
-		goto ReadStructEndError
-	}
-
-	return nil
-ReadStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetTemplatesRes[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-
-ReadFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *GetTemplatesRes) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		p.Code = v
-	}
-	return nil
-}
-
-func (p *GetTemplatesRes) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		p.Msg = v
-	}
-	return nil
-}
-
-func (p *GetTemplatesRes) ReadField3(iprot thrift.TProtocol) error {
-	p.Data = NewGetTemplatesResData()
-	if err := p.Data.Read(iprot); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *GetTemplatesRes) Write(oprot thrift.TProtocol) (err error) {
-	var fieldId int16
-	if err = oprot.WriteStructBegin("GetTemplatesRes"); err != nil {
-		goto WriteStructBeginError
-	}
-	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
-			goto WriteFieldError
-		}
-
-	}
-	if err = oprot.WriteFieldStop(); err != nil {
-		goto WriteFieldStopError
-	}
-	if err = oprot.WriteStructEnd(); err != nil {
-		goto WriteStructEndError
-	}
-	return nil
-WriteStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
-WriteFieldStopError:
-	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
-WriteStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *GetTemplatesRes) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("code", thrift.I32, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.Code); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *GetTemplatesRes) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("msg", thrift.STRING, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.Msg); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *GetTemplatesRes) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := p.Data.Write(oprot); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
-}
-
-func (p *GetTemplatesRes) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("GetTemplatesRes(%+v)", *p)
-}
-
-func (p *GetTemplatesRes) DeepEqual(ano *GetTemplatesRes) bool {
-	if p == ano {
-		return true
-	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field1DeepEqual(ano.Code) {
-		return false
-	}
-	if !p.Field2DeepEqual(ano.Msg) {
-		return false
-	}
-	if !p.Field3DeepEqual(ano.Data) {
-		return false
-	}
-	return true
-}
-
-func (p *GetTemplatesRes) Field1DeepEqual(src int32) bool {
-
-	if p.Code != src {
-		return false
-	}
-	return true
-}
-func (p *GetTemplatesRes) Field2DeepEqual(src string) bool {
-
-	if strings.Compare(p.Msg, src) != 0 {
-		return false
-	}
-	return true
-}
-func (p *GetTemplatesRes) Field3DeepEqual(src *GetTemplatesResData) bool {
-
-	if !p.Data.DeepEqual(src) {
-		return false
-	}
-	return true
-}
-
-type GetTemplatesResData struct {
-	Templates []*model.Template `thrift:"templates,1" frugal:"1,default,list<model.Template>" json:"templates"`
-}
-
-func NewGetTemplatesResData() *GetTemplatesResData {
-	return &GetTemplatesResData{}
-}
-
-func (p *GetTemplatesResData) InitDefault() {
-	*p = GetTemplatesResData{}
-}
-
-func (p *GetTemplatesResData) GetTemplates() (v []*model.Template) {
-	return p.Templates
-}
-func (p *GetTemplatesResData) SetTemplates(val []*model.Template) {
-	p.Templates = val
-}
-
-var fieldIDToName_GetTemplatesResData = map[int16]string{
-	1: "templates",
-}
-
-func (p *GetTemplatesResData) Read(iprot thrift.TProtocol) (err error) {
-
-	var fieldTypeId thrift.TType
-	var fieldId int16
-
-	if _, err = iprot.ReadStructBegin(); err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.LIST {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		}
-
-		if err = iprot.ReadFieldEnd(); err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	if err = iprot.ReadStructEnd(); err != nil {
-		goto ReadStructEndError
-	}
-
-	return nil
-ReadStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetTemplatesResData[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-
-ReadFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *GetTemplatesResData) ReadField1(iprot thrift.TProtocol) error {
-	_, size, err := iprot.ReadListBegin()
-	if err != nil {
-		return err
-	}
-	p.Templates = make([]*model.Template, 0, size)
-	for i := 0; i < size; i++ {
-		_elem := model.NewTemplate()
-		if err := _elem.Read(iprot); err != nil {
-			return err
-		}
-
-		p.Templates = append(p.Templates, _elem)
-	}
-	if err := iprot.ReadListEnd(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *GetTemplatesResData) Write(oprot thrift.TProtocol) (err error) {
-	var fieldId int16
-	if err = oprot.WriteStructBegin("GetTemplatesResData"); err != nil {
-		goto WriteStructBeginError
-	}
-	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
-
-	}
-	if err = oprot.WriteFieldStop(); err != nil {
-		goto WriteFieldStopError
-	}
-	if err = oprot.WriteStructEnd(); err != nil {
-		goto WriteStructEndError
-	}
-	return nil
-WriteStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
-WriteFieldStopError:
-	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
-WriteStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *GetTemplatesResData) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("templates", thrift.LIST, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Templates)); err != nil {
-		return err
-	}
-	for _, v := range p.Templates {
-		if err := v.Write(oprot); err != nil {
-			return err
-		}
-	}
-	if err := oprot.WriteListEnd(); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *GetTemplatesResData) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("GetTemplatesResData(%+v)", *p)
-}
-
-func (p *GetTemplatesResData) DeepEqual(ano *GetTemplatesResData) bool {
-	if p == ano {
-		return true
-	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field1DeepEqual(ano.Templates) {
-		return false
-	}
-	return true
-}
-
-func (p *GetTemplatesResData) Field1DeepEqual(src []*model.Template) bool {
-
-	if len(p.Templates) != len(src) {
-		return false
-	}
-	for i, v := range p.Templates {
-		_src := src[i]
-		if !v.DeepEqual(_src) {
-			return false
-		}
-	}
-	return true
-}
-
 type AddTemplateItemReq struct {
 	TemplateId int64  `thrift:"template_id,1" frugal:"1,default,i64" json:"template_id"`
 	Name       string `thrift:"name,2" frugal:"2,default,string" json:"name"`
@@ -2417,9 +1828,174 @@ func (p *AddTemplateItemReq) Field3DeepEqual(src string) bool {
 	return true
 }
 
+type AddTemplateItemResData struct {
+	Id int64 `thrift:"id,1" frugal:"1,default,i64" json:"id"`
+}
+
+func NewAddTemplateItemResData() *AddTemplateItemResData {
+	return &AddTemplateItemResData{}
+}
+
+func (p *AddTemplateItemResData) InitDefault() {
+	*p = AddTemplateItemResData{}
+}
+
+func (p *AddTemplateItemResData) GetId() (v int64) {
+	return p.Id
+}
+func (p *AddTemplateItemResData) SetId(val int64) {
+	p.Id = val
+}
+
+var fieldIDToName_AddTemplateItemResData = map[int16]string{
+	1: "id",
+}
+
+func (p *AddTemplateItemResData) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AddTemplateItemResData[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AddTemplateItemResData) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		p.Id = v
+	}
+	return nil
+}
+
+func (p *AddTemplateItemResData) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AddTemplateItemResData"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AddTemplateItemResData) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("id", thrift.I64, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.Id); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AddTemplateItemResData) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AddTemplateItemResData(%+v)", *p)
+}
+
+func (p *AddTemplateItemResData) DeepEqual(ano *AddTemplateItemResData) bool {
+	if p == ano {
+		return true
+	} else if p == nil || ano == nil {
+		return false
+	}
+	if !p.Field1DeepEqual(ano.Id) {
+		return false
+	}
+	return true
+}
+
+func (p *AddTemplateItemResData) Field1DeepEqual(src int64) bool {
+
+	if p.Id != src {
+		return false
+	}
+	return true
+}
+
 type AddTemplateItemRes struct {
-	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Code int32                   `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string                  `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *AddTemplateItemResData `thrift:"data,3" frugal:"3,default,AddTemplateItemResData" json:"data"`
 }
 
 func NewAddTemplateItemRes() *AddTemplateItemRes {
@@ -2437,16 +2013,33 @@ func (p *AddTemplateItemRes) GetCode() (v int32) {
 func (p *AddTemplateItemRes) GetMsg() (v string) {
 	return p.Msg
 }
+
+var AddTemplateItemRes_Data_DEFAULT *AddTemplateItemResData
+
+func (p *AddTemplateItemRes) GetData() (v *AddTemplateItemResData) {
+	if !p.IsSetData() {
+		return AddTemplateItemRes_Data_DEFAULT
+	}
+	return p.Data
+}
 func (p *AddTemplateItemRes) SetCode(val int32) {
 	p.Code = val
 }
 func (p *AddTemplateItemRes) SetMsg(val string) {
 	p.Msg = val
 }
+func (p *AddTemplateItemRes) SetData(val *AddTemplateItemResData) {
+	p.Data = val
+}
 
 var fieldIDToName_AddTemplateItemRes = map[int16]string{
 	1: "code",
 	2: "msg",
+	3: "data",
+}
+
+func (p *AddTemplateItemRes) IsSetData() bool {
+	return p.Data != nil
 }
 
 func (p *AddTemplateItemRes) Read(iprot thrift.TProtocol) (err error) {
@@ -2481,6 +2074,16 @@ func (p *AddTemplateItemRes) Read(iprot thrift.TProtocol) (err error) {
 		case 2:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 3:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -2536,6 +2139,14 @@ func (p *AddTemplateItemRes) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
+func (p *AddTemplateItemRes) ReadField3(iprot thrift.TProtocol) error {
+	p.Data = NewAddTemplateItemResData()
+	if err := p.Data.Read(iprot); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *AddTemplateItemRes) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	if err = oprot.WriteStructBegin("AddTemplateItemRes"); err != nil {
@@ -2548,6 +2159,10 @@ func (p *AddTemplateItemRes) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
 			goto WriteFieldError
 		}
 
@@ -2603,6 +2218,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
+func (p *AddTemplateItemRes) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 3); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Data.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
 func (p *AddTemplateItemRes) String() string {
 	if p == nil {
 		return "<nil>"
@@ -2622,6 +2254,9 @@ func (p *AddTemplateItemRes) DeepEqual(ano *AddTemplateItemRes) bool {
 	if !p.Field2DeepEqual(ano.Msg) {
 		return false
 	}
+	if !p.Field3DeepEqual(ano.Data) {
+		return false
+	}
 	return true
 }
 
@@ -2635,6 +2270,13 @@ func (p *AddTemplateItemRes) Field1DeepEqual(src int32) bool {
 func (p *AddTemplateItemRes) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.Msg, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *AddTemplateItemRes) Field3DeepEqual(src *AddTemplateItemResData) bool {
+
+	if !p.Data.DeepEqual(src) {
 		return false
 	}
 	return true
@@ -3559,66 +3201,75 @@ func (p *UpdateTemplateItemRes) Field2DeepEqual(src string) bool {
 	return true
 }
 
-type GetTemplateItemsReq struct {
-	TemplateId int64  `thrift:"template_id,1" frugal:"1,default,i64" json:"template_id"`
-	Page       int32  `thrift:"page,2" frugal:"2,default,i32" json:"page"`
-	Limit      int32  `thrift:"limit,3" frugal:"3,default,i32" json:"limit"`
-	Order      int32  `thrift:"order,4" frugal:"4,default,i32" json:"order"`
-	OrderBy    string `thrift:"order_by,5" frugal:"5,default,string" json:"order_by"`
+type GetTemplatesReq struct {
+	Page    int32  `thrift:"page,1" frugal:"1,default,i32" json:"page"`
+	Limit   int32  `thrift:"limit,2" frugal:"2,default,i32" json:"limit"`
+	Order   int32  `thrift:"order,3" frugal:"3,default,i32" json:"order"`
+	OrderBy string `thrift:"order_by,4" frugal:"4,default,string" json:"order_by"`
+	Type    int32  `thrift:"type,5" frugal:"5,default,i32" json:"type"`
+	Name    string `thrift:"name,6" frugal:"6,default,string" json:"name"`
 }
 
-func NewGetTemplateItemsReq() *GetTemplateItemsReq {
-	return &GetTemplateItemsReq{}
+func NewGetTemplatesReq() *GetTemplatesReq {
+	return &GetTemplatesReq{}
 }
 
-func (p *GetTemplateItemsReq) InitDefault() {
-	*p = GetTemplateItemsReq{}
+func (p *GetTemplatesReq) InitDefault() {
+	*p = GetTemplatesReq{}
 }
 
-func (p *GetTemplateItemsReq) GetTemplateId() (v int64) {
-	return p.TemplateId
-}
-
-func (p *GetTemplateItemsReq) GetPage() (v int32) {
+func (p *GetTemplatesReq) GetPage() (v int32) {
 	return p.Page
 }
 
-func (p *GetTemplateItemsReq) GetLimit() (v int32) {
+func (p *GetTemplatesReq) GetLimit() (v int32) {
 	return p.Limit
 }
 
-func (p *GetTemplateItemsReq) GetOrder() (v int32) {
+func (p *GetTemplatesReq) GetOrder() (v int32) {
 	return p.Order
 }
 
-func (p *GetTemplateItemsReq) GetOrderBy() (v string) {
+func (p *GetTemplatesReq) GetOrderBy() (v string) {
 	return p.OrderBy
 }
-func (p *GetTemplateItemsReq) SetTemplateId(val int64) {
-	p.TemplateId = val
+
+func (p *GetTemplatesReq) GetType() (v int32) {
+	return p.Type
 }
-func (p *GetTemplateItemsReq) SetPage(val int32) {
+
+func (p *GetTemplatesReq) GetName() (v string) {
+	return p.Name
+}
+func (p *GetTemplatesReq) SetPage(val int32) {
 	p.Page = val
 }
-func (p *GetTemplateItemsReq) SetLimit(val int32) {
+func (p *GetTemplatesReq) SetLimit(val int32) {
 	p.Limit = val
 }
-func (p *GetTemplateItemsReq) SetOrder(val int32) {
+func (p *GetTemplatesReq) SetOrder(val int32) {
 	p.Order = val
 }
-func (p *GetTemplateItemsReq) SetOrderBy(val string) {
+func (p *GetTemplatesReq) SetOrderBy(val string) {
 	p.OrderBy = val
 }
-
-var fieldIDToName_GetTemplateItemsReq = map[int16]string{
-	1: "template_id",
-	2: "page",
-	3: "limit",
-	4: "order",
-	5: "order_by",
+func (p *GetTemplatesReq) SetType(val int32) {
+	p.Type = val
+}
+func (p *GetTemplatesReq) SetName(val string) {
+	p.Name = val
 }
 
-func (p *GetTemplateItemsReq) Read(iprot thrift.TProtocol) (err error) {
+var fieldIDToName_GetTemplatesReq = map[int16]string{
+	1: "page",
+	2: "limit",
+	3: "order",
+	4: "order_by",
+	5: "type",
+	6: "name",
+}
+
+func (p *GetTemplatesReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -3638,7 +3289,7 @@ func (p *GetTemplateItemsReq) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -3668,7 +3319,7 @@ func (p *GetTemplateItemsReq) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 4:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -3678,8 +3329,18 @@ func (p *GetTemplateItemsReq) Read(iprot thrift.TProtocol) (err error) {
 				}
 			}
 		case 5:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField5(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 6:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField6(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else {
@@ -3707,7 +3368,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetTemplateItemsReq[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetTemplatesReq[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -3717,16 +3378,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *GetTemplateItemsReq) ReadField1(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		p.TemplateId = v
-	}
-	return nil
-}
-
-func (p *GetTemplateItemsReq) ReadField2(iprot thrift.TProtocol) error {
+func (p *GetTemplatesReq) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -3735,7 +3387,7 @@ func (p *GetTemplateItemsReq) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *GetTemplateItemsReq) ReadField3(iprot thrift.TProtocol) error {
+func (p *GetTemplatesReq) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -3744,7 +3396,7 @@ func (p *GetTemplateItemsReq) ReadField3(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *GetTemplateItemsReq) ReadField4(iprot thrift.TProtocol) error {
+func (p *GetTemplatesReq) ReadField3(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -3753,7 +3405,7 @@ func (p *GetTemplateItemsReq) ReadField4(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *GetTemplateItemsReq) ReadField5(iprot thrift.TProtocol) error {
+func (p *GetTemplatesReq) ReadField4(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -3762,9 +3414,27 @@ func (p *GetTemplateItemsReq) ReadField5(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *GetTemplateItemsReq) Write(oprot thrift.TProtocol) (err error) {
+func (p *GetTemplatesReq) ReadField5(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.Type = v
+	}
+	return nil
+}
+
+func (p *GetTemplatesReq) ReadField6(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		p.Name = v
+	}
+	return nil
+}
+
+func (p *GetTemplatesReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("GetTemplateItemsReq"); err != nil {
+	if err = oprot.WriteStructBegin("GetTemplatesReq"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -3788,6 +3458,10 @@ func (p *GetTemplateItemsReq) Write(oprot thrift.TProtocol) (err error) {
 			fieldId = 5
 			goto WriteFieldError
 		}
+		if err = p.writeField6(oprot); err != nil {
+			fieldId = 6
+			goto WriteFieldError
+		}
 
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
@@ -3807,11 +3481,11 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *GetTemplateItemsReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("template_id", thrift.I64, 1); err != nil {
+func (p *GetTemplatesReq) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("page", thrift.I32, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.TemplateId); err != nil {
+	if err := oprot.WriteI32(p.Page); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3824,11 +3498,11 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *GetTemplateItemsReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page", thrift.I32, 2); err != nil {
+func (p *GetTemplatesReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("limit", thrift.I32, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Page); err != nil {
+	if err := oprot.WriteI32(p.Limit); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3841,11 +3515,11 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *GetTemplateItemsReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("limit", thrift.I32, 3); err != nil {
+func (p *GetTemplatesReq) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("order", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Limit); err != nil {
+	if err := oprot.WriteI32(p.Order); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3858,11 +3532,11 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
-func (p *GetTemplateItemsReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("order", thrift.I32, 4); err != nil {
+func (p *GetTemplatesReq) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("order_by", thrift.STRING, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Order); err != nil {
+	if err := oprot.WriteString(p.OrderBy); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3875,11 +3549,11 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
-func (p *GetTemplateItemsReq) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("order_by", thrift.STRING, 5); err != nil {
+func (p *GetTemplatesReq) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("type", thrift.I32, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.OrderBy); err != nil {
+	if err := oprot.WriteI32(p.Type); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3892,124 +3566,151 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
 }
 
-func (p *GetTemplateItemsReq) String() string {
+func (p *GetTemplatesReq) writeField6(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("name", thrift.STRING, 6); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Name); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
+}
+
+func (p *GetTemplatesReq) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplateItemsReq(%+v)", *p)
+	return fmt.Sprintf("GetTemplatesReq(%+v)", *p)
 }
 
-func (p *GetTemplateItemsReq) DeepEqual(ano *GetTemplateItemsReq) bool {
+func (p *GetTemplatesReq) DeepEqual(ano *GetTemplatesReq) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.TemplateId) {
+	if !p.Field1DeepEqual(ano.Page) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.Page) {
+	if !p.Field2DeepEqual(ano.Limit) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Limit) {
+	if !p.Field3DeepEqual(ano.Order) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.Order) {
+	if !p.Field4DeepEqual(ano.OrderBy) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.OrderBy) {
+	if !p.Field5DeepEqual(ano.Type) {
+		return false
+	}
+	if !p.Field6DeepEqual(ano.Name) {
 		return false
 	}
 	return true
 }
 
-func (p *GetTemplateItemsReq) Field1DeepEqual(src int64) bool {
-
-	if p.TemplateId != src {
-		return false
-	}
-	return true
-}
-func (p *GetTemplateItemsReq) Field2DeepEqual(src int32) bool {
+func (p *GetTemplatesReq) Field1DeepEqual(src int32) bool {
 
 	if p.Page != src {
 		return false
 	}
 	return true
 }
-func (p *GetTemplateItemsReq) Field3DeepEqual(src int32) bool {
+func (p *GetTemplatesReq) Field2DeepEqual(src int32) bool {
 
 	if p.Limit != src {
 		return false
 	}
 	return true
 }
-func (p *GetTemplateItemsReq) Field4DeepEqual(src int32) bool {
+func (p *GetTemplatesReq) Field3DeepEqual(src int32) bool {
 
 	if p.Order != src {
 		return false
 	}
 	return true
 }
-func (p *GetTemplateItemsReq) Field5DeepEqual(src string) bool {
+func (p *GetTemplatesReq) Field4DeepEqual(src string) bool {
 
 	if strings.Compare(p.OrderBy, src) != 0 {
 		return false
 	}
 	return true
 }
+func (p *GetTemplatesReq) Field5DeepEqual(src int32) bool {
 
-type GetTemplateItemsRes struct {
-	Code int32                    `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string                   `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
-	Data *GetTemplateItemsResData `thrift:"data,3" frugal:"3,default,GetTemplateItemsResData" json:"data"`
+	if p.Type != src {
+		return false
+	}
+	return true
+}
+func (p *GetTemplatesReq) Field6DeepEqual(src string) bool {
+
+	if strings.Compare(p.Name, src) != 0 {
+		return false
+	}
+	return true
 }
 
-func NewGetTemplateItemsRes() *GetTemplateItemsRes {
-	return &GetTemplateItemsRes{}
+type GetTemplatesRes struct {
+	Code int32                `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string               `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *GetTemplatesResData `thrift:"data,3" frugal:"3,default,GetTemplatesResData" json:"data"`
 }
 
-func (p *GetTemplateItemsRes) InitDefault() {
-	*p = GetTemplateItemsRes{}
+func NewGetTemplatesRes() *GetTemplatesRes {
+	return &GetTemplatesRes{}
 }
 
-func (p *GetTemplateItemsRes) GetCode() (v int32) {
+func (p *GetTemplatesRes) InitDefault() {
+	*p = GetTemplatesRes{}
+}
+
+func (p *GetTemplatesRes) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *GetTemplateItemsRes) GetMsg() (v string) {
+func (p *GetTemplatesRes) GetMsg() (v string) {
 	return p.Msg
 }
 
-var GetTemplateItemsRes_Data_DEFAULT *GetTemplateItemsResData
+var GetTemplatesRes_Data_DEFAULT *GetTemplatesResData
 
-func (p *GetTemplateItemsRes) GetData() (v *GetTemplateItemsResData) {
+func (p *GetTemplatesRes) GetData() (v *GetTemplatesResData) {
 	if !p.IsSetData() {
-		return GetTemplateItemsRes_Data_DEFAULT
+		return GetTemplatesRes_Data_DEFAULT
 	}
 	return p.Data
 }
-func (p *GetTemplateItemsRes) SetCode(val int32) {
+func (p *GetTemplatesRes) SetCode(val int32) {
 	p.Code = val
 }
-func (p *GetTemplateItemsRes) SetMsg(val string) {
+func (p *GetTemplatesRes) SetMsg(val string) {
 	p.Msg = val
 }
-func (p *GetTemplateItemsRes) SetData(val *GetTemplateItemsResData) {
+func (p *GetTemplatesRes) SetData(val *GetTemplatesResData) {
 	p.Data = val
 }
 
-var fieldIDToName_GetTemplateItemsRes = map[int16]string{
+var fieldIDToName_GetTemplatesRes = map[int16]string{
 	1: "code",
 	2: "msg",
 	3: "data",
 }
 
-func (p *GetTemplateItemsRes) IsSetData() bool {
+func (p *GetTemplatesRes) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *GetTemplateItemsRes) Read(iprot thrift.TProtocol) (err error) {
+func (p *GetTemplatesRes) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -4078,7 +3779,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetTemplateItemsRes[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetTemplatesRes[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -4088,7 +3789,7 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *GetTemplateItemsRes) ReadField1(iprot thrift.TProtocol) error {
+func (p *GetTemplatesRes) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
@@ -4097,7 +3798,7 @@ func (p *GetTemplateItemsRes) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *GetTemplateItemsRes) ReadField2(iprot thrift.TProtocol) error {
+func (p *GetTemplatesRes) ReadField2(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
@@ -4106,17 +3807,17 @@ func (p *GetTemplateItemsRes) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *GetTemplateItemsRes) ReadField3(iprot thrift.TProtocol) error {
-	p.Data = NewGetTemplateItemsResData()
+func (p *GetTemplatesRes) ReadField3(iprot thrift.TProtocol) error {
+	p.Data = NewGetTemplatesResData()
 	if err := p.Data.Read(iprot); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p *GetTemplateItemsRes) Write(oprot thrift.TProtocol) (err error) {
+func (p *GetTemplatesRes) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("GetTemplateItemsRes"); err != nil {
+	if err = oprot.WriteStructBegin("GetTemplatesRes"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -4151,7 +3852,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *GetTemplateItemsRes) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *GetTemplatesRes) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("code", thrift.I32, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -4168,7 +3869,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *GetTemplateItemsRes) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *GetTemplatesRes) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("msg", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -4185,7 +3886,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *GetTemplateItemsRes) writeField3(oprot thrift.TProtocol) (err error) {
+func (p *GetTemplatesRes) writeField3(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("data", thrift.STRUCT, 3); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -4202,14 +3903,14 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
-func (p *GetTemplateItemsRes) String() string {
+func (p *GetTemplatesRes) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplateItemsRes(%+v)", *p)
+	return fmt.Sprintf("GetTemplatesRes(%+v)", *p)
 }
 
-func (p *GetTemplateItemsRes) DeepEqual(ano *GetTemplateItemsRes) bool {
+func (p *GetTemplatesRes) DeepEqual(ano *GetTemplatesRes) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
@@ -4227,21 +3928,21 @@ func (p *GetTemplateItemsRes) DeepEqual(ano *GetTemplateItemsRes) bool {
 	return true
 }
 
-func (p *GetTemplateItemsRes) Field1DeepEqual(src int32) bool {
+func (p *GetTemplatesRes) Field1DeepEqual(src int32) bool {
 
 	if p.Code != src {
 		return false
 	}
 	return true
 }
-func (p *GetTemplateItemsRes) Field2DeepEqual(src string) bool {
+func (p *GetTemplatesRes) Field2DeepEqual(src string) bool {
 
 	if strings.Compare(p.Msg, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *GetTemplateItemsRes) Field3DeepEqual(src *GetTemplateItemsResData) bool {
+func (p *GetTemplatesRes) Field3DeepEqual(src *GetTemplatesResData) bool {
 
 	if !p.Data.DeepEqual(src) {
 		return false
@@ -4249,30 +3950,39 @@ func (p *GetTemplateItemsRes) Field3DeepEqual(src *GetTemplateItemsResData) bool
 	return true
 }
 
-type GetTemplateItemsResData struct {
-	TemplateItems []*model.TemplateItem `thrift:"template_items,1" frugal:"1,default,list<model.TemplateItem>" json:"template_items"`
+type GetTemplatesResData struct {
+	Templates []*model.TemplateWithInfo `thrift:"templates,1" frugal:"1,default,list<model.TemplateWithInfo>" json:"templates"`
+	Total     int32                     `thrift:"total,2" frugal:"2,default,i32" json:"total"`
 }
 
-func NewGetTemplateItemsResData() *GetTemplateItemsResData {
-	return &GetTemplateItemsResData{}
+func NewGetTemplatesResData() *GetTemplatesResData {
+	return &GetTemplatesResData{}
 }
 
-func (p *GetTemplateItemsResData) InitDefault() {
-	*p = GetTemplateItemsResData{}
+func (p *GetTemplatesResData) InitDefault() {
+	*p = GetTemplatesResData{}
 }
 
-func (p *GetTemplateItemsResData) GetTemplateItems() (v []*model.TemplateItem) {
-	return p.TemplateItems
-}
-func (p *GetTemplateItemsResData) SetTemplateItems(val []*model.TemplateItem) {
-	p.TemplateItems = val
+func (p *GetTemplatesResData) GetTemplates() (v []*model.TemplateWithInfo) {
+	return p.Templates
 }
 
-var fieldIDToName_GetTemplateItemsResData = map[int16]string{
-	1: "template_items",
+func (p *GetTemplatesResData) GetTotal() (v int32) {
+	return p.Total
+}
+func (p *GetTemplatesResData) SetTemplates(val []*model.TemplateWithInfo) {
+	p.Templates = val
+}
+func (p *GetTemplatesResData) SetTotal(val int32) {
+	p.Total = val
 }
 
-func (p *GetTemplateItemsResData) Read(iprot thrift.TProtocol) (err error) {
+var fieldIDToName_GetTemplatesResData = map[int16]string{
+	1: "templates",
+	2: "total",
+}
+
+func (p *GetTemplatesResData) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -4301,6 +4011,16 @@ func (p *GetTemplateItemsResData) Read(iprot thrift.TProtocol) (err error) {
 					goto SkipFieldError
 				}
 			}
+		case 2:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				if err = iprot.Skip(fieldTypeId); err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -4321,7 +4041,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetTemplateItemsResData[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetTemplatesResData[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -4331,19 +4051,19 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *GetTemplateItemsResData) ReadField1(iprot thrift.TProtocol) error {
+func (p *GetTemplatesResData) ReadField1(iprot thrift.TProtocol) error {
 	_, size, err := iprot.ReadListBegin()
 	if err != nil {
 		return err
 	}
-	p.TemplateItems = make([]*model.TemplateItem, 0, size)
+	p.Templates = make([]*model.TemplateWithInfo, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := model.NewTemplateItem()
+		_elem := model.NewTemplateWithInfo()
 		if err := _elem.Read(iprot); err != nil {
 			return err
 		}
 
-		p.TemplateItems = append(p.TemplateItems, _elem)
+		p.Templates = append(p.Templates, _elem)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return err
@@ -4351,14 +4071,27 @@ func (p *GetTemplateItemsResData) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *GetTemplateItemsResData) Write(oprot thrift.TProtocol) (err error) {
+func (p *GetTemplatesResData) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		p.Total = v
+	}
+	return nil
+}
+
+func (p *GetTemplatesResData) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("GetTemplateItemsResData"); err != nil {
+	if err = oprot.WriteStructBegin("GetTemplatesResData"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 
@@ -4380,14 +4113,14 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *GetTemplateItemsResData) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("template_items", thrift.LIST, 1); err != nil {
+func (p *GetTemplatesResData) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("templates", thrift.LIST, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.TemplateItems)); err != nil {
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Templates)); err != nil {
 		return err
 	}
-	for _, v := range p.TemplateItems {
+	for _, v := range p.Templates {
 		if err := v.Write(oprot); err != nil {
 			return err
 		}
@@ -4405,35 +4138,62 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *GetTemplateItemsResData) String() string {
+func (p *GetTemplatesResData) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("total", thrift.I32, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Total); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *GetTemplatesResData) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplateItemsResData(%+v)", *p)
+	return fmt.Sprintf("GetTemplatesResData(%+v)", *p)
 }
 
-func (p *GetTemplateItemsResData) DeepEqual(ano *GetTemplateItemsResData) bool {
+func (p *GetTemplatesResData) DeepEqual(ano *GetTemplatesResData) bool {
 	if p == ano {
 		return true
 	} else if p == nil || ano == nil {
 		return false
 	}
-	if !p.Field1DeepEqual(ano.TemplateItems) {
+	if !p.Field1DeepEqual(ano.Templates) {
+		return false
+	}
+	if !p.Field2DeepEqual(ano.Total) {
 		return false
 	}
 	return true
 }
 
-func (p *GetTemplateItemsResData) Field1DeepEqual(src []*model.TemplateItem) bool {
+func (p *GetTemplatesResData) Field1DeepEqual(src []*model.TemplateWithInfo) bool {
 
-	if len(p.TemplateItems) != len(src) {
+	if len(p.Templates) != len(src) {
 		return false
 	}
-	for i, v := range p.TemplateItems {
+	for i, v := range p.Templates {
 		_src := src[i]
 		if !v.DeepEqual(_src) {
 			return false
 		}
+	}
+	return true
+}
+func (p *GetTemplatesResData) Field2DeepEqual(src int32) bool {
+
+	if p.Total != src {
+		return false
 	}
 	return true
 }

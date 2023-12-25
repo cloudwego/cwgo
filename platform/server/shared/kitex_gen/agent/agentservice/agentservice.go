@@ -31,11 +31,10 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"AddTemplate":        kitex.NewMethodInfo(addTemplateHandler, newAgentServiceAddTemplateArgs, newAgentServiceAddTemplateResult, false),
 		"DeleteTemplate":     kitex.NewMethodInfo(deleteTemplateHandler, newAgentServiceDeleteTemplateArgs, newAgentServiceDeleteTemplateResult, false),
 		"UpdateTemplate":     kitex.NewMethodInfo(updateTemplateHandler, newAgentServiceUpdateTemplateArgs, newAgentServiceUpdateTemplateResult, false),
-		"GetTemplates":       kitex.NewMethodInfo(getTemplatesHandler, newAgentServiceGetTemplatesArgs, newAgentServiceGetTemplatesResult, false),
 		"AddTemplateItem":    kitex.NewMethodInfo(addTemplateItemHandler, newAgentServiceAddTemplateItemArgs, newAgentServiceAddTemplateItemResult, false),
 		"DeleteTemplateItem": kitex.NewMethodInfo(deleteTemplateItemHandler, newAgentServiceDeleteTemplateItemArgs, newAgentServiceDeleteTemplateItemResult, false),
 		"UpdateTemplateItem": kitex.NewMethodInfo(updateTemplateItemHandler, newAgentServiceUpdateTemplateItemArgs, newAgentServiceUpdateTemplateItemResult, false),
-		"GetTemplateItems":   kitex.NewMethodInfo(getTemplateItemsHandler, newAgentServiceGetTemplateItemsArgs, newAgentServiceGetTemplateItemsResult, false),
+		"GetTemplates":       kitex.NewMethodInfo(getTemplatesHandler, newAgentServiceGetTemplatesArgs, newAgentServiceGetTemplatesResult, false),
 		"UpdateTasks":        kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
 		"AddToken":           kitex.NewMethodInfo(addTokenHandler, newAgentServiceAddTokenArgs, newAgentServiceAddTokenResult, false),
 		"DeleteToken":        kitex.NewMethodInfo(deleteTokenHandler, newAgentServiceDeleteTokenArgs, newAgentServiceDeleteTokenResult, false),
@@ -271,24 +270,6 @@ func newAgentServiceUpdateTemplateResult() interface{} {
 	return agent.NewAgentServiceUpdateTemplateResult()
 }
 
-func getTemplatesHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*agent.AgentServiceGetTemplatesArgs)
-	realResult := result.(*agent.AgentServiceGetTemplatesResult)
-	success, err := handler.(agent.AgentService).GetTemplates(ctx, realArg.Req)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newAgentServiceGetTemplatesArgs() interface{} {
-	return agent.NewAgentServiceGetTemplatesArgs()
-}
-
-func newAgentServiceGetTemplatesResult() interface{} {
-	return agent.NewAgentServiceGetTemplatesResult()
-}
-
 func addTemplateItemHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*agent.AgentServiceAddTemplateItemArgs)
 	realResult := result.(*agent.AgentServiceAddTemplateItemResult)
@@ -343,22 +324,22 @@ func newAgentServiceUpdateTemplateItemResult() interface{} {
 	return agent.NewAgentServiceUpdateTemplateItemResult()
 }
 
-func getTemplateItemsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*agent.AgentServiceGetTemplateItemsArgs)
-	realResult := result.(*agent.AgentServiceGetTemplateItemsResult)
-	success, err := handler.(agent.AgentService).GetTemplateItems(ctx, realArg.Req)
+func getTemplatesHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceGetTemplatesArgs)
+	realResult := result.(*agent.AgentServiceGetTemplatesResult)
+	success, err := handler.(agent.AgentService).GetTemplates(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newAgentServiceGetTemplateItemsArgs() interface{} {
-	return agent.NewAgentServiceGetTemplateItemsArgs()
+func newAgentServiceGetTemplatesArgs() interface{} {
+	return agent.NewAgentServiceGetTemplatesArgs()
 }
 
-func newAgentServiceGetTemplateItemsResult() interface{} {
-	return agent.NewAgentServiceGetTemplateItemsResult()
+func newAgentServiceGetTemplatesResult() interface{} {
+	return agent.NewAgentServiceGetTemplatesResult()
 }
 
 func updateTasksHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -563,16 +544,6 @@ func (p *kClient) UpdateTemplate(ctx context.Context, req *agent.UpdateTemplateR
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) GetTemplates(ctx context.Context, req *agent.GetTemplatesReq) (r *agent.GetTemplatesRes, err error) {
-	var _args agent.AgentServiceGetTemplatesArgs
-	_args.Req = req
-	var _result agent.AgentServiceGetTemplatesResult
-	if err = p.c.Call(ctx, "GetTemplates", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
 func (p *kClient) AddTemplateItem(ctx context.Context, req *agent.AddTemplateItemReq) (r *agent.AddTemplateItemRes, err error) {
 	var _args agent.AgentServiceAddTemplateItemArgs
 	_args.Req = req
@@ -603,11 +574,11 @@ func (p *kClient) UpdateTemplateItem(ctx context.Context, req *agent.UpdateTempl
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq) (r *agent.GetTemplateItemsRes, err error) {
-	var _args agent.AgentServiceGetTemplateItemsArgs
+func (p *kClient) GetTemplates(ctx context.Context, req *agent.GetTemplatesReq) (r *agent.GetTemplatesRes, err error) {
+	var _args agent.AgentServiceGetTemplatesArgs
 	_args.Req = req
-	var _result agent.AgentServiceGetTemplateItemsResult
-	if err = p.c.Call(ctx, "GetTemplateItems", &_args, &_result); err != nil {
+	var _result agent.AgentServiceGetTemplatesResult
+	if err = p.c.Call(ctx, "GetTemplates", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

@@ -42,6 +42,6 @@ CREATE TABLE `repository`  (
     UNIQUE INDEX `domain`(`domain`, `owner`, `repository_name`) USING BTREE,
     INDEX `repository_type`(`repository_type`) USING BTREE,
     INDEX `store_type`(`store_type`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'repository table' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'repository table' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

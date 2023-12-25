@@ -28,6 +28,11 @@ import (
 )
 
 func ProcessFolders(fileContentMap map[string][]byte, tempDir string, paths ...string) error {
+	if len(paths) == 0 {
+		// if path is not specified,
+		// then walk the entire temp dir
+		paths = append(paths, "")
+	}
 	// Iterate over the specified paths
 	for _, path := range paths {
 		// Recursively walk through the path and its subdirectories

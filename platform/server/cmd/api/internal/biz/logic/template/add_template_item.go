@@ -77,5 +77,8 @@ func (l *AddTemplateItemLogic) AddTemplateItem(req *template.AddTemplateItemReq)
 	return &template.AddTemplateItemRes{
 		Code: 0,
 		Msg:  successMsgAddTemplateItem,
+		Data: &template.AddTemplateItemResData{
+			ID: rpcRes.Data.Id,
+		},
 	}
 }

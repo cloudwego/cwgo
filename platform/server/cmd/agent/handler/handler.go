@@ -158,13 +158,6 @@ func (s *AgentServiceImpl) UpdateTemplateItem(ctx context.Context, req *agent.Up
 	return resp, err
 }
 
-// GetTemplateItems implements the AgentServiceImpl interface.
-func (s *AgentServiceImpl) GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq) (resp *agent.GetTemplateItemsRes, err error) {
-	resp, err = service.NewGetTemplateItemsService(ctx, s.svcCtx).Run(req)
-
-	return resp, err
-}
-
 // AddToken implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) AddToken(ctx context.Context, req *agent.AddTokenReq) (resp *agent.AddTokenRes, err error) {
 	resp, err = service.NewAddTokenService(ctx, s.svcCtx).Run(req)

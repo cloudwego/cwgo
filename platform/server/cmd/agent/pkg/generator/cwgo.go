@@ -20,6 +20,7 @@ package generator
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -33,7 +34,7 @@ func NewCwgoGenerator() *CwgoGenerator {
 	return &CwgoGenerator{}
 }
 
-func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, idlSearchPath, serviceName, generatePath string) error {
+func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, idlSearchPath, templatePath, serviceName, generatePath string) error {
 	// Fixed options were used to generate code, which can be optimized to be optional in the future
 	var build strings.Builder
 	build.WriteString(
@@ -52,8 +53,18 @@ func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, idlSearchPath, 
 			),
 		)
 	}
+	if templatePath != "" {
+		build.WriteString(
+			fmt.Sprintf("--template %s ",
+				templatePath,
+			),
+		)
+	}
 	build.WriteString("&& go mod tidy")
-	cwgoCmd := exec.Command("sh", "-c", build.String())
+
+	shell := os.Getenv("SHELL")
+
+	cwgoCmd := exec.Command(shell, "-c", build.String())
 
 	cwgoCmd.Dir = generatePath
 

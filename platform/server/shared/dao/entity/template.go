@@ -40,3 +40,8 @@ type MysqlTemplate struct {
 func (*MysqlTemplate) TableName() string {
 	return TableNameMysqlTemplate
 }
+
+type MysqlTemplateWithInfo struct {
+	MysqlTemplate
+	Items []MysqlTemplateItem `gorm:"foreignKey:template_id;references:id"`
+}

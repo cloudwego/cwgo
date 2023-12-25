@@ -5,7 +5,7 @@ update_behavior:
   append_tpl: |-
     {{range .AllMethods}}
      {{- if or .ClientStreaming .ServerStreaming}}
-     func (s *{{$.ServiceName}}Impl) {{.Name}}({{if not .ClientStreaming}}{{range .Args}}{{LowerFirst .Name}} {{.Type}}, {{end}}{{end}}stream {{.PkgRefName}}.{{.ServiceName}}_{{.RawName}}Server) (err error) {	
+     func (s *{{$.ServiceName}}Impl) {{.Name}}({{if not .ClientStreaming}}{{range .Args}}{{LowerFirst .Name}} {{.Type}}, {{end}}{{end}}stream {{.PkgRefName}}.{{.ServiceName}}_{{.RawName}}Server) (err error) {
        ctx := context.Background()
        err = service.New{{.Name}}Service(ctx, s.svcCtx).Run({{if not .ClientStreaming}}{{range .Args}}{{LowerFirst .Name}}, {{end}}{{end}}stream)
        return

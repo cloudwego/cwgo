@@ -3,7 +3,7 @@ namespace go model
 struct Template{
     1: i64 id
     2: string name
-    3: i32 type // 1: hz, 2: kitex
+    3: i32 type
     4: bool is_deleted
     5: string create_time
     6: string update_time
@@ -19,7 +19,7 @@ struct TemplateItem{
     7: string update_time
 }
 
-struct TemplateWithItemInfo{
+struct TemplateWithInfo{
     1: Template template
     2: list<TemplateItem> items
 }

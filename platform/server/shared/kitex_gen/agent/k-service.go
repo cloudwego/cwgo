@@ -3119,264 +3119,6 @@ func (p *AgentServiceUpdateTemplateResult) field0Length() int {
 	return l
 }
 
-func (p *AgentServiceGetTemplatesArgs) FastRead(buf []byte) (int, error) {
-	var err error
-	var offset int
-	var l int
-	var fieldTypeId thrift.TType
-	var fieldId int16
-	_, l, err = bthrift.Binary.ReadStructBegin(buf)
-	offset += l
-	if err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, l, err = bthrift.Binary.ReadFieldBegin(buf[offset:])
-		offset += l
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.STRUCT {
-				l, err = p.FastReadField1(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
-			offset += l
-			if err != nil {
-				goto SkipFieldError
-			}
-		}
-
-		l, err = bthrift.Binary.ReadFieldEnd(buf[offset:])
-		offset += l
-		if err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	l, err = bthrift.Binary.ReadStructEnd(buf[offset:])
-	offset += l
-	if err != nil {
-		goto ReadStructEndError
-	}
-
-	return offset, nil
-ReadStructBeginError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetTemplatesArgs[fieldId]), err)
-SkipFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-ReadFieldEndError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *AgentServiceGetTemplatesArgs) FastReadField1(buf []byte) (int, error) {
-	offset := 0
-
-	tmp := NewGetTemplatesReq()
-	if l, err := tmp.FastRead(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-	}
-	p.Req = tmp
-	return offset, nil
-}
-
-// for compatibility
-func (p *AgentServiceGetTemplatesArgs) FastWrite(buf []byte) int {
-	return 0
-}
-
-func (p *AgentServiceGetTemplatesArgs) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
-	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetTemplates_args")
-	if p != nil {
-		offset += p.fastWriteField1(buf[offset:], binaryWriter)
-	}
-	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
-	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
-	return offset
-}
-
-func (p *AgentServiceGetTemplatesArgs) BLength() int {
-	l := 0
-	l += bthrift.Binary.StructBeginLength("GetTemplates_args")
-	if p != nil {
-		l += p.field1Length()
-	}
-	l += bthrift.Binary.FieldStopLength()
-	l += bthrift.Binary.StructEndLength()
-	return l
-}
-
-func (p *AgentServiceGetTemplatesArgs) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
-	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "req", thrift.STRUCT, 1)
-	offset += p.Req.FastWriteNocopy(buf[offset:], binaryWriter)
-	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
-	return offset
-}
-
-func (p *AgentServiceGetTemplatesArgs) field1Length() int {
-	l := 0
-	l += bthrift.Binary.FieldBeginLength("req", thrift.STRUCT, 1)
-	l += p.Req.BLength()
-	l += bthrift.Binary.FieldEndLength()
-	return l
-}
-
-func (p *AgentServiceGetTemplatesResult) FastRead(buf []byte) (int, error) {
-	var err error
-	var offset int
-	var l int
-	var fieldTypeId thrift.TType
-	var fieldId int16
-	_, l, err = bthrift.Binary.ReadStructBegin(buf)
-	offset += l
-	if err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, l, err = bthrift.Binary.ReadFieldBegin(buf[offset:])
-		offset += l
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-		switch fieldId {
-		case 0:
-			if fieldTypeId == thrift.STRUCT {
-				l, err = p.FastReadField0(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
-			offset += l
-			if err != nil {
-				goto SkipFieldError
-			}
-		}
-
-		l, err = bthrift.Binary.ReadFieldEnd(buf[offset:])
-		offset += l
-		if err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	l, err = bthrift.Binary.ReadStructEnd(buf[offset:])
-	offset += l
-	if err != nil {
-		goto ReadStructEndError
-	}
-
-	return offset, nil
-ReadStructBeginError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetTemplatesResult[fieldId]), err)
-SkipFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-ReadFieldEndError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *AgentServiceGetTemplatesResult) FastReadField0(buf []byte) (int, error) {
-	offset := 0
-
-	tmp := NewGetTemplatesRes()
-	if l, err := tmp.FastRead(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-	}
-	p.Success = tmp
-	return offset, nil
-}
-
-// for compatibility
-func (p *AgentServiceGetTemplatesResult) FastWrite(buf []byte) int {
-	return 0
-}
-
-func (p *AgentServiceGetTemplatesResult) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
-	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetTemplates_result")
-	if p != nil {
-		offset += p.fastWriteField0(buf[offset:], binaryWriter)
-	}
-	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
-	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
-	return offset
-}
-
-func (p *AgentServiceGetTemplatesResult) BLength() int {
-	l := 0
-	l += bthrift.Binary.StructBeginLength("GetTemplates_result")
-	if p != nil {
-		l += p.field0Length()
-	}
-	l += bthrift.Binary.FieldStopLength()
-	l += bthrift.Binary.StructEndLength()
-	return l
-}
-
-func (p *AgentServiceGetTemplatesResult) fastWriteField0(buf []byte, binaryWriter bthrift.BinaryWriter) int {
-	offset := 0
-	if p.IsSetSuccess() {
-		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "success", thrift.STRUCT, 0)
-		offset += p.Success.FastWriteNocopy(buf[offset:], binaryWriter)
-		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
-	}
-	return offset
-}
-
-func (p *AgentServiceGetTemplatesResult) field0Length() int {
-	l := 0
-	if p.IsSetSuccess() {
-		l += bthrift.Binary.FieldBeginLength("success", thrift.STRUCT, 0)
-		l += p.Success.BLength()
-		l += bthrift.Binary.FieldEndLength()
-	}
-	return l
-}
-
 func (p *AgentServiceAddTemplateItemArgs) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
@@ -4151,7 +3893,7 @@ func (p *AgentServiceUpdateTemplateItemResult) field0Length() int {
 	return l
 }
 
-func (p *AgentServiceGetTemplateItemsArgs) FastRead(buf []byte) (int, error) {
+func (p *AgentServiceGetTemplatesArgs) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -4213,7 +3955,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetTemplateItemsArgs[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetTemplatesArgs[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -4222,10 +3964,10 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *AgentServiceGetTemplateItemsArgs) FastReadField1(buf []byte) (int, error) {
+func (p *AgentServiceGetTemplatesArgs) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
-	tmp := NewGetTemplateItemsReq()
+	tmp := NewGetTemplatesReq()
 	if l, err := tmp.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -4236,13 +3978,13 @@ func (p *AgentServiceGetTemplateItemsArgs) FastReadField1(buf []byte) (int, erro
 }
 
 // for compatibility
-func (p *AgentServiceGetTemplateItemsArgs) FastWrite(buf []byte) int {
+func (p *AgentServiceGetTemplatesArgs) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *AgentServiceGetTemplateItemsArgs) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *AgentServiceGetTemplatesArgs) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetTemplateItems_args")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetTemplates_args")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 	}
@@ -4251,9 +3993,9 @@ func (p *AgentServiceGetTemplateItemsArgs) FastWriteNocopy(buf []byte, binaryWri
 	return offset
 }
 
-func (p *AgentServiceGetTemplateItemsArgs) BLength() int {
+func (p *AgentServiceGetTemplatesArgs) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("GetTemplateItems_args")
+	l += bthrift.Binary.StructBeginLength("GetTemplates_args")
 	if p != nil {
 		l += p.field1Length()
 	}
@@ -4262,7 +4004,7 @@ func (p *AgentServiceGetTemplateItemsArgs) BLength() int {
 	return l
 }
 
-func (p *AgentServiceGetTemplateItemsArgs) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *AgentServiceGetTemplatesArgs) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "req", thrift.STRUCT, 1)
 	offset += p.Req.FastWriteNocopy(buf[offset:], binaryWriter)
@@ -4270,7 +4012,7 @@ func (p *AgentServiceGetTemplateItemsArgs) fastWriteField1(buf []byte, binaryWri
 	return offset
 }
 
-func (p *AgentServiceGetTemplateItemsArgs) field1Length() int {
+func (p *AgentServiceGetTemplatesArgs) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("req", thrift.STRUCT, 1)
 	l += p.Req.BLength()
@@ -4278,7 +4020,7 @@ func (p *AgentServiceGetTemplateItemsArgs) field1Length() int {
 	return l
 }
 
-func (p *AgentServiceGetTemplateItemsResult) FastRead(buf []byte) (int, error) {
+func (p *AgentServiceGetTemplatesResult) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -4340,7 +4082,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetTemplateItemsResult[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AgentServiceGetTemplatesResult[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -4349,10 +4091,10 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *AgentServiceGetTemplateItemsResult) FastReadField0(buf []byte) (int, error) {
+func (p *AgentServiceGetTemplatesResult) FastReadField0(buf []byte) (int, error) {
 	offset := 0
 
-	tmp := NewGetTemplateItemsRes()
+	tmp := NewGetTemplatesRes()
 	if l, err := tmp.FastRead(buf[offset:]); err != nil {
 		return offset, err
 	} else {
@@ -4363,13 +4105,13 @@ func (p *AgentServiceGetTemplateItemsResult) FastReadField0(buf []byte) (int, er
 }
 
 // for compatibility
-func (p *AgentServiceGetTemplateItemsResult) FastWrite(buf []byte) int {
+func (p *AgentServiceGetTemplatesResult) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *AgentServiceGetTemplateItemsResult) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *AgentServiceGetTemplatesResult) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetTemplateItems_result")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetTemplates_result")
 	if p != nil {
 		offset += p.fastWriteField0(buf[offset:], binaryWriter)
 	}
@@ -4378,9 +4120,9 @@ func (p *AgentServiceGetTemplateItemsResult) FastWriteNocopy(buf []byte, binaryW
 	return offset
 }
 
-func (p *AgentServiceGetTemplateItemsResult) BLength() int {
+func (p *AgentServiceGetTemplatesResult) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("GetTemplateItems_result")
+	l += bthrift.Binary.StructBeginLength("GetTemplates_result")
 	if p != nil {
 		l += p.field0Length()
 	}
@@ -4389,7 +4131,7 @@ func (p *AgentServiceGetTemplateItemsResult) BLength() int {
 	return l
 }
 
-func (p *AgentServiceGetTemplateItemsResult) fastWriteField0(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *AgentServiceGetTemplatesResult) fastWriteField0(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	if p.IsSetSuccess() {
 		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "success", thrift.STRUCT, 0)
@@ -4399,7 +4141,7 @@ func (p *AgentServiceGetTemplateItemsResult) fastWriteField0(buf []byte, binaryW
 	return offset
 }
 
-func (p *AgentServiceGetTemplateItemsResult) field0Length() int {
+func (p *AgentServiceGetTemplatesResult) field0Length() int {
 	l := 0
 	if p.IsSetSuccess() {
 		l += bthrift.Binary.FieldBeginLength("success", thrift.STRUCT, 0)
@@ -5537,14 +5279,6 @@ func (p *AgentServiceUpdateTemplateResult) GetResult() interface{} {
 	return p.Success
 }
 
-func (p *AgentServiceGetTemplatesArgs) GetFirstArgument() interface{} {
-	return p.Req
-}
-
-func (p *AgentServiceGetTemplatesResult) GetResult() interface{} {
-	return p.Success
-}
-
 func (p *AgentServiceAddTemplateItemArgs) GetFirstArgument() interface{} {
 	return p.Req
 }
@@ -5569,11 +5303,11 @@ func (p *AgentServiceUpdateTemplateItemResult) GetResult() interface{} {
 	return p.Success
 }
 
-func (p *AgentServiceGetTemplateItemsArgs) GetFirstArgument() interface{} {
+func (p *AgentServiceGetTemplatesArgs) GetFirstArgument() interface{} {
 	return p.Req
 }
 
-func (p *AgentServiceGetTemplateItemsResult) GetResult() interface{} {
+func (p *AgentServiceGetTemplatesResult) GetResult() interface{} {
 	return p.Success
 }
 

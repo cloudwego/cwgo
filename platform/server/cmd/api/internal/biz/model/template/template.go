@@ -33,9 +33,29 @@ func (p *AddTemplateReq) String() string {
 	return fmt.Sprintf("AddTemplateReq(%+v)", *p)
 }
 
+type AddTemplateResData struct {
+	ID int64 `thrift:"id,1" form:"id" json:"id" query:"id"`
+}
+
+func NewAddTemplateResData() *AddTemplateResData {
+	return &AddTemplateResData{}
+}
+
+func (p *AddTemplateResData) GetID() (v int64) {
+	return p.ID
+}
+
+func (p *AddTemplateResData) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AddTemplateResData(%+v)", *p)
+}
+
 type AddTemplateRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32               `thrift:"code,1" form:"code" json:"code" query:"code"`
+	Msg  string              `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Data *AddTemplateResData `thrift:"data,3" form:"data" json:"data" query:"data"`
 }
 
 func NewAddTemplateRes() *AddTemplateRes {
@@ -48,6 +68,19 @@ func (p *AddTemplateRes) GetCode() (v int32) {
 
 func (p *AddTemplateRes) GetMsg() (v string) {
 	return p.Msg
+}
+
+var AddTemplateRes_Data_DEFAULT *AddTemplateResData
+
+func (p *AddTemplateRes) GetData() (v *AddTemplateResData) {
+	if !p.IsSetData() {
+		return AddTemplateRes_Data_DEFAULT
+	}
+	return p.Data
+}
+
+func (p *AddTemplateRes) IsSetData() bool {
+	return p.Data != nil
 }
 
 func (p *AddTemplateRes) String() string {
@@ -148,97 +181,6 @@ func (p *UpdateTemplateRes) String() string {
 	return fmt.Sprintf("UpdateTemplateRes(%+v)", *p)
 }
 
-type GetTemplatesReq struct {
-	Page    int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
-	Limit   int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
-	Order   int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
-	OrderBy string `thrift:"order_by,4" json:"order_by" query:"order_by"`
-}
-
-func NewGetTemplatesReq() *GetTemplatesReq {
-	return &GetTemplatesReq{}
-}
-
-func (p *GetTemplatesReq) GetPage() (v int32) {
-	return p.Page
-}
-
-func (p *GetTemplatesReq) GetLimit() (v int32) {
-	return p.Limit
-}
-
-func (p *GetTemplatesReq) GetOrder() (v int32) {
-	return p.Order
-}
-
-func (p *GetTemplatesReq) GetOrderBy() (v string) {
-	return p.OrderBy
-}
-
-func (p *GetTemplatesReq) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("GetTemplatesReq(%+v)", *p)
-}
-
-type GetTemplatesRes struct {
-	Code int32                `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string               `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
-	Data *GetTemplatesResData `thrift:"data,3" form:"data" json:"data" query:"data"`
-}
-
-func NewGetTemplatesRes() *GetTemplatesRes {
-	return &GetTemplatesRes{}
-}
-
-func (p *GetTemplatesRes) GetCode() (v int32) {
-	return p.Code
-}
-
-func (p *GetTemplatesRes) GetMsg() (v string) {
-	return p.Msg
-}
-
-var GetTemplatesRes_Data_DEFAULT *GetTemplatesResData
-
-func (p *GetTemplatesRes) GetData() (v *GetTemplatesResData) {
-	if !p.IsSetData() {
-		return GetTemplatesRes_Data_DEFAULT
-	}
-	return p.Data
-}
-
-func (p *GetTemplatesRes) IsSetData() bool {
-	return p.Data != nil
-}
-
-func (p *GetTemplatesRes) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("GetTemplatesRes(%+v)", *p)
-}
-
-type GetTemplatesResData struct {
-	Templates []*model.Template `thrift:"templates,1" form:"templates" json:"templates" query:"templates"`
-}
-
-func NewGetTemplatesResData() *GetTemplatesResData {
-	return &GetTemplatesResData{}
-}
-
-func (p *GetTemplatesResData) GetTemplates() (v []*model.Template) {
-	return p.Templates
-}
-
-func (p *GetTemplatesResData) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("GetTemplatesResData(%+v)", *p)
-}
-
 type AddTemplateItemReq struct {
 	TemplateID int64  `thrift:"template_id,1" form:"template_id" json:"template_id" query:"template_id"`
 	Name       string `thrift:"name,2" form:"name,required" json:"name,required" vd:"len($)>0"`
@@ -268,9 +210,29 @@ func (p *AddTemplateItemReq) String() string {
 	return fmt.Sprintf("AddTemplateItemReq(%+v)", *p)
 }
 
+type AddTemplateItemResData struct {
+	ID int64 `thrift:"id,1" form:"id" json:"id" query:"id"`
+}
+
+func NewAddTemplateItemResData() *AddTemplateItemResData {
+	return &AddTemplateItemResData{}
+}
+
+func (p *AddTemplateItemResData) GetID() (v int64) {
+	return p.ID
+}
+
+func (p *AddTemplateItemResData) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AddTemplateItemResData(%+v)", *p)
+}
+
 type AddTemplateItemRes struct {
-	Code int32  `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Code int32                   `thrift:"code,1" form:"code" json:"code" query:"code"`
+	Msg  string                  `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Data *AddTemplateItemResData `thrift:"data,3" form:"data" json:"data" query:"data"`
 }
 
 func NewAddTemplateItemRes() *AddTemplateItemRes {
@@ -283,6 +245,19 @@ func (p *AddTemplateItemRes) GetCode() (v int32) {
 
 func (p *AddTemplateItemRes) GetMsg() (v string) {
 	return p.Msg
+}
+
+var AddTemplateItemRes_Data_DEFAULT *AddTemplateItemResData
+
+func (p *AddTemplateItemRes) GetData() (v *AddTemplateItemResData) {
+	if !p.IsSetData() {
+		return AddTemplateItemRes_Data_DEFAULT
+	}
+	return p.Data
+}
+
+func (p *AddTemplateItemRes) IsSetData() bool {
+	return p.Data != nil
 }
 
 func (p *AddTemplateItemRes) String() string {
@@ -337,7 +312,7 @@ func (p *DeleteTemplateItemRes) String() string {
 
 type UpdateTemplateItemReq struct {
 	ID      int64  `thrift:"id,1" form:"id,required" json:"id,required"`
-	Name    string `thrift:"name,2" form:"name" json:"name" vd:"len($)>0"`
+	Name    string `thrift:"name,2" form:"name" json:"name"`
 	Content string `thrift:"content,3" form:"content" json:"content"`
 }
 
@@ -388,100 +363,110 @@ func (p *UpdateTemplateItemRes) String() string {
 	return fmt.Sprintf("UpdateTemplateItemRes(%+v)", *p)
 }
 
-type GetTemplateItemsReq struct {
-	ID      int64  `thrift:"id,1" json:"id" query:"id" vd:"$>=0"`
-	Page    int32  `thrift:"page,2" json:"page" query:"page" vd:"$>=0"`
-	Limit   int32  `thrift:"limit,3" json:"limit" query:"limit" vd:"$>=0"`
-	Order   int32  `thrift:"order,4" json:"order" query:"order" vd:"$>=0"`
-	OrderBy string `thrift:"order_by,5" json:"order_by" query:"order_by"`
+type GetTemplatesReq struct {
+	Page    int32  `thrift:"page,1" json:"page" query:"page" vd:"$>=0"`
+	Limit   int32  `thrift:"limit,2" json:"limit" query:"limit" vd:"$>=0"`
+	Order   int32  `thrift:"order,3" json:"order" query:"order" vd:"$>=0"`
+	OrderBy string `thrift:"order_by,4" json:"order_by" query:"order_by"`
+	Type    int32  `thrift:"type,5" json:"type" query:"type"`
+	Name    string `thrift:"name,6" json:"name" query:"name"`
 }
 
-func NewGetTemplateItemsReq() *GetTemplateItemsReq {
-	return &GetTemplateItemsReq{}
+func NewGetTemplatesReq() *GetTemplatesReq {
+	return &GetTemplatesReq{}
 }
 
-func (p *GetTemplateItemsReq) GetID() (v int64) {
-	return p.ID
-}
-
-func (p *GetTemplateItemsReq) GetPage() (v int32) {
+func (p *GetTemplatesReq) GetPage() (v int32) {
 	return p.Page
 }
 
-func (p *GetTemplateItemsReq) GetLimit() (v int32) {
+func (p *GetTemplatesReq) GetLimit() (v int32) {
 	return p.Limit
 }
 
-func (p *GetTemplateItemsReq) GetOrder() (v int32) {
+func (p *GetTemplatesReq) GetOrder() (v int32) {
 	return p.Order
 }
 
-func (p *GetTemplateItemsReq) GetOrderBy() (v string) {
+func (p *GetTemplatesReq) GetOrderBy() (v string) {
 	return p.OrderBy
 }
 
-func (p *GetTemplateItemsReq) String() string {
+func (p *GetTemplatesReq) GetType() (v int32) {
+	return p.Type
+}
+
+func (p *GetTemplatesReq) GetName() (v string) {
+	return p.Name
+}
+
+func (p *GetTemplatesReq) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplateItemsReq(%+v)", *p)
+	return fmt.Sprintf("GetTemplatesReq(%+v)", *p)
 }
 
-type GetTemplateItemsRes struct {
-	Code int32                    `thrift:"code,1" form:"code" json:"code" query:"code"`
-	Msg  string                   `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
-	Data *GetTemplateItemsResData `thrift:"data,3" form:"data" json:"data" query:"data"`
+type GetTemplatesRes struct {
+	Code int32                `thrift:"code,1" form:"code" json:"code" query:"code"`
+	Msg  string               `thrift:"msg,2" form:"msg" json:"msg" query:"msg"`
+	Data *GetTemplatesResData `thrift:"data,3" form:"data" json:"data" query:"data"`
 }
 
-func NewGetTemplateItemsRes() *GetTemplateItemsRes {
-	return &GetTemplateItemsRes{}
+func NewGetTemplatesRes() *GetTemplatesRes {
+	return &GetTemplatesRes{}
 }
 
-func (p *GetTemplateItemsRes) GetCode() (v int32) {
+func (p *GetTemplatesRes) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *GetTemplateItemsRes) GetMsg() (v string) {
+func (p *GetTemplatesRes) GetMsg() (v string) {
 	return p.Msg
 }
 
-var GetTemplateItemsRes_Data_DEFAULT *GetTemplateItemsResData
+var GetTemplatesRes_Data_DEFAULT *GetTemplatesResData
 
-func (p *GetTemplateItemsRes) GetData() (v *GetTemplateItemsResData) {
+func (p *GetTemplatesRes) GetData() (v *GetTemplatesResData) {
 	if !p.IsSetData() {
-		return GetTemplateItemsRes_Data_DEFAULT
+		return GetTemplatesRes_Data_DEFAULT
 	}
 	return p.Data
 }
 
-func (p *GetTemplateItemsRes) IsSetData() bool {
+func (p *GetTemplatesRes) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *GetTemplateItemsRes) String() string {
+func (p *GetTemplatesRes) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplateItemsRes(%+v)", *p)
+	return fmt.Sprintf("GetTemplatesRes(%+v)", *p)
 }
 
-type GetTemplateItemsResData struct {
-	TemplateItems []*model.TemplateItem `thrift:"template_items,1" form:"template_items" json:"template_items" query:"template_items"`
+type GetTemplatesResData struct {
+	Templates []*model.TemplateWithInfo `thrift:"templates,1" form:"templates" json:"templates" query:"templates"`
+	Total     int32                     `thrift:"total,2" form:"total" json:"total" query:"total"`
 }
 
-func NewGetTemplateItemsResData() *GetTemplateItemsResData {
-	return &GetTemplateItemsResData{}
+func NewGetTemplatesResData() *GetTemplatesResData {
+	return &GetTemplatesResData{}
 }
 
-func (p *GetTemplateItemsResData) GetTemplateItems() (v []*model.TemplateItem) {
-	return p.TemplateItems
+func (p *GetTemplatesResData) GetTemplates() (v []*model.TemplateWithInfo) {
+	return p.Templates
 }
 
-func (p *GetTemplateItemsResData) String() string {
+func (p *GetTemplatesResData) GetTotal() (v int32) {
+	return p.Total
+}
+
+func (p *GetTemplatesResData) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplateItemsResData(%+v)", *p)
+	return fmt.Sprintf("GetTemplatesResData(%+v)", *p)
 }
 
 type TemplateService interface {
@@ -491,13 +476,11 @@ type TemplateService interface {
 
 	UpdateTemplate(ctx context.Context, req *UpdateTemplateReq) (r *UpdateTemplateRes, err error)
 
-	GetTemplates(ctx context.Context, req *GetTemplatesReq) (r *GetTemplatesRes, err error)
-
 	AddTemplateItem(ctx context.Context, req *AddTemplateItemReq) (r *AddTemplateItemRes, err error)
 
 	DeleteTemplateItem(ctx context.Context, req *DeleteTemplateItemReq) (r *DeleteTemplateItemRes, err error)
 
 	UpdateTemplateItem(ctx context.Context, req *UpdateTemplateItemReq) (r *UpdateTemplateItemRes, err error)
 
-	GetTemplateItems(ctx context.Context, req *GetTemplateItemsReq) (r *GetTemplateItemsRes, err error)
+	GetTemplates(ctx context.Context, req *GetTemplatesReq) (r *GetTemplatesRes, err error)
 }

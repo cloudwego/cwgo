@@ -6,7 +6,8 @@ struct AddIDLReq{
     1: i64 repository_id (api.body="repository_id,required")
     2: string main_idl_path (api.body="main_idl_path,required",api.vd="len($)>0")
     3: string service_name (api.body="service_name,required",api.vd="len($)>0")
-    4: string service_repository_name (api.body='service_repository_name')
+    4: string service_repository_name (api.body="service_repository_name")
+    5: i64 template_id (api.body="template_id")
 }
 struct AddIDLRes{
     1: i32 code
@@ -25,6 +26,7 @@ struct UpdateIDLReq{
     1: i64 id (api.body="id,required")
     2: i32 status (api.body="status")
     3: string service_name (api.body="service_name")
+    4: i64 template_id (api.body="template_id")
 }
 struct UpdateIDLRes{
     1: i32 code
@@ -44,7 +46,7 @@ struct GetIDLsRes{
     3: GetIDLsResData data
 }
 struct GetIDLsResData{
-    1: list<idl.IDLWithRepositoryInfo> idls
+    1: list<idl.IDLWithInfo> idls
     2: i32 total
 }
 

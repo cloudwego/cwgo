@@ -21,11 +21,10 @@ service AgentService {
     template.AddTemplateRes AddTemplate(1: template.AddTemplateReq req)
     template.DeleteTemplateRes DeleteTemplate(1: template.DeleteTemplateReq req)
     template.UpdateTemplateRes UpdateTemplate(1: template.UpdateTemplateReq req)
-    template.GetTemplatesRes GetTemplates(1: template.GetTemplatesReq req)
     template.AddTemplateItemRes AddTemplateItem(1: template.AddTemplateItemReq req)
     template.DeleteTemplateItemRes DeleteTemplateItem(1: template.DeleteTemplateItemReq req)
     template.UpdateTemplateItemRes UpdateTemplateItem(1: template.UpdateTemplateItemReq req)
-    template.GetTemplateItemsRes GetTemplateItems(1: template.GetTemplateItemsReq req)
+    template.GetTemplatesRes GetTemplates(1: template.GetTemplatesReq req)
 
     agent.UpdateTasksRes UpdateTasks(1: agent.UpdateTasksReq req)
 

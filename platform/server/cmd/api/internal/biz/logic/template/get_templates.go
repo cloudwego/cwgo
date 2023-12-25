@@ -55,9 +55,7 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 	}
 
 	switch req.OrderBy {
-	case "create_time":
-
-	case "update_time":
+	case "create_time", "update_time", "":
 
 	default:
 		return &template.GetTemplatesRes{
@@ -70,8 +68,18 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 	if req.Page == 0 {
 		req.Page = 1
 	}
-	if req.Limit == 0 {
+	if req.Limit <= 0 {
 		req.Limit = consts.DefaultLimit
+	}
+
+	// validate param template type
+	if req.Type != 0 {
+		if _, ok := consts.TemplateTypeNumMap[int(req.Type)]; !ok {
+			return &template.GetTemplatesRes{
+				Code: consts.ErrNumParamTemplateType,
+				Msg:  consts.ErrMsgParamTemplateType,
+			}
+		}
 	}
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
@@ -88,6 +96,8 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 		Limit:   req.Limit,
 		Order:   req.Order,
 		OrderBy: req.OrderBy,
+		Type:    req.Type,
+		Name:    req.Name,
 	})
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
@@ -106,6 +116,9 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 	return &template.GetTemplatesRes{
 		Code: 0,
 		Msg:  successMsgGetTemplates,
-		Data: &template.GetTemplatesResData{Templates: rpcRes.Data.Templates},
+		Data: &template.GetTemplatesResData{
+			Templates: rpcRes.Data.Templates,
+			Total:     rpcRes.Data.Total,
+		},
 	}
 }

@@ -52,7 +52,7 @@ func NewSyncIDLsByIdService(ctx context.Context, svcCtx *svc.ServiceContext, age
 // Run create note info
 func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncIDLsByIdRes, err error) {
 	for _, syncMainIdlId := range req.Ids {
-		idlEntityWithRepoInfo, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, syncMainIdlId)
+		idlEntityWithInfo, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, syncMainIdlId)
 		if err != nil {
 			if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
 				return &agent.SyncIDLsByIdRes{
@@ -67,7 +67,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		idlRepoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idlEntityWithRepoInfo.IdlRepositoryId)
+		idlRepoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, idlEntityWithInfo.IdlRepositoryId)
 		if err != nil {
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumDatabase,
@@ -101,7 +101,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 					idlRepoModel.RepositoryName,
 				),
 				idlRepoModel.RepositoryBranch,
-				idlEntityWithRepoInfo.MainIdlPath,
+				idlEntityWithInfo.MainIdlPath,
 			),
 		)
 		if err != nil {
@@ -210,7 +210,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}, nil
 		}
 
-		if mainIdlHash != idlEntityWithRepoInfo.CommitHash {
+		if mainIdlHash != idlEntityWithInfo.CommitHash {
 			needToSync = true
 		} else {
 			// if mail idl is not changed
@@ -236,7 +236,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			}
 
 			// use a bool value to judge whether to sync
-			if len(importIDLs) == len(idlEntityWithRepoInfo.ImportIdls) {
+			if len(importIDLs) == len(idlEntityWithInfo.ImportIdls) {
 				// create a map to find imports
 				existingImportIDLsMap := make(map[string]struct{})
 				for _, importIDL := range importIDLs {
@@ -245,7 +245,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 				}
 
 				// compare import idl
-				for _, dbImportIDL := range idlEntityWithRepoInfo.ImportIdls {
+				for _, dbImportIDL := range idlEntityWithInfo.ImportIdls {
 					if _, ok := existingImportIDLsMap[dbImportIDL.CommitHash]; ok {
 						// importIDL exist in importIDLs then continue
 						continue
@@ -263,13 +263,13 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			continue
 		}
 
-		idlEntityWithRepoInfo.ImportIdls = importIDLs
+		idlEntityWithInfo.ImportIdls = importIDLs
 
 		if idlType != consts.IdlTypeNumProto {
 			importBaseDirPath = ""
 		}
 		err = s.svcCtx.GenerateCode(s.ctx, repoClient,
-			tempDir, importBaseDirPath, idlEntityWithRepoInfo, idlRepoModel, archiveName)
+			tempDir, importBaseDirPath, idlEntityWithInfo, idlRepoModel, archiveName)
 		if err != nil {
 			return &agent.SyncIDLsByIdRes{
 				Code: errx.GetCode(err),
@@ -278,7 +278,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		}
 
 		err = s.svcCtx.DaoManager.Idl.Sync(s.ctx, model.IDL{
-			Id:         idlEntityWithRepoInfo.Id,
+			Id:         idlEntityWithInfo.Id,
 			CommitHash: mainIdlHash,
 			ImportIdls: importIDLs,
 		})

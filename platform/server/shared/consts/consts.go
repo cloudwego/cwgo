@@ -45,6 +45,7 @@ const (
 
 const (
 	TempDirRepo          = "repo"           // repo pull file temp dir
+	TempDirTemplate      = "template"       // code template temp dir
 	TempDirGeneratedCode = "generated_code" // generated code temp dir
 )
 

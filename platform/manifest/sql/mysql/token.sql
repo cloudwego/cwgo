@@ -42,6 +42,6 @@ CREATE TABLE `token`  (
     INDEX `repository_domain`(`repository_domain`) USING BTREE,
     INDEX `owner_id`(`owner_id`) USING BTREE,
     INDEX `token_type`(`token_type`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 36 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -68,9 +68,10 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 	}
 
 	rpcRes, err := client.UpdateIDL(l.ctx, &agent.UpdateIDLReq{
-		RepositoryId: req.ID,
-		ServiceName:  req.ServiceName,
-		Status:       req.Status,
+		Id:          req.ID,
+		ServiceName: req.ServiceName,
+		Status:      req.Status,
+		TemplateId:  req.TemplateID,
 	})
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))

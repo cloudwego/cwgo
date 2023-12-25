@@ -214,7 +214,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	}
 
 	// delete all file in temp branch
-	err = a.DeleteFiles(owner, repoName, tempBranch, "kitex_gen", "rpc", "go.mod", "go.sum")
+	err = a.DeleteAllFiles(owner, repoName, tempBranch)
 	if err != nil {
 		if !strings.Contains(err.Error(), "doesn't exist") {
 			logger.Logger.Warn("delete all file in temp branch failed",
@@ -382,6 +382,50 @@ func (a *GitLabApi) DeleteFiles(owner, repoName, branch string, filePaths ...str
 
 	// create commit(push all file) into temp branch
 	_, _, err := a.client.Commits.CreateCommit(repoPid, opts)
+	if err != nil {
+		if !strings.Contains(err.Error(), "doesn't exist") {
+			logger.Logger.Warn("create commit into branch failed",
+				zap.Error(err),
+				zap.String("repo_pid", repoPid),
+				zap.String("branch", branch),
+			)
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (a *GitLabApi) DeleteAllFiles(owner, repoName, branch string) error {
+	// generate the project ID by combining owner and repoName
+	repoPid := fmt.Sprintf("%s/%s", owner, repoName)
+
+	// get repo file tree
+	tree, _, err := a.client.Repositories.ListTree(repoPid, &gitlab.ListTreeOptions{
+		Ref: gitlab.String(branch),
+	})
+	if err != nil {
+		return err
+	}
+
+	opts := &gitlab.CreateCommitOptions{
+		Branch:        &branch,
+		CommitMessage: gitlab.String("delete file"),
+	}
+
+	commitActionOptions := make([]*gitlab.CommitActionOptions, len(tree))
+
+	for i, node := range tree {
+		commitActionOptions[i] = &gitlab.CommitActionOptions{
+			Action:   gitlab.FileAction(gitlab.FileDelete),
+			FilePath: gitlab.String(node.Path),
+		}
+	}
+
+	opts.Actions = commitActionOptions
+
+	// create commit(push all file) into temp branch
+	_, _, err = a.client.Commits.CreateCommit(repoPid, opts)
 	if err != nil {
 		if !strings.Contains(err.Error(), "doesn't exist") {
 			logger.Logger.Warn("create commit into branch failed",

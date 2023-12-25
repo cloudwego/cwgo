@@ -23,15 +23,17 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Table structure for template_item
 -- ----------------------------
 DROP TABLE IF EXISTS `template_item`;
-CREATE TABLE `template_item` (
+CREATE TABLE `template_item`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'template item id',
   `template_id` bigint(20) NOT NULL COMMENT 'template id',
-  `name` varchar(255) NOT NULL COMMENT 'template item name',
-  `content` text COMMENT 'template content',
-  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'is deleted',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'template item name',
+  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT 'template content',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'is deleted',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='template item table';
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `template_id`(`template_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'template item table' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
+

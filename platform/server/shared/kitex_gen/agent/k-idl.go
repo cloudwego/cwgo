@@ -103,6 +103,20 @@ func (p *AddIDLReq) FastRead(buf []byte) (int, error) {
 					goto SkipFieldError
 				}
 			}
+		case 5:
+			if fieldTypeId == thrift.I64 {
+				l, err = p.FastReadField5(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
 		default:
 			l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
 			offset += l
@@ -194,6 +208,20 @@ func (p *AddIDLReq) FastReadField4(buf []byte) (int, error) {
 	return offset, nil
 }
 
+func (p *AddIDLReq) FastReadField5(buf []byte) (int, error) {
+	offset := 0
+
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+
+		p.TemplateId = v
+
+	}
+	return offset, nil
+}
+
 // for compatibility
 func (p *AddIDLReq) FastWrite(buf []byte) int {
 	return 0
@@ -204,6 +232,7 @@ func (p *AddIDLReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWrite
 	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "AddIDLReq")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
+		offset += p.fastWriteField5(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 		offset += p.fastWriteField3(buf[offset:], binaryWriter)
 		offset += p.fastWriteField4(buf[offset:], binaryWriter)
@@ -221,6 +250,7 @@ func (p *AddIDLReq) BLength() int {
 		l += p.field2Length()
 		l += p.field3Length()
 		l += p.field4Length()
+		l += p.field5Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -263,6 +293,15 @@ func (p *AddIDLReq) fastWriteField4(buf []byte, binaryWriter bthrift.BinaryWrite
 	return offset
 }
 
+func (p *AddIDLReq) fastWriteField5(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+	offset := 0
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "template_id", thrift.I64, 5)
+	offset += bthrift.Binary.WriteI64(buf[offset:], p.TemplateId)
+
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
+	return offset
+}
+
 func (p *AddIDLReq) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("repository_id", thrift.I64, 1)
@@ -294,6 +333,15 @@ func (p *AddIDLReq) field4Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("service_repository_name", thrift.STRING, 4)
 	l += bthrift.Binary.StringLengthNocopy(p.ServiceRepositoryName)
+
+	l += bthrift.Binary.FieldEndLength()
+	return l
+}
+
+func (p *AddIDLReq) field5Length() int {
+	l := 0
+	l += bthrift.Binary.FieldBeginLength("template_id", thrift.I64, 5)
+	l += bthrift.Binary.I64Length(p.TemplateId)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -1023,7 +1071,7 @@ func (p *UpdateIDLReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.I32 {
 				l, err = p.FastReadField2(buf[offset:])
 				offset += l
 				if err != nil {
@@ -1051,22 +1099,8 @@ func (p *UpdateIDLReq) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 4:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.I64 {
 				l, err = p.FastReadField4(buf[offset:])
-				offset += l
-				if err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				l, err = bthrift.Binary.Skip(buf[offset:], fieldTypeId)
-				offset += l
-				if err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 5:
-			if fieldTypeId == thrift.STRING {
-				l, err = p.FastReadField5(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -1130,12 +1164,12 @@ func (p *UpdateIDLReq) FastReadField1(buf []byte) (int, error) {
 func (p *UpdateIDLReq) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
-	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
+	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
 
-		p.RepositoryId = v
+		p.Status = v
 
 	}
 	return offset, nil
@@ -1149,7 +1183,7 @@ func (p *UpdateIDLReq) FastReadField3(buf []byte) (int, error) {
 	} else {
 		offset += l
 
-		p.MainIdlPath = v
+		p.ServiceName = v
 
 	}
 	return offset, nil
@@ -1158,26 +1192,12 @@ func (p *UpdateIDLReq) FastReadField3(buf []byte) (int, error) {
 func (p *UpdateIDLReq) FastReadField4(buf []byte) (int, error) {
 	offset := 0
 
-	if v, l, err := bthrift.Binary.ReadI32(buf[offset:]); err != nil {
+	if v, l, err := bthrift.Binary.ReadI64(buf[offset:]); err != nil {
 		return offset, err
 	} else {
 		offset += l
 
-		p.Status = v
-
-	}
-	return offset, nil
-}
-
-func (p *UpdateIDLReq) FastReadField5(buf []byte) (int, error) {
-	offset := 0
-
-	if v, l, err := bthrift.Binary.ReadString(buf[offset:]); err != nil {
-		return offset, err
-	} else {
-		offset += l
-
-		p.ServiceName = v
+		p.TemplateId = v
 
 	}
 	return offset, nil
@@ -1196,7 +1216,6 @@ func (p *UpdateIDLReq) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWr
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
 		offset += p.fastWriteField4(buf[offset:], binaryWriter)
 		offset += p.fastWriteField3(buf[offset:], binaryWriter)
-		offset += p.fastWriteField5(buf[offset:], binaryWriter)
 	}
 	offset += bthrift.Binary.WriteFieldStop(buf[offset:])
 	offset += bthrift.Binary.WriteStructEnd(buf[offset:])
@@ -1211,7 +1230,6 @@ func (p *UpdateIDLReq) BLength() int {
 		l += p.field2Length()
 		l += p.field3Length()
 		l += p.field4Length()
-		l += p.field5Length()
 	}
 	l += bthrift.Binary.FieldStopLength()
 	l += bthrift.Binary.StructEndLength()
@@ -1229,8 +1247,8 @@ func (p *UpdateIDLReq) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWr
 
 func (p *UpdateIDLReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "repository_id", thrift.I64, 2)
-	offset += bthrift.Binary.WriteI64(buf[offset:], p.RepositoryId)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "status", thrift.I32, 2)
+	offset += bthrift.Binary.WriteI32(buf[offset:], p.Status)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -1238,8 +1256,8 @@ func (p *UpdateIDLReq) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWr
 
 func (p *UpdateIDLReq) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "main_idl_path", thrift.STRING, 3)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.MainIdlPath)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "service_name", thrift.STRING, 3)
+	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.ServiceName)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -1247,17 +1265,8 @@ func (p *UpdateIDLReq) fastWriteField3(buf []byte, binaryWriter bthrift.BinaryWr
 
 func (p *UpdateIDLReq) fastWriteField4(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "status", thrift.I32, 4)
-	offset += bthrift.Binary.WriteI32(buf[offset:], p.Status)
-
-	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
-	return offset
-}
-
-func (p *UpdateIDLReq) fastWriteField5(buf []byte, binaryWriter bthrift.BinaryWriter) int {
-	offset := 0
-	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "service_name", thrift.STRING, 5)
-	offset += bthrift.Binary.WriteStringNocopy(buf[offset:], binaryWriter, p.ServiceName)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "template_id", thrift.I64, 4)
+	offset += bthrift.Binary.WriteI64(buf[offset:], p.TemplateId)
 
 	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
@@ -1274,8 +1283,8 @@ func (p *UpdateIDLReq) field1Length() int {
 
 func (p *UpdateIDLReq) field2Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("repository_id", thrift.I64, 2)
-	l += bthrift.Binary.I64Length(p.RepositoryId)
+	l += bthrift.Binary.FieldBeginLength("status", thrift.I32, 2)
+	l += bthrift.Binary.I32Length(p.Status)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -1283,8 +1292,8 @@ func (p *UpdateIDLReq) field2Length() int {
 
 func (p *UpdateIDLReq) field3Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("main_idl_path", thrift.STRING, 3)
-	l += bthrift.Binary.StringLengthNocopy(p.MainIdlPath)
+	l += bthrift.Binary.FieldBeginLength("service_name", thrift.STRING, 3)
+	l += bthrift.Binary.StringLengthNocopy(p.ServiceName)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -1292,17 +1301,8 @@ func (p *UpdateIDLReq) field3Length() int {
 
 func (p *UpdateIDLReq) field4Length() int {
 	l := 0
-	l += bthrift.Binary.FieldBeginLength("status", thrift.I32, 4)
-	l += bthrift.Binary.I32Length(p.Status)
-
-	l += bthrift.Binary.FieldEndLength()
-	return l
-}
-
-func (p *UpdateIDLReq) field5Length() int {
-	l := 0
-	l += bthrift.Binary.FieldBeginLength("service_name", thrift.STRING, 5)
-	l += bthrift.Binary.StringLengthNocopy(p.ServiceName)
+	l += bthrift.Binary.FieldBeginLength("template_id", thrift.I64, 4)
+	l += bthrift.Binary.I64Length(p.TemplateId)
 
 	l += bthrift.Binary.FieldEndLength()
 	return l
@@ -2124,9 +2124,9 @@ func (p *GetIDLsResData) FastReadField1(buf []byte) (int, error) {
 	if err != nil {
 		return offset, err
 	}
-	p.Idls = make([]*model.IDLWithRepositoryInfo, 0, size)
+	p.Idls = make([]*model.IDLWithInfo, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := model.NewIDLWithRepositoryInfo()
+		_elem := model.NewIDLWithInfo()
 		if l, err := _elem.FastRead(buf[offset:]); err != nil {
 			return offset, err
 		} else {

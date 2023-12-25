@@ -46,6 +46,7 @@ func NewAddTemplateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddTe
 }
 
 func (l *AddTemplateLogic) AddTemplate(req *template.AddTemplateReq) (res *template.AddTemplateRes) {
+	// validate param template type
 	if _, ok := consts.TemplateTypeNumMap[int(req.Type)]; !ok {
 		return &template.AddTemplateRes{
 			Code: consts.ErrNumParamTemplateType,
@@ -83,5 +84,8 @@ func (l *AddTemplateLogic) AddTemplate(req *template.AddTemplateReq) (res *templ
 	return &template.AddTemplateRes{
 		Code: 0,
 		Msg:  successMsgAddTemplate,
+		Data: &template.AddTemplateResData{
+			ID: rpcRes.Data.Id,
+		},
 	}
 }

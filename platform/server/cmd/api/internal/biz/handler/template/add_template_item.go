@@ -61,5 +61,5 @@ func AddTemplateItem(ctx context.Context, rCtx *app.RequestContext) {
 		return
 	}
 
-	response.Ok(rCtx, res.Msg)
+	response.OkWithData(rCtx, res.Msg, res.Data)
 }

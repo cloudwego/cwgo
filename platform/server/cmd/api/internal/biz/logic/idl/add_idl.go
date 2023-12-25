@@ -86,6 +86,7 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 		MainIdlPath:           req.MainIdlPath,
 		ServiceName:           req.ServiceName,
 		ServiceRepositoryName: req.ServiceRepositoryName,
+		TemplateId:            req.TemplateID,
 	})
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))

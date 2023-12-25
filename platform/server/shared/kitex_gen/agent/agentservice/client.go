@@ -23,11 +23,10 @@ type Client interface {
 	AddTemplate(ctx context.Context, req *agent.AddTemplateReq, callOptions ...callopt.Option) (r *agent.AddTemplateRes, err error)
 	DeleteTemplate(ctx context.Context, req *agent.DeleteTemplateReq, callOptions ...callopt.Option) (r *agent.DeleteTemplateRes, err error)
 	UpdateTemplate(ctx context.Context, req *agent.UpdateTemplateReq, callOptions ...callopt.Option) (r *agent.UpdateTemplateRes, err error)
-	GetTemplates(ctx context.Context, req *agent.GetTemplatesReq, callOptions ...callopt.Option) (r *agent.GetTemplatesRes, err error)
 	AddTemplateItem(ctx context.Context, req *agent.AddTemplateItemReq, callOptions ...callopt.Option) (r *agent.AddTemplateItemRes, err error)
 	DeleteTemplateItem(ctx context.Context, req *agent.DeleteTemplateItemReq, callOptions ...callopt.Option) (r *agent.DeleteTemplateItemRes, err error)
 	UpdateTemplateItem(ctx context.Context, req *agent.UpdateTemplateItemReq, callOptions ...callopt.Option) (r *agent.UpdateTemplateItemRes, err error)
-	GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq, callOptions ...callopt.Option) (r *agent.GetTemplateItemsRes, err error)
+	GetTemplates(ctx context.Context, req *agent.GetTemplatesReq, callOptions ...callopt.Option) (r *agent.GetTemplatesRes, err error)
 	UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error)
 	AddToken(ctx context.Context, req *agent.AddTokenReq, callOptions ...callopt.Option) (r *agent.AddTokenRes, err error)
 	DeleteToken(ctx context.Context, req *agent.DeleteTokenReq, callOptions ...callopt.Option) (r *agent.DeleteTokenRes, err error)
@@ -123,11 +122,6 @@ func (p *kAgentServiceClient) UpdateTemplate(ctx context.Context, req *agent.Upd
 	return p.kClient.UpdateTemplate(ctx, req)
 }
 
-func (p *kAgentServiceClient) GetTemplates(ctx context.Context, req *agent.GetTemplatesReq, callOptions ...callopt.Option) (r *agent.GetTemplatesRes, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.GetTemplates(ctx, req)
-}
-
 func (p *kAgentServiceClient) AddTemplateItem(ctx context.Context, req *agent.AddTemplateItemReq, callOptions ...callopt.Option) (r *agent.AddTemplateItemRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.AddTemplateItem(ctx, req)
@@ -143,9 +137,9 @@ func (p *kAgentServiceClient) UpdateTemplateItem(ctx context.Context, req *agent
 	return p.kClient.UpdateTemplateItem(ctx, req)
 }
 
-func (p *kAgentServiceClient) GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq, callOptions ...callopt.Option) (r *agent.GetTemplateItemsRes, err error) {
+func (p *kAgentServiceClient) GetTemplates(ctx context.Context, req *agent.GetTemplatesReq, callOptions ...callopt.Option) (r *agent.GetTemplatesRes, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.GetTemplateItems(ctx, req)
+	return p.kClient.GetTemplates(ctx, req)
 }
 
 func (p *kAgentServiceClient) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error) {

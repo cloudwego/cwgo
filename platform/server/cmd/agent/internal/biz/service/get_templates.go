@@ -20,6 +20,7 @@ package service
 
 import (
 	"context"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -39,7 +40,12 @@ func NewGetTemplatesService(ctx context.Context, svcCtx *svc.ServiceContext) *Ge
 
 // Run create note info
 func (s *GetTemplatesService) Run(req *agent.GetTemplatesReq) (resp *agent.GetTemplatesRes, err error) {
-	templates, err := s.svcCtx.DaoManager.Template.GetTemplateList(s.ctx, req.Page, req.Limit, req.Order, req.OrderBy)
+	templates, total, err := s.svcCtx.DaoManager.Template.GetTemplateList(s.ctx,
+		model.Template{
+			Name: req.Name,
+			Type: req.Type,
+		},
+		req.Page, req.Limit, req.Order, req.OrderBy)
 	if err != nil {
 		return &agent.GetTemplatesRes{
 			Code: consts.ErrNumDatabase,
@@ -53,6 +59,7 @@ func (s *GetTemplatesService) Run(req *agent.GetTemplatesReq) (resp *agent.GetTe
 		Msg:  "get templates successfully",
 		Data: &agent.GetTemplatesResData{
 			Templates: templates,
+			Total:     int32(total),
 		},
 	}, nil
 }

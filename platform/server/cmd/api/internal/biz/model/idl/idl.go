@@ -14,6 +14,7 @@ type AddIDLReq struct {
 	MainIdlPath           string `thrift:"main_idl_path,2" form:"main_idl_path,required" json:"main_idl_path,required" vd:"len($)>0"`
 	ServiceName           string `thrift:"service_name,3" form:"service_name,required" json:"service_name,required" vd:"len($)>0"`
 	ServiceRepositoryName string `thrift:"service_repository_name,4" form:"service_repository_name" json:"service_repository_name"`
+	TemplateID            int64  `thrift:"template_id,5" form:"template_id" json:"template_id"`
 }
 
 func NewAddIDLReq() *AddIDLReq {
@@ -34,6 +35,10 @@ func (p *AddIDLReq) GetServiceName() (v string) {
 
 func (p *AddIDLReq) GetServiceRepositoryName() (v string) {
 	return p.ServiceRepositoryName
+}
+
+func (p *AddIDLReq) GetTemplateID() (v int64) {
+	return p.TemplateID
 }
 
 func (p *AddIDLReq) String() string {
@@ -114,6 +119,7 @@ type UpdateIDLReq struct {
 	ID          int64  `thrift:"id,1" form:"id,required" json:"id,required"`
 	Status      int32  `thrift:"status,2" form:"status" json:"status"`
 	ServiceName string `thrift:"service_name,3" form:"service_name" json:"service_name"`
+	TemplateID  int64  `thrift:"template_id,4" form:"template_id" json:"template_id"`
 }
 
 func NewUpdateIDLReq() *UpdateIDLReq {
@@ -130,6 +136,10 @@ func (p *UpdateIDLReq) GetStatus() (v int32) {
 
 func (p *UpdateIDLReq) GetServiceName() (v string) {
 	return p.ServiceName
+}
+
+func (p *UpdateIDLReq) GetTemplateID() (v int64) {
+	return p.TemplateID
 }
 
 func (p *UpdateIDLReq) String() string {
@@ -241,15 +251,15 @@ func (p *GetIDLsRes) String() string {
 }
 
 type GetIDLsResData struct {
-	Idls  []*model.IDLWithRepositoryInfo `thrift:"idls,1" form:"idls" json:"idls" query:"idls"`
-	Total int32                          `thrift:"total,2" form:"total" json:"total" query:"total"`
+	Idls  []*model.IDLWithInfo `thrift:"idls,1" form:"idls" json:"idls" query:"idls"`
+	Total int32                `thrift:"total,2" form:"total" json:"total" query:"total"`
 }
 
 func NewGetIDLsResData() *GetIDLsResData {
 	return &GetIDLsResData{}
 }
 
-func (p *GetIDLsResData) GetIdls() (v []*model.IDLWithRepositoryInfo) {
+func (p *GetIDLsResData) GetIdls() (v []*model.IDLWithInfo) {
 	return p.Idls
 }
 

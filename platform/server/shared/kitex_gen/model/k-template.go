@@ -811,7 +811,7 @@ func (p *TemplateItem) field7Length() int {
 	return l
 }
 
-func (p *TemplateWithItemInfo) FastRead(buf []byte) (int, error) {
+func (p *TemplateWithInfo) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -887,7 +887,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_TemplateWithItemInfo[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_TemplateWithInfo[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -896,7 +896,7 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *TemplateWithItemInfo) FastReadField1(buf []byte) (int, error) {
+func (p *TemplateWithInfo) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
 	tmp := NewTemplate()
@@ -909,7 +909,7 @@ func (p *TemplateWithItemInfo) FastReadField1(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *TemplateWithItemInfo) FastReadField2(buf []byte) (int, error) {
+func (p *TemplateWithInfo) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
 	_, size, l, err := bthrift.Binary.ReadListBegin(buf[offset:])
@@ -937,13 +937,13 @@ func (p *TemplateWithItemInfo) FastReadField2(buf []byte) (int, error) {
 }
 
 // for compatibility
-func (p *TemplateWithItemInfo) FastWrite(buf []byte) int {
+func (p *TemplateWithInfo) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *TemplateWithItemInfo) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *TemplateWithInfo) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "TemplateWithItemInfo")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "TemplateWithInfo")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 		offset += p.fastWriteField2(buf[offset:], binaryWriter)
@@ -953,9 +953,9 @@ func (p *TemplateWithItemInfo) FastWriteNocopy(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *TemplateWithItemInfo) BLength() int {
+func (p *TemplateWithInfo) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("TemplateWithItemInfo")
+	l += bthrift.Binary.StructBeginLength("TemplateWithInfo")
 	if p != nil {
 		l += p.field1Length()
 		l += p.field2Length()
@@ -965,7 +965,7 @@ func (p *TemplateWithItemInfo) BLength() int {
 	return l
 }
 
-func (p *TemplateWithItemInfo) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *TemplateWithInfo) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "template", thrift.STRUCT, 1)
 	offset += p.Template.FastWriteNocopy(buf[offset:], binaryWriter)
@@ -973,7 +973,7 @@ func (p *TemplateWithItemInfo) fastWriteField1(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *TemplateWithItemInfo) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *TemplateWithInfo) fastWriteField2(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "items", thrift.LIST, 2)
 	listBeginOffset := offset
@@ -989,7 +989,7 @@ func (p *TemplateWithItemInfo) fastWriteField2(buf []byte, binaryWriter bthrift.
 	return offset
 }
 
-func (p *TemplateWithItemInfo) field1Length() int {
+func (p *TemplateWithInfo) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("template", thrift.STRUCT, 1)
 	l += p.Template.BLength()
@@ -997,7 +997,7 @@ func (p *TemplateWithItemInfo) field1Length() int {
 	return l
 }
 
-func (p *TemplateWithItemInfo) field2Length() int {
+func (p *TemplateWithInfo) field2Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("items", thrift.LIST, 2)
 	l += bthrift.Binary.ListBeginLength(thrift.STRUCT, len(p.Items))

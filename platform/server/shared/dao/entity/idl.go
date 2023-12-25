@@ -36,6 +36,7 @@ type MysqlIDL struct {
 	CommitHash          string                `gorm:"column:commit_hash;not null;comment:idl file commit hash" json:"commit_hash"`                             // idl file commit hash
 	ServiceName         string                `gorm:"column:service_name;not null;comment:service name" json:"service_name"`                                   // service name
 	LastSyncTime        time.Time             `gorm:"column:last_sync_time;not null;default:CURRENT_TIMESTAMP;comment:last update time" json:"last_sync_time"` // last update time
+	TemplateID          int64                 `gorm:"column:template_id;comment:template id" json:"template_id"`                                               // template id
 	Status              int32                 `gorm:"column:status;default:1;comment:status" json:"status"`
 	IsDeleted           soft_delete.DeletedAt `gorm:"column:is_deleted;softDelete:flag;not null;comment:is deleted" json:"is_deleted"`                             // is deleted
 	CreateTime          time.Time             `gorm:"column:create_time;autoCreateTime;not null;default:CURRENT_TIMESTAMP;comment:create time" json:"create_time"` // create time
@@ -47,8 +48,9 @@ func (*MysqlIDL) TableName() string {
 	return TableNameMysqlIDL
 }
 
-type MysqlIDLWithRepositoryInfo struct {
+type MysqlIDLWithInfo struct {
 	MysqlIDL
 	IdlRepository     MysqlRepository `gorm:"foreignKey:idl_repository_id;references:id"`
 	ServiceRepository MysqlRepository `gorm:"foreignKey:service_repository_id;references:id"`
+	Template          MysqlTemplate   `gorm:"foreignKey:template_id;references:id"`
 }

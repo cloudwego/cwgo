@@ -125,11 +125,8 @@ func (m *MysqlRepositoryManager) DeleteRepository(ctx context.Context, ids []int
 			return err
 		},
 	)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (m *MysqlRepositoryManager) UpdateRepository(ctx context.Context, repoModel model.Repository) error {
@@ -167,6 +164,7 @@ func (m *MysqlRepositoryManager) UpdateRepository(ctx context.Context, repoModel
 				if err == gorm.ErrRecordNotFound {
 					return consts.ErrDatabaseRecordNotFound
 				}
+				return err
 			}
 
 			return nil
