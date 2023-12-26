@@ -136,12 +136,22 @@ func (serverGen *Generator) handleNewRegistryTemplate(body, docker string, addr 
 		mvcTemplates           []template.Template
 		appendInitRegistryFunc string
 		appendRegistryAddrFunc string
+		disableAddConf         bool
 	)
 
 	if serverGen.CommunicationType == consts.RPC {
 		mvcTemplates = kitexServerMVCTemplates
 		appendInitRegistryFunc = kitexAppendInitRegistryFunc
-		appendRegistryAddrFunc = kitexNewAppendRegistryAddrFunc
+		isExist, err := geneUtils.IsStructExist(serverGen.confGoContent, "Registry")
+		if err != nil {
+			return err
+		}
+		if isExist {
+			disableAddConf = true
+			appendRegistryAddrFunc = kitexNewAppendRegistryAddrFunc
+		} else {
+			appendRegistryAddrFunc = kitexAppendRegistryAddrFunc
+		}
 	} else {
 		mvcTemplates = hzServerMVCTemplates
 		appendInitRegistryFunc = hzAppendInitRegistryFunc
@@ -157,15 +167,6 @@ func (serverGen *Generator) handleNewRegistryTemplate(body, docker string, addr 
 	serverGen.RegistryDocker = docker
 
 	if serverGen.mainGoContent != "" {
-		if serverGen.CommunicationType == consts.HTTP {
-			content, err := geneUtils.InsertField2Struct(serverGen.confGoContent, "Config", rhCommon.RegistryStructField, "Registry")
-			if err != nil {
-				return err
-			}
-			if err = utils.CreateFile(consts.ConfGo, content); err != nil {
-				return err
-			}
-		}
 		isExist, err := geneUtils.IsFuncExist(serverGen.mainGoContent, consts.FuncInitRegistry)
 		if err != nil {
 			return err
@@ -186,7 +187,16 @@ func (serverGen *Generator) handleNewRegistryTemplate(body, docker string, addr 
 		if err != nil {
 			return err
 		}
+
 		if !isExist {
+			content, err := geneUtils.InsertField2Struct(serverGen.confGoContent, "Config", rhCommon.RegistryStructField, "Registry")
+			if err != nil {
+				return err
+			}
+			if err = utils.CreateFile(consts.ConfGo, content); err != nil {
+				return err
+			}
+
 			mvcTemplates[consts.FileServerConfGoIndex].Type = consts.Append
 			mvcTemplates[consts.FileServerConfGoIndex].AppendContent += appendRegistryAddrFunc + consts.LineBreak
 			geneUtils.Add2MapStrStr(rhCommon.EnvGoImports, mvcTemplates[consts.FileServerConfGoIndex].AppendImport)
@@ -196,7 +206,7 @@ func (serverGen *Generator) handleNewRegistryTemplate(body, docker string, addr 
 				mvcTemplates[consts.FileServerDockerComposeIndex].AppendContent += docker + consts.LineBreak
 			}
 
-			if serverGen.CommunicationType == consts.HTTP {
+			if !disableAddConf {
 				mvcTemplates[consts.FileServerDevConf].Type = consts.Append
 				mvcTemplates[consts.FileServerDevConf].AppendContent += rhCommon.RegistryConfYaml + consts.LineBreak
 				mvcTemplates[consts.FileServerOnlineConf].Type = consts.Append
