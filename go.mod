@@ -8,9 +8,12 @@ require (
 	github.com/cloudwego/hertz/cmd/hz v0.6.5
 	github.com/cloudwego/kitex v0.6.2-0.20230724065132-d12de3d166da
 	github.com/creack/pty v1.1.17
+	github.com/hashicorp/go-version v1.5.0
 	github.com/hinshun/vt10x v0.0.0-20220119200601-820417d04eec
 	github.com/stretchr/testify v1.8.2
 	github.com/urfave/cli/v2 v2.23.5
+	golang.org/x/tools v0.4.0
+	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.4.4
 	gorm.io/driver/postgres v1.4.5
 	gorm.io/driver/sqlite v1.4.3
@@ -33,7 +36,6 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/hashicorp/go-version v1.5.0 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
@@ -67,10 +69,8 @@ require (
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/term v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
-	golang.org/x/tools v0.4.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/datatypes v1.0.7 // indirect
 	gorm.io/hints v1.1.0 // indirect

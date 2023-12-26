@@ -118,14 +118,12 @@ Flags:
 		}
 	}
 
-	sa.TemplateDir = kitexArgument.TemplateDir
-
 	kitexArgument.GenerateMain = false
 
-	return checkKitexArgs(kitexArgument)
+	return checkKitexArgs(sa, kitexArgument)
 }
 
-func checkKitexArgs(a *kargs.Arguments) (err error) {
+func checkKitexArgs(sa *config.ServerArgument, a *kargs.Arguments) (err error) {
 	// check IDL
 	a.IDLType, err = utils.GetIdlType(a.IDL, consts.Protobuf)
 	if err != nil {
@@ -187,12 +185,14 @@ func checkKitexArgs(a *kargs.Arguments) (err error) {
 				os.Exit(1)
 			}
 			a.PackagePrefix = filepath.Join(a.ModuleName, a.PackagePrefix, generator.KitexGenPath)
+			sa.GoModPath = p
 		} else {
 			if err = utils.InitGoMod(a.ModuleName); err != nil {
 				log.Warn("Init go mod failed:", err.Error())
 				os.Exit(1)
 			}
 			a.PackagePrefix = filepath.Join(a.ModuleName, generator.KitexGenPath)
+			sa.GoModPath = curpath
 		}
 	}
 

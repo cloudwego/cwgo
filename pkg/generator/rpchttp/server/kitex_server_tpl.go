@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 CloudWeGo Authors
+ * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,153 +14,23 @@
  * limitations under the License.
  */
 
-package generator
+package server
 
-import "github.com/cloudwego/cwgo/pkg/consts"
-
-// related to service registration
-var (
-	kitexNilRegistryFuncBody = "{\n\treturn\n}"
-
-	kitexAppendRegistryFunc = `func GetRegistryAddress() []string {
-		e := os.Getenv("GO_KITEX_REGISTRY_[[ToUpper .ServiceName]]")
-		if len(e) == 0 {
-		  if conf.GetConf().Registry.Address != nil {
-			return conf.GetConf().Registry.Address
-		  } else {
-			return []string{[[$lenSlice := len .RegistryAddress]][[range $key, $value := .RegistryAddress]]"[[$value]]"[[if eq $key (Sub $lenSlice 1)]][[else]], [[end]][[end]]}
-		  }
-	    }
-	    return strings.Fields(e)
-      }`
-
-	kitexCommonRegisterBody = `*ops = append(*ops, server.WithRegistry(r))`
-
-	kitexEtcdServerImports = []string{"github.com/kitex-contrib/registry-etcd"}
-
-	kitexEtcdServer = `r, err := etcd.NewEtcdRegistry(conf.GetRegistryAddress())
-	if err != nil {
-		return err
-	}` + consts.LineBreak + kitexCommonRegisterBody
-
-	kitexZKServerImports = []string{
-		"github.com/kitex-contrib/registry-zookeeper/registry",
-		"time",
-	}
-
-	kitexZKServer = `r, err := registry.NewZookeeperRegistry(conf.GetRegistryAddress(), 40*time.Second)
-    if err != nil{
-        return err
-    }` + consts.LineBreak + kitexCommonRegisterBody
-
-	kitexNacosServerImports = []string{"github.com/kitex-contrib/registry-nacos/registry"}
-
-	kitexNacosServer = `r, err := registry.NewDefaultNacosRegistry()
-	if err != nil {
-		return err
-	}` + consts.LineBreak + kitexCommonRegisterBody
-
-	kitexPolarisServerImports = []string{
-		"github.com/kitex-contrib/polaris",
-		"github.com/cloudwego/kitex/pkg/registry",
-	}
-
-	kitexPolarisServer = `so := polaris.ServerOptions{}
-	r, err := polaris.NewPolarisRegistry(so)
-	if err != nil {
-		return err
-	}
-	info := &registry.Info{
-		ServiceName: conf.GetConf().Kitex.ServiceName,
-		Tags: map[string]string{
-			"namespace": "Polaris",
-		},
-	}
-	*ops = append(*ops, server.WithRegistry(r), server.WithRegistryInfo(info))`
-
-	kitexEurekaServerImports = []string{
-		"github.com/kitex-contrib/registry-eureka/registry",
-		"time",
-	}
-
-	kitexEurekaServer = `r := registry.NewEurekaRegistry(conf.GetRegistryAddress(), 15*time.Second)` +
-		consts.LineBreak + kitexCommonRegisterBody
-
-	kitexConsulServerImports = []string{
-		"github.com/kitex-contrib/registry-consul",
-		"github.com/cloudwego/kitex/pkg/registry",
-	}
-
-	kitexConsulServer = `r, err := consul.NewConsulRegister(conf.GetRegistryAddress()[0])
-	if err != nil {
-		return err
-	}
-	info := &registry.Info{
-		ServiceName: conf.GetConf().Kitex.ServiceName,
-		Weight:      1, // weights must be greater than 0 in consul,else received error and exit.
-	}
-	*ops = append(*ops, server.WithRegistry(r), server.WithRegistryInfo(info))`
-
-	kitexServiceCombServerImports = []string{"github.com/kitex-contrib/registry-servicecomb/registry"}
-
-	kitexServiceCombServer = `r, err := registry.NewDefaultSCRegistry()
-    if err != nil {
-        return err
-    }` + consts.LineBreak + kitexCommonRegisterBody
+import (
+	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/cwgo/pkg/generator/common/template"
 )
 
-var (
-	envGoImports = []string{"os", "strings"}
-
-	etcdServerAddr        = []string{"127.0.0.1:2379"}
-	nacosServerAddr       = []string{"127.0.0.1:8848"}
-	consulServerAddr      = []string{"127.0.0.1:8500"}
-	eurekaServerAddr      = []string{"http://127.0.0.1:8761/eureka"}
-	polarisServerAddr     = []string{"127.0.0.1:8090"}
-	serviceCombServerAddr = []string{"127.0.0.1:30100"}
-	zkServerAddr          = []string{"127.0.0.1:2181"}
-
-	etcdDocker = `Etcd:
-    image: 'bitnami/etcd:latest'
-    ports:
-      - "2379:2379"
-      - "2380:2380"	`
-
-	zkDocker = `zookeeper:
-    image: zookeeper
-    ports:
-      - "2181:2181"`
-
-	nacosDocker = `nacos:
-    image: nacos/nacos-server:latest
-    ports:
-      - "8848:8848"`
-
-	polarisDocker = `polaris:
-    image: polarismesh/polaris-server:latest
-    ports:
-      - "8090:8090"`
-
-	eurekaDocker = `eureka:
-    image: 'xdockerh/eureka-server:latest'
-    ports:
-      - 8761:8761`
-
-	consulDocker = `consul:
-    image: consul:latest
-    ports:
-      - "8500:8500"`
-
-	serviceCombDocker = `service-center:
-    image: 'servicecomb/service-center:latest'
-    ports:
-      - "30100:30100"`
-)
-
-var kitexServerMVCTemplates = []Template{
+var kitexServerMVCTemplates = []template.Template{
 	{
 		Path:   consts.DevConf,
 		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		UpdateBehavior: template.UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+			Append: template.Append{
+				AppendImport: map[string]string{},
+			},
+		},
 		Body: `kitex:
   service_name: "{{.ServiceName}}"
   address: ":8888"
@@ -191,6 +61,12 @@ registry:
 	{
 		Path:   consts.OnlineConf,
 		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		UpdateBehavior: template.UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+			Append: template.Append{
+				AppendImport: map[string]string{},
+			},
+		},
 		Body: `kitex:
   service_name: "{{.ServiceName}}"
   address: ":8888"
@@ -220,6 +96,12 @@ registry:
 	{
 		Path:   consts.TestConf,
 		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		UpdateBehavior: template.UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+			Append: template.Append{
+				AppendImport: map[string]string{},
+			},
+		},
 		Body: `kitex:
   service_name: "{{.ServiceName}}"
   address: ":8888"
@@ -249,17 +131,20 @@ registry:
 	{
 		Path:   consts.ConfGo,
 		Delims: [2]string{"[[", "]]"},
-		UpdateBehavior: UpdateBehavior{
+		UpdateBehavior: template.UpdateBehavior{
 			AppendRender: map[string]interface{}{},
+			Append: template.Append{
+				AppendImport: map[string]string{},
+			},
 		},
-		CustomFunc: TemplateCustomFuncMap,
+		CustomFunc: template.CustomFuncMap,
 		Body: `package conf
 
   import (
     [[range $key, $value := .GoFileImports]]
 	[[if eq $key "conf/conf.go"]]
 	[[range $k, $v := $value]]
-    [[if ne $k ""]]"[[$k]]"[[end]][[end]][[end]][[end]]
+    [[if ne $k ""]][[if ne $v ""]][[$v]] "[[$k]]"[[else]]"[[$k]]"[[end]][[end]][[end]][[end]][[end]]
   )
 
   var (
@@ -274,9 +159,9 @@ registry:
   	MySQL    MySQL    ` + "`yaml:\"mysql\"`" + `
   	Redis    Redis    ` + "`yaml:\"redis\"`" + `
 	Log      Log      ` + "`yaml:\"log\"`" + `
-  	{{if ne .RegistryName ""}}
+  	[[if ne .RegistryName ""]]
 	Registry Registry ` + "`yaml:\"registry\"`" + `
-	{{end}}
+	[[end]]
   }
 
   type MySQL struct {
@@ -347,8 +232,8 @@ registry:
   func GetRegistryAddress() []string {
 	e := os.Getenv("GO_KITEX_REGISTRY_[[ToUpper .ServiceName]]")
 	if len(e) == 0 {
-	  if conf.GetConf().Registry.Address != nil {
-		return conf.GetConf().Registry.Address
+	  if GetConf().Registry.Address != nil {
+		return GetConf().Registry.Address
 	  } else {
 		return []string{[[$lenSlice := len .RegistryAddress]][[range $key, $value := .RegistryAddress]]"[[$value]]"[[if eq $key (Sub $lenSlice 1)]][[else]], [[end]][[end]]}
 	  }
@@ -383,21 +268,26 @@ registry:
 	{
 		Path:   consts.Main,
 		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
-		UpdateBehavior: UpdateBehavior{
+		UpdateBehavior: template.UpdateBehavior{
 			AppendRender: map[string]interface{}{},
-			ReplaceFunc: ReplaceFunc{
-				ReplaceFuncName:   make([]string, 0, 5),
-				ReplaceFuncImport: make([][]string, 0, 15),
-				ReplaceFuncBody:   make([]string, 0, 5),
+			Append: template.Append{
+				AppendImport: map[string]string{},
+			},
+			ReplaceFunc: template.ReplaceFunc{
+				ReplaceFuncName:         make([]string, 0, 5),
+				ReplaceFuncAppendImport: make([]map[string]string, 0, 10),
+				ReplaceFuncDeleteImport: make([]map[string]string, 0, 10),
+				ReplaceFuncBody:         make([]string, 0, 5),
 			},
 		},
+		CustomFunc: template.CustomFuncMap,
 		Body: `package main
 
   import (
     {{range $key, $value := .GoFileImports}}
 	{{if eq $key "main.go"}}
 	{{range $k, $v := $value}}
-    {{if ne $k ""}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}
+    {{if ne $k ""}}{{if ne $v ""}}{{$v}} "{{$k}}"{{else}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}{{end}}
   )
 
   func main() {
@@ -429,12 +319,12 @@ registry:
     opts = append(opts, server.WithMetaHandler(transmeta.ServerTTHeaderHandler))
     {{- end}}
 
-	if err := initRegistry(&opts); err != nil {
+	if err = initRegistry(&opts); err != nil {
 	  panic(err)
     }
 
     // klog
-    logger := kitexlogrus.NewLogger()
+    logger := kitexLogrus.NewLogger()
     klog.SetLogger(logger)
     klog.SetLevel(conf.LogLevel())
     klog.SetOutput(&lumberjack.Logger{
@@ -460,6 +350,9 @@ registry:
 	{
 		Path:   consts.DockerCompose,
 		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		UpdateBehavior: template.UpdateBehavior{
+			AppendRender: map[string]interface{}{},
+		},
 		Body: `version: '3'
 
 services:
@@ -478,7 +371,170 @@ services:
     ports:
       - 6379:6379
   
-  {{.RegistryDocker}}
+{{.RegistryDocker}}
 `,
+	},
+
+	{
+		Path:   consts.DalInitGo,
+		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		Body: `package dal
+  
+  import (
+    {{range $key, $value := .GoFileImports}}
+	{{if eq $key "biz/dal/init.go"}}
+	{{range $k, $v := $value}}
+    {{if ne $k ""}}{{if ne $v ""}}{{$v}} "{{$k}}"{{else}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}{{end}}
+  )
+
+  func Init() {
+    redis.Init()
+    mysql.Init()
+  }`,
+	},
+
+	{
+		Path:   consts.Gitignore,
+		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		Body: `*.o
+*.a
+*.so
+_obj
+_test
+*.[568vq]
+[568vq].out
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+_testmain.go
+*.exe
+*.exe~
+*.test
+*.prof
+*.rar
+*.zip
+*.gz
+*.psd
+*.bmd
+*.cfg
+*.pptx
+*.log
+*nohup.out
+*settings.pyc
+*.sublime-project
+*.sublime-workspace
+!.gitkeep
+.DS_Store
+/.idea
+/.vscode
+/output
+*.local.yml`,
+	},
+
+	{
+		Path:   consts.MysqlInit,
+		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		Body: `package mysql
+  
+  import (
+    {{range $key, $value := .GoFileImports}}
+	{{if eq $key "biz/dal/mysql/init.go"}}
+	{{range $k, $v := $value}}
+    {{if ne $k ""}}{{if ne $v ""}}{{$v}} "{{$k}}"{{else}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}{{end}}
+  )
+
+  var (
+    DB  *gorm.DB
+    err error
+  )
+
+  func Init() {
+    DB, err = gorm.Open(mysql.Open(conf.GetConf().MySQL.DSN),
+      &gorm.Config{
+        PrepareStmt:            true,
+        SkipDefaultTransaction: true,
+      },
+    )
+    if err != nil {
+      panic(err)
+    }
+  }`,
+	},
+
+	{
+		Path:   consts.RedisInit,
+		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		Body: `package redis
+  
+  import (
+    {{range $key, $value := .GoFileImports}}
+	{{if eq $key "biz/dal/redis/init.go"}}
+	{{range $k, $v := $value}}
+    {{if ne $k ""}}{{if ne $v ""}}{{$v}} "{{$k}}"{{else}}"{{$k}}"{{end}}{{end}}{{end}}{{end}}{{end}}
+  )
+
+  var (
+    RedisClient *redis.Client
+  )
+
+  func Init() {
+    RedisClient = redis.NewClient(&redis.Options{
+      Addr:     conf.GetConf().Redis.Address,
+      Username: conf.GetConf().Redis.Username,
+      Password: conf.GetConf().Redis.Password,
+      DB:       conf.GetConf().Redis.DB,
+    })
+    if err := RedisClient.Ping(context.Background()).Err(); err != nil {
+      panic(err)
+    }
+  }`,
+	},
+
+	{
+		Path:   consts.Readme,
+		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		Body: `# *** Project
+
+## introduce
+
+- Use the [Kitex](https://github.com/cloudwego/kitex/) framework
+- Generating the base code for unit tests.
+- Provides basic config functions
+- Provides the most basic MVC code hierarchy.
+
+## Directory structure
+
+|  catalog   | introduce  |
+|  ----  | ----  |
+| conf  | Configuration files |
+| main.go  | Startup file |
+| handler.go  | Used for request processing return of response. |
+| kitex_gen  | kitex generated code |
+| biz/service  | The actual business logic. |
+| biz/dal  | Logic for operating the storage layer |
+
+## How to run` + "\n\n```shell\nsh build.sh\nsh output/bootstrap.sh\n```",
+	},
+
+	{
+		Path:   consts.BuildSh,
+		Delims: [2]string{consts.LeftDelimiter, consts.RightDelimiter},
+		Body: `#!/usr/bin/env bash
+RUN_NAME="{{.ServiceName}}"
+mkdir -p output/bin output/conf
+cp script/* output/
+cp -r conf/* output/conf
+chmod +x output/bootstrap.sh
+go build -o output/bin/${RUN_NAME}`,
+	},
+
+	{
+		Path: consts.BootstrapSh,
+		Body: `#! /usr/bin/env bash
+CURDIR=$(cd $(dirname $0); pwd)
+echo "$CURDIR/bin/{{.ServiceName}}"
+exec "$CURDIR/bin/{{.ServiceName}}"`,
 	},
 }

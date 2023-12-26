@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 CloudWeGo Authors
+ * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package generator
+package utils
 
 import (
 	"bytes"
@@ -26,15 +26,16 @@ import (
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-func appendGoFileImports(src string, appendImports []string) (data string, err error) {
+// isAppend == true ==> append false ==> delete
+func HandleGoFileImports(src string, handleImports map[string]string, isAppend bool) (data string, err error) {
 	fSet := token.NewFileSet()
 	file, err := parser.ParseFile(fSet, "", src, parser.ParseComments)
 	if err != nil {
 		return "", err
 	}
 
-	extraImports := make([]string, 0, 10)
-	for _, impt := range appendImports {
+	extraImports := make(map[string]string, 10)
+	for key, impt := range handleImports {
 		flag := 0
 		ast.Inspect(file, func(n ast.Node) bool {
 			if importSpec, ok := n.(*ast.ImportSpec); ok && importSpec.Path.Value == impt {
@@ -44,12 +45,26 @@ func appendGoFileImports(src string, appendImports []string) (data string, err e
 			return true
 		})
 		if flag == 0 {
-			extraImports = append(extraImports, impt)
+			extraImports[key] = impt
 		}
 	}
 
-	for _, imp := range extraImports {
-		astutil.AddImport(fSet, file, imp)
+	if isAppend {
+		for key, value := range extraImports {
+			if value == "" {
+				astutil.AddImport(fSet, file, key)
+			} else {
+				astutil.AddNamedImport(fSet, file, value, key)
+			}
+		}
+	} else {
+		for key, value := range extraImports {
+			if value == "" {
+				astutil.DeleteImport(fSet, file, key)
+			} else {
+				astutil.DeleteNamedImport(fSet, file, value, key)
+			}
+		}
 	}
 
 	var buf bytes.Buffer
@@ -60,7 +75,7 @@ func appendGoFileImports(src string, appendImports []string) (data string, err e
 	return buf.String(), nil
 }
 
-func replaceFuncBody(src string, funcName, funcBody []string) (data string, err error) {
+func ReplaceFuncBody(src string, funcName, funcBody []string) (data string, err error) {
 	fSet := token.NewFileSet()
 	file, err := parser.ParseFile(fSet, "", src, parser.ParseComments)
 	if err != nil {
@@ -99,7 +114,7 @@ func replaceFuncBody(src string, funcName, funcBody []string) (data string, err 
 	return buf.String(), nil
 }
 
-func isFuncExist(src, funcName string) (isExist bool, err error) {
+func IsFuncExist(src, funcName string) (isExist bool, err error) {
 	fSet := token.NewFileSet()
 	file, err := parser.ParseFile(fSet, "", src, parser.ParseComments)
 	if err != nil {
@@ -117,7 +132,7 @@ func isFuncExist(src, funcName string) (isExist bool, err error) {
 	return
 }
 
-func isFuncBodyEqual(src, funcName, body string) (isExist bool, err error) {
+func IsFuncBodyEqual(src, funcName, body string) (equal bool, err error) {
 	fSet := token.NewFileSet()
 	file, err := parser.ParseFile(fSet, "", src, parser.ParseComments)
 	if err != nil {
@@ -133,6 +148,10 @@ func isFuncBodyEqual(src, funcName, body string) (isExist bool, err error) {
 		return true
 	})
 
+	if targetFunc == nil {
+		return false, nil
+	}
+
 	buffer := &bytes.Buffer{}
 	if err = printer.Fprint(buffer, fSet, targetFunc.Body); err != nil {
 		return false, err
@@ -141,7 +160,7 @@ func isFuncBodyEqual(src, funcName, body string) (isExist bool, err error) {
 	return buffer.String() == body, nil
 }
 
-func getStructNames(src string) (result []string, err error) {
+func GetStructNames(src string) (result []string, err error) {
 	fSet := token.NewFileSet()
 	file, err := parser.ParseFile(fSet, "", src, parser.ParseComments)
 	if err != nil {
@@ -158,6 +177,69 @@ func getStructNames(src string) (result []string, err error) {
 			return true
 		}
 		result = append(result, ts.Name.Name)
+		return true
+	})
+
+	return
+}
+
+func InsertField2Struct(src, structName, structBody, fieldName string) (data string, err error) {
+	fSet := token.NewFileSet()
+	file, err := parser.ParseFile(fSet, "", src, parser.ParseComments)
+	if err != nil {
+		return "", err
+	}
+
+	ast.Inspect(file, func(n ast.Node) bool {
+		if t, ok := n.(*ast.TypeSpec); ok && t.Name.Name == structName {
+			structType, ok := t.Type.(*ast.StructType)
+			if !ok {
+				return false
+			}
+
+			var hasField bool
+			ast.Inspect(t, func(t ast.Node) bool {
+				if field, ok := t.(*ast.Field); ok {
+					if field.Names[0].Name == fieldName {
+						hasField = true
+						return false
+					}
+				}
+				return true
+			})
+
+			if hasField {
+				return false
+			}
+
+			newField := &ast.Field{Type: ast.NewIdent(structBody)}
+			structType.Fields.List = append(structType.Fields.List, newField)
+		}
+		return true
+	})
+
+	buffer := &bytes.Buffer{}
+	if err = printer.Fprint(buffer, fSet, file); err != nil {
+		return "", err
+	}
+
+	return buffer.String(), nil
+}
+
+func IsStructExist(src, structName string) (isExist bool, err error) {
+	fSet := token.NewFileSet()
+	file, err := parser.ParseFile(fSet, "", src, parser.ParseComments)
+	if err != nil {
+		return false, err
+	}
+
+	ast.Inspect(file, func(n ast.Node) bool {
+		if _, ok := n.(*ast.TypeSpec); ok {
+			if n.(*ast.TypeSpec).Name.Name == structName {
+				isExist = true
+				return false
+			}
+		}
 		return true
 	})
 

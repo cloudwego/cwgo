@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 CloudWeGo Authors
+ * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package generator
+package common
 
-import "strings"
+import "errors"
 
 var (
-	TemplateCustomFuncMap = map[string]interface{}{
-		"Sub":     func(a, b int) int { return a - b },
-		"ToUpper": strings.ToUpper,
-		"ToLower": strings.ToLower,
-	}
+	ErrKeyInput  = errors.New("input wrong key")
+	ErrTypeInput = errors.New("input wrong type")
 )

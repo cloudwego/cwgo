@@ -20,10 +20,14 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
+
+	"github.com/cloudwego/cwgo/pkg/generator/rpchttp/client"
 
 	"github.com/cloudwego/cwgo/pkg/consts"
 
+	cwgoMeta "github.com/cloudwego/cwgo/meta"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"
@@ -33,7 +37,6 @@ import (
 
 	"github.com/cloudwego/cwgo/config"
 
-	"github.com/cloudwego/cwgo/pkg/generator"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
@@ -52,6 +55,51 @@ func Client(c *config.ClientArgument) error {
 		return err
 	}
 
+	workPath, err := filepath.Abs(consts.CurrentDir)
+	if err != nil {
+		return fmt.Errorf(err.Error())
+	}
+
+	clientGen := new(client.Generator)
+	cwgoManifest := new(cwgoMeta.Manifest)
+
+	if c.Type == consts.RPC {
+		clientGen, err = client.NewGenerator(consts.RPC)
+		if err != nil {
+			return err
+		}
+	} else {
+		clientGen, err = client.NewGenerator(consts.HTTP)
+		if err != nil {
+			return err
+		}
+	}
+
+	// handle manifest and determine if .cwgo exists
+	var dir string
+	dir, err = os.Getwd()
+	if err != nil {
+		return fmt.Errorf("get current path failed: %s", err)
+	}
+
+	isNew := utils.IsCwgoNew(dir)
+	if isNew {
+		clientGen.IsNew = true
+	} else {
+		if err = cwgoManifest.InitAndValidate(dir); err != nil {
+			return err
+		}
+		if !(cwgoManifest.CommandType == consts.Client && cwgoManifest.CommunicationType == c.Type) {
+			clientGen.IsNew = true
+		}
+	}
+
+	cwgoManifest.Version = cwgoMeta.Version
+	cwgoManifest.CommandType = consts.Client
+	cwgoManifest.CommunicationType = c.Type
+	cwgoManifest.HzInfo = meta.Manifest{}
+	cwgoManifest.KitexInfo = cwgoMeta.KitexInfo{}
+
 	switch c.Type {
 	case consts.RPC:
 		var args kargs.Arguments
@@ -68,7 +116,7 @@ func Client(c *config.ClientArgument) error {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
 				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
-					utils.ReplaceThriftVersion()
+					utils.ReplaceThriftVersion(c.GoModPath)
 				}
 			}
 			os.Exit(1)
@@ -76,21 +124,16 @@ func Client(c *config.ClientArgument) error {
 
 		if c.Template == "" {
 			// initialize cwgo side generator parameters
-			clientGen, err := generator.NewClientGenerator(consts.RPC)
-			if err != nil {
-				return err
-			}
-			if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
+			if err = client.ConvertGenerator(clientGen, c); err != nil {
 				return err
 			}
 
 			// generate cwgo side files
-			if err = generator.GenerateClient(clientGen); err != nil {
+			if err = client.GenerateClient(clientGen); err != nil {
 				return cli.Exit(err, consts.GenerateCwgoError)
 			}
 		}
 
-		utils.ReplaceThriftVersion()
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)
@@ -99,21 +142,21 @@ func Client(c *config.ClientArgument) error {
 			return err
 		}
 
-		module, path, ok := utils.SearchGoMod(consts.CurrentDir, false)
+		module, path, ok := utils.SearchGoMod(workPath, true)
 		if ok {
 			// go.mod exists
 			if module != c.GoMod {
 				return fmt.Errorf("module name given by the '-module' option ('%s') is not consist with the name defined in go.mod ('%s' from %s)", c.GoMod, module, path)
 			}
 			c.GoMod = module
+			c.GoModPath = path
 		} else {
-			// generate go.mod file
 			if err = utils.InitGoMod(c.GoMod); err != nil {
-				return fmt.Errorf("init go mod failed: %s", err.Error())
+				log.Warn("Init go mod failed:", err.Error())
+				os.Exit(1)
 			}
+			c.GoModPath = workPath
 		}
-
-		utils.ReplaceThriftVersion()
 
 		args.CmdType = meta.CmdClient
 		logs.Debugf("Args: %#v\n", args)
@@ -124,19 +167,22 @@ func Client(c *config.ClientArgument) error {
 
 		if c.Template == "" {
 			// initialize cwgo side generator parameters
-			clientGen, err := generator.NewClientGenerator(consts.HTTP)
-			if err != nil {
-				return err
-			}
-			if err = generator.ConvertClientGenerator(clientGen, c); err != nil {
+			if err = client.ConvertGenerator(clientGen, c); err != nil {
 				return err
 			}
 
 			// generate cwgo side files
-			if err = generator.GenerateClient(clientGen); err != nil {
+			if err = client.GenerateClient(clientGen); err != nil {
 				return cli.Exit(err, consts.GenerateCwgoError)
 			}
 		}
 	}
+
+	// generate .cwgo file
+	if err = cwgoManifest.Persist(dir); err != nil {
+		return err
+	}
+
+	utils.ReplaceThriftVersion(c.GoModPath)
 	return nil
 }

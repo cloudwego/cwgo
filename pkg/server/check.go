@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -48,12 +49,6 @@ func check(sa *config.ServerArgument) error {
 		return errors.New("must specify service name")
 	}
 
-	if sa.CustomExtension != "" {
-		if isExist, _ := utils.PathExist(sa.CustomExtension); !isExist {
-			return errors.New("must specify correct custom extension file path")
-		}
-	}
-
 	// handle cwd and output dir
 	dir, err := os.Getwd()
 	if err != nil {
@@ -68,9 +63,21 @@ func check(sa *config.ServerArgument) error {
 		sa.OutDir = ap
 	}
 
-	if sa.CustomExtension != "" {
-		if !filepath.IsAbs(sa.CustomExtension) {
-			sa.CustomExtension = filepath.Join(sa.Cwd, sa.CustomExtension)
+	if strings.HasSuffix(sa.CustomExtension, consts.SuffixGit) {
+		err = utils.GitClone(sa.CustomExtension, consts.CurrentDir)
+		if err != nil {
+			return err
+		}
+		gitPath, err := utils.GitPath(sa.CustomExtension)
+		if err != nil {
+			return err
+		}
+		sa.CustomExtension = path.Join(consts.CurrentDir, gitPath, consts.ExtensionYaml)
+	}
+
+	if sa.CustomExtension != "" && !strings.HasSuffix(sa.CustomExtension, consts.SuffixGit) {
+		if isExist, _ := utils.PathExist(sa.CustomExtension); !isExist {
+			return errors.New("must specify correct custom extension file path")
 		}
 	}
 

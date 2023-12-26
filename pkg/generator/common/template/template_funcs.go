@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 CloudWeGo Authors
+ * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-package generator
+package template
 
-import (
-	"github.com/cloudwego/cwgo/meta"
-	"github.com/cloudwego/kitex/tool/internal_pkg/generator"
-)
+import "strings"
 
-type CommonGenerator struct {
-	OutDir string
-
-	communicationType string // rpc or http
-	templateDir       string // for generating kitex extensions.yaml
-
-	kitexExtension *generator.TemplateExtension // for kitex extension
-
-	isNew    bool           // whether .cwgo exists
-	manifest *meta.Manifest // .cwgo
-
-	CustomExtensionFile string // custom extension file path
+var CustomFuncMap = map[string]interface{}{
+	"Sub":     func(a, b int) int { return a - b },
+	"ToUpper": strings.ToUpper,
+	"ToLower": strings.ToLower,
 }

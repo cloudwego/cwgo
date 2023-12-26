@@ -40,15 +40,3 @@ func StringSliceSpilt(s []string) []string {
 	}
 	return ret
 }
-
-func String2StringSlice(s []string) (ret string) {
-	for k, v := range s {
-		if k != len(s)-1 {
-			ret += v + consts.BlackSpace
-		} else {
-			ret += v
-		}
-	}
-
-	return
-}

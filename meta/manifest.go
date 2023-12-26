@@ -22,18 +22,24 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/cloudwego/hertz/cmd/hz/meta"
+
 	"github.com/cloudwego/cwgo/pkg/consts"
 	gv "github.com/hashicorp/go-version"
 	"gopkg.in/yaml.v2"
 )
 
 type Manifest struct {
-	Version             string `yaml:"cwgo version"`      // cwgo version
-	CommandType         string `yaml:"commandType"`       // client or server
-	CommunicationType   string `yaml:"communicationType"` // http or rpc
-	Registry            string `yaml:"registry"`
-	Resolver            string `yaml:"resolver"`
-	CustomExtensionFile string `yaml:"customExtensionFile"`
+	Version           string        `yaml:"cwgo version"`      // cwgo version
+	CommandType       string        `yaml:"commandType"`       // client or server
+	CommunicationType string        `yaml:"communicationType"` // http or rpc
+	HzInfo            meta.Manifest `yaml:"hzInfo"`
+	KitexInfo         KitexInfo     `yaml:"kitexInfo"`
+}
+
+type KitexInfo struct {
+	Version     string `yaml:"kitex version"`
+	ServiceName string `yaml:"serviceName"`
 }
 
 var GoVersion *gv.Version

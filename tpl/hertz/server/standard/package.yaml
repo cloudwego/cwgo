@@ -71,7 +71,7 @@ layouts:
        if err != nil {
           utils.SendErrResponse(ctx, c, consts.StatusOK, err)
           return
-       }
+       
        {{end}}
        {{if eq .OutputDir "" -}}
           resp,err := service.New{{.Name}}Service(ctx, c).Run(&req)

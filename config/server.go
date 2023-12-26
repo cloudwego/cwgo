@@ -44,9 +44,9 @@ type CommonParam struct {
 	Service         string // service name
 	Type            string // GenerateType: RPC or HTTP
 	GoMod           string // Go Mod name
+	GoModPath       string
 	IdlPath         string
 	OutDir          string // output path
-	TemplateDir     string // for generating kitex extensions.yaml
 	CustomExtension string // custom extension file path
 }
 
