@@ -142,13 +142,17 @@ func (serverGen *Generator) handleNewRegistryTemplate(body, docker string, addr 
 	if serverGen.CommunicationType == consts.RPC {
 		mvcTemplates = kitexServerMVCTemplates
 		appendInitRegistryFunc = kitexAppendInitRegistryFunc
-		isExist, err := geneUtils.IsStructExist(serverGen.confGoContent, "Registry")
-		if err != nil {
-			return err
-		}
-		if isExist {
-			disableAddConf = true
-			appendRegistryAddrFunc = kitexNewAppendRegistryAddrFunc
+		if serverGen.confGoContent != "" {
+			isExist, err := geneUtils.IsStructExist(serverGen.confGoContent, "Registry")
+			if err != nil {
+				return err
+			}
+			if isExist {
+				disableAddConf = true
+				appendRegistryAddrFunc = kitexNewAppendRegistryAddrFunc
+			} else {
+				appendRegistryAddrFunc = kitexAppendRegistryAddrFunc
+			}
 		} else {
 			appendRegistryAddrFunc = kitexAppendRegistryAddrFunc
 		}
