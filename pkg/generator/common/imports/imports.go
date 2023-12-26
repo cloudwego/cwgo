@@ -84,6 +84,8 @@ var (
 			"github.com/cloudwego/kitex/server":      "",
 			"github.com/kitex-contrib/obs-opentelemetry/logging/logrus": "kitexLogrus",
 			"gopkg.in/natefinch/lumberjack.v2":                          "",
+			"go.uber.org/zap/zapcore":                                   "",
+			"time":                                                      "",
 		},
 
 		consts.DalInitGo: {},
@@ -103,6 +105,8 @@ var (
 		consts.InitGo: {
 			"sync":                              "",
 			"github.com/cloudwego/kitex/client": "",
+			"github.com/cloudwego/kitex/pkg/transmeta": "",
+			"github.com/cloudwego/kitex/transport":     "",
 		},
 
 		consts.EnvGo: {},
@@ -134,6 +138,8 @@ var (
 			"github.com/hertz-contrib/logger/logrus":         "",
 			"github.com/hertz-contrib/pprof":                 "",
 			"gopkg.in/natefinch/lumberjack.v2":               "",
+			"go.uber.org/zap/zapcore":                        "",
+			"time":                                           "",
 		},
 
 		consts.DalInitGo: {},

@@ -9,5 +9,7 @@ header:
 
   paths-ignore:
     - "example/**"
+    - "platform/server/shared/kitex_gen/**"
+    - "platform/server/cmd/api/internal/biz/model/**"
 
   comment: on-failure

@@ -357,12 +357,19 @@ registry:
       	logger := logrus.NewLogger()
       	hlog.SetLogger(logger)
       	hlog.SetLevel(conf.LogLevel())
-      	hlog.SetOutput(&lumberjack.Logger{
-      		Filename:   conf.GetConf().Log.LogFileName,
-      		MaxSize:    conf.GetConf().Log.LogMaxSize,
-      		MaxBackups: conf.GetConf().Log.LogMaxBackups,
-      		MaxAge:     conf.GetConf().Log.LogMaxAge,
-      	})
+      	asyncWriter := &zapcore.BufferedWriteSyncer{
+            WS: zapcore.AddSync(&lumberjack.Logger{
+                Filename:   conf.GetConf().Log.LogFileName,
+                MaxSize:    conf.GetConf().Log.LogMaxSize,
+                MaxBackups: conf.GetConf().Log.LogMaxBackups,
+                MaxAge:     conf.GetConf().Log.LogMaxAge,
+            }),
+            FlushInterval: time.Minute,
+        }
+        hlog.SetOutput(asyncWriter)
+        h.OnShutdown = append(h.OnShutdown, func(ctx context.Context) {
+            asyncWriter.Sync()
+        })
 
       	// pprof
       	if conf.GetConf().Middleware.EnablePprof {

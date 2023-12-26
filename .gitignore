@@ -30,3 +30,11 @@ output/*
 
 # mac
 .DS_Store
+
+# platform
+/platform/server/log/
+/platform/manifest/config/config-dev.yaml
+/platform/manifest/config/config-pro.yaml
+/platform/dist/
+
+

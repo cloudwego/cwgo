@@ -327,12 +327,19 @@ registry:
     logger := kitexLogrus.NewLogger()
     klog.SetLogger(logger)
     klog.SetLevel(conf.LogLevel())
-    klog.SetOutput(&lumberjack.Logger{
-          		Filename:   conf.GetConf().Log.LogFileName,
-          		MaxSize:    conf.GetConf().Log.LogMaxSize,
-          		MaxBackups: conf.GetConf().Log.LogMaxBackups,
-          		MaxAge:     conf.GetConf().Log.LogMaxAge,
-          	})
+    asyncWriter := &zapcore.BufferedWriteSyncer{
+        WS: zapcore.AddSync(&lumberjack.Logger{
+            Filename:   conf.GetConf().Log.LogFileName,
+            MaxSize:    conf.GetConf().Log.LogMaxSize,
+            MaxBackups: conf.GetConf().Log.LogMaxBackups,
+            MaxAge:     conf.GetConf().Log.LogMaxAge,
+        }),
+        FlushInterval: time.Minute,
+    }
+    klog.SetOutput(asyncWriter)
+    server.RegisterShutdownHook(func() {
+        asyncWriter.Sync()
+    })
     return
   }
   

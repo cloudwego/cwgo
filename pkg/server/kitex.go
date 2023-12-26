@@ -82,6 +82,8 @@ func convertKitexArgs(sa *config.ServerArgument, kitexArgument *kargs.Arguments)
 	f.BoolVar(&kitexArgument.Record, "record", false, "Record Kitex cmd into kitex-all.sh.")
 	f.StringVar(&kitexArgument.GenPath, "gen-path", generator.KitexGenPath,
 		"Specify a code gen path.")
+	f.StringVar(&kitexArgument.Protocol, "protocol", "", "Specify a protocol for codec.")
+	f.Var(&kitexArgument.Hessian2Options, "hessian2", "Specify arguments for the hessian2 codec.")
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, `Version %s
