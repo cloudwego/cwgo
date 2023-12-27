@@ -7,12 +7,6 @@ the developer experience. The main features of cwgo tool are as follows:
 
 ## Tool Characteristics
 
-- User-friendly generation method
-
-  cwgo tool provides both interactive command line and static command line methods. The interactive command line can
-  generate code at a low cost, without worrying about passing parameters or executing multiple commands, which is
-  suitable for most users; while advanced users with specific needs can still use regular static commands to construct
-  generation commands.
 
 - Supports generating project templates
 
