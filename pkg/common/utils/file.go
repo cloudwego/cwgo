@@ -18,9 +18,14 @@ package utils
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
+	"time"
 
+	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 )
 
@@ -55,4 +60,82 @@ func GetIdlType(path string, pbName ...string) (string, error) {
 	default:
 		return "", fmt.Errorf("IDL type %s is not supported", ext)
 	}
+}
+
+func FormatGoFile(filePath string) error {
+	path, err := LookupTool(consts.Gofumpt)
+	if err != nil {
+		return err
+	}
+
+	var buf strings.Builder
+	cmd := &exec.Cmd{
+		Path: path,
+		Args: []string{
+			"gofumpt", "-w", filePath,
+		},
+		Stdin:  os.Stdin,
+		Stdout: &buf,
+		Stderr: &buf,
+	}
+
+	done := make(chan error)
+	go func() {
+		done <- cmd.Run()
+	}()
+	select {
+	case err = <-done:
+		if err != nil {
+			return fmt.Errorf("can not format go file, err: %v", cmd.Stderr)
+		}
+	case <-time.After(time.Minute):
+		return fmt.Errorf("format go file time out")
+	}
+
+	return nil
+}
+
+// GetSubDirs gets all subdirectories under the specified directory
+func GetSubDirs(dir string, includeCwd bool) (dirs []string, err error) {
+	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			if includeCwd {
+				dirs = append(dirs, path)
+			} else {
+				if path != dir {
+					dirs = append(dirs, path)
+				}
+			}
+		}
+		return nil
+	})
+
+	return dirs, err
+}
+
+func ReadFileContent(filePath string) (content []byte, err error) {
+	file, err := os.Open(filePath)
+	defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return ioutil.ReadAll(file)
+}
+
+func CreateFile(path, content string) (err error) {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_RDWR, os.FileMode(0o755))
+	defer file.Close()
+	if err != nil {
+		return err
+	}
+
+	if _, err = file.WriteString(content); err != nil {
+		return err
+	}
+
+	return nil
 }

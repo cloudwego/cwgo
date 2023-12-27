@@ -115,7 +115,7 @@ func Terminal(*cli.Context) error {
 				return err
 			}
 			if !cfg.DefaultConfig {
-				if err = survey.Ask(registryConfig(), ca.CommonParam); err != nil {
+				if err = survey.Ask(resolverConfig(), ca.CommonParam); err != nil {
 					return err
 				}
 				err = survey.Ask(customConfig(), ca.SliceParam)

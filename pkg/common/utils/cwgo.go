@@ -17,13 +17,12 @@
 package utils
 
 import (
-	"github.com/cloudwego/hertz/cmd/hz/util/logs"
+	"path"
+
+	"github.com/cloudwego/cwgo/pkg/consts"
 )
 
-func SetHzVerboseLog(v bool) {
-	if v {
-		logs.SetLevel(logs.LevelDebug)
-	} else {
-		logs.SetLevel(logs.LevelWarn)
-	}
+func IsCwgoNew(outputDir string) bool {
+	exist, _ := PathExist(path.Join(outputDir, consts.ManifestFile))
+	return !exist
 }

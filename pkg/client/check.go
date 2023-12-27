@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -33,16 +34,19 @@ func check(ca *config.ClientArgument) error {
 		return errors.New("generate type not supported")
 	}
 
-	if ca.Registry != "" &&
-		ca.Registry != consts.Zk &&
-		ca.Registry != consts.Nacos &&
-		ca.Registry != consts.Etcd &&
-		ca.Registry != consts.Polaris {
-		return errors.New("unsupported registry")
+	if ca.Resolver != "" &&
+		ca.Resolver != consts.Zk &&
+		ca.Resolver != consts.Nacos &&
+		ca.Resolver != consts.Etcd &&
+		ca.Resolver != consts.Polaris &&
+		ca.Resolver != consts.Consul &&
+		ca.Resolver != consts.Eureka &&
+		ca.Resolver != consts.ServiceComb {
+		return errors.New("unsupported resolver")
 	}
 
 	if ca.Service == "" {
-		return errors.New("must specify service name when use registry")
+		return errors.New("must specify service name when using resolver")
 	}
 
 	// handle cwd and output dir
@@ -61,6 +65,24 @@ func check(ca *config.ClientArgument) error {
 	if !filepath.IsAbs(ca.OutDir) {
 		ap := filepath.Join(ca.Cwd, ca.OutDir)
 		ca.OutDir = ap
+	}
+
+	if strings.HasSuffix(ca.CustomExtension, consts.SuffixGit) {
+		err = utils.GitClone(ca.CustomExtension, consts.CurrentDir)
+		if err != nil {
+			return err
+		}
+		gitPath, err := utils.GitPath(ca.CustomExtension)
+		if err != nil {
+			return err
+		}
+		ca.CustomExtension = path.Join(consts.CurrentDir, gitPath, consts.ExtensionYaml)
+	}
+
+	if ca.CustomExtension != "" && !strings.HasSuffix(ca.CustomExtension, consts.SuffixGit) {
+		if isExist, _ := utils.PathExist(ca.CustomExtension); !isExist {
+			return errors.New("must specify correct custom extension file path")
+		}
 	}
 
 	gopath, err := utils.GetGOPATH()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 CloudWeGo Authors
+ * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,10 @@
 
 package utils
 
-import (
-	"github.com/cloudwego/hertz/cmd/hz/util/logs"
-)
-
-func SetHzVerboseLog(v bool) {
-	if v {
-		logs.SetLevel(logs.LevelDebug)
-	} else {
-		logs.SetLevel(logs.LevelWarn)
+func Add2MapStrStr(addMap, addedMap map[string]string) {
+	for key, value := range addMap {
+		if _, ok := addedMap[key]; !ok {
+			addedMap[key] = value
+		}
 	}
 }

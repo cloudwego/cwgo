@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 CloudWeGo Authors
+ * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package utils
+package common
 
-import (
-	"github.com/cloudwego/hertz/cmd/hz/util/logs"
-)
-
-func SetHzVerboseLog(v bool) {
-	if v {
-		logs.SetLevel(logs.LevelDebug)
-	} else {
-		logs.SetLevel(logs.LevelWarn)
-	}
+type ServerClientComGen struct {
+	GoModPath           string
+	OutDir              string
+	CommunicationType   string // rpc or http
+	IsNew               bool   // whether .cwgo exists
+	CustomExtensionFile string // custom extension file path
 }

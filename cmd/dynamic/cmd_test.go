@@ -234,7 +234,7 @@ func TestDefaultConfig(t *testing.T) {
 }
 
 func TestRegistryConfig(t *testing.T) {
-	var answer config.CommonParam
+	var answer config.ServerArgument
 	test := PromptTest{
 		name:   "RegistryConfig",
 		prompt: registryConfig(),
@@ -244,7 +244,7 @@ func TestRegistryConfig(t *testing.T) {
 
 			c.ExpectEOF()
 		},
-		expected: config.CommonParam{
+		expected: config.ServerArgument{
 			Registry: "ZK",
 		},
 	}

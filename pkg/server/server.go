@@ -23,8 +23,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/cloudwego/cwgo/pkg/generator/rpchttp/server"
+
 	"github.com/cloudwego/cwgo/config"
-	"github.com/cloudwego/cwgo/pkg/common/kx_registry"
+	cwgoMeta "github.com/cloudwego/cwgo/meta"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/hertz/cmd/hz/app"
@@ -43,6 +45,48 @@ func Server(c *config.ServerArgument) error {
 		return err
 	}
 
+	// check and install tools
+	if _, err = utils.LookupTool(consts.Gofumpt); err != nil {
+		return err
+	}
+
+	workPath, err := filepath.Abs(consts.CurrentDir)
+	if err != nil {
+		return fmt.Errorf(err.Error())
+	}
+
+	serverGen := new(server.Generator)
+	cwgoManifest := new(cwgoMeta.Manifest)
+
+	if c.Type == consts.RPC {
+		serverGen, err = server.NewGenerator(consts.RPC)
+		if err != nil {
+			return err
+		}
+	} else {
+		serverGen, err = server.NewGenerator(consts.HTTP)
+		if err != nil {
+			return err
+		}
+	}
+
+	// handle manifest and determine if .cwgo exists
+	isNew := utils.IsCwgoNew(c.OutDir)
+	if isNew {
+		serverGen.IsNew = true
+	} else {
+		if err = cwgoManifest.InitAndValidate(c.OutDir); err != nil {
+			return err
+		}
+		if !(cwgoManifest.CommandType == consts.Server && cwgoManifest.CommunicationType == c.Type) {
+			serverGen.IsNew = true
+		}
+	}
+
+	cwgoManifest.Version = cwgoMeta.Version
+	cwgoManifest.CommandType = consts.Server
+	cwgoManifest.CommunicationType = c.Type
+
 	switch c.Type {
 	case consts.RPC:
 		var args kargs.Arguments
@@ -51,8 +95,6 @@ func Server(c *config.ServerArgument) error {
 		if err != nil {
 			return err
 		}
-		kx_registry.HandleRegistry(c.CommonParam, args.TemplateDir)
-		defer kx_registry.RemoveExtension()
 
 		out := new(bytes.Buffer)
 		cmd := args.BuildCmd(out)
@@ -61,7 +103,7 @@ func Server(c *config.ServerArgument) error {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
 				if strings.HasSuffix(out, thriftgo.TheUseOptionMessage) {
-					utils.ReplaceThriftVersion()
+					utils.ReplaceThriftVersion(c.GoModPath)
 				}
 			}
 			os.Exit(1)
@@ -84,7 +126,23 @@ func Server(c *config.ServerArgument) error {
 				log.Warn("please add \"opts = append(opts,server.WithTransHandlerFactory(&mixTransHandlerFactory{nil}))\", to your kitex options")
 			}
 		}
-		utils.ReplaceThriftVersion()
+
+		cwgoManifest.KitexInfo.Version = args.Version
+		cwgoManifest.KitexInfo.ServiceName = args.ServiceName
+		cwgoManifest.HzInfo = meta.Manifest{}
+
+		if c.Template == "" {
+			// initialize cwgo side generator parameters
+			if err = server.ConvertGenerator(serverGen, c); err != nil {
+				return err
+			}
+
+			// generate cwgo side files
+			if err = server.GenerateServer(serverGen); err != nil {
+				return cli.Exit(err, consts.GenerateCwgoError)
+			}
+		}
+
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)
@@ -92,80 +150,78 @@ func Server(c *config.ServerArgument) error {
 		if err != nil {
 			return err
 		}
+		manifest := new(meta.Manifest)
 
-		if utils.IsHzNew(c.OutDir) {
+		if serverGen.IsNew {
 			args.CmdType = meta.CmdNew
 			if c.GoMod == "" {
 				return fmt.Errorf("output directory %s is not under GOPATH/src. Please specify a module name with the '-module' flag", c.Cwd)
 			}
-			module, path, ok := utils.SearchGoMod(consts.CurrentDir, false)
+			module, path, ok := utils.SearchGoMod(workPath, true)
 			if ok {
 				// go.mod exists
 				if module != c.GoMod {
 					return fmt.Errorf("module name given by the '-module' option ('%s') is not consist with the name defined in go.mod ('%s' from %s)", c.GoMod, module, path)
 				}
 				c.GoMod = module
+				c.GoModPath = path
 			} else {
-				args.NeedGoMod = true
+				if err = utils.InitGoMod(c.GoMod); err != nil {
+					log.Warn("Init go mod failed:", err.Error())
+					os.Exit(1)
+				}
+				c.GoModPath = workPath
 			}
 			err = app.GenerateLayout(args)
 			if err != nil {
 				return cli.Exit(err, meta.GenerateLayoutError)
 			}
-			defer func() {
-				// ".hz" file converges to the hz tool
-				manifest := new(meta.Manifest)
-				args.InitManifest(manifest)
-				err = manifest.Persist(args.OutDir)
-				if err != nil {
-					err = cli.Exit(fmt.Errorf("persist manifest failed: %v", err), meta.PersistError)
-				}
-				if !args.NeedGoMod && args.IsNew() {
-					log.Warn(meta.AddThriftReplace)
-				}
-			}()
+
+			args.InitManifest(manifest)
+			cwgoManifest.HzInfo = *manifest
 		} else {
 			args.CmdType = meta.CmdUpdate
-			manifest := new(meta.Manifest)
-			err = manifest.InitAndValidate(args.OutDir)
-			if err != nil {
-				return cli.Exit(err, meta.LoadError)
-			}
 
-			module, path, ok := utils.SearchGoMod(consts.CurrentDir, false)
+			module, path, ok := utils.SearchGoMod(workPath, true)
 			if ok {
 				// go.mod exists
 				if c.GoMod != "" && module != c.GoMod {
 					return fmt.Errorf("module name given by the '-module' option ('%s') is not consist with the name defined in go.mod ('%s' from %s)", c.GoMod, module, path)
 				}
 				args.Gomod = module
+				c.GoModPath = path
 			} else {
-				workPath, err := filepath.Abs(consts.CurrentDir)
-				if err != nil {
-					return fmt.Errorf(err.Error())
-				}
 				return fmt.Errorf("go.mod not found in %s", workPath)
 			}
 
-			// update argument by ".hz", can automatically get "handler_dir"/"model_dir"/"router_dir"
-			args.UpdateByManifest(manifest)
-
-			defer func() {
-				// If the "handler_dir"/"model_dir" is updated, write it back to ".hz"
-				args.UpdateManifest(manifest)
-				err = manifest.Persist(args.OutDir)
-				if err != nil {
-					err = cli.Exit(fmt.Errorf("persist manifest failed: %v", err), meta.PersistError)
-				}
-			}()
+			args.UpdateByManifest(&cwgoManifest.HzInfo)
 		}
 
 		err = app.TriggerPlugin(args)
 		if err != nil {
 			return cli.Exit(err, meta.PluginError)
 		}
-		utils.ReplaceThriftVersion()
+
+		cwgoManifest.KitexInfo = cwgoMeta.KitexInfo{}
+
+		if c.Template == "" {
+			// initialize cwgo side generator parameters
+			if err = server.ConvertGenerator(serverGen, c); err != nil {
+				return err
+			}
+
+			// generate cwgo side files
+			if err = server.GenerateServer(serverGen); err != nil {
+				return cli.Exit(err, consts.GenerateCwgoError)
+			}
+		}
 	}
 
+	// generate .cwgo file
+	if err = cwgoManifest.Persist(c.OutDir); err != nil {
+		return err
+	}
+
+	utils.ReplaceThriftVersion(c.GoModPath)
 	return nil
 }

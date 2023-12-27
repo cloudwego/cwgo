@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -37,7 +38,10 @@ func check(sa *config.ServerArgument) error {
 		sa.Registry != consts.Zk &&
 		sa.Registry != consts.Nacos &&
 		sa.Registry != consts.Etcd &&
-		sa.Registry != consts.Polaris {
+		sa.Registry != consts.Polaris &&
+		sa.Registry != consts.Consul &&
+		sa.Registry != consts.Eureka &&
+		sa.Registry != consts.ServiceComb {
 		return errors.New("unsupported registry")
 	}
 
@@ -57,6 +61,24 @@ func check(sa *config.ServerArgument) error {
 	if !filepath.IsAbs(sa.OutDir) {
 		ap := filepath.Join(sa.Cwd, sa.OutDir)
 		sa.OutDir = ap
+	}
+
+	if strings.HasSuffix(sa.CustomExtension, consts.SuffixGit) {
+		err = utils.GitClone(sa.CustomExtension, consts.CurrentDir)
+		if err != nil {
+			return err
+		}
+		gitPath, err := utils.GitPath(sa.CustomExtension)
+		if err != nil {
+			return err
+		}
+		sa.CustomExtension = path.Join(consts.CurrentDir, gitPath, consts.ExtensionYaml)
+	}
+
+	if sa.CustomExtension != "" && !strings.HasSuffix(sa.CustomExtension, consts.SuffixGit) {
+		if isExist, _ := utils.PathExist(sa.CustomExtension); !isExist {
+			return errors.New("must specify correct custom extension file path")
+		}
 	}
 
 	gopath, err := utils.GetGOPATH()

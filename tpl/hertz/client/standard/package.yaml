@@ -32,7 +32,14 @@ layouts:
       }
 
       func New{{.ServiceName}}Client(hostUrl string, ops ...Option) (Client, error) {
-      	opts := getOptions(append(ops, withHostUrl(hostUrl))...)
+        options, err := initClientOpts(hostUrl)
+        if err != nil {
+          return nil, err
+        }
+      
+        options = append(options, ops...)
+      
+      	opts := getOptions(options...)
       	cli, err := newClient(opts)
       	if err != nil {
       		return nil, err

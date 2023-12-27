@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package utils
+package meta
 
 import (
-	"github.com/cloudwego/hertz/cmd/hz/util/logs"
+	"testing"
+
+	gv "github.com/hashicorp/go-version"
 )
 
-func SetHzVerboseLog(v bool) {
-	if v {
-		logs.SetLevel(logs.LevelDebug)
-	} else {
-		logs.SetLevel(logs.LevelWarn)
+func TestValidate(t *testing.T) {
+	_, err := gv.NewVersion(Version)
+	if err != nil {
+		t.Fatalf("not a valid version: %s", err)
 	}
 }
