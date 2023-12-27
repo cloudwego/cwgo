@@ -178,6 +178,7 @@ func Server(c *config.ServerArgument) error {
 			}
 
 			args.InitManifest(manifest)
+			cwgoManifest.HzInfo = *manifest
 		} else {
 			args.CmdType = meta.CmdUpdate
 
@@ -193,7 +194,7 @@ func Server(c *config.ServerArgument) error {
 				return fmt.Errorf("go.mod not found in %s", workPath)
 			}
 
-			args.UpdateByManifest(manifest)
+			args.UpdateByManifest(&cwgoManifest.HzInfo)
 		}
 
 		err = app.TriggerPlugin(args)
@@ -201,7 +202,6 @@ func Server(c *config.ServerArgument) error {
 			return cli.Exit(err, meta.PluginError)
 		}
 
-		cwgoManifest.HzInfo = *manifest
 		cwgoManifest.KitexInfo = cwgoMeta.KitexInfo{}
 
 		if c.Template == "" {
