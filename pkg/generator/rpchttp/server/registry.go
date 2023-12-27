@@ -162,7 +162,7 @@ func (serverGen *Generator) handleNewRegistryTemplate(body, docker string, addr 
 		appendRegistryAddrFunc = hzAppendRegistryAddrFunc
 	}
 
-	if serverGen.CommunicationType == consts.HTTP {
+	if serverGen.CommunicationType == consts.HTTP && serverGen.CustomExtensionFile == "" {
 		serverGen.RegistryBody = fmt.Sprintf(body, serverGen.ServiceName)
 	} else {
 		serverGen.RegistryBody = body
@@ -276,7 +276,6 @@ func (serverGen *Generator) handleUpdateRegistry(registryName string) (err error
 				return
 			}
 		default:
-			return
 		}
 
 	case consts.HTTP:
@@ -321,7 +320,7 @@ func (serverGen *Generator) handleUpdateRegistry(registryName string) (err error
 
 func (serverGen *Generator) handleUpdateRegistryTemplate(body, docker string, addr []string, imports map[string]string) error {
 	serverGen.RegistryAddress = addr
-	if serverGen.CommunicationType == consts.HTTP {
+	if serverGen.CommunicationType == consts.HTTP && serverGen.CustomExtensionFile == "" {
 		body = fmt.Sprintf(body, serverGen.ServiceName)
 	}
 
