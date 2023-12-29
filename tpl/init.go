@@ -21,7 +21,9 @@ import (
 	"os"
 	"path"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/kitex/tool/internal_pkg/generator"
 )
 
 //go:embed kitex
@@ -42,6 +44,7 @@ func Init() {
 	os.Mkdir(HertzDir, 0o755)
 	initDir(kitexTpl, consts.Kitex, KitexDir)
 	initDir(hertzTpl, consts.Hertz, HertzDir)
+	RegisterTemplateFunc()
 }
 
 func initDir(fs embed.FS, srcDir, dstDir string) {
@@ -70,5 +73,11 @@ func initDir(fs embed.FS, srcDir, dstDir string) {
 		}
 		file.Write(content)
 		file.Close()
+	}
+}
+
+func RegisterTemplateFunc() {
+	for k, f := range sprig.FuncMap() {
+		generator.AddTemplateFunc(k, f)
 	}
 }

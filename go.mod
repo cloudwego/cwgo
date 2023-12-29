@@ -3,8 +3,9 @@ module github.com/cloudwego/cwgo
 go 1.18
 
 require (
+	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/cloudwego/hertz/cmd/hz v0.6.5
-	github.com/cloudwego/kitex v0.8.1-0.20231214142918-9afebf195b9d
+	github.com/cloudwego/kitex v0.8.1-0.20231228051945-98b184166d21
 	github.com/urfave/cli/v2 v2.23.5
 	gorm.io/driver/mysql v1.4.4
 	gorm.io/driver/postgres v1.4.5
@@ -17,7 +18,6 @@ require (
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
-	github.com/Masterminds/sprig/v3 v3.2.3 // indirect
 	github.com/apache/thrift v0.13.0 // indirect
 	github.com/cloudwego/fastpb v0.0.4 // indirect
 	github.com/cloudwego/thriftgo v0.3.3 // indirect
