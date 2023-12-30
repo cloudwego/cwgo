@@ -7,6 +7,7 @@ services:
       context: ../../../
       dockerfile: manifest/deploy/docker/Dockerfile
       args:
+        GOPROXY: 'https://goproxy.cn,direct'
         TZ: 'Asia/Shanghai'
     ports:
       - "8089:8089"
