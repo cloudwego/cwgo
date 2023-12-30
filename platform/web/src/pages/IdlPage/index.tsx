@@ -68,7 +68,7 @@ export default function RepositoryPage() {
 								onClick={() => {
 									// 跳转到对应的 idl
 									window.open(
-										`https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/-/blob/${repo.repository_branch}/${item.idl_path}`
+										`https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/blob/${repo.repository_branch}/${item.idl_path}`
 									);
 								}}
 							>
