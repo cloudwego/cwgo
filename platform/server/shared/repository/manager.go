@@ -95,13 +95,25 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 		// use token which it's owner is same with repo owner
 		for _, tokenModel := range tokenModels {
 			if tokenModel.Owner == repositoryModel.RepositoryOwner {
-				repositoryClient, err = NewGitLabApi(
-					tokenModel.RepositoryDomain,
-					tokenModel.Token,
-					repositoryModel.RepositoryOwner,
-					repositoryModel.RepositoryName,
-					repositoryModel.RepositoryBranch,
-				)
+				switch repositoryModel.RepositoryType {
+				case consts.RepositoryTypeNumGitLab:
+					repositoryClient, err = NewGitLabApi(
+						tokenModel.RepositoryDomain,
+						tokenModel.Token,
+						repositoryModel.RepositoryOwner,
+						repositoryModel.RepositoryName,
+						repositoryModel.RepositoryBranch,
+					)
+				case consts.RepositoryTypeNumGithub:
+					repositoryClient, err = NewGitHubApi(
+						tokenModel.Token,
+						repositoryModel.RepositoryOwner,
+						repositoryModel.RepositoryName,
+						repositoryModel.RepositoryBranch,
+					)
+				default:
+					return consts.ErrParamRepositoryType
+				}
 				if err != nil {
 					if errx.GetCode(err) != consts.ErrNumTokenInvalid {
 						return err
