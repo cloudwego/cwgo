@@ -14,22 +14,21 @@ agent:
 
 registry:
   builtin:
-    address: 'localhost:8089' # please set to api service's external address
+    address: cwgo-api:8089 # please set to api service's external address
 
 store:
   mysql:
-    addr: '127.0.0.1' # database addr
-    port: '3306' # database port
-    db: 'cwgo' # mysql database name
-    username: 'root' # mysql username
-    password: 'password' # mysql password
-    charset: 'utf8mb4' # mysql database charset
+    addr: mysql # database addr
+    port: 3306 # database port
+    db: cwgo # mysql database name
+    username: root # mysql username
+    password: password # mysql password
+    charset: utf8mb4 # mysql database charset
   redis:
-    type: 'standalone' # standalone/cluster
+    type: standalone # standalone/cluster
     standalone:
-      addr: '127.0.0.1:6379' # redis address
-      username: '' # redis username
-      password: 'password' # redis password
+      addr: redis:6379 # redis address
+      password: 121212 # redis password
       db: 1 # redis db num
     cluster:
       masterNum: 3 # redis cluster's master node num
@@ -42,7 +41,6 @@ store:
           port: '6393'
       username: '' # redis username
       password: 'password' # redis password
-
 logger:
   savePath: 'log'
   # https://pkg.go.dev/go.uber.org/zap@v1.26.0/zapcore#Encoder

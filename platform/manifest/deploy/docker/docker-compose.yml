@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   cwgo-api:
+    container_name: cwgo-api
     build:
       context: ../../../
       dockerfile: manifest/deploy/docker/Dockerfile
@@ -20,14 +21,16 @@ services:
       --server_mode dev
       --config_path config
       --static_file_path ./dist
+    depends_on:
+      - redis
   cwgo-agent:
     depends_on:
       - cwgo-api
+    container_name: cwgo-agent
     build:
       context: ../../../
       dockerfile: manifest/deploy/docker/Dockerfile
       args:
-        GOPROXY: 'https://goproxy.cn,direct'
         TZ: 'Asia/Shanghai'
     volumes:
       - "../../../agent/logs:/app/logs"
@@ -38,7 +41,36 @@ services:
       agent
       --server_mode dev
       --config_path config
-
+  redis:
+    image: redis:6.2.5
+    container_name: redis
+    ports:
+      - "6379:6379"
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - ./data/redis/data:/data:rw
+    command: "redis-server --requirepass 121212  --appendonly yes"
+    privileged: true
+    restart: always
+    networks:
+      - cwgo
+  mysql:
+    image: mysql:8.0.26
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      # 时区上海 - Time zone Shanghai (Change if needed)
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - ./data/mysql/data:/var/lib/mysql:rw
+      - ../../sql/mysql:/docker-entrypoint-initdb.d
+    privileged: true
+    restart: always
+    networks:
+      - cwgo
 networks:
   cwgo:
     driver: bridge
