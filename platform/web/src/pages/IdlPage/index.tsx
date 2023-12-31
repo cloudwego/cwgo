@@ -1,23 +1,22 @@
 import { deleteIdl, getIdl, updateIdl } from "./api";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
 	Button,
 	ConfigProvider,
+	Dropdown,
 	Form,
 	Popconfirm,
 	Select,
 	Space,
-	// Modal,
 	Table,
 	Tag,
 	Toast
-	// Toast,
 } from "@douyinfe/semi-ui";
-import { Dropdown } from "@douyinfe/semi-ui";
 import styles from "./index.module.scss";
 // import { ModalReactProps } from "@douyinfe/semi-ui/lib/es/modal";
 import { Data } from "@douyinfe/semi-ui/lib/es/table";
 import { updateRepo } from "../ServiceRepositoryPage/api";
+import { GITHUB_TYPE, GITLAB_TYPE } from "../../utils/consts.ts";
 // import { IconInfoCircle } from "@douyinfe/semi-icons";
 // import ContextHolder from "./contextHolder";
 
@@ -41,6 +40,7 @@ export default function RepositoryPage() {
 	const [pageSize, setPageSize] = useState(
 		Number(localStorage.getItem("pageSize")) || 10
 	);
+
 	// let destroyFn = () => {};
 
 	function InnerIdls({
@@ -53,6 +53,7 @@ export default function RepositoryPage() {
 			repository_owner: string;
 			repository_name: string;
 			repository_branch: string;
+			repository_type: number;
 		};
 	}) {
 		return (
@@ -66,16 +67,16 @@ export default function RepositoryPage() {
 									maxWidth: "100vw"
 								}}
 								onClick={() => {
-									let url: string = "";
-									switch (repo.repository_domain) {
-									case "github.com":
-										url = `https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/blob/${repo.repository_branch}/${item.idl_path}`;
-										break;
-									case "gitlab.com":
-										url = `https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/-/blob/${repo.repository_branch}/${item.idl_path}`;
-										break;
-									default:
-										url = `https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/-/blob/${repo.repository_branch}/${item.idl_path}`;
+									let url: string;
+									switch (repo.repository_type) {
+										case GITHUB_TYPE:
+											url = `https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/blob/${repo.repository_branch}/${item.idl_path}`;
+											break;
+										case GITLAB_TYPE:
+											url = `https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/-/blob/${repo.repository_branch}/${item.idl_path}`;
+											break;
+										default:
+											url = `https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/-/blob/${repo.repository_branch}/${item.idl_path}`;
 									}
 
 									// 跳转到对应的 idl
@@ -178,6 +179,7 @@ export default function RepositoryPage() {
 					repository_owner: string;
 					repository_name: string;
 					repository_branch: string;
+					repository_type: number;
 				};
 			}) => {
 				return import_idls.length ? (
