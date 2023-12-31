@@ -204,7 +204,7 @@ layouts:
       package {{$.PackageName}}
 
       import (
-      	"github.com/cloudwego/hertz/pkg/app/server"
+      	"github.com/cloudwego/hertz/pkg/route"
 
       	{{range $k, $v := .HandlerPackages}}{{$k}} "{{$v}}"{{end}}
       )
