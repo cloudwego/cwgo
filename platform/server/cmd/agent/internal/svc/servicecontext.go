@@ -93,7 +93,6 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 	if err := utils.ProcessFolders(
 		fileContentMap,
 		tempDirGeneratedCode,
-		"kitex_gen", "rpc", "go.mod", "go.sum",
 	); err != nil {
 		return consts.ErrCommonProcessFolders
 	}
