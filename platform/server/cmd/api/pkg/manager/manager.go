@@ -21,6 +21,8 @@ package manager
 import (
 	"context"
 	"fmt"
+	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
+	"github.com/cloudwego/kitex/transport"
 	"sync"
 	"time"
 
@@ -124,6 +126,8 @@ func (m *Manager) GetAgentClient() (agentservice.Client, error) {
 	c, err := agentservice.NewClient(
 		consts.ServiceNameAgent,
 		client.WithResolver(m.resolver),
+		client.WithTransportProtocol(transport.Framed),
+		client.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite)),
 	)
 	if err != nil {
 		return nil, err
