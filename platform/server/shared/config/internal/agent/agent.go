@@ -20,8 +20,11 @@ package agent
 
 import (
 	"fmt"
-	"github.com/cloudwego/kitex/pkg/registry"
 	"net"
+
+	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
+
+	"github.com/cloudwego/kitex/pkg/registry"
 
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
@@ -72,6 +75,8 @@ func (cm *ConfigManager) GetKitexServerOptions() []server.Option {
 	return []server.Option{
 		server.WithServiceAddr(tcpAddr),
 		server.WithRegistry(kxRegistry),
+		// open frugal
+		server.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead | thrift.FrugalWrite)),
 		server.WithRegistryInfo(registryInfo),
 		server.WithLimit(&limit.Option{MaxConnections: 2000, MaxQPS: 500}),
 		server.WithSuite(tracing.NewServerSuite()),
