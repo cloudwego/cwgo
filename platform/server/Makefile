@@ -16,4 +16,5 @@ FILE_NAME ?= ""
 
 api_gen:
 	bash build.sh
+	gofumpt -l -w .
 
