@@ -66,10 +66,20 @@ export default function RepositoryPage() {
 									maxWidth: "100vw"
 								}}
 								onClick={() => {
+									let url: string = "";
+									switch (repo.repository_domain) {
+									case "github.com":
+										url = `https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/blob/${repo.repository_branch}/${item.idl_path}`;
+										break;
+									case "gitlab.com":
+										url = `https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/-/blob/${repo.repository_branch}/${item.idl_path}`;
+										break;
+									default:
+										url = `https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/-/blob/${repo.repository_branch}/${item.idl_path}`;
+									}
+
 									// 跳转到对应的 idl
-									window.open(
-										`https://${repo.repository_domain}/${repo.repository_owner}/${repo.repository_name}/blob/${repo.repository_branch}/${item.idl_path}`
-									);
+									window.open(url);
 								}}
 							>
 								{item.idl_path}
