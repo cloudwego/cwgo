@@ -22,8 +22,8 @@ import (
 	"context"
 	"net/http"
 
-	registry "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/registry"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	registry "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	registrymodel "github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"go.uber.org/zap"

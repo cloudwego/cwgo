@@ -12,9 +12,11 @@ rpc_gen:
       -template-dir ../../template/agent \
       ../../idl/agent/service.thrift
 
-FILE_NAME ?= ""
-
 api_gen:
-	bash build.sh
+	bash build.sh api_gen
+	gofumpt -l -w .
+
+reuse_kx_model:
+	bash build.sh reuse_kx_model
 	gofumpt -l -w .
 

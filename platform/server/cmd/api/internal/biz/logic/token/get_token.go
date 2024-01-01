@@ -21,10 +21,10 @@ package token
 import (
 	"context"
 
-	token "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/token"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	token "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/token"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
 )

@@ -21,8 +21,8 @@ package base
 import (
 	"context"
 
-	base "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/base"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	base "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base"
 )
 
 const (

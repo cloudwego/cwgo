@@ -32,10 +32,10 @@ layouts:
         hertzconsts "github.com/cloudwego/hertz/pkg/protocol/consts"
         "go.uber.org/zap"
         "github.com/cloudwego/cwgo/platform/server/shared/logger"
-      {{- range $k, $v := .Imports}}
-      	{{$k}}model "{{$v.Package}}"
-        {{$k}}logic "{{$.ProjPackage}}/internal/biz/logic/{{$v.PackageName}}"
-      {{- end}}
+        {{- range $k, $v := .Imports}}
+          {{$k}}model "{{$v.Package}}"
+          {{$k}}logic "{{$.ProjPackage}}/internal/biz/logic/{{$v.PackageName}}"
+        {{- end}}
         "{{.ProjPackage}}/internal/consts"
         "{{.ProjPackage}}/internal/svc"
         "{{.ProjPackage}}/pkg/model/response"

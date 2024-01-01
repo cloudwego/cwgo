@@ -2,5 +2,5 @@
 
 hz version: v0.7.1
 handlerDir: internal/biz/handler/token
-modelDir: internal/biz/model
+modelDir: ../../shared/kitex_gen
 routerDir: internal/biz/router
