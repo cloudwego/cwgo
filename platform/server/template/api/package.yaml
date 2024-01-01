@@ -219,20 +219,20 @@ layouts:
       {{- if eq .Path "/"}}r
       {{- else}}{{.GroupName}}{{end}}
       {{- end}}
-
+      
       {{define "G"}}
       {{- if ne .Handler ""}}
-      	{{- .GroupName}}.{{.HttpMethod}}("{{.Path}}", append({{.MiddleWare}}Mw(), {{.Handler}})...)
+        {{- .GroupName}}.{{.HttpMethod}}("{{.Path}}", append({{.HandlerMiddleware}}Mw(), {{.Handler}})...)
       {{- end}}
       {{- if ne (len .Children) 0}}
-      {{.MiddleWare}} := {{template "g" .}}.Group("{{.Path}}", {{.MiddleWare}}Mw()...)
+      {{.MiddleWare}} := {{template "g" .}}.Group("{{.Path}}", {{.GroupMiddleware}}Mw()...)
       {{- end}}
       {{- range $_, $router := .Children}}
       {{- if ne .Handler ""}}
-      	{{template "G" $router}}
+        {{template "G" $router}}
       {{- else}}
-      	{	{{template "G" $router}}
-      	}
+      {	{{template "G" $router}}
+      }
       {{- end}}
       {{- end}}
       {{- end}}
