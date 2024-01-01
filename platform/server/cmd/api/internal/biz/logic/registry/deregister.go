@@ -45,7 +45,7 @@ func NewDeregisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Deregi
 }
 
 func (l *DeregisterLogic) Deregister(req *registry.DeregisterReq) (res *registry.DeRegisterRes) {
-	err := l.svcCtx.BuiltinRegistry.Deregister(req.ServiceID)
+	err := l.svcCtx.BuiltinRegistry.Deregister(req.ServiceId)
 	if err != nil {
 		logger.Logger.Error("deregister service failed", zap.Error(err))
 		return &registry.DeRegisterRes{

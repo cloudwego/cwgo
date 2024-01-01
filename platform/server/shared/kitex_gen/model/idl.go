@@ -7,18 +7,26 @@ import (
 )
 
 type IDL struct {
-	Id                  int64        `thrift:"id,1" frugal:"1,default,i64" json:"id"`
-	IdlRepositoryId     int64        `thrift:"idl_repository_id,2" frugal:"2,default,i64" json:"idl_repository_id"`
-	ServiceRepositoryId int64        `thrift:"service_repository_id,3" frugal:"3,default,i64" json:"service_repository_id"`
-	MainIdlPath         string       `thrift:"main_idl_path,4" frugal:"4,default,string" json:"main_idl_path"`
-	CommitHash          string       `thrift:"commit_hash,5" frugal:"5,default,string" json:"commit_hash"`
-	ImportIdls          []*ImportIDL `thrift:"import_idls,6" frugal:"6,default,list<ImportIDL>" json:"import_idls"`
-	ServiceName         string       `thrift:"service_name,7" frugal:"7,default,string" json:"service_name"`
-	LastSyncTime        string       `thrift:"last_sync_time,8" frugal:"8,default,string" json:"last_sync_time"`
-	Status              int32        `thrift:"status,9" frugal:"9,default,i32" json:"status"`
-	IsDeleted           bool         `thrift:"is_deleted,10" frugal:"10,default,bool" json:"is_deleted"`
-	CreateTime          string       `thrift:"create_time,11" frugal:"11,default,string" json:"create_time"`
-	UpdateTime          string       `thrift:"update_time,12" frugal:"12,default,string" json:"update_time"`
+	// idl record id
+	Id int64 `thrift:"id,1" frugal:"1,default,i64" form:"id" json:"id" query:"id"`
+	// repository id where stores the idl
+	IdlRepositoryId int64 `thrift:"idl_repository_id,2" frugal:"2,default,i64" form:"idl_repository_id" json:"idl_repository_id" query:"idl_repository_id"`
+	// repository id where stores the service
+	ServiceRepositoryId int64 `thrift:"service_repository_id,3" frugal:"3,default,i64" form:"service_repository_id" json:"service_repository_id" query:"service_repository_id"`
+	// repo ref path of idl
+	MainIdlPath string `thrift:"main_idl_path,4" frugal:"4,default,string" form:"main_idl_path" json:"main_idl_path" query:"main_idl_path"`
+	// idl file commit hash
+	CommitHash string       `thrift:"commit_hash,5" frugal:"5,default,string" form:"commit_hash" json:"commit_hash" query:"commit_hash"`
+	ImportIdls []*ImportIDL `thrift:"import_idls,6" frugal:"6,default,list<ImportIDL>" form:"import_idls" json:"import_idls" query:"import_idls"`
+	// service name
+	ServiceName string `thrift:"service_name,7" frugal:"7,default,string" form:"service_name" json:"service_name" query:"service_name"`
+	// idl last sync time
+	LastSyncTime string `thrift:"last_sync_time,8" frugal:"8,default,string" form:"last_sync_time" json:"last_sync_time" query:"last_sync_time"`
+	// idl status
+	Status     int32  `thrift:"status,9" frugal:"9,default,i32" form:"status" json:"status" query:"status"`
+	IsDeleted  bool   `thrift:"is_deleted,10" frugal:"10,default,bool" form:"is_deleted" json:"is_deleted" query:"is_deleted"`
+	CreateTime string `thrift:"create_time,11" frugal:"11,default,string" form:"create_time" json:"create_time" query:"create_time"`
+	UpdateTime string `thrift:"update_time,12" frugal:"12,default,string" form:"update_time" json:"update_time" query:"update_time"`
 }
 
 func NewIDL() *IDL {
@@ -121,8 +129,8 @@ func (p *IDL) String() string {
 }
 
 type ImportIDL struct {
-	IdlPath    string `thrift:"idl_path,1" frugal:"1,default,string" json:"idl_path"`
-	CommitHash string `thrift:"commit_hash,2" frugal:"2,default,string" json:"commit_hash"`
+	IdlPath    string `thrift:"idl_path,1" frugal:"1,default,string" form:"idl_path" json:"idl_path" query:"idl_path"`
+	CommitHash string `thrift:"commit_hash,2" frugal:"2,default,string" form:"commit_hash" json:"commit_hash" query:"commit_hash"`
 }
 
 func NewImportIDL() *ImportIDL {
@@ -155,20 +163,30 @@ func (p *ImportIDL) String() string {
 }
 
 type IDLWithRepositoryInfo struct {
-	Id                  int64        `thrift:"id,1" frugal:"1,default,i64" json:"id"`
-	IdlRepositoryId     int64        `thrift:"idl_repository_id,2" frugal:"2,default,i64" json:"idl_repository_id"`
-	IdlRepository       *Repository  `thrift:"idl_repository,3" frugal:"3,default,Repository" json:"idl_repository"`
-	ServiceRepositoryId int64        `thrift:"service_repository_id,4" frugal:"4,default,i64" json:"service_repository_id"`
-	ServiceRepository   *Repository  `thrift:"service_repository,5" frugal:"5,default,Repository" json:"service_repository"`
-	MainIdlPath         string       `thrift:"main_idl_path,6" frugal:"6,default,string" json:"main_idl_path"`
-	CommitHash          string       `thrift:"commit_hash,7" frugal:"7,default,string" json:"commit_hash"`
-	ImportIdls          []*ImportIDL `thrift:"import_idls,8" frugal:"8,default,list<ImportIDL>" json:"import_idls"`
-	ServiceName         string       `thrift:"service_name,9" frugal:"9,default,string" json:"service_name"`
-	LastSyncTime        string       `thrift:"last_sync_time,10" frugal:"10,default,string" json:"last_sync_time"`
-	Status              int32        `thrift:"status,11" frugal:"11,default,i32" json:"status"`
-	IsDeleted           bool         `thrift:"is_deleted,12" frugal:"12,default,bool" json:"is_deleted"`
-	CreateTime          string       `thrift:"create_time,13" frugal:"13,default,string" json:"create_time"`
-	UpdateTime          string       `thrift:"update_time,14" frugal:"14,default,string" json:"update_time"`
+	// idl record id
+	Id int64 `thrift:"id,1" frugal:"1,default,i64" form:"id" json:"id" query:"id"`
+	// repository id where stores the idl
+	IdlRepositoryId int64 `thrift:"idl_repository_id,2" frugal:"2,default,i64" form:"idl_repository_id" json:"idl_repository_id" query:"idl_repository_id"`
+	// idl repository info
+	IdlRepository *Repository `thrift:"idl_repository,3" frugal:"3,default,Repository" form:"idl_repository" json:"idl_repository" query:"idl_repository"`
+	// repository id where stores the service
+	ServiceRepositoryId int64 `thrift:"service_repository_id,4" frugal:"4,default,i64" form:"service_repository_id" json:"service_repository_id" query:"service_repository_id"`
+	// service repository info
+	ServiceRepository *Repository `thrift:"service_repository,5" frugal:"5,default,Repository" form:"service_repository" json:"service_repository" query:"service_repository"`
+	// repo ref path of idl
+	MainIdlPath string `thrift:"main_idl_path,6" frugal:"6,default,string" form:"main_idl_path" json:"main_idl_path" query:"main_idl_path"`
+	// idl file commit hash
+	CommitHash string       `thrift:"commit_hash,7" frugal:"7,default,string" form:"commit_hash" json:"commit_hash" query:"commit_hash"`
+	ImportIdls []*ImportIDL `thrift:"import_idls,8" frugal:"8,default,list<ImportIDL>" form:"import_idls" json:"import_idls" query:"import_idls"`
+	// service name
+	ServiceName string `thrift:"service_name,9" frugal:"9,default,string" form:"service_name" json:"service_name" query:"service_name"`
+	// idl last sync time
+	LastSyncTime string `thrift:"last_sync_time,10" frugal:"10,default,string" form:"last_sync_time" json:"last_sync_time" query:"last_sync_time"`
+	// idl status
+	Status     int32  `thrift:"status,11" frugal:"11,default,i32" form:"status" json:"status" query:"status"`
+	IsDeleted  bool   `thrift:"is_deleted,12" frugal:"12,default,bool" form:"is_deleted" json:"is_deleted" query:"is_deleted"`
+	CreateTime string `thrift:"create_time,13" frugal:"13,default,string" form:"create_time" json:"create_time" query:"create_time"`
+	UpdateTime string `thrift:"update_time,14" frugal:"14,default,string" form:"update_time" json:"update_time" query:"update_time"`
 }
 
 func NewIDLWithRepositoryInfo() *IDLWithRepositoryInfo {

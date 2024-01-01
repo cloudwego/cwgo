@@ -56,7 +56,7 @@ func (l *UpdateTemplateItemLogic) UpdateTemplateItem(req *template.UpdateTemplat
 	}
 
 	rpcRes, err := client.UpdateTemplateItem(l.ctx, &agent.UpdateTemplateItemReq{
-		Id:      req.ID,
+		Id:      req.Id,
 		Name:    req.Name,
 		Content: req.Content,
 	})

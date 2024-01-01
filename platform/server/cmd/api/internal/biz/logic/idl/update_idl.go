@@ -68,7 +68,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 	}
 
 	rpcRes, err := client.UpdateIDL(l.ctx, &agent.UpdateIDLReq{
-		RepositoryId: req.ID,
+		RepositoryId: req.Id,
 		ServiceName:  req.ServiceName,
 		Status:       req.Status,
 	})
@@ -90,7 +90,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 	case consts.IdlStatusNumInactive:
 		go func() {
 			// delete task
-			_ = l.svcCtx.Manager.DeleteTask(strconv.FormatInt(req.ID, 10))
+			_ = l.svcCtx.Manager.DeleteTask(strconv.FormatInt(req.Id, 10))
 		}()
 	case consts.IdlStatusNumActive:
 		go func() {
@@ -101,7 +101,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 					"",
 					&model.Data{
 						SyncIdlData: &model.SyncIdlData{
-							IdlId: req.ID,
+							IdlId: req.Id,
 						},
 					},
 				),

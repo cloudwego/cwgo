@@ -56,7 +56,7 @@ func (l *GetTemplateItemsLogic) GetTemplateItems(req *template.GetTemplateItemsR
 	}
 
 	rpcRes, err := client.GetTemplateItems(l.ctx, &agent.GetTemplateItemsReq{
-		TemplateId: req.ID,
+		TemplateId: req.Id,
 	})
 	if err != nil {
 		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))

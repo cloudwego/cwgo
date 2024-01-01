@@ -56,7 +56,7 @@ func (l *AddTemplateItemLogic) AddTemplateItem(req *template.AddTemplateItemReq)
 	}
 
 	rpcRes, err := client.AddTemplateItem(l.ctx, &agent.AddTemplateItemReq{
-		TemplateId: req.TemplateID,
+		TemplateId: req.TemplateId,
 		Name:       req.Name,
 		Content:    req.Content,
 	})

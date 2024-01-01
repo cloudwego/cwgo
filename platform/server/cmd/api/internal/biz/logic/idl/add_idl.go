@@ -82,7 +82,7 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 	}
 
 	rpcRes, err := client.AddIDL(l.ctx, &agent.AddIDLReq{
-		RepositoryId:          req.RepositoryID,
+		RepositoryId:          req.RepositoryId,
 		MainIdlPath:           req.MainIdlPath,
 		ServiceName:           req.ServiceName,
 		ServiceRepositoryName: req.ServiceRepositoryName,

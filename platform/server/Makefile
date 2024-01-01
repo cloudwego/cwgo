@@ -13,6 +13,7 @@ rpc_gen:
       ../../idl/agent/service.thrift
 
 api_gen:
+	bash build.sh reuse_kx_model
 	bash build.sh api_gen
 	gofumpt -l -w .
 

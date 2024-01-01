@@ -65,7 +65,7 @@ func (l *UpdateRepositoryLogic) UpdateRepository(req *repository.UpdateRepositor
 	}
 
 	rpcRes, err := client.UpdateRepository(l.ctx, &agent.UpdateRepositoryReq{
-		Id:     req.ID,
+		Id:     req.Id,
 		Branch: req.Branch,
 		Status: req.Status,
 	})

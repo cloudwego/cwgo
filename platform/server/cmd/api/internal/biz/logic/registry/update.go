@@ -46,7 +46,7 @@ func NewUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateLogi
 }
 
 func (l *UpdateLogic) Update(req *registry.UpdateReq) (res *registry.UpdateRes) {
-	err := l.svcCtx.BuiltinRegistry.Update(req.ServiceID)
+	err := l.svcCtx.BuiltinRegistry.Update(req.ServiceId)
 	if err != nil {
 		if err == registrymodel.ErrServiceNotFound {
 			return &registry.UpdateRes{
