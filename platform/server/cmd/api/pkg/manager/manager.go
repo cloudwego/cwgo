@@ -24,6 +24,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
+	"github.com/cloudwego/kitex/transport"
+
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -124,6 +127,9 @@ func (m *Manager) GetAgentClient() (agentservice.Client, error) {
 	c, err := agentservice.NewClient(
 		consts.ServiceNameAgent,
 		client.WithResolver(m.resolver),
+		// open frugal
+		client.WithTransportProtocol(transport.Framed),
+		client.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite)),
 	)
 	if err != nil {
 		return nil, err

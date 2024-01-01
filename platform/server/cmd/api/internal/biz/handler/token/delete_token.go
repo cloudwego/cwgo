@@ -22,9 +22,9 @@ import (
 	"context"
 
 	tokenlogic "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/logic/token"
-	tokenmodel "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/token"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/model/response"
+	tokenmodel "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/token"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertzconsts "github.com/cloudwego/hertz/pkg/protocol/consts"

@@ -22,10 +22,10 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
@@ -49,7 +49,7 @@ func NewAddRepositoryLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Add
 
 func (l *AddRepositoryLogic) AddRepository(req *repository.AddRepositoryReq) (res *repository.AddRepositoryRes) {
 	// validate repository url
-	_, err := url.Parse(req.RepositoryURL)
+	_, err := url.Parse(req.RepositoryUrl)
 	if err != nil {
 		return &repository.AddRepositoryRes{
 			Code: consts.ErrNumParamRepositoryUrl,
@@ -65,7 +65,7 @@ func (l *AddRepositoryLogic) AddRepository(req *repository.AddRepositoryReq) (re
 	}
 
 	// parse repository url
-	domain, owner, repoName, err := utils.ParseRepoUrl(req.RepositoryURL)
+	domain, owner, repoName, err := utils.ParseRepoUrl(req.RepositoryUrl)
 	if err != nil {
 		return &repository.AddRepositoryRes{
 			Code: consts.ErrNumParamRepositoryUrl,

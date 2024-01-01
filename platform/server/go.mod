@@ -7,6 +7,7 @@ require (
 	github.com/avast/retry-go/v4 v4.5.1
 	github.com/buraksezer/consistent v0.10.0
 	github.com/bytedance/gopkg v0.0.0-20230728082804-614d0af6619b
+	github.com/cloudwego/frugal v0.1.12
 	github.com/cloudwego/hertz v0.7.0
 	github.com/cloudwego/kitex v0.8.0
 	github.com/google/go-github/v56 v56.0.0
@@ -36,7 +37,6 @@ require (
 	github.com/cloudwego/configmanager v0.2.0 // indirect
 	github.com/cloudwego/dynamicgo v0.1.6 // indirect
 	github.com/cloudwego/fastpb v0.0.4 // indirect
-	github.com/cloudwego/frugal v0.1.12 // indirect
 	github.com/cloudwego/localsession v0.0.2 // indirect
 	github.com/cloudwego/netpoll v0.5.1 // indirect
 	github.com/cloudwego/thriftgo v0.3.3 // indirect
@@ -110,3 +110,5 @@ require (
 	google.golang.org/protobuf v1.30.0 // indirect
 	gorm.io/gorm v1.25.1
 )
+
+replace github.com/apache/thrift => github.com/apache/thrift v0.13.0

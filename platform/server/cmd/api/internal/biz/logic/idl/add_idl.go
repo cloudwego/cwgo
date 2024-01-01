@@ -26,10 +26,10 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/task"
 
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
 )
@@ -82,7 +82,7 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 	}
 
 	rpcRes, err := client.AddIDL(l.ctx, &agent.AddIDLReq{
-		RepositoryId:          req.RepositoryID,
+		RepositoryId:          req.RepositoryId,
 		MainIdlPath:           req.MainIdlPath,
 		ServiceName:           req.ServiceName,
 		ServiceRepositoryName: req.ServiceRepositoryName,

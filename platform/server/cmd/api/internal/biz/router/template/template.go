@@ -35,7 +35,7 @@ func Register(r *route.RouterGroup) {
 	root := r.Group("/", rootMw()...)
 	{
 		_api := root.Group("/api", _apiMw()...)
-		_api.POST("/template", append(_templateMw(), template.AddTemplate)...)
+		_api.POST("/template", append(_addtemplateMw(), template.AddTemplate)...)
 		_template := _api.Group("/template", _templateMw()...)
 		_template.POST("/item", append(_addtemplateitemMw(), template.AddTemplateItem)...)
 		_template.DELETE("/item", append(_deletetemplateitemMw(), template.DeleteTemplateItem)...)

@@ -21,10 +21,10 @@ package template
 import (
 	"context"
 
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"go.uber.org/zap"
 )
@@ -56,7 +56,7 @@ func (l *UpdateTemplateItemLogic) UpdateTemplateItem(req *template.UpdateTemplat
 	}
 
 	rpcRes, err := client.UpdateTemplateItem(l.ctx, &agent.UpdateTemplateItemReq{
-		Id:      req.ID,
+		Id:      req.Id,
 		Name:    req.Name,
 		Content: req.Content,
 	})

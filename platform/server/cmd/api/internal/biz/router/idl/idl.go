@@ -35,7 +35,7 @@ func Register(r *route.RouterGroup) {
 	root := r.Group("/", rootMw()...)
 	{
 		_api := root.Group("/api", _apiMw()...)
-		_api.POST("/idl", append(_idlMw(), idl.AddIDL)...)
+		_api.POST("/idl", append(_addidlMw(), idl.AddIDL)...)
 		_idl := _api.Group("/idl", _idlMw()...)
 		_idl.POST("/sync", append(_syncidlsMw(), idl.SyncIDLs)...)
 		_api.DELETE("/idl", append(_deleteidlMw(), idl.DeleteIDL)...)

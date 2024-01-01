@@ -22,10 +22,10 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/model/idl"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/logger"
 	"github.com/cloudwego/cwgo/platform/server/shared/task"
@@ -68,7 +68,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 	}
 
 	rpcRes, err := client.UpdateIDL(l.ctx, &agent.UpdateIDLReq{
-		RepositoryId: req.ID,
+		RepositoryId: req.Id,
 		ServiceName:  req.ServiceName,
 		Status:       req.Status,
 	})
@@ -90,7 +90,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 	case consts.IdlStatusNumInactive:
 		go func() {
 			// delete task
-			_ = l.svcCtx.Manager.DeleteTask(strconv.FormatInt(req.ID, 10))
+			_ = l.svcCtx.Manager.DeleteTask(strconv.FormatInt(req.Id, 10))
 		}()
 	case consts.IdlStatusNumActive:
 		go func() {
@@ -101,7 +101,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 					"",
 					&model.Data{
 						SyncIdlData: &model.SyncIdlData{
-							IdlId: req.ID,
+							IdlId: req.Id,
 						},
 					},
 				),
