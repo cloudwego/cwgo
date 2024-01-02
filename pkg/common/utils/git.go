@@ -18,6 +18,7 @@ package utils
 
 import (
 	"net/url"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -31,10 +32,16 @@ func GitClone(gitURL, path string) error {
 	}
 	c := exec.Command("git", "clone", gitURL)
 	c.Dir = path
+	c.Stderr = os.Stderr
 	return c.Run()
 }
 
 func GitPath(gitURL string) (string, error) {
+	if len(gitURL) > 3 && gitURL[0:3] == "git" {
+		p := strings.Split(gitURL, consts.Slash)
+		path := p[len(p)-1]
+		return path[:len(path)-4], nil
+	}
 	u, err := url.Parse(gitURL)
 	if err != nil {
 		return "", err
