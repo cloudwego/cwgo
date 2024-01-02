@@ -48,6 +48,8 @@ const (
 	TempDirGeneratedCode = "generated_code" // generated code temp dir
 )
 
+const ServiceID = "service_id"
+
 var TempDir string
 
 func init() {
