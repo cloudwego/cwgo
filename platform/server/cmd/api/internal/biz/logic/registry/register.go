@@ -24,7 +24,7 @@ import (
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	registry "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"go.uber.org/zap"
 )
 
@@ -47,7 +47,7 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 func (l *RegisterLogic) Register(req *registry.RegisterReq) (res *registry.RegisterRes) {
 	err := l.svcCtx.BuiltinRegistry.Register(req.ServiceId, req.Host, int(req.Port))
 	if err != nil {
-		logger.Logger.Error("register service failed", zap.Error(err))
+		log.Error("register service failed", zap.Error(err))
 		return &registry.RegisterRes{
 			Code: http.StatusBadRequest,
 			Msg:  "internal err",

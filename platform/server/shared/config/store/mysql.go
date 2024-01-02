@@ -23,7 +23,7 @@ import (
 	"net/url"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -51,9 +51,9 @@ func (m Mysql) GetDsn() string {
 }
 
 func (conf *Config) NewMysqlDB() (*gorm.DB, error) {
-	logger.Logger.Info("connecting mysql", zap.Reflect("dsn", conf.Mysql.GetDsn()))
+	log.Info("connecting mysql", zap.Reflect("dsn", conf.Mysql.GetDsn()))
 
-	gormLogger, err := logger.GetGormZapWriter(logger.GetGormLoggerConfig())
+	gormLogger, err := log.GetGormZapWriter(log.GetGormLoggerConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (conf *Config) NewMysqlDB() (*gorm.DB, error) {
 		PrepareStmt: true,
 	})
 	if err != nil {
-		logger.Logger.Error("connect mysql failed", zap.Error(err))
+		log.Error("connect mysql failed", zap.Error(err))
 		return nil, err
 	}
 

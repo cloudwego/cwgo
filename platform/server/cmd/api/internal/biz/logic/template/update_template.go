@@ -25,7 +25,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"go.uber.org/zap"
 )
 
@@ -48,7 +48,7 @@ func NewUpdateTemplateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Up
 func (l *UpdateTemplateLogic) UpdateTemplate(req *template.UpdateTemplateReq) (res *template.UpdateTemplateRes) {
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &template.UpdateTemplateRes{
 			Code: consts.ErrNumRpcGetClient,
 			Msg:  consts.ErrMsgRpcGetClient,
@@ -60,7 +60,7 @@ func (l *UpdateTemplateLogic) UpdateTemplate(req *template.UpdateTemplateReq) (r
 		Name: req.Name,
 	})
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &template.UpdateTemplateRes{
 			Code: consts.ErrNumRpcConnectClient,
 			Msg:  consts.ErrMsgRpcConnectClient,

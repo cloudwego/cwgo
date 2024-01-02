@@ -25,7 +25,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/repository"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"go.uber.org/zap"
 )
 
@@ -57,7 +57,7 @@ func (l *UpdateRepositoryLogic) UpdateRepository(req *repository.UpdateRepositor
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &repository.UpdateRepositoryRes{
 			Code: consts.ErrNumRpcGetClient,
 			Msg:  consts.ErrMsgRpcGetClient,
@@ -70,7 +70,7 @@ func (l *UpdateRepositoryLogic) UpdateRepository(req *repository.UpdateRepositor
 		Status: req.Status,
 	})
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &repository.UpdateRepositoryRes{
 			Code: consts.ErrNumRpcConnectClient,
 			Msg:  consts.ErrMsgRpcConnectClient,

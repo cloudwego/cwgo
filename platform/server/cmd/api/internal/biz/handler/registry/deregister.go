@@ -25,7 +25,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/model/response"
 	registrymodel "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/hertz/pkg/app"
 	hertzconsts "github.com/cloudwego/hertz/pkg/protocol/consts"
 	"go.uber.org/zap"
@@ -38,7 +38,7 @@ func Deregister(ctx context.Context, rCtx *app.RequestContext) {
 	var req registrymodel.DeregisterReq
 	err = rCtx.BindAndValidate(&req)
 	if err != nil {
-		logger.Logger.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
+		log.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
 		response.Fail(
 			rCtx,
 			hertzconsts.StatusBadRequest,
@@ -48,13 +48,13 @@ func Deregister(ctx context.Context, rCtx *app.RequestContext) {
 		return
 	}
 
-	logger.Logger.Debug("http request args", zap.Reflect("args", req))
+	log.Debug("http request args", zap.Reflect("args", req))
 
 	l := registrylogic.NewDeregisterLogic(ctx, svc.Svc)
 
 	res := l.Deregister(&req)
 
-	logger.Logger.Debug("http response args", zap.Reflect("args", res))
+	log.Debug("http response args", zap.Reflect("args", res))
 
 	if res.Code != 0 {
 		response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)

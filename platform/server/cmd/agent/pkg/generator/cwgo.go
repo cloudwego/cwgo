@@ -23,7 +23,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"go.uber.org/zap"
 )
 
@@ -57,11 +57,11 @@ func (g *CwgoGenerator) Generate(repoDomain, repoOwner, idlPath, idlSearchPath, 
 
 	cwgoCmd.Dir = generatePath
 
-	logger.Logger.Debug("exec generate command", zap.String("command", cwgoCmd.String()))
+	log.Debug("exec generate command", zap.String("command", cwgoCmd.String()))
 
 	outBytes, err := cwgoCmd.CombinedOutput()
 
-	logger.Logger.Debug("generate command output", zap.String("output", string(outBytes)))
+	log.Debug("generate command output", zap.String("output", string(outBytes)))
 
 	return err
 }

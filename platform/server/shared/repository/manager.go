@@ -27,7 +27,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/patrickmn/go-cache"
 	"go.uber.org/zap"
 )
@@ -158,7 +158,7 @@ func (rm *Manager) AddClient(repositoryModel *model.Repository) (err error) {
 						return
 					}
 
-					logger.Logger.Debug("get token for repo",
+					log.Debug("get token for repo",
 						zap.Int64("repo_id", repositoryModel.Id),
 						zap.Int64("token_id", tokenModel.Id),
 					)

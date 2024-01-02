@@ -27,7 +27,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/idl"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/task"
 	"go.uber.org/zap"
 )
@@ -60,7 +60,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &idl.UpdateIDLRes{
 			Code: consts.ErrNumRpcGetClient,
 			Msg:  consts.ErrMsgRpcGetClient,
@@ -73,7 +73,7 @@ func (l *UpdateIDLLogic) UpdateIDL(req *idl.UpdateIDLReq) (res *idl.UpdateIDLRes
 		Status:       req.Status,
 	})
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &idl.UpdateIDLRes{
 			Code: consts.ErrNumRpcConnectClient,
 			Msg:  consts.ErrMsgRpcConnectClient,

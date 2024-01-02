@@ -24,7 +24,7 @@ import (
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	registry "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	registrymodel "github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"go.uber.org/zap"
 )
@@ -54,7 +54,7 @@ func (l *UpdateLogic) Update(req *registry.UpdateReq) (res *registry.UpdateRes) 
 				Msg:  "service not found",
 			}
 		}
-		logger.Logger.Error("update service failed", zap.Error(err))
+		log.Error("update service failed", zap.Error(err))
 		return &registry.UpdateRes{
 			Code: http.StatusInternalServerError,
 			Msg:  "internal err",

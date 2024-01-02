@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/google/go-github/v56/github"
 	"go.uber.org/zap"
@@ -64,7 +64,7 @@ func NewGitHubApi(token, repoOwner, repoName, branch string) (*GitHubApi, error)
 	// check token has certain repo permission
 	isValid, err := utils.ValidateTokenForRepoGitHub(client, repoOwner, repoName)
 	if err != nil {
-		logger.Logger.Error("validate token for repo failed", zap.Error(err))
+		log.Error("validate token for repo failed", zap.Error(err))
 		return nil, err
 	}
 

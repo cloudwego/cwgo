@@ -25,7 +25,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"go.uber.org/zap"
 )
 
@@ -76,7 +76,7 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &template.GetTemplatesRes{
 			Code: consts.ErrNumRpcGetClient,
 			Msg:  consts.ErrMsgRpcGetClient,
@@ -90,7 +90,7 @@ func (l *GetTemplatesLogic) GetTemplates(req *template.GetTemplatesReq) (res *te
 		OrderBy: req.OrderBy,
 	})
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &template.GetTemplatesRes{
 			Code: consts.ErrNumRpcConnectClient,
 			Msg:  consts.ErrMsgRpcConnectClient,

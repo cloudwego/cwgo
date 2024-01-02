@@ -24,7 +24,7 @@ import (
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	registry "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"go.uber.org/zap"
 )
 
@@ -47,7 +47,7 @@ func NewDeregisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Deregi
 func (l *DeregisterLogic) Deregister(req *registry.DeregisterReq) (res *registry.DeRegisterRes) {
 	err := l.svcCtx.BuiltinRegistry.Deregister(req.ServiceId)
 	if err != nil {
-		logger.Logger.Error("deregister service failed", zap.Error(err))
+		log.Error("deregister service failed", zap.Error(err))
 		return &registry.DeRegisterRes{
 			Code: http.StatusBadRequest,
 			Msg:  "internal err",

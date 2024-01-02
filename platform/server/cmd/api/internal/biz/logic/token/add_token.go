@@ -26,7 +26,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	token "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/token"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"go.uber.org/zap"
 )
 
@@ -75,7 +75,7 @@ func (l *AddTokenLogic) AddToken(req *token.AddTokenReq) (res *token.AddTokenRes
 
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcGetClient, zap.Error(err))
 		return &token.AddTokenRes{
 			Code: consts.ErrNumRpcGetClient,
 			Msg:  consts.ErrMsgRpcGetClient,
@@ -88,7 +88,7 @@ func (l *AddTokenLogic) AddToken(req *token.AddTokenReq) (res *token.AddTokenRes
 		Token:            req.Token,
 	})
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
+		log.Error(consts.ErrMsgRpcConnectClient, zap.Error(err))
 		return &token.AddTokenRes{
 			Code: consts.ErrNumRpcConnectClient,
 			Msg:  consts.ErrMsgRpcConnectClient,

@@ -30,7 +30,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/parser"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
@@ -85,7 +85,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 				}, nil
 			}
 
-			logger.Logger.Error(consts.ErrMsgRepoGetClient, zap.Error(err), zap.Int64("repo_id", idlRepoModel.Id))
+			log.Error(consts.ErrMsgRepoGetClient, zap.Error(err), zap.Int64("repo_id", idlRepoModel.Id))
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumRepoGetClient,
 				Msg:  consts.ErrMsgRepoGetClient,
@@ -105,7 +105,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			),
 		)
 		if err != nil {
-			logger.Logger.Error(consts.ErrMsgParamRepositoryUrl, zap.Error(err))
+			log.Error(consts.ErrMsgParamRepositoryUrl, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumParamRepositoryUrl,
 				Msg:  consts.ErrMsgParamRepositoryUrl,
@@ -115,7 +115,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		// get the entire repository archive
 		archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, idlRepoModel.RepositoryBranch)
 		if err != nil {
-			logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
+			log.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumRepoGetArchive,
 				Msg:  consts.ErrMsgRepoGetArchive,
@@ -128,7 +128,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			if os.IsNotExist(err) {
 				err = os.Mkdir(consts.TempDir, 0o700)
 				if err != nil {
-					logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
+					log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 					return &agent.SyncIDLsByIdRes{
 						Code: consts.ErrNumCommonCreateTempDir,
 						Msg:  consts.ErrMsgCommonCreateTempDir,
@@ -137,14 +137,14 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 
 				tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
 				if err != nil {
-					logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
+					log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 					return &agent.SyncIDLsByIdRes{
 						Code: consts.ErrNumCommonCreateTempDir,
 						Msg:  consts.ErrMsgCommonCreateTempDir,
 					}, nil
 				}
 			} else {
-				logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
+				log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 				return &agent.SyncIDLsByIdRes{
 					Code: consts.ErrNumCommonCreateTempDir,
 					Msg:  consts.ErrMsgCommonCreateTempDir,
@@ -164,7 +164,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		// extract the tar package and persist it to a temporary file
 		archiveName, err := utils.UnTar(archiveData, tempDirRepo, isTarBall)
 		if err != nil {
-			logger.Logger.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
+			log.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumRepoParseArchive,
 				Msg:  consts.ErrMsgRepoParseArchive,
@@ -203,7 +203,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		// compare main idl
 		mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, idlRepoModel.RepositoryBranch)
 		if err != nil {
-			logger.Logger.Error("get latest commit hash failed", zap.Error(err))
+			log.Error("get latest commit hash failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumRepoGetCommitHash,
 				Msg:  consts.ErrMsgRepoGetCommitHash,
@@ -283,7 +283,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			ImportIdls: importIDLs,
 		})
 		if err != nil {
-			logger.Logger.Error("sync idl content to dao failed", zap.Error(err))
+			log.Error("sync idl content to dao failed", zap.Error(err))
 			return &agent.SyncIDLsByIdRes{
 				Code: consts.ErrNumDatabase,
 				Msg:  consts.ErrMsgDatabase,

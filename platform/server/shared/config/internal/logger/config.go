@@ -18,7 +18,7 @@
 
 package logger
 
-import "github.com/cloudwego/cwgo/platform/server/shared/logger"
+import "github.com/cloudwego/cwgo/platform/server/shared/log"
 
 type Config struct {
 	SavePath     string `mapstructure:"savePath"`
@@ -37,14 +37,14 @@ func (conf *Config) setDefaults() {
 	}
 
 	if conf.EncoderType == "" {
-		conf.EncoderType = logger.ConsoleEncoder
+		conf.EncoderType = log.ConsoleEncoder
 	}
 
 	if conf.EncodeLevel == "" {
-		conf.EncodeLevel = logger.CapitalLevelEncoder
+		conf.EncodeLevel = log.CapitalLevelEncoder
 	}
 
 	if conf.EncodeCaller == "" {
-		conf.EncodeCaller = logger.FullCallerEncoder
+		conf.EncodeCaller = log.FullCallerEncoder
 	}
 }

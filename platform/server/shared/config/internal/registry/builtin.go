@@ -23,7 +23,7 @@ import (
 
 	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
@@ -61,12 +61,12 @@ func (cm *BuiltinRegistryConfigManager) GetRegistryType() consts.RegistryType {
 
 func (cm *BuiltinRegistryConfigManager) GetRegistry() registry.IRegistry {
 	if cm.Registry == nil {
-		logger.Logger.Info("initializing redis")
+		log.Info("initializing redis")
 		rdb, err := cm.storeConfig.NewRedisClient()
 		if err != nil {
-			logger.Logger.Fatal("initializing redis failed", zap.Error(err))
+			log.Fatal("initializing redis failed", zap.Error(err))
 		}
-		logger.Logger.Info("initializing redis successfully")
+		log.Info("initializing redis successfully")
 
 		cm.Registry = registry.NewBuiltinRegistry(rdb)
 	}
