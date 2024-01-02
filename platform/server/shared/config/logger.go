@@ -20,7 +20,7 @@ package config
 
 import "github.com/cloudwego/cwgo/platform/server/shared/log"
 
-type Config struct {
+type LoggerConfig struct {
 	SavePath     string `mapstructure:"savePath"`
 	EncoderType  string `mapstructure:"encoderType"`
 	EncodeLevel  string `mapstructure:"encodeLevel"`

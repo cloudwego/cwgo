@@ -462,7 +462,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 					errNum = 0
 				}
 				log.Debug("update service to registry successfully")
-		log.Debug("start sync agent services")
+				log.Debug("start sync agent services")
 			}
 		}
 	}()

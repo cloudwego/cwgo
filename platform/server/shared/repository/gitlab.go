@@ -24,11 +24,8 @@ import (
 	"time"
 
 	"github.com/avast/retry-go/v4"
-
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
-
-	"github.com/avast/retry-go/v4"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/xanzy/go-gitlab"
 	"go.uber.org/zap"

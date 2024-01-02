@@ -21,9 +21,9 @@ package dao
 import (
 	"fmt"
 
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
-	"github.com/cloudwego/cwgo/platform/server/shared/config"
 
 	"go.uber.org/zap"
 )

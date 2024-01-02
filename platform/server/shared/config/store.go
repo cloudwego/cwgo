@@ -22,6 +22,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
+
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/redis/go-redis/v9"
@@ -60,7 +63,7 @@ func (m Mysql) GetDsn() string {
 func (conf *StoreConfig) NewMysqlDB() (*gorm.DB, error) {
 	log.Info("connecting mysql", zap.Reflect("dsn", conf.Mysql.GetDsn()))
 
-	gormLogger, err := logger.GetGormZapWriter(logger.GetGormLoggerConfig())
+	gormLogger, err := log.GetGormZapWriter(log.GetGormLoggerConfig())
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +103,7 @@ type RedisCluster struct {
 	Password string `mapstructure:"password"`
 }
 
-func (conf *Config) NewRedisClient() (redis.UniversalClient, error) {
+func (conf *StoreConfig) NewRedisClient() (redis.UniversalClient, error) {
 	var rdb redis.UniversalClient
 
 	if conf.Redis.Type == "standalone" {
