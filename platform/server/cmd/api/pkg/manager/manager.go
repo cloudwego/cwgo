@@ -123,13 +123,17 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 	return manager
 }
 
-func (m *Manager) GetAgentClient() (agentservice.Client, error) {
-	c, err := agentservice.NewClient(
-		consts.ServiceNameAgent,
+func (m *Manager) newAgentClient(opts ...client.Option) (agentservice.Client, error) {
+	options := []client.Option{
 		client.WithResolver(m.resolver),
 		// open frugal
 		client.WithTransportProtocol(transport.Framed),
-		client.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead|thrift.FrugalWrite)),
+		client.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead | thrift.FrugalWrite)),
+	}
+	options = append(options, opts...)
+	c, err := agentservice.NewClient(
+		consts.ServiceNameAgent,
+		options...,
 	)
 	if err != nil {
 		return nil, err
@@ -138,17 +142,12 @@ func (m *Manager) GetAgentClient() (agentservice.Client, error) {
 	return c, nil
 }
 
-func (m *Manager) GetAgentClientByServiceId(serviceId string) (agentservice.Client, error) {
-	c, err := agentservice.NewClient(
-		consts.ServiceNameAgent,
-		client.WithResolver(m.resolver),
-		client.WithTag("service_id", serviceId),
-	)
-	if err != nil {
-		return nil, err
-	}
+func (m *Manager) GetAgentClient() (agentservice.Client, error) {
+	return m.newAgentClient()
+}
 
-	return c, nil
+func (m *Manager) GetAgentClientByServiceId(serviceId string) (agentservice.Client, error) {
+	return m.newAgentClient(client.WithTag(consts.ServiceID, serviceId))
 }
 
 func (m *Manager) AddTask(t *model.Task) error {
