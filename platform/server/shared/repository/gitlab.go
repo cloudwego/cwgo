@@ -26,7 +26,7 @@ import (
 	"github.com/avast/retry-go/v4"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/xanzy/go-gitlab"
 	"go.uber.org/zap"
@@ -64,7 +64,7 @@ func NewGitLabApi(domain, token, repoOwner, repoName, branch string) (*GitLabApi
 	// check token has certain repo permission
 	isValid, err := utils.ValidateTokenForRepoGitLab(client, repoOwner, repoName)
 	if err != nil {
-		logger.Logger.Error("validate token for repo failed", zap.Error(err))
+		log.Error("validate token for repo failed", zap.Error(err))
 		return nil, err
 	}
 
@@ -204,7 +204,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 		Ref:    &branch,
 	})
 	if err != nil {
-		logger.Logger.Warn("create repo temp branch failed",
+		log.Warn("create repo temp branch failed",
 			zap.Error(err),
 			zap.String("repo_pid", repoPid),
 			zap.String("base_branch", branch),
@@ -217,7 +217,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	err = a.DeleteAllFiles(owner, repoName, tempBranch)
 	if err != nil {
 		if !strings.Contains(err.Error(), "doesn't exist") {
-			logger.Logger.Warn("delete all file in temp branch failed",
+			log.Warn("delete all file in temp branch failed",
 				zap.Error(err),
 				zap.String("repo_pid", repoPid),
 				zap.String("branch", tempBranch),
@@ -250,7 +250,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 	// create commit(push all file) into temp branch
 	_, _, err = a.client.Commits.CreateCommit(repoPid, opts)
 	if err != nil {
-		logger.Logger.Warn("create commit into temp branch failed",
+		log.Warn("create commit into temp branch failed",
 			zap.Error(err),
 			zap.String("repo_pid", repoPid),
 			zap.String("branch", tempBranch),
@@ -265,7 +265,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 		TargetBranch: &branch,
 	})
 	if err != nil {
-		logger.Logger.Warn("create merge request from temp branch to source branch failed",
+		log.Warn("create merge request from temp branch to source branch failed",
 			zap.Error(err),
 			zap.String("repo_pid", repoPid),
 			zap.String("temp_branch", tempBranch),
@@ -298,7 +298,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 		retry.LastErrorOnly(true),
 	)
 	if err != nil {
-		logger.Logger.Warn("approve merge request failed",
+		log.Warn("approve merge request failed",
 			zap.Error(err),
 			zap.Int("mr_iid", createMergeRequestRes.IID),
 			zap.String("repo_pid", repoPid),
@@ -311,7 +311,7 @@ func (a *GitLabApi) PushFilesToRepository(files map[string][]byte, owner, repoNa
 		go func() {
 			_, err = a.client.Branches.DeleteBranch(repoPid, tempBranch)
 			if err != nil {
-				logger.Logger.Warn("delete temp branch failed",
+				log.Warn("delete temp branch failed",
 					zap.Error(err),
 					zap.String("repo_id", repoPid),
 					zap.String("temp_branch", tempBranch),
@@ -384,7 +384,7 @@ func (a *GitLabApi) DeleteFiles(owner, repoName, branch string, filePaths ...str
 	_, _, err := a.client.Commits.CreateCommit(repoPid, opts)
 	if err != nil {
 		if !strings.Contains(err.Error(), "doesn't exist") {
-			logger.Logger.Warn("create commit into branch failed",
+			log.Warn("create commit into branch failed",
 				zap.Error(err),
 				zap.String("repo_pid", repoPid),
 				zap.String("branch", branch),
@@ -428,7 +428,7 @@ func (a *GitLabApi) DeleteAllFiles(owner, repoName, branch string) error {
 	_, _, err = a.client.Commits.CreateCommit(repoPid, opts)
 	if err != nil {
 		if !strings.Contains(err.Error(), "doesn't exist") {
-			logger.Logger.Warn("create commit into branch failed",
+			log.Warn("create commit into branch failed",
 				zap.Error(err),
 				zap.String("repo_pid", repoPid),
 				zap.String("branch", branch),

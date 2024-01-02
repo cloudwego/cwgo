@@ -29,7 +29,7 @@ import (
 	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -89,7 +89,7 @@ func (cm *ConfigManager) GetKitexServerOptions() []server.Option {
 func getTCPAddr(addr string) *net.TCPAddr {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
-		logger.Logger.Fatal("resolve tcp addr failed", zap.Error(err), zap.String("addr", addr))
+		log.Fatal("resolve tcp addr failed", zap.Error(err), zap.String("addr", addr))
 	}
 	return tcpAddr
 }

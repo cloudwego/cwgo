@@ -27,7 +27,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 )
 
 func run(opts *options.ApiOptions) error {
@@ -109,8 +109,8 @@ func run(opts *options.ApiOptions) error {
 
 	// init logger
 	loggerConfig := config.GetManager().Config.Logger
-	logger.InitLogger(
-		logger.Config{
+	log.InitLogger(
+		log.Config{
 			SavePath:     loggerConfig.SavePath,
 			EncoderType:  loggerConfig.EncoderType,
 			EncodeLevel:  loggerConfig.EncodeLevel,
@@ -125,10 +125,10 @@ func run(opts *options.ApiOptions) error {
 	svc.InitServiceContext()
 
 	// start api service
-	logger.Logger.Info("register api service")
+	log.Info("register api service")
 	register(config.GetManager().ApiConfigManager.Server, staticFilePath)
 
-	logger.Logger.Info("start running api service...")
+	log.Info("start running api service...")
 	config.GetManager().ApiConfigManager.Server.Spin()
 
 	return nil

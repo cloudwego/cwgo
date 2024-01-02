@@ -22,7 +22,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/manager"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"go.uber.org/zap"
 )
@@ -36,12 +36,12 @@ var Svc *ServiceContext
 
 func InitServiceContext() {
 	// init dao manager
-	logger.Logger.Info("initializing dao manager")
+	log.Info("initializing dao manager")
 	daoManager, err := dao.NewDaoManager(config.GetManager().Config.Store)
 	if err != nil {
-		logger.Logger.Fatal("initialize dao manager failed", zap.Error(err))
+		log.Fatal("initialize dao manager failed", zap.Error(err))
 	}
-	logger.Logger.Info("initialize dao manager successfully")
+	log.Info("initialize dao manager successfully")
 	Svc = &ServiceContext{
 		BuiltinRegistry: config.GetManager().ApiConfigManager.RegistryConfigManager.GetRegistry().(*registry.BuiltinRegistry),
 		Manager: manager.NewManager(

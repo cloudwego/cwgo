@@ -23,7 +23,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
@@ -55,7 +55,7 @@ func (conf *Config) NewRedisClient() (redis.UniversalClient, error) {
 	var rdb redis.UniversalClient
 
 	if conf.Redis.Type == "standalone" {
-		logger.Logger.Info("connecting redis",
+		log.Info("connecting redis",
 			zap.String("type", conf.Redis.Type),
 			zap.Reflect("config", conf.Redis.StandAlone),
 		)
@@ -67,7 +67,7 @@ func (conf *Config) NewRedisClient() (redis.UniversalClient, error) {
 			DB:       conf.Redis.StandAlone.Db,
 		})
 	} else if conf.Redis.Type == "cluster" || conf.Redis.Type == "" {
-		logger.Logger.Info("connecting redis",
+		log.Info("connecting redis",
 			zap.String("type", conf.Redis.Type),
 			zap.Reflect("config", conf.Redis.Cluster),
 		)
@@ -83,13 +83,13 @@ func (conf *Config) NewRedisClient() (redis.UniversalClient, error) {
 			Password: conf.Redis.Cluster.Password,
 		})
 	} else {
-		logger.Logger.Error("invalid redis type", zap.String("type", conf.Redis.Type))
+		log.Error("invalid redis type", zap.String("type", conf.Redis.Type))
 		return nil, errors.New("invalid redis type")
 	}
 
 	err := rdb.Ping(context.Background()).Err()
 	if err != nil {
-		logger.Logger.Error("ping redis failed", zap.Error(err))
+		log.Error("ping redis failed", zap.Error(err))
 		return nil, err
 	}
 

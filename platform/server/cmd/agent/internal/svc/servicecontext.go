@@ -28,7 +28,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
@@ -67,7 +67,7 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 
 	err = os.Mkdir(tempDir+"/"+consts.TempDirGeneratedCode, 0o755)
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgCommonMkdir, zap.Error(err))
+		log.Error(consts.ErrMsgCommonMkdir, zap.Error(err))
 		return consts.ErrCommonMkdir
 	}
 
@@ -84,7 +84,7 @@ func (svc *ServiceContext) GenerateCode(ctx context.Context, repoClient reposito
 		tempDirGeneratedCode,
 	)
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgCommonGenerateCode, zap.Error(err))
+		log.Error(consts.ErrMsgCommonGenerateCode, zap.Error(err))
 		return consts.ErrCommonGenerateCode
 	}
 

@@ -29,7 +29,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/parser"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"go.uber.org/zap"
@@ -93,7 +93,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	idlRepoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.RepositoryId)
 	if err != nil {
-		logger.Logger.Error("get repository failed", zap.Error(err))
+		log.Error("get repository failed", zap.Error(err))
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
@@ -103,7 +103,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// get the entire repository archive
 	archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, repoClient.GetBranch())
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
+		log.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumRepoGetArchive,
 			Msg:  consts.ErrMsgRepoGetArchive,
@@ -116,7 +116,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		if os.IsNotExist(err) {
 			err = os.Mkdir(consts.TempDir, 0o700)
 			if err != nil {
-				logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
+				log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 				return &agent.AddIDLRes{
 					Code: consts.ErrNumCommonCreateTempDir,
 					Msg:  consts.ErrMsgCommonCreateTempDir,
@@ -124,14 +124,14 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			}
 			tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
 			if err != nil {
-				logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
+				log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 				return &agent.AddIDLRes{
 					Code: consts.ErrNumCommonCreateTempDir,
 					Msg:  consts.ErrMsgCommonCreateTempDir,
 				}, nil
 			}
 		} else {
-			logger.Logger.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
+			log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
 			return &agent.AddIDLRes{
 				Code: consts.ErrNumCommonCreateTempDir,
 				Msg:  consts.ErrMsgCommonCreateTempDir,
@@ -150,7 +150,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// extract the tar package and persist it to a temporary file
 	archiveName, err := utils.UnTar(archiveData, tempDirRepo, isTarBall)
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
+		log.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumRepoParseArchive,
 			Msg:  consts.ErrMsgRepoParseArchive,
@@ -190,7 +190,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		calculatedPath := filepath.ToSlash(filepath.Join(importBaseDirPath, importPath))
 		commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, repoClient.GetBranch())
 		if err != nil {
-			logger.Logger.Error(consts.ErrMsgRepoGetCommitHash, zap.Error(err))
+			log.Error(consts.ErrMsgRepoGetCommitHash, zap.Error(err))
 			return &agent.AddIDLRes{
 				Code: consts.ErrNumRepoGetCommitHash,
 				Msg:  consts.ErrMsgRepoGetCommitHash,
@@ -205,7 +205,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	isPrivacy, err := repoClient.GetRepositoryPrivacy(owner, repoName)
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRepoCreate, zap.Error(err))
+		log.Error(consts.ErrMsgRepoCreate, zap.Error(err))
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumRepoCreate,
 			Msg:  consts.ErrMsgRepoCreate,
@@ -214,7 +214,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	serviceRepoURL, err := repoClient.AutoCreateRepository(owner, req.ServiceRepositoryName, isPrivacy)
 	if err != nil {
-		logger.Logger.Error(consts.ErrMsgRepoCreate, zap.Error(err))
+		log.Error(consts.ErrMsgRepoCreate, zap.Error(err))
 		return &agent.AddIDLRes{
 			Code: consts.ErrNumRepoCreate,
 			Msg:  consts.ErrMsgRepoCreate,

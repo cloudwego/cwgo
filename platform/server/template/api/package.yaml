@@ -49,7 +49,7 @@ layouts:
       	var req {{$.PackageName}}model.{{$MethodInfo.Name}}Req
       	err = rCtx.BindAndValidate(&req)
       	if err != nil {
-          logger.Logger.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
+          logger.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
           response.Fail(
             rCtx,
             hertzconsts.StatusBadRequest,
@@ -60,13 +60,13 @@ layouts:
       	}
       	{{end}}
       
-        logger.Logger.Debug("http request args", zap.Reflect("args", req))
+        logger.Debug("http request args", zap.Reflect("args", req))
       
         l := {{$.PackageName}}logic.New{{$MethodInfo.Name}}Logic(ctx, svc.Svc)
     
       	res := l.{{$MethodInfo.Name}}(&req)
       
-        logger.Logger.Debug("http response args", zap.Reflect("args", res))
+        logger.Debug("http response args", zap.Reflect("args", res))
       
         if res.Code != 0 {
           response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)
@@ -90,7 +90,7 @@ layouts:
       	var req {{.ServiceInfo.Name}}model.{{.Name}}Req
       	err = rCtx.BindAndValidate(&req)
       	if err != nil {
-          logger.Logger.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
+          logger.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
           response.Fail(
             rCtx,
             hertzconsts.StatusBadRequest,
@@ -101,13 +101,13 @@ layouts:
       	}
       	{{end}}
       
-        logger.Logger.Debug("http request args", zap.Reflect("args", req))
+        logger.Debug("http request args", zap.Reflect("args", req))
       
         l := {{.ServiceInfo.Name}}logic.New{{.Name}}Logic(ctx, svc.Svc)
       
       	res := l.{{.Name}}(&req)
       
-        logger.Logger.Debug("http response args", zap.Reflect("args", res))
+        logger.Debug("http response args", zap.Reflect("args", res))
       
         if res.Code != 0 {
           response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)

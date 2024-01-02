@@ -34,7 +34,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent/agentservice"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/service"
 	"github.com/cloudwego/cwgo/platform/server/shared/task"
@@ -83,7 +83,7 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 	go func() {
 		// get all task from database
 		if manager.syncIdlInterval != 0 {
-			logger.Logger.Info("acquiring all sync task from database")
+			log.Info("acquiring all sync task from database")
 			page := 1
 			for {
 				idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(),
@@ -114,7 +114,7 @@ func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatch
 				}
 				page++
 			}
-			logger.Logger.Info("acquire all sync task complete")
+			log.Info("acquire all sync task complete")
 		}
 	}()
 
@@ -186,7 +186,7 @@ func (m *Manager) DeleteTask(taskId string) error {
 
 func (m *Manager) UpdateAgentTasks() {
 	var wg sync.WaitGroup
-	logger.Logger.Debug("start update agent tasks")
+	log.Debug("start update agent tasks")
 	for _, svr := range m.agents {
 		// push tasks to each agent
 		wg.Add(1)
@@ -195,19 +195,19 @@ func (m *Manager) UpdateAgentTasks() {
 
 			c, err := m.GetAgentClientByServiceId(serviceId)
 			if err != nil {
-				logger.Logger.Error("get agent client failed", zap.Error(err))
+				log.Error("get agent client failed", zap.Error(err))
 			}
 
 			tasks := m.dispatcher.GetTaskByServiceId(serviceId)
 
 			rpcRes, err := c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasks})
 			if err != nil {
-				logger.Logger.Error("update tasks to rpc client failed", zap.Error(err))
+				log.Error("update tasks to rpc client failed", zap.Error(err))
 			} else if rpcRes.Code != 0 {
-				logger.Logger.Error("update tasks failed", zap.String("err", rpcRes.Msg))
+				log.Error("update tasks failed", zap.String("err", rpcRes.Msg))
 			}
 
-			logger.Logger.Debug("update tasks to agent service successfully",
+			log.Debug("update tasks to agent service successfully",
 				zap.String("service_id", serviceId),
 				zap.Reflect("tasks", tasks),
 			)
@@ -231,7 +231,7 @@ func (m *Manager) StartUpdate() {
 			m.Lock()
 			if m.lastUpdateTaskTime != m.currentUpdateTaskTime {
 				if m.currentUpdateTaskTime.Add(m.updateTaskInterval).After(time.Now()) {
-					logger.Logger.Debug("task changed, stat update agent tasks")
+					log.Debug("task changed, stat update agent tasks")
 					m.UpdateAgentTasks()
 					m.lastUpdateTaskTime = m.currentUpdateTaskTime
 				}
@@ -244,7 +244,7 @@ func (m *Manager) StartUpdate() {
 // SyncService
 // sync service from registry
 func (m *Manager) SyncService() {
-	logger.Logger.Debug("start sync service")
+	log.Debug("start sync service")
 	services, err := m.registry.GetAllService()
 	if err != nil {
 		return
@@ -289,7 +289,7 @@ func (m *Manager) SyncService() {
 
 	m.agents = services
 
-	logger.Logger.Debug("sync service complete", zap.Reflect("services", services))
+	log.Debug("sync service complete", zap.Reflect("services", services))
 
 	if len(addServiceIds) != 0 || len(delServicesIds) != 0 {
 		// service changed, update cron

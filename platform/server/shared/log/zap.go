@@ -16,7 +16,7 @@
  *
  */
 
-package logger
+package log
 
 import (
 	"time"

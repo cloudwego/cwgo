@@ -16,7 +16,7 @@
  *
  */
 
-package logger
+package log
 
 import (
 	"fmt"
@@ -131,4 +131,28 @@ func InitLogger(config Config, serverType consts.ServerType, serviceId string, s
 	default:
 		panic("invalid run mode")
 	}
+}
+
+func Info(msg string, field ...zap.Field) {
+	Logger.Info(msg, field...)
+}
+
+func Error(msg string, field ...zap.Field) {
+	Logger.Info(msg, field...)
+}
+
+func Debug(msg string, field ...zap.Field) {
+	Logger.Debug(msg, field...)
+}
+
+func Warn(msg string, field ...zap.Field) {
+	Logger.Warn(msg, field...)
+}
+
+func Fatal(msg string, field ...zap.Field) {
+	Logger.Fatal(msg, field...)
+}
+
+func Sugar() *zap.SugaredLogger {
+	return Logger.Sugar()
 }

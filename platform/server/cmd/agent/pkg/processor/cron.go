@@ -20,7 +20,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/cloudwego/cwgo/platform/server/shared/logger"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"go.uber.org/zap"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
@@ -57,7 +57,7 @@ func (w Worker) Start() {
 			select {
 			case t := <-w.taskChan:
 				// process task with certain task type by calling service method
-				logger.Logger.Debug("process task",
+				log.Debug("process task",
 					zap.String("task_type", t.Type.String()),
 					zap.String("task_id", t.Id),
 					zap.String("task_data", t.Data.String()),
