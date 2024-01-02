@@ -32,6 +32,7 @@ import (
 	"time"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/service"
@@ -254,7 +255,7 @@ func (r *BuiltinRegistry) Update(serviceId string) error {
 		defaultExpiration,
 	).Err()
 	if err != nil {
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			return errors.New("service not found")
 		}
 		log.Error(
@@ -447,7 +448,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 				log.Debug("updating service to registry")
 				err = rc.Update(serviceId)
 				if err != nil {
-					if err == ErrServiceNotFound {
+					if errors.Is(ErrServiceNotFound, err) {
 						err = rc.registry(serviceId, host, port)
 						if err != nil {
 							errNum++
@@ -461,6 +462,7 @@ func (rc *BuiltinKitexRegistryClient) Register(info *kitexregistry.Info) error {
 					errNum = 0
 				}
 				log.Debug("update service to registry successfully")
+		log.Debug("start sync agent services")
 			}
 		}
 	}()

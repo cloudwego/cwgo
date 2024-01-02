@@ -16,14 +16,15 @@
  *
  */
 
-package template
+package dao
 
 import (
 	"context"
 	"time"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
+	entity2 "github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"gorm.io/gorm"
 )
@@ -59,7 +60,7 @@ func NewMysqlTemplate(db *gorm.DB) *MysqlTemplateManager {
 }
 
 func (m *MysqlTemplateManager) AddTemplate(ctx context.Context, templateModel model.Template) error {
-	templateEntity := entity.MysqlTemplate{
+	templateEntity := entity2.MysqlTemplate{
 		Name: templateModel.Name,
 		Type: templateModel.Type,
 	}
@@ -71,7 +72,7 @@ func (m *MysqlTemplateManager) AddTemplate(ctx context.Context, templateModel mo
 }
 
 func (m *MysqlTemplateManager) DeleteTemplate(ctx context.Context, ids []int64) error {
-	var templateEntity entity.MysqlTemplate
+	var templateEntity entity2.MysqlTemplate
 
 	err := m.db.WithContext(ctx).
 		Delete(&templateEntity, ids).Error
@@ -80,7 +81,7 @@ func (m *MysqlTemplateManager) DeleteTemplate(ctx context.Context, ids []int64) 
 }
 
 func (m *MysqlTemplateManager) UpdateTemplate(ctx context.Context, templateModel model.Template) error {
-	templateEntity := entity.MysqlTemplate{
+	templateEntity := entity2.MysqlTemplate{
 		ID:   templateModel.Id,
 		Name: templateModel.Name,
 		Type: templateModel.Type,
@@ -93,7 +94,7 @@ func (m *MysqlTemplateManager) UpdateTemplate(ctx context.Context, templateModel
 }
 
 func (m *MysqlTemplateManager) GetTemplateList(ctx context.Context, page, limit, order int32, orderBy string) ([]*model.Template, error) {
-	var templateEntities []*entity.MysqlTemplate
+	var templateEntities []*entity2.MysqlTemplate
 
 	if page < 1 {
 		page = 1
@@ -138,7 +139,7 @@ func (m *MysqlTemplateManager) GetTemplateList(ctx context.Context, page, limit,
 }
 
 func (m *MysqlTemplateManager) AddTemplateItem(ctx context.Context, templateItemModel model.TemplateItem) error {
-	templateItemEntity := entity.MysqlTemplateItem{
+	templateItemEntity := entity2.MysqlTemplateItem{
 		TemplateID: templateItemModel.TemplateId,
 		Name:       templateItemModel.Name,
 		Content:    templateItemModel.Content,
@@ -151,7 +152,7 @@ func (m *MysqlTemplateManager) AddTemplateItem(ctx context.Context, templateItem
 }
 
 func (m *MysqlTemplateManager) DeleteTemplateItem(ctx context.Context, ids []int64) error {
-	var templateItemEntity entity.MysqlTemplateItem
+	var templateItemEntity entity2.MysqlTemplateItem
 
 	err := m.db.WithContext(ctx).
 		Delete(&templateItemEntity, ids).Error
@@ -160,7 +161,7 @@ func (m *MysqlTemplateManager) DeleteTemplateItem(ctx context.Context, ids []int
 }
 
 func (m *MysqlTemplateManager) UpdateTemplateItem(ctx context.Context, templateItemModel model.TemplateItem) error {
-	templateItemEntity := entity.MysqlTemplateItem{
+	templateItemEntity := entity2.MysqlTemplateItem{
 		ID:      templateItemModel.TemplateId,
 		Name:    templateItemModel.Name,
 		Content: templateItemModel.Content,
@@ -174,7 +175,7 @@ func (m *MysqlTemplateManager) UpdateTemplateItem(ctx context.Context, templateI
 }
 
 func (m *MysqlTemplateManager) GetTemplateItemList(ctx context.Context, templateId int64, page, limit, order int32, orderBy string) ([]*model.TemplateItem, error) {
-	var templateItemEntities []*entity.MysqlTemplateItem
+	var templateItemEntities []*entity2.MysqlTemplateItem
 
 	if page < 1 {
 		page = 1

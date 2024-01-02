@@ -42,7 +42,7 @@ const (
 	ServerModeNumPro
 
 	ServerModeDev = "dev"
-	ServerModePro = "pro"
+	ServerModePro = "prod"
 )
 
 var (

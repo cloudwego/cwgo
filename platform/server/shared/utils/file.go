@@ -22,7 +22,6 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -51,7 +50,7 @@ func ProcessFolders(fileContentMap map[string][]byte, tempDir string, paths ...s
 				}
 
 				// Read the content of the file
-				content, err := ioutil.ReadFile(path)
+				content, err := os.ReadFile(path)
 				if err != nil {
 					return err
 				}

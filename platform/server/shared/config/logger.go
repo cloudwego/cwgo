@@ -16,19 +16,31 @@
  *
  */
 
-package registry
+package config
 
-import "github.com/cloudwego/cwgo/platform/server/shared/consts"
+import "github.com/cloudwego/cwgo/platform/server/shared/log"
 
 type Config struct {
-	Type    string                `mapstructure:"type"`
-	Builtin BuiltinRegistryConfig `mapstructure:"builtin"`
+	SavePath     string `mapstructure:"savePath"`
+	EncoderType  string `mapstructure:"encoderType"`
+	EncodeLevel  string `mapstructure:"encodeLevel"`
+	EncodeCaller string `mapstructure:"encodeCaller"`
 }
 
-func (conf *Config) SetUp() {
-	conf.setDefaults()
-}
+func (conf *LoggerConfig) Init() {
+	if conf.SavePath == "" {
+		conf.SavePath = "log"
+	}
 
-func (conf *Config) setDefaults() {
-	conf.Type = consts.RegistryTypeBuiltin
+	if conf.EncoderType == "" {
+		conf.EncoderType = log.ConsoleEncoder
+	}
+
+	if conf.EncodeLevel == "" {
+		conf.EncodeLevel = log.CapitalLevelEncoder
+	}
+
+	if conf.EncodeCaller == "" {
+		conf.EncodeCaller = log.FullCallerEncoder
+	}
 }

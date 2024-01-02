@@ -16,23 +16,20 @@
  *
  */
 
-package options
+package args
 
 import "github.com/spf13/cobra"
 
-type ApiOptions struct {
-	GlobalOptions
-	StaticFilePath string
+type GlobalArgs struct {
+	ServerMode string
+	ConfigType string
+	ConfigPath string
 }
 
-func NewApiOptions() *ApiOptions {
-	return &ApiOptions{}
-}
+func (o *GlobalArgs) AddFlags(cmd *cobra.Command) {
+	flagSet := cmd.PersistentFlags()
 
-func (o *ApiOptions) AddFlags(cmd *cobra.Command) {
-	o.GlobalOptions.AddFlags(cmd)
-
-	flagSet := cmd.Flags()
-
-	flagSet.StringVarP(&o.StaticFilePath, "static_file_path", "", "", "web static file path")
+	flagSet.StringVarP(&o.ServerMode, "server_mode", "", "", "server run mode (dev|prod)")
+	flagSet.StringVarP(&o.ConfigType, "config_type", "", "", "config type (file)")
+	flagSet.StringVarP(&o.ConfigPath, "config_path", "", "", "config file path")
 }

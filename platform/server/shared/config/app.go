@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-package app
+package config
 
 import (
 	"time"
@@ -24,7 +22,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 )
 
-type Config struct {
+type AppConfig struct {
 	RunMode                  string `mapstructure:"runMode"`
 	Timezone                 string `mapstructure:"timezone"`
 	ProxyUrl                 string `mapstructure:"proxyUrl"`
@@ -37,15 +35,11 @@ const (
 	defaultSyncIdlInterval          = 3 * time.Minute
 )
 
-func (conf *Config) SetUp() {
-	conf.setDefaults()
-}
-
-func (conf *Config) setDefaults() {
+func (conf *AppConfig) Init() {
 	conf.RunMode = consts.ServerRunModeCluster
 }
 
-func (conf *Config) GetSyncAgentServiceInterval() time.Duration {
+func (conf *AppConfig) GetSyncAgentServiceInterval() time.Duration {
 	duration, err := time.ParseDuration(conf.SyncAgentServiceInterval)
 	if err == nil {
 		return duration
@@ -54,7 +48,7 @@ func (conf *Config) GetSyncAgentServiceInterval() time.Duration {
 	return defaultSyncAgentServiceInterval
 }
 
-func (conf *Config) GetSyncIdlInterval() time.Duration {
+func (conf *AppConfig) GetSyncIdlInterval() time.Duration {
 	duration, err := time.ParseDuration(conf.SyncIdlInterval)
 	if err == nil {
 		return duration

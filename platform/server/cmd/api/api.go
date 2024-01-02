@@ -22,7 +22,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/cloudwego/cwgo/platform/server/cmd/internal/options"
+	"github.com/cloudwego/cwgo/platform/server/shared/args"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
@@ -30,79 +30,21 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
 )
 
-func run(opts *options.ApiOptions) error {
+func run(opts *args.ApiArgs) error {
 	var (
 		serverMode     consts.ServerMode
 		configType     consts.ConfigType
 		staticFilePath string
+		metadata       any
+		err            error
 	)
-	var ok bool
-	// priority: command line > env > config > default
-	if opts.ServerMode != "" {
-		serverMode, ok = consts.ServerModeMapToNum[opts.ServerMode]
-		if !ok {
-			return errors.New("invalid server_mode")
-		}
-	}
-	if serverMode == 0 {
-		if serverModeStr := os.Getenv(consts.ServerTypeEnvName); serverModeStr != "" {
-			serverMode, ok = consts.ServerModeMapToNum[serverModeStr]
-			if !ok {
-				return errors.New("invalid server_mode")
-			}
-		}
-		if serverMode == 0 {
-			serverMode = consts.ServerModeNumPro
-		}
-	}
 
-	if opts.ConfigType != "" {
-		configType, ok = consts.ConfigTypeMapToNum[opts.ConfigType]
-		if !ok {
-			return errors.New("invalid config_type")
-		}
+	metadata, serverMode, configType, staticFilePath, err = validateOption(opts)
+	if err != nil {
+		return err
 	}
-	if configType == 0 {
-		if configTypeStr := os.Getenv(consts.ConfigTypeEnvName); configTypeStr != "" {
-			configType, ok = consts.ConfigTypeMapToNum[configTypeStr]
-			if ok {
-				return errors.New("invalid config_type")
-			}
-		}
-		if configType == 0 {
-			configType = consts.ConfigTypeNumFile
-		}
-	}
-	if opts.StaticFilePath != "" {
-		staticFilePath = opts.StaticFilePath
-	}
-	if staticFilePath == "" {
-		if staticFilePathStr := os.Getenv(consts.StaticFilePathEnvName); staticFilePathStr != "" {
-			staticFilePath = staticFilePathStr
-		}
-		if staticFilePath == "" {
-			staticFilePath = consts.StaticFileDefaultPath
-		}
-	}
-
-	var metadata interface{}
-	switch configType {
-	case consts.ConfigTypeNumFile:
-		var configPath string
-
-		if opts.ConfigPath != "" {
-			configPath = opts.ConfigPath
-		} else if configPath = os.Getenv(consts.ConfigPathEnvName); configPath == "" {
-			configPath = consts.ConfigDefaultPath
-		}
-
-		metadata = config.FileConfig{
-			Path: configPath,
-		}
-	}
-
 	// init config
-	err := config.InitManager(consts.ServerTypeNumApi, serverMode, configType, metadata)
+	err = config.InitManager(consts.ServerTypeNumApi, serverMode, configType, metadata)
 	if err != nil {
 		return err
 	}
@@ -132,4 +74,79 @@ func run(opts *options.ApiOptions) error {
 	config.GetManager().ApiConfigManager.Server.Spin()
 
 	return nil
+}
+
+func validateOption(opts *args.ApiArgs) (metaData interface{}, serverMode consts.ServerMode, configType consts.ConfigType, staticFilePath string, err error) {
+	var ok bool
+
+	// priority: command line > env > config  > default
+	if opts.ServerMode != "" {
+		serverMode, ok = consts.ServerModeMapToNum[opts.ServerMode]
+		if !ok {
+			err = errors.New("invalid server_mode")
+			return
+		}
+	}
+	if serverMode == 0 {
+		if serverModeStr := os.Getenv(consts.ServerTypeEnvName); serverModeStr != "" {
+			serverMode, ok = consts.ServerModeMapToNum[serverModeStr]
+			if !ok {
+				err = errors.New("invalid server_mode")
+				return
+			}
+		}
+		if serverMode == 0 {
+			serverMode = consts.ServerModeNumPro
+		}
+	}
+
+	if opts.ConfigType != "" {
+		configType, ok = consts.ConfigTypeMapToNum[opts.ConfigType]
+		if !ok {
+			err = errors.New("invalid config_type")
+			return
+		}
+	}
+	if configType == 0 {
+		if configTypeStr := os.Getenv(consts.ConfigTypeEnvName); configTypeStr != "" {
+			configType, ok = consts.ConfigTypeMapToNum[configTypeStr]
+			if ok {
+				err = errors.New("invalid config_type")
+				return
+			}
+		}
+		if configType == 0 {
+			configType = consts.ConfigTypeNumFile
+		}
+	}
+	if opts.StaticFilePath != "" {
+		staticFilePath = opts.StaticFilePath
+	}
+
+	if staticFilePath == "" {
+		if staticFilePathStr := os.Getenv(consts.StaticFilePathEnvName); staticFilePathStr != "" {
+			staticFilePath = staticFilePathStr
+		}
+		if staticFilePath == "" {
+			staticFilePath = consts.StaticFileDefaultPath
+		}
+	}
+
+	switch configType {
+	case consts.ConfigTypeNumFile:
+		var configPath string
+
+		if opts.ConfigPath != "" {
+			configPath = opts.ConfigPath
+		} else if configPath = os.Getenv(consts.ConfigPathEnvName); configPath == "" {
+			configPath = consts.ConfigDefaultPath
+		}
+
+		metaData = config.FileConfig{
+			Path: configPath,
+		}
+	default:
+
+	}
+	return
 }

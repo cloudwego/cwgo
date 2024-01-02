@@ -16,27 +16,10 @@
  *
  */
 
-package store
+package utils
 
-import (
-	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+const (
+	RegRepoURL   = "https?:\\/\\/([^\\/]+)\\/([^\\/]+)\\/([^\\/]+)"
+	regGitHubURL = `https://github\.com/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
+	regGitLabURL = `https?://[^/]+/([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`
 )
-
-type Config struct {
-	Type  string `mapstructure:"type"`
-	Mysql Mysql  `mapstructure:"mysql"`
-	Mongo Mongo  `mapstructure:"mongo"`
-	Redis Redis  `mapstructure:"redis"`
-}
-
-func (conf *Config) SetUp() {
-	conf.setDefaults()
-}
-
-func (conf *Config) setDefaults() {
-	conf.Type = consts.StoreTypeMysql
-}
-
-func (conf *Config) GetStoreType() consts.StoreType {
-	return consts.StoreTypeMapToNum[conf.Type]
-}

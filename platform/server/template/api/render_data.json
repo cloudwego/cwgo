@@ -4,7 +4,7 @@
     "ServiceName": "cwgo-api",
     "GoModule": "cwgo",
     "UseApacheThrift": true,
-    "ProjectPath": "github.com/cloudwego/cwgo/platform/server/cmd/api"
+    "ProjectPath": "github.com/cloudwego/cwgo/platform/cmd/api"
   },
   "main.go": {
     "MainData": "this is customized render data"

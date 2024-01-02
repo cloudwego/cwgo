@@ -19,9 +19,10 @@
 package consts
 
 const (
-	MainRef      = "main"
-	GitHubDomain = "github.com"
-	GitLabDomain = "gitlab.com"
+	MainRef         = "main"
+	GitHubDomain    = "github.com"
+	GitLabDomain    = "gitlab.com"
+	GithubURLPrefix = "https://github.com/"
 )
 
 const (

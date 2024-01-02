@@ -16,7 +16,7 @@
  *
  */
 
-package store
+package config
 
 import (
 	"context"
@@ -26,7 +26,56 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
+
+type StoreConfig struct {
+	Type  string `mapstructure:"type"`
+	Mysql Mysql  `mapstructure:"mysql"`
+	Redis Redis  `mapstructure:"redis"`
+}
+
+type Mysql struct {
+	Addr     string `mapstructure:"addr"`
+	Port     string `mapstructure:"port"`
+	Db       string `mapstructure:"db"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	Charset  string `mapstructure:"charset"`
+}
+
+func (m Mysql) GetDsn() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=%s",
+		m.Username,
+		m.Password,
+		m.Addr,
+		m.Port,
+		m.Db,
+		m.Charset,
+		url.PathEscape(consts.TimeZone.String()),
+	)
+}
+
+func (conf *StoreConfig) NewMysqlDB() (*gorm.DB, error) {
+	log.Info("connecting mysql", zap.Reflect("dsn", conf.Mysql.GetDsn()))
+
+	gormLogger, err := logger.GetGormZapWriter(logger.GetGormLoggerConfig())
+	if err != nil {
+		return nil, err
+	}
+
+	db, err := gorm.Open(mysql.Open(conf.Mysql.GetDsn()), &gorm.Config{
+		Logger:      gormLogger,
+		PrepareStmt: true,
+	})
+	if err != nil {
+		log.Error("connect mysql failed", zap.Error(err))
+		return nil, err
+	}
+
+	return db, err
+}
 
 type Redis struct {
 	Type       string          `mapstructure:"type"`
@@ -94,4 +143,12 @@ func (conf *Config) NewRedisClient() (redis.UniversalClient, error) {
 	}
 
 	return rdb, nil
+}
+
+func (conf *StoreConfig) Init() {
+	conf.Type = consts.StoreTypeMysql
+}
+
+func (conf *StoreConfig) GetStoreType() consts.StoreType {
+	return consts.StoreTypeMapToNum[conf.Type]
 }
