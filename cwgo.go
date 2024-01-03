@@ -28,11 +28,12 @@ import (
 )
 
 func main() {
+	tpl.RegisterTemplateFunc()
+
 	// run cwgo as hz plugin mode
 	app.PluginMode()
 	// run cwgo as kitex plugin mode
 	kitexPluginMode()
-
 	tpl.Init()
 	cli := static.Init()
 

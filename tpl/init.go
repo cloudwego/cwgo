@@ -44,7 +44,6 @@ func Init() {
 	os.Mkdir(HertzDir, 0o755)
 	initDir(kitexTpl, consts.Kitex, KitexDir)
 	initDir(hertzTpl, consts.Hertz, HertzDir)
-	RegisterTemplateFunc()
 }
 
 func initDir(fs embed.FS, srcDir, dstDir string) {
