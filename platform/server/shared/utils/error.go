@@ -19,6 +19,7 @@
 package utils
 
 import (
+	"errors"
 	"net"
 	"strings"
 )
@@ -30,7 +31,8 @@ func IsTokenError(err error) bool {
 
 // IsNetworkError Determine if it is a network timeout issue
 func IsNetworkError(err error) bool {
-	if netErr, ok := err.(net.Error); ok {
+	var netErr net.Error
+	if errors.As(err, &netErr) {
 		if netErr.Timeout() {
 			return true
 		}

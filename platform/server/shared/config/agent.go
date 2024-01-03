@@ -13,25 +13,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-package agent
+package config
 
 import (
 	"fmt"
+	"log"
 	"net"
 
-	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
-
-	"github.com/cloudwego/kitex/pkg/registry"
-
-	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/log"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/limit"
+	"github.com/cloudwego/kitex/pkg/registry"
+	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/transmeta"
 	"github.com/cloudwego/kitex/server"
@@ -39,20 +35,45 @@ import (
 	"go.uber.org/zap"
 )
 
-type ConfigManager struct {
-	config                Config
-	RegistryConfigManager registryconfig.IRegistryConfigManager
+type AgentConfig struct {
+	Addr           string `mapstructure:"addr"`
+	MaxConnections int64  `mapstructure:"maxConnections"`
+	MaxQPS         int64  `mapstructure:"maxQPS"`
+	WorkerNum      int    `mapstructure:"workerNum"`
+}
+
+type Metadata struct {
+	ServiceId string `yaml:"service_id"`
+}
+
+func (conf *AgentConfig) Init() {
+	if conf.Addr == "" {
+		conf.Addr = "0.0.0.0:11010"
+	}
+
+	if conf.MaxConnections == 0 {
+		conf.MaxConnections = 2000
+	}
+
+	if conf.MaxQPS == 0 {
+		conf.MaxQPS = 500
+	}
+}
+
+type AgentManager struct {
+	config                AgentConfig
+	RegistryConfigManager IRegistryConfigManager
 	ServiceId             string
 	ServiceName           string
 }
 
-func NewConfigManager(config Config, registryConfig registryconfig.Config, storeConfig store.Config, serviceId string) *ConfigManager {
-	var registryConfigManager registryconfig.IRegistryConfigManager
+func NewAgentManager(config AgentConfig, registryConfig RegistryConfig, storeConfig StoreConfig, serviceId string) *AgentManager {
+	var registryConfigManager IRegistryConfigManager
 	var err error
 
 	switch registryConfig.Type {
 	case consts.RegistryTypeBuiltin:
-		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin, storeConfig)
+		registryConfigManager, err = NewBuiltinRegistryConfigManager(registryConfig.Builtin, storeConfig)
 		if err != nil {
 			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
 		}
@@ -60,7 +81,7 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, store
 		panic("not support registryConfigType")
 	}
 
-	return &ConfigManager{
+	return &AgentManager{
 		config:                config,
 		RegistryConfigManager: registryConfigManager,
 		ServiceId:             serviceId,
@@ -68,7 +89,7 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, store
 	}
 }
 
-func (cm *ConfigManager) GetKitexServerOptions() []server.Option {
+func (cm *AgentManager) GetKitexServerOptions() []server.Option {
 	tcpAddr := getTCPAddr(cm.config.Addr)
 	kxRegistry, registryInfo := cm.getRegistryAndInfo()
 
@@ -95,7 +116,7 @@ func getTCPAddr(addr string) *net.TCPAddr {
 }
 
 // GetRegistryAndInfo extracts registry-related logic
-func (cm *ConfigManager) getRegistryAndInfo() (registry.Registry, *registry.Info) {
+func (cm *AgentManager) getRegistryAndInfo() (registry.Registry, *registry.Info) {
 	pubListenOn := utils.FigureOutListenOn(cm.config.Addr)
 	return cm.RegistryConfigManager.GetKitexRegistry(cm.ServiceName, cm.ServiceId, pubListenOn)
 }

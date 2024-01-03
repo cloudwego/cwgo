@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,18 +12,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-package api
+package config
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/bytedance/gopkg/util/gopool"
-	registryconfig "github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	http2config "github.com/hertz-contrib/http2/config"
@@ -32,21 +28,51 @@ import (
 	"github.com/hertz-contrib/pprof"
 )
 
-type ConfigManager struct {
-	config                Config
-	RegistryConfigManager registryconfig.IRegistryConfigManager
+type ApiConfig struct {
+	Host       string           `mapstructure:"host"`
+	Port       int              `mapstructure:"port"`
+	Tracing    TracerConf       `mapstructure:"tracing"`
+	MetricsUrl string           `mapstructure:"metricsUrl"`
+	Dispatcher DispatcherConfig `mapstructure:"dispatcher"`
+}
+
+type TracerConf struct {
+	Endpoint string  `mapstructure:"endpoint"`
+	Sampler  float64 `mapstructure:"sampler"`
+}
+
+type RpcClientConf struct {
+	Name          string `mapstructure:"name" json:"name"`
+	MuxConnection int    `mapstructure:"muxConnection" json:"mux_connection,default=1"`
+}
+
+func (conf *ApiConfig) Init() {
+	if conf.Host == "" {
+		conf.Host = "0.0.0.0"
+	}
+
+	if conf.Port == 0 {
+		conf.Port = 8089
+	}
+
+	conf.Dispatcher.Init()
+}
+
+type ApiManager struct {
+	config                ApiConfig
+	RegistryConfigManager IRegistryConfigManager
 	Server                *server.Hertz
 	ServiceId             string
 	ServiceName           string
 }
 
-func NewConfigManager(config Config, registryConfig registryconfig.Config, storeConfig store.Config, serviceId string) *ConfigManager {
-	var registryConfigManager registryconfig.IRegistryConfigManager
+func NewApiManager(config ApiConfig, registryConfig RegistryConfig, storeConfig StoreConfig, serviceId string) *ApiManager {
+	var registryConfigManager IRegistryConfigManager
 	var err error
 
 	switch registryConfig.Type {
 	case consts.RegistryTypeBuiltin:
-		registryConfigManager, err = registryconfig.NewBuiltinRegistryConfigManager(registryConfig.Builtin, storeConfig)
+		registryConfigManager, err = NewBuiltinRegistryConfigManager(registryConfig.Builtin, storeConfig)
 		if err != nil {
 			panic(err)
 		}
@@ -81,7 +107,7 @@ func NewConfigManager(config Config, registryConfig registryconfig.Config, store
 	// register pprof service
 	pprof.Register(hertzServer)
 
-	return &ConfigManager{
+	return &ApiManager{
 		config:                config,
 		Server:                hertzServer,
 		RegistryConfigManager: registryConfigManager,

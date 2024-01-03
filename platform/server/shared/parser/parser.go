@@ -18,7 +18,9 @@
 
 package parser
 
-import "github.com/cloudwego/cwgo/platform/server/shared/consts"
+import (
+	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+)
 
 type Parser interface {
 	GetDependentFilePaths(baseDirPath, mainIdlPath string) (string, []string, error) // Obtain string slices that rely on main idl

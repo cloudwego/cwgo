@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	PkgName = "github.com/cloudwego/cwgo/platform/server/shared/errx"
+	PkgName = "github.com/cloudwego/cwgo/platform/shared/errx"
 )
 
 type (

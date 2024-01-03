@@ -16,33 +16,31 @@
  *
  */
 
-package agent
+package config
 
-type Config struct {
-	Addr           string `mapstructure:"addr"`
-	MaxConnections int64  `mapstructure:"maxConnections"`
-	MaxQPS         int64  `mapstructure:"maxQPS"`
-	WorkerNum      int    `mapstructure:"workerNum"`
+import "github.com/cloudwego/cwgo/platform/server/shared/log"
+
+type LoggerConfig struct {
+	SavePath     string `mapstructure:"savePath"`
+	EncoderType  string `mapstructure:"encoderType"`
+	EncodeLevel  string `mapstructure:"encodeLevel"`
+	EncodeCaller string `mapstructure:"encodeCaller"`
 }
 
-type Metadata struct {
-	ServiceId string `yaml:"service_id"`
-}
-
-func (conf *Config) SetUp() {
-	conf.setDefaults()
-}
-
-func (conf *Config) setDefaults() {
-	if conf.Addr == "" {
-		conf.Addr = "0.0.0.0:11010"
+func (conf *LoggerConfig) Init() {
+	if conf.SavePath == "" {
+		conf.SavePath = "log"
 	}
 
-	if conf.MaxConnections == 0 {
-		conf.MaxConnections = 2000
+	if conf.EncoderType == "" {
+		conf.EncoderType = log.ConsoleEncoder
 	}
 
-	if conf.MaxQPS == 0 {
-		conf.MaxQPS = 500
+	if conf.EncodeLevel == "" {
+		conf.EncodeLevel = log.CapitalLevelEncoder
+	}
+
+	if conf.EncodeCaller == "" {
+		conf.EncodeCaller = log.FullCallerEncoder
 	}
 }

@@ -16,30 +16,32 @@
  *
  */
 
-package repository
+package utils
 
 import (
 	"errors"
 	"fmt"
 	"regexp"
-	"strings"
 )
 
-func GetRepoFullUrlGitLab(repoUrl, ref, filePid string) string {
-	return fmt.Sprintf("%s/-/blob/%s/%s?ref_type=heads", repoUrl, ref, filePid)
+func GetRepoFullUrlGitHub(repoUrl, ref, filePid string) string {
+	return fmt.Sprintf("%s/blob/%s/%s", repoUrl, ref, filePid)
 }
 
-func ParseRepoFileUrlGitLab(url string) (filePid, owner, repoName string, err error) {
-	// using regular expressions to match fields
-	regex := regexp.MustCompile(regGitLabURL)
+func ParseRepoFileUrlGitHub(url string) (filePid, owner, repoName string, err error) {
+	// define a regular expression to parse the GitHub URL.
+	regex := regexp.MustCompile(regGitHubURL)
+
+	// use the regular expression to extract relevant components from the URL.
 	matches := regex.FindStringSubmatch(url)
 	if len(matches) != 5 {
-		return "", "", "", errors.New("idlPath format wrong, cannot parse gitlab URL")
+		return "", "", "", errors.New("IDL path format is incorrect; unable to parse the GitHub URL")
 	}
 
+	// assign values to the returned variables.
 	owner = matches[1]
 	repoName = matches[2]
-	filePid = strings.Split(matches[4], "?")[0]
+	filePid = matches[4]
 
 	return filePid, owner, repoName, nil
 }

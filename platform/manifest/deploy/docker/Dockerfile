@@ -16,6 +16,8 @@ ENV GOPROXY=${GOPROXY}
 COPY ./server /build
 WORKDIR /build
 
+ENV CGO_ENABLED=0
+
 RUN go build -ldflags="-s -w" -o cwgo-platform cmd/command.go
 
 FROM golang:1.20.11-alpine3.18 as run

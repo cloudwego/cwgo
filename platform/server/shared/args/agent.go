@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2023 CloudWeGo Authors
+ * Copyright 2022 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
  *
  */
 
-package store
+package args
 
-import "fmt"
+import "github.com/spf13/cobra"
 
-type Mongo struct {
-	Addr         string `mapstructure:"addr"`
-	Port         string `mapstructure:"port"`
-	DatabaseName string `mapstructure:"databaseName"`
-	Username     string `mapstructure:"username"`
-	Password     string `mapstructure:"password"`
+type AgentArgs struct {
+	GlobalArgs
 }
 
-func (m Mongo) GetAddr() string {
-	return fmt.Sprintf("mongodb://%s:%s", m.Addr, m.Port)
+func NewAgentArgs() *AgentArgs {
+	return &AgentArgs{}
+}
+
+func (o *AgentArgs) AddFlags(cmd *cobra.Command) {
+	o.GlobalArgs.AddFlags(cmd)
 }

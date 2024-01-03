@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2023 CloudWeGo Authors
+ * Copyright 2022 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,23 @@
  *
  */
 
-package repository
+package args
 
-const (
-	RegRepoURL = "https?:\\/\\/([^\\/]+)\\/([^\\/]+)\\/([^\\/]+)"
+import "github.com/spf13/cobra"
 
-	githubURLPrefix = "https://github.com/"
-	regGitHubURL    = `https://github\.com/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
+type ApiArgs struct {
+	GlobalArgs
+	StaticFilePath string
+}
 
-	regGitLabURL = `https?://[^/]+/([^\/]+)\/([^\/]+)\/-\/blob\/([^\/]+)\/(.+)`
-)
+func NewApiArgs() *ApiArgs {
+	return &ApiArgs{}
+}
+
+func (o *ApiArgs) AddFlags(cmd *cobra.Command) {
+	o.GlobalArgs.AddFlags(cmd)
+
+	flagSet := cmd.Flags()
+
+	flagSet.StringVarP(&o.StaticFilePath, "static_file_path", "", "", "web static file path")
+}

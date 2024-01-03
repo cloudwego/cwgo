@@ -29,7 +29,7 @@ import (
 	"time"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/utils/internal/repository"
+
 	"github.com/google/go-github/v56/github"
 	"github.com/xanzy/go-gitlab"
 )
@@ -176,16 +176,16 @@ func GetGitHubTokenInfo(client *github.Client) (owner string, ownerId int64, tok
 func GetRepoFullUrl(repoType int32, repoUrl, ref, filePid string) string {
 	switch repoType {
 	case consts.RepositoryTypeNumGitLab:
-		return repository.GetRepoFullUrlGitLab(repoUrl, ref, filePid)
+		return GetRepoFullUrlGitLab(repoUrl, ref, filePid)
 	case consts.RepositoryTypeNumGithub:
-		return repository.GetRepoFullUrlGitHub(repoUrl, ref, filePid)
+		return GetRepoFullUrlGitHub(repoUrl, ref, filePid)
 	default:
 		return ""
 	}
 }
 
 func ParseRepoUrl(url string) (domain, owner, repoName string, err error) {
-	r := regexp.MustCompile(repository.RegRepoURL)
+	r := regexp.MustCompile(RegRepoURL)
 	matches := r.FindStringSubmatch(url)
 	if len(matches) != 4 {
 		return "", "", "", errors.New("repository path format is incorrect; unable to parse the GitHub URL")
@@ -197,10 +197,10 @@ func ParseRepoUrl(url string) (domain, owner, repoName string, err error) {
 func ParseRepoFileUrl(repoType int32, url string) (filePid, owner, repoName string, err error) {
 	switch repoType {
 	case consts.RepositoryTypeNumGitLab:
-		return repository.ParseRepoFileUrlGitLab(url)
+		return ParseRepoFileUrlGitLab(url)
 
 	case consts.RepositoryTypeNumGithub:
-		return repository.ParseRepoFileUrlGitHub(url)
+		return ParseRepoFileUrlGitHub(url)
 
 	default:
 		return "", "", "", errors.New("invalid repo type")

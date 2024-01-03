@@ -1,5 +1,4 @@
 /*
- *
  * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,29 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-package dispatcher
+package config
 
 import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 )
 
-type Config struct {
+type DispatcherConfig struct {
 	Type string `mapstructure:"type"`
 }
 
-func (conf *Config) SetUp() {
-	conf.setDefaults()
-}
-
-func (conf *Config) setDefaults() {
+func (conf *DispatcherConfig) Init() {
 	conf.Type = consts.DispatcherTypeHash
 }
 
-func (conf *Config) NewDispatcher() dispatcher.IDispatcher {
+func (conf *DispatcherConfig) NewDispatcher() dispatcher.IDispatcher {
 	dispatcherType, ok := consts.DispatcherMapToNum[conf.Type]
 	if !ok {
 		panic("invalid dispatcher type")

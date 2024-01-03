@@ -23,53 +23,33 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/agent"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/api"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/logger"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/internal/registry"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 )
+
+var manager *Manager
 
 type Manager struct {
 	ServerType         consts.ServerType
 	ServerMode         consts.ServerMode
 	ServiceId          string
 	Config             Config
-	ApiConfigManager   *api.ConfigManager
-	AgentConfigManager *agent.ConfigManager
+	ApiConfigManager   *ApiManager
+	AgentConfigManager *AgentManager
 }
-
-type Config struct {
-	App      app.Config      `mapstructure:"app"`
-	Logger   logger.Config   `mapstructure:"logger"`
-	Registry registry.Config `mapstructure:"registry"`
-	Store    store.Config    `mapstructure:"store"`
-	Api      api.Config      `mapstructure:"api"`
-	Agent    agent.Config    `mapstructure:"agent"`
-}
-
-func (conf *Config) SetUp() {
-	conf.App.SetUp()
-	conf.Logger.SetUp()
-	conf.Registry.SetUp()
-	conf.Store.SetUp()
-	conf.Api.SetUp()
-	conf.Agent.SetUp()
-}
-
-var manager *Manager
 
 type FileConfig struct {
 	Path string
 }
 
 func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, configType consts.ConfigType, metadata ...interface{}) error {
-	var config Config
+	var (
+		config Config
+		err    error
+	)
 
 	switch configType {
 	case consts.ConfigTypeNumFile:
@@ -83,7 +63,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 		configPath = filepath.ToSlash(filepath.Join(configPath, fmt.Sprintf("config-%s.yaml", consts.ServerModeMapToStr[serverMode])))
 
-		fmt.Printf("get config path: %s\n", configPath)
+		fmt.Printf("get config path: %s", configPath)
 
 		v := viper.New()
 		v.SetConfigType("yaml")
@@ -96,17 +76,11 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 		if err := v.Unmarshal(&config); err != nil {
 			return fmt.Errorf("unmarshal Config failed, err: %v", err)
 		}
-
-	case consts.ConfigTypeNumApollo:
-		// TODO: to be implemented
-		panic("to be implemented")
 	default:
 
 	}
 
-	config.SetUp()
-
-	var err error
+	config.Init()
 
 	// init consts in config
 	consts.ProxyUrl = config.App.ProxyUrl
@@ -137,7 +111,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 			panic(fmt.Sprintf("read agent metadata file failed, err: %v", err))
 		}
 
-		var agentMetadata agent.Metadata
+		var agentMetadata Metadata
 		err = yaml.Unmarshal(yamlFileBytes, &agentMetadata)
 		if err != nil {
 			panic(fmt.Sprintf("unmarshal agent metadata file failed, err: %v", err))
@@ -153,7 +127,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 			ServerMode:       serverMode,
 			ServiceId:        serviceId,
 			Config:           config,
-			ApiConfigManager: api.NewConfigManager(config.Api, config.Registry, config.Store, serviceId),
+			ApiConfigManager: NewApiManager(config.Api, config.Registry, config.Store, serviceId),
 		}
 	case consts.ServerTypeNumAgent:
 		manager = &Manager{
@@ -161,7 +135,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 			ServerMode:         serverMode,
 			ServiceId:          serviceId,
 			Config:             config,
-			AgentConfigManager: agent.NewConfigManager(config.Agent, config.Registry, config.Store, serviceId),
+			AgentConfigManager: NewAgentManager(config.Agent, config.Registry, config.Store, serviceId),
 		}
 	}
 

@@ -18,6 +18,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -28,12 +29,6 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/google/go-github/v56/github"
 	"go.uber.org/zap"
-)
-
-const (
-	githubURLPrefix  = "https://github.com/"
-	regGitHubURL     = `https://github\.com/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)`
-	regGithubRepoURL = `https://github\.com/([^\/]+)\/([^\/]+)`
 )
 
 type GitHubApi struct {
@@ -429,11 +424,12 @@ func (a *GitHubApi) DeleteAllFiles(owner, repoName, branch string) error {
 func (a *GitHubApi) AutoCreateRepository(owner, repoName string, isPrivate bool) (string, error) {
 	ctx := context.Background()
 	// new repository's URL
-	newRepoURL := githubURLPrefix + owner + "/" + repoName
+	newRepoURL := consts.GithubURLPrefix + owner + "/" + repoName
 	_, _, err := a.client.Repositories.Get(ctx, owner, repoName)
 	if err != nil {
 		// if the error is caused by the inability to find a repository with the name, create the repository
-		if _, ok := err.(*github.ErrorResponse); ok {
+		var errorResponse *github.ErrorResponse
+		if errors.As(err, &errorResponse) {
 			newRepo := &github.Repository{
 				Name:                github.String(repoName),
 				Private:             &isPrivate,

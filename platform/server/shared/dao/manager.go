@@ -21,24 +21,21 @@ package dao
 import (
 	"fmt"
 
-	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/idl"
-	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/repository"
-	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/template"
-	"github.com/cloudwego/cwgo/platform/server/shared/dao/internal/token"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
+
 	"go.uber.org/zap"
 )
 
 type Manager struct {
-	Idl        idl.IIdlDaoManager
-	Repository repository.IRepositoryDaoManager
-	Template   template.ITemplateDaoManager
-	Token      token.ITokenDaoManager
+	Idl        IIdlDaoManager
+	Repository IRepositoryDaoManager
+	Template   ITemplateDaoManager
+	Token      ITokenDaoManager
 }
 
-func NewDaoManager(conf store.Config) (*Manager, error) {
+func NewDaoManager(conf config.StoreConfig) (*Manager, error) {
 	switch conf.GetStoreType() {
 	case consts.StoreTypeNumMysql:
 		log.Info("initializing mysql")
@@ -49,10 +46,10 @@ func NewDaoManager(conf store.Config) (*Manager, error) {
 		}
 		log.Info("initialize mysql successfully")
 
-		idlDaoManager := idl.NewMysqlIDL(mysqlDb)
-		repositoryDaoManager := repository.NewMysqlRepository(mysqlDb)
-		templateDaoManager := template.NewMysqlTemplate(mysqlDb)
-		tokenDaoManager := token.NewMysqlToken(mysqlDb)
+		idlDaoManager := NewMysqlIDL(mysqlDb)
+		repositoryDaoManager := NewMysqlRepository(mysqlDb)
+		templateDaoManager := NewMysqlTemplate(mysqlDb)
+		tokenDaoManager := NewMysqlToken(mysqlDb)
 
 		return &Manager{
 			Idl:        idlDaoManager,
@@ -60,12 +57,6 @@ func NewDaoManager(conf store.Config) (*Manager, error) {
 			Template:   templateDaoManager,
 			Token:      tokenDaoManager,
 		}, nil
-
-	case consts.StoreTypeNumMongo:
-		panic("to be implemented")
-
-	case consts.StoreTypeNumRedis:
-		panic("to be implemented")
 
 	default:
 		return nil, fmt.Errorf("invalid store type")

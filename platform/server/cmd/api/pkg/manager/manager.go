@@ -24,11 +24,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
+
 	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
 	"github.com/cloudwego/kitex/transport"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
-	"github.com/cloudwego/cwgo/platform/server/shared/config/app"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
@@ -62,7 +63,7 @@ type Manager struct {
 	resolver   discovery.Resolver
 }
 
-func NewManager(appConf app.Config, daoManager *dao.Manager, dispatcher dispatcher.IDispatcher, registry registry.IRegistry, resolver discovery.Resolver) *Manager {
+func NewManager(appConf config.AppConfig, daoManager *dao.Manager, dispatcher dispatcher.IDispatcher, registry registry.IRegistry, resolver discovery.Resolver) *Manager {
 	manager := &Manager{
 		Mutex:                 sync.Mutex{},
 		updateTaskInterval:    3 * time.Second,

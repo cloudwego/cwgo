@@ -16,12 +16,11 @@
  *
  */
 
-package registry
+package config
 
 import (
 	"fmt"
 
-	"github.com/cloudwego/cwgo/platform/server/shared/config/store"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
@@ -31,18 +30,34 @@ import (
 	"go.uber.org/zap"
 )
 
+type IRegistryConfigManager interface {
+	GetRegistryType() consts.RegistryType
+	GetRegistry() registry.IRegistry
+	GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info)
+	GetDiscoveryResolver() discovery.Resolver
+}
+
+type RegistryConfig struct {
+	Type    string                `mapstructure:"type"`
+	Builtin BuiltinRegistryConfig `mapstructure:"builtin"`
+}
+
+func (conf *RegistryConfig) Init() {
+	conf.Type = consts.RegistryTypeBuiltin
+}
+
 type BuiltinRegistryConfig struct {
 	Address string `mapstructure:"address"`
 }
 
 type BuiltinRegistryConfigManager struct {
 	Config       BuiltinRegistryConfig
-	storeConfig  store.Config
+	storeConfig  StoreConfig
 	RegistryType consts.RegistryType
 	Registry     *registry.BuiltinRegistry
 }
 
-func NewBuiltinRegistryConfigManager(config BuiltinRegistryConfig, storeConfig store.Config) (*BuiltinRegistryConfigManager, error) {
+func NewBuiltinRegistryConfigManager(config BuiltinRegistryConfig, storeConfig StoreConfig) (*BuiltinRegistryConfigManager, error) {
 	if config.Address == "" {
 		panic("builtin registry address is empty")
 	}

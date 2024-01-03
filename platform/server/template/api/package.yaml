@@ -31,7 +31,7 @@ layouts:
       	"github.com/cloudwego/hertz/pkg/app"
         hertzconsts "github.com/cloudwego/hertz/pkg/protocol/consts"
         "go.uber.org/zap"
-        "github.com/cloudwego/cwgo/platform/server/shared/logger"
+        "github.com/cloudwego/cwgo/platform/shared/logger"
         {{- range $k, $v := .Imports}}
           {{$k}}model "{{$v.Package}}"
           {{$k}}logic "{{$.ProjPackage}}/internal/biz/logic/{{$v.PackageName}}"
@@ -63,7 +63,7 @@ layouts:
         logger.Debug("http request args", zap.Reflect("args", req))
       
         l := {{$.PackageName}}logic.New{{$MethodInfo.Name}}Logic(ctx, svc.Svc)
-    
+      
       	res := l.{{$MethodInfo.Name}}(&req)
       
         logger.Debug("http response args", zap.Reflect("args", res))
@@ -149,7 +149,7 @@ layouts:
       {{- range $k, $v := .HttpMethod.Models}}
       	{{$k}} "{{$v.Package}}"
       {{- end}}
-        "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+        "github.com/cloudwego/cwgo/platform/cmd/api/internal/svc"
       )
       
       const (
