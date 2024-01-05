@@ -213,8 +213,13 @@ func hzArgsForHex(c *config.ServerArgument) (*hzConfig.Argument, error) {
 	}
 	hzArgs.CmdType = meta.CmdUpdate // update command is enough for hex
 	// these options are aligned with the kitex
-	hzArgs.ThriftOptions = append(hzArgs.ThriftOptions, "naming_style=golint", "ignore_initialisms", "gen_setter", "gen_deep_equal", "compatible_names", "frugal_tag")
-	hzArgs.ModelDir = consts.DefaultKitexModelDir
+	if strings.EqualFold(hzArgs.IdlType, consts.Thrift) {
+		hzArgs.ThriftOptions = append(hzArgs.ThriftOptions, "naming_style=golint", "ignore_initialisms", "gen_setter", "gen_deep_equal", "compatible_names", "frugal_tag")
+		hzArgs.ModelDir = consts.DefaultKitexModelDir
+	}
+	if strings.EqualFold(hzArgs.IdlType, consts.Proto) {
+		hzArgs.Use = fmt.Sprintf("%s/%s", hzArgs.Gomod, consts.DefaultKitexModelDir)
+	}
 	if hzArgs.CustomizePackage == path.Join(tpl.HertzDir, consts.Server, consts.Standard, consts.PackageLayoutFile) {
 		hzArgs.CustomizePackage = "" // disable the default hertz template for hex
 	}

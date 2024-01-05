@@ -37,6 +37,7 @@ const (
 const (
 	Thrift   = "thrift"
 	Protobuf = "protobuf"
+	Proto    = "proto"
 )
 
 // SysType is the running program's operating system type
