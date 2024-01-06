@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/cloudwego/hertz/cmd/hz v0.6.5
-	github.com/cloudwego/kitex v0.8.1-0.20231228051945-98b184166d21
+	github.com/cloudwego/kitex v0.8.1-0.20240104033255-ac3269c906f9
 	github.com/urfave/cli/v2 v2.23.5
 	gorm.io/driver/mysql v1.4.4
 	gorm.io/driver/postgres v1.4.5
