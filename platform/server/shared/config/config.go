@@ -16,10 +16,6 @@
 
 package config
 
-type Cfg interface {
-	Init()
-}
-
 type Config struct {
 	App      AppConfig      `mapstructure:"app"`
 	Logger   LoggerConfig   `mapstructure:"logger"`

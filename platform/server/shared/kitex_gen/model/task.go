@@ -8,37 +8,37 @@ import (
 	"fmt"
 )
 
-type Type int64
+type TaskType int64
 
 const (
-	Type_sync_idl_data Type = 0
+	TaskType_Sync TaskType = 1
 )
 
-func (p Type) String() string {
+func (p TaskType) String() string {
 	switch p {
-	case Type_sync_idl_data:
-		return "sync_idl_data"
+	case TaskType_Sync:
+		return "Sync"
 	}
 	return "<UNSET>"
 }
 
-func TypeFromString(s string) (Type, error) {
+func TaskTypeFromString(s string) (TaskType, error) {
 	switch s {
-	case "sync_idl_data":
-		return Type_sync_idl_data, nil
+	case "Sync":
+		return TaskType_Sync, nil
 	}
-	return Type(0), fmt.Errorf("not a valid Type string")
+	return TaskType(0), fmt.Errorf("not a valid TaskType string")
 }
 
-func TypePtr(v Type) *Type { return &v }
-func (p *Type) Scan(value interface{}) (err error) {
+func TaskTypePtr(v TaskType) *TaskType { return &v }
+func (p *TaskType) Scan(value interface{}) (err error) {
 	var result sql.NullInt64
 	err = result.Scan(value)
-	*p = Type(result.Int64)
+	*p = TaskType(result.Int64)
 	return
 }
 
-func (p *Type) Value() (driver.Value, error) {
+func (p *TaskType) Value() (driver.Value, error) {
 	if p == nil {
 		return nil, nil
 	}
@@ -46,10 +46,10 @@ func (p *Type) Value() (driver.Value, error) {
 }
 
 type Task struct {
-	Id           string `thrift:"Id,1" frugal:"1,default,string" json:"Id"`
-	Type         Type   `thrift:"Type,2" frugal:"2,default,Type" json:"Type"`
-	ScheduleTime string `thrift:"ScheduleTime,3" frugal:"3,default,string" json:"ScheduleTime"`
-	Data         *Data  `thrift:"Data,4" frugal:"4,default,Data" json:"Data"`
+	ID           string   `thrift:"ID,1" frugal:"1,default,string" json:"ID"`
+	Type         TaskType `thrift:"Type,2" frugal:"2,default,TaskType" json:"Type"`
+	ScheduleTime string   `thrift:"ScheduleTime,3" frugal:"3,default,string" json:"ScheduleTime"`
+	IdlID        int64    `thrift:"IdlID,4" frugal:"4,default,i64" json:"IdlID"`
 }
 
 func NewTask() *Task {
@@ -60,11 +60,11 @@ func (p *Task) InitDefault() {
 	*p = Task{}
 }
 
-func (p *Task) GetId() (v string) {
-	return p.Id
+func (p *Task) GetID() (v string) {
+	return p.ID
 }
 
-func (p *Task) GetType() (v Type) {
+func (p *Task) GetType() (v TaskType) {
 	return p.Type
 }
 
@@ -72,29 +72,20 @@ func (p *Task) GetScheduleTime() (v string) {
 	return p.ScheduleTime
 }
 
-var Task_Data_DEFAULT *Data
-
-func (p *Task) GetData() (v *Data) {
-	if !p.IsSetData() {
-		return Task_Data_DEFAULT
-	}
-	return p.Data
+func (p *Task) GetIdlID() (v int64) {
+	return p.IdlID
 }
-func (p *Task) SetId(val string) {
-	p.Id = val
+func (p *Task) SetID(val string) {
+	p.ID = val
 }
-func (p *Task) SetType(val Type) {
+func (p *Task) SetType(val TaskType) {
 	p.Type = val
 }
 func (p *Task) SetScheduleTime(val string) {
 	p.ScheduleTime = val
 }
-func (p *Task) SetData(val *Data) {
-	p.Data = val
-}
-
-func (p *Task) IsSetData() bool {
-	return p.Data != nil
+func (p *Task) SetIdlID(val int64) {
+	p.IdlID = val
 }
 
 func (p *Task) String() string {
@@ -102,73 +93,4 @@ func (p *Task) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("Task(%+v)", *p)
-}
-
-type SyncIdlData struct {
-	IdlId int64 `thrift:"IdlId,1" frugal:"1,default,i64" json:"IdlId"`
-}
-
-func NewSyncIdlData() *SyncIdlData {
-	return &SyncIdlData{}
-}
-
-func (p *SyncIdlData) InitDefault() {
-	*p = SyncIdlData{}
-}
-
-func (p *SyncIdlData) GetIdlId() (v int64) {
-	return p.IdlId
-}
-func (p *SyncIdlData) SetIdlId(val int64) {
-	p.IdlId = val
-}
-
-func (p *SyncIdlData) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("SyncIdlData(%+v)", *p)
-}
-
-type Data struct {
-	SyncIdlData *SyncIdlData `thrift:"syncIdlData,1,optional" frugal:"1,optional,SyncIdlData" json:"syncIdlData,omitempty"`
-}
-
-func NewData() *Data {
-	return &Data{}
-}
-
-func (p *Data) InitDefault() {
-	*p = Data{}
-}
-
-var Data_SyncIdlData_DEFAULT *SyncIdlData
-
-func (p *Data) GetSyncIdlData() (v *SyncIdlData) {
-	if !p.IsSetSyncIdlData() {
-		return Data_SyncIdlData_DEFAULT
-	}
-	return p.SyncIdlData
-}
-func (p *Data) SetSyncIdlData(val *SyncIdlData) {
-	p.SyncIdlData = val
-}
-
-func (p *Data) CountSetFieldsData() int {
-	count := 0
-	if p.IsSetSyncIdlData() {
-		count++
-	}
-	return count
-}
-
-func (p *Data) IsSetSyncIdlData() bool {
-	return p.SyncIdlData != nil
-}
-
-func (p *Data) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("Data(%+v)", *p)
 }

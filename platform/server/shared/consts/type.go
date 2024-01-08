@@ -39,7 +39,7 @@ type ServerMode uint32
 
 const (
 	ServerModeNumDev ServerMode = iota + 1
-	ServerModeNumPro
+	ServerModeNumProd
 
 	ServerModeDev = "dev"
 	ServerModePro = "prod"
@@ -47,12 +47,12 @@ const (
 
 var (
 	ServerModeMapToStr = map[ServerMode]string{
-		ServerModeNumDev: ServerModeDev,
-		ServerModeNumPro: ServerModePro,
+		ServerModeNumDev:  ServerModeDev,
+		ServerModeNumProd: ServerModePro,
 	}
 	ServerModeMapToNum = map[string]ServerMode{
 		ServerModeDev: ServerModeNumDev,
-		ServerModePro: ServerModeNumPro,
+		ServerModePro: ServerModeNumProd,
 	}
 )
 
@@ -60,14 +60,17 @@ type RegistryType uint32
 
 const (
 	RegistryTypeNumBuiltin RegistryType = iota + 1
+	RegistryTypeNumRedis
 	RegistryTypeNumConsul
 
 	RegistryTypeBuiltin = "builtin"
+	RegistryTypeRedis   = "redis"
 	RegistryTypeConsul  = "consul"
 )
 
 var RegistryTypeMapToNum = map[string]RegistryType{
 	RegistryTypeBuiltin: RegistryTypeNumBuiltin,
+	RegistryTypeRedis:   RegistryTypeNumRedis,
 	RegistryTypeConsul:  RegistryTypeNumConsul,
 }
 

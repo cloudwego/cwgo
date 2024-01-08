@@ -19,29 +19,18 @@
 package manager
 
 import (
-	"context"
-	"fmt"
 	"sync"
 	"time"
 
-	"github.com/cloudwego/cwgo/platform/server/shared/config"
+	"github.com/cloudwego/kitex/pkg/discovery"
 
-	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
-	"github.com/cloudwego/kitex/transport"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/dispatcher"
-	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent/agentservice"
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
-	"github.com/cloudwego/cwgo/platform/server/shared/log"
+	"github.com/cloudwego/cwgo/platform/server/shared/meta"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
-	"github.com/cloudwego/cwgo/platform/server/shared/service"
-	"github.com/cloudwego/cwgo/platform/server/shared/task"
-	"github.com/cloudwego/kitex/client"
-	"github.com/cloudwego/kitex/pkg/discovery"
-	"go.uber.org/zap"
 )
 
 // Manager that
@@ -51,256 +40,57 @@ type Manager struct {
 	updateTaskInterval    time.Duration
 	currentUpdateTaskTime time.Time
 	lastUpdateTaskTime    time.Time
+	agents                []*meta.Agent
+	syncAgentInterval     time.Duration
+	syncIdlInterval       time.Duration
+	// api service id
+	apiID string
 
-	agents []*service.Service
-
-	syncAgentServiceInterval time.Duration
-	syncIdlInterval          time.Duration
-
-	daoManager *dao.Manager
-	dispatcher dispatcher.IDispatcher
-	registry   registry.IRegistry
-	resolver   discovery.Resolver
+	// isMasterApi
+	// false:
+	//   1. will not push task to agent service
+	//   2. trying to promote to master
+	// true:
+	//   1. will push task to agent service
+	//   2. trying to maintain the master identity
+	isMasterApi bool
+	rdb         redis.UniversalClient
+	daoManager  *dao.Manager
+	dispatcher  dispatcher.IDispatcher
+	registry    registry.IRegistry
+	resolver    discovery.Resolver
 }
 
-func NewManager(appConf config.AppConfig, daoManager *dao.Manager, dispatcher dispatcher.IDispatcher, registry registry.IRegistry, resolver discovery.Resolver) *Manager {
+func NewApiManager(
+	appConf config.AppConfig,
+	apiID string,
+	rdb redis.UniversalClient,
+	daoManager *dao.Manager,
+	dispatcher dispatcher.IDispatcher,
+	registry registry.IRegistry,
+	resolver discovery.Resolver,
+) *Manager {
 	manager := &Manager{
 		Mutex:                 sync.Mutex{},
+		rdb:                   rdb,
+		isMasterApi:           false,
 		updateTaskInterval:    3 * time.Second,
 		currentUpdateTaskTime: time.Time{},
 		lastUpdateTaskTime:    time.Now(),
-
-		agents: make([]*service.Service, 0),
-
-		syncAgentServiceInterval: appConf.GetSyncAgentServiceInterval(),
-		syncIdlInterval:          appConf.GetSyncIdlInterval(),
-
-		daoManager: daoManager,
-		dispatcher: dispatcher,
-		registry:   registry,
-		resolver:   resolver,
+		agents:                make([]*meta.Agent, 0),
+		syncAgentInterval:     appConf.GetSyncAgentServiceInterval(),
+		syncIdlInterval:       appConf.GetSyncIdlInterval(),
+		apiID:                 apiID,
+		daoManager:            daoManager,
+		dispatcher:            dispatcher,
+		registry:              registry,
+		resolver:              resolver,
 	}
 
-	go func() {
-		// get all task from database
-		if manager.syncIdlInterval != 0 {
-			log.Info("acquiring all sync task from database")
-			page := 1
-			for {
-				idlModels, total, err := daoManager.Idl.GetIDLList(context.Background(),
-					model.IDL{
-						Status: consts.IdlStatusNumActive,
-					},
-					int32(page), 1000, consts.OrderNumDec, "update_time")
-				if err != nil {
-					panic(fmt.Sprintf("get idl list failed, err: %v", err))
-				}
-				for _, idlModel := range idlModels {
-					err = manager.AddTask(
-						task.NewTask(
-							model.Type_sync_idl_data,
-							manager.syncIdlInterval.String(),
-							&model.Data{
-								SyncIdlData: &model.SyncIdlData{
-									IdlId: idlModel.Id,
-								},
-							},
-						))
-					if err != nil {
-						panic(err)
-					}
-				}
-				if int64(page)*1000 >= total {
-					break
-				}
-				page++
-			}
-			log.Info("acquire all sync task complete")
-		}
-	}()
-
-	go manager.StartUpdate()
+	go manager.tryPromoteApiToMasterSrv()
+	go manager.watchTaskUpdate()
+	go manager.syncTaskFromDB()
+	go manager.startUpdate()
 
 	return manager
-}
-
-func (m *Manager) newAgentClient(opts ...client.Option) (agentservice.Client, error) {
-	options := []client.Option{
-		client.WithResolver(m.resolver),
-		// open frugal
-		client.WithTransportProtocol(transport.Framed),
-		client.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead | thrift.FrugalWrite)),
-	}
-	options = append(options, opts...)
-	c, err := agentservice.NewClient(
-		consts.ServiceNameAgent,
-		options...,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return c, nil
-}
-
-func (m *Manager) GetAgentClient() (agentservice.Client, error) {
-	return m.newAgentClient()
-}
-
-func (m *Manager) GetAgentClientByServiceId(serviceId string) (agentservice.Client, error) {
-	return m.newAgentClient(client.WithTag(consts.ServiceID, serviceId))
-}
-
-func (m *Manager) AddTask(t *model.Task) error {
-	switch t.Type {
-	case model.Type_sync_idl_data:
-		if m.syncIdlInterval == 0 {
-			return nil
-		}
-		t.ScheduleTime = m.syncIdlInterval.String()
-	}
-	err := m.dispatcher.AddTask(t)
-	if err != nil {
-		return fmt.Errorf("add task to dispatcher failed, err: %v", err)
-	}
-
-	m.Lock()
-	m.currentUpdateTaskTime = time.Now()
-	m.Unlock()
-
-	return nil
-}
-
-func (m *Manager) DeleteTask(taskId string) error {
-	err := m.dispatcher.RemoveTask(taskId)
-	if err != nil {
-		return fmt.Errorf("delete task in dispatcher failed, err: %v", err)
-	}
-
-	m.Lock()
-	m.currentUpdateTaskTime = time.Now()
-	m.Unlock()
-
-	return nil
-}
-
-func (m *Manager) UpdateAgentTasks() {
-	var wg sync.WaitGroup
-	log.Debug("start update agent tasks")
-	for _, svr := range m.agents {
-		// push tasks to each agent
-		wg.Add(1)
-		go func(serviceId string) {
-			defer wg.Done()
-
-			c, err := m.GetAgentClientByServiceId(serviceId)
-			if err != nil {
-				log.Error("get agent client failed", zap.Error(err))
-			}
-
-			tasks := m.dispatcher.GetTaskByServiceId(serviceId)
-
-			rpcRes, err := c.UpdateTasks(context.Background(), &agent.UpdateTasksReq{Tasks: tasks})
-			if err != nil {
-				log.Error("update tasks to rpc client failed", zap.Error(err))
-			} else if rpcRes.Code != 0 {
-				log.Error("update tasks failed", zap.String("err", rpcRes.Msg))
-			}
-
-			log.Debug("update tasks to agent service successfully",
-				zap.String("service_id", serviceId),
-				zap.Reflect("tasks", tasks),
-			)
-		}(svr.Id)
-	}
-	wg.Wait()
-}
-
-func (m *Manager) StartUpdate() {
-	go func() {
-		for {
-			time.Sleep(m.syncAgentServiceInterval)
-			m.SyncService()
-		}
-	}()
-
-	go func() {
-		for {
-			time.Sleep(100 * time.Millisecond)
-
-			m.Lock()
-			if m.lastUpdateTaskTime != m.currentUpdateTaskTime {
-				if m.currentUpdateTaskTime.Add(m.updateTaskInterval).After(time.Now()) {
-					log.Debug("task changed, stat update agent tasks")
-					m.UpdateAgentTasks()
-					m.lastUpdateTaskTime = m.currentUpdateTaskTime
-				}
-			}
-			m.Unlock()
-		}
-	}()
-}
-
-// SyncService
-// sync service from registry
-func (m *Manager) SyncService() {
-	log.Debug("start sync service")
-	services, err := m.registry.GetAllService()
-	if err != nil {
-		return
-	}
-
-	seta := make(map[string]struct{})
-	setb := make(map[string]struct{})
-	var addServiceIds, delServicesIds []string
-
-	for _, svr := range m.agents {
-		seta[svr.Id] = struct{}{}
-	}
-	for _, svr := range services {
-		setb[svr.Id] = struct{}{}
-	}
-
-	for serviceId := range seta {
-		if _, ok := setb[serviceId]; !ok {
-			delServicesIds = append(delServicesIds, serviceId)
-		}
-	}
-
-	for serviceId := range setb {
-		if _, ok := seta[serviceId]; !ok {
-			addServiceIds = append(addServiceIds, serviceId)
-		}
-	}
-
-	for _, serviceId := range addServiceIds {
-		err = m.dispatcher.AddService(serviceId)
-		if err != nil {
-			continue
-		}
-	}
-
-	for _, serviceId := range delServicesIds {
-		err = m.dispatcher.DelService(serviceId)
-		if err != nil {
-			continue
-		}
-	}
-
-	m.agents = services
-
-	log.Debug("sync service complete", zap.Reflect("services", services))
-
-	if len(addServiceIds) != 0 || len(delServicesIds) != 0 {
-		// service changed, update cron
-		m.UpdateAgentTasks()
-	}
-}
-
-func (m *Manager) GetDispatcher() dispatcher.IDispatcher {
-	return m.dispatcher
-}
-
-func (m *Manager) GetRegistry() registry.IRegistry {
-	return m.registry
 }

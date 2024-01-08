@@ -23,12 +23,22 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 )
 
-func NewTask(tp model.Type, scheduleTime string, data *model.Data) *model.Task {
+func NewTask(tp model.TaskType, scheduleTime string, idlID int64) *model.Task {
 	taskId, _ := utils.NewTaskId()
 	return &model.Task{
-		Id:           taskId,
+		ID:           taskId,
 		ScheduleTime: scheduleTime,
 		Type:         tp,
-		Data:         data,
+		IdlID:        idlID,
 	}
 }
+
+type Message struct {
+	Command string     `json:"command"`
+	Task    model.Task `json:"task"`
+}
+
+const (
+	AddTask    = "add"
+	DeleteTask = "del"
+)

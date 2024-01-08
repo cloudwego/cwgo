@@ -30,7 +30,7 @@ type (
 func (servicePrefix) Type() string { return "service" }
 func (taskPrefix) Type() string    { return "task" }
 
-func NewServiceId() (string, error) {
+func NewServiceID() (string, error) {
 	id, err := typeid.New[servicePrefix]()
 	return id.String(), err
 }

@@ -45,12 +45,12 @@ func GetGormLoggerConfig() logger.Config {
 }
 
 func GetGormZapWriter(config logger.Config) (logger.Interface, error) {
-	if Logger == nil {
-		return nil, errors.New("logger is null, try user InitLogger to initialize a logger")
+	if _logger == nil {
+		return nil, errors.New("logger is null, try user InitLogger to init a logger")
 	}
 
 	return &GormZapWriter{
-		logger: Logger,
+		logger: _logger,
 		Config: config,
 	}, nil
 }

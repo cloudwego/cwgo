@@ -22,9 +22,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/cloudwego/cwgo/platform/server/shared/args"
-
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/args"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
@@ -59,18 +58,21 @@ func run(opts *args.ApiArgs) error {
 			EncodeCaller: loggerConfig.EncodeCaller,
 		},
 		config.GetManager().ServerType,
-		config.GetManager().ServiceId,
+		config.GetManager().ServiceID,
 		config.GetManager().ServerMode,
 	)
 
 	// init service context
 	svc.InitServiceContext()
 
+	//if err = _tmp(); err != nil {
+	//	return err
+	//}
+
 	// start api service
-	log.Info("register api service")
 	register(config.GetManager().ApiConfigManager.Server, staticFilePath)
 
-	log.Info("start running api service...")
+	log.Info("start running api service")
 	config.GetManager().ApiConfigManager.Server.Spin()
 
 	return nil
@@ -96,7 +98,7 @@ func validateOption(opts *args.ApiArgs) (metaData interface{}, serverMode consts
 			}
 		}
 		if serverMode == 0 {
-			serverMode = consts.ServerModeNumPro
+			serverMode = consts.ServerModeNumProd
 		}
 	}
 

@@ -25,7 +25,7 @@ import (
 	"time"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	entity2 "github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
+	entity "github.com/cloudwego/cwgo/platform/server/shared/dao/entity"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"gorm.io/gorm"
@@ -69,7 +69,7 @@ func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel mo
 		lastUpdateTime = time.Now()
 	}
 
-	var repoEntity entity2.MysqlRepository
+	var repoEntity entity.MysqlRepository
 
 	// check if repo exists
 	isExist, err := m.IsExist(ctx, repoModel.RepositoryDomain, repoModel.RepositoryOwner, repoModel.RepositoryName)
@@ -81,7 +81,7 @@ func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel mo
 	}
 
 	// create repo if record is not exist or record's `is_deleted` = 1
-	repoEntity = entity2.MysqlRepository{
+	repoEntity = entity.MysqlRepository{
 		RepositoryType: repoModel.RepositoryType,
 		Domain:         repoModel.RepositoryDomain,
 		Owner:          repoModel.RepositoryOwner,
@@ -106,7 +106,7 @@ func (m *MysqlRepositoryManager) AddRepository(ctx context.Context, repoModel mo
 }
 
 func (m *MysqlRepositoryManager) DeleteRepository(ctx context.Context, ids []int64) error {
-	var repoEntity entity2.MysqlRepository
+	var repoEntity entity.MysqlRepository
 
 	err := m.db.WithContext(ctx).Transaction(
 		func(tx *gorm.DB) error {
@@ -121,7 +121,7 @@ func (m *MysqlRepositoryManager) DeleteRepository(ctx context.Context, ids []int
 
 			// delete idl info in repo
 			err := tx.Where("`idl_repository_id` IN ?", ids).
-				Delete(&entity2.MysqlIDL{}).Error
+				Delete(&entity.MysqlIDL{}).Error
 
 			return err
 		},
@@ -140,7 +140,7 @@ func (m *MysqlRepositoryManager) UpdateRepository(ctx context.Context, repoModel
 		}
 	}
 
-	repoEntity := entity2.MysqlRepository{
+	repoEntity := entity.MysqlRepository{
 		ID:     repoModel.Id,
 		Branch: repoModel.RepositoryBranch,
 		Status: repoModel.Status,
@@ -152,7 +152,7 @@ func (m *MysqlRepositoryManager) UpdateRepository(ctx context.Context, repoModel
 				// if repo status change to inactive
 				// then idl in repo should change to inactive too
 				err := tx.
-					Table(entity2.TableNameMysqlIDL).
+					Table(entity.TableNameMysqlIDL).
 					Where("`idl_repository_id` = ?", repoEntity.ID).
 					UpdateColumn("status", consts.IdlStatusNumInactive).Error
 				if err != nil {
@@ -165,7 +165,7 @@ func (m *MysqlRepositoryManager) UpdateRepository(ctx context.Context, repoModel
 				Model(&repoEntity).
 				Updates(repoEntity).Error
 			if err != nil {
-				if err == gorm.ErrRecordNotFound {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
 					return consts.ErrDatabaseRecordNotFound
 				}
 			}
@@ -186,7 +186,7 @@ func (m *MysqlRepositoryManager) Sync(ctx context.Context, repoModel model.Repos
 		lastSyncTime, _ = time.ParseInLocation(time.DateTime, repoModel.LastSyncTime, consts.TimeZone)
 	}
 
-	repoEntity := entity2.MysqlRepository{
+	repoEntity := entity.MysqlRepository{
 		ID:             repoModel.Id,
 		LastUpdateTime: lastUpdateTime,
 		LastSyncTime:   lastSyncTime,
@@ -208,7 +208,7 @@ func (m *MysqlRepositoryManager) ChangeRepositoryStatus(ctx context.Context, id 
 		}
 	}
 
-	repoEntity := entity2.MysqlRepository{
+	repoEntity := entity.MysqlRepository{
 		ID:     id,
 		Status: status,
 	}
@@ -219,7 +219,7 @@ func (m *MysqlRepositoryManager) ChangeRepositoryStatus(ctx context.Context, id 
 				// if repo status change to inactive
 				// then idl in repo should change to inactive too
 				err := tx.
-					Table(entity2.TableNameMysqlIDL).
+					Table(entity.TableNameMysqlIDL).
 					Where("`idl_repository_id` = ?", repoEntity.ID).
 					UpdateColumn("status", consts.IdlStatusNumInactive).Error
 				if err != nil {
@@ -232,7 +232,7 @@ func (m *MysqlRepositoryManager) ChangeRepositoryStatus(ctx context.Context, id 
 				Model(&repoEntity).
 				Updates(repoEntity).Error
 			if err != nil {
-				if err == gorm.ErrRecordNotFound {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
 					return consts.ErrDatabaseRecordNotFound
 				}
 			}
@@ -245,13 +245,13 @@ func (m *MysqlRepositoryManager) ChangeRepositoryStatus(ctx context.Context, id 
 }
 
 func (m *MysqlRepositoryManager) GetRepository(ctx context.Context, id int64) (*model.Repository, error) {
-	var repoEntity entity2.MysqlRepository
+	var repoEntity entity.MysqlRepository
 
 	err := m.db.WithContext(ctx).
 		Where("`id` = ?", id).
 		Take(&repoEntity).Error
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, consts.ErrDatabaseRecordNotFound
 		}
 		return nil, err
@@ -302,7 +302,7 @@ func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, reposito
 	}
 
 	err := db.
-		Model(&entity2.MysqlRepository{}).
+		Model(&entity.MysqlRepository{}).
 		Count(&total).Error
 	if err != nil {
 		return nil, -1, err
@@ -312,7 +312,7 @@ func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, reposito
 		return nil, total, nil
 	}
 
-	var repoEntities []*entity2.MysqlRepository
+	var repoEntities []*entity.MysqlRepository
 
 	// default sort field to 'update_time' if not provided
 	if orderBy == "" {
@@ -360,7 +360,7 @@ func (m *MysqlRepositoryManager) GetRepositoryList(ctx context.Context, reposito
 }
 
 func (m *MysqlRepositoryManager) GetAllRepositories(ctx context.Context) ([]*model.Repository, error) {
-	var repoEntities []*entity2.MysqlRepository
+	var repoEntities []*entity.MysqlRepository
 
 	err := m.db.WithContext(ctx).
 		Find(&repoEntities).Error
@@ -396,7 +396,7 @@ func (m *MysqlRepositoryManager) GetTokenByID(ctx context.Context, id int64) (st
 	var token string
 
 	err := m.db.WithContext(ctx).
-		Table(entity2.TableNameMysqlRepository).
+		Table(entity.TableNameMysqlRepository).
 		Select("`token`").
 		Where("`id = ?`", id).
 		Take(&token).Error
@@ -408,7 +408,7 @@ func (m *MysqlRepositoryManager) GetRepoTypeByID(ctx context.Context, id int64) 
 	var repoType int32
 
 	err := m.db.WithContext(ctx).
-		Table(entity2.TableNameMysqlRepository).
+		Table(entity.TableNameMysqlRepository).
 		Select("`repo_type`").
 		Where("`id = ?`", id).
 		Take(&repoType).Error
@@ -423,9 +423,9 @@ func (m *MysqlRepositoryManager) IsExist(ctx context.Context, domain, owner, rep
 			owner,
 			repoName,
 		).
-		Take(&entity2.MysqlRepository{}).Error
+		Take(&entity.MysqlRepository{}).Error
 	if err != nil {
-		if err != gorm.ErrRecordNotFound {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, err
 		}
 	} else {

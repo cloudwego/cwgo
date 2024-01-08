@@ -16,24 +16,9 @@
  *
  */
 
-package service
+package meta
 
-import (
-	"time"
-)
-
-type Service struct {
-	Id             string
-	Host           string
-	Port           int
-	LastUpdateTime time.Time
-}
-
-func NewService(serviceId, host string, port int) (*Service, error) {
-	return &Service{
-		Id:             serviceId,
-		Host:           host,
-		Port:           port,
-		LastUpdateTime: time.Now(),
-	}, nil
+type Agent struct {
+	ID   string
+	Host string
 }

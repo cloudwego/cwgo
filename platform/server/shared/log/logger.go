@@ -29,7 +29,10 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var Logger *zap.Logger
+var (
+	_logger     *zap.Logger
+	sugarLogger *zap.SugaredLogger
+)
 
 type Config struct {
 	SavePath     string `mapstructure:"savePath"`
@@ -113,47 +116,68 @@ func InitLogger(config Config, serverType consts.ServerType, serviceId string, s
 			zapcore.NewCore(encoder, getWriteSyncer(fmt.Sprintf("./%s/warn/server_warn.log", savePath)), warnPriority),
 			zapcore.NewCore(encoder, getWriteSyncer(fmt.Sprintf("./%s/error/server_error.log", savePath)), errorPriority),
 		}
-		Logger = zap.New(zapcore.NewTee(cores[:]...), zap.AddCaller())
-		defer func(zapLogger *zap.Logger) {
-			_ = zapLogger.Sync()
-		}(Logger)
+		_logger = zap.New(
+			zapcore.NewTee(cores[:]...),
+			zap.AddCaller(),
+			zap.AddCallerSkip(1),
+		)
+		sugarLogger = zap.New(
+			zapcore.NewTee(cores[:]...),
+			zap.AddCaller(),
+		).Sugar()
 
-	case consts.ServerModeNumPro:
+		defer func(zapLogger *zap.Logger, sugarLogger *zap.SugaredLogger) {
+			_ = zapLogger.Sync()
+			_ = sugarLogger.Sync()
+		}(_logger, sugarLogger)
+
+	case consts.ServerModeNumProd:
 		dynamicLevel.SetLevel(zap.InfoLevel)
 
 		cores := [...]zapcore.Core{
 			zapcore.NewCore(encoder, os.Stdout, dynamicLevel), // console output
 			zapcore.NewCore(encoder, getWriteSyncer(fmt.Sprintf("./%s/server.log", savePath)), dynamicLevel),
 		}
-		Logger = zap.New(zapcore.NewTee(cores[:]...), zap.AddCaller())
-		defer func(zapLogger *zap.Logger) {
+		_logger = zap.New(
+			zapcore.NewTee(cores[:]...),
+			zap.AddCaller(),
+			zap.AddCallerSkip(1),
+		)
+		sugarLogger = zap.New(
+			zapcore.NewTee(cores[:]...),
+			zap.AddCaller(),
+			zap.AddCallerSkip(2),
+		).Sugar()
+
+		defer func(zapLogger *zap.Logger, sugarLogger *zap.SugaredLogger) {
 			_ = zapLogger.Sync()
-		}(Logger)
+			_ = sugarLogger.Sync()
+		}(_logger, sugarLogger)
 	default:
 		panic("invalid run mode")
 	}
 }
 
 func Info(msg string, field ...zap.Field) {
-	Logger.Info(msg, field...)
+	_logger.Info(msg, field...)
 }
 
 func Error(msg string, field ...zap.Field) {
-	Logger.Info(msg, field...)
+	_logger.Info(msg, field...)
 }
 
 func Debug(msg string, field ...zap.Field) {
-	Logger.Debug(msg, field...)
+	_logger.Debug(msg, field...)
 }
 
 func Warn(msg string, field ...zap.Field) {
-	Logger.Warn(msg, field...)
+	_logger.Warn(msg, field...)
 }
 
 func Fatal(msg string, field ...zap.Field) {
-	Logger.Fatal(msg, field...)
+	_logger.Fatal(msg, field...)
 }
 
 func Sugar() *zap.SugaredLogger {
-	return Logger.Sugar()
+	return sugarLogger
 }

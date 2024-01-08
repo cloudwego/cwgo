@@ -4,9 +4,65 @@ package agent
 
 import (
 	"context"
+	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/task"
 )
 
+type PingReq struct {
+	Msg string `thrift:"msg,1" frugal:"1,default,string" json:"msg"`
+}
+
+func NewPingReq() *PingReq {
+	return &PingReq{}
+}
+
+func (p *PingReq) InitDefault() {
+	*p = PingReq{}
+}
+
+func (p *PingReq) GetMsg() (v string) {
+	return p.Msg
+}
+func (p *PingReq) SetMsg(val string) {
+	p.Msg = val
+}
+
+func (p *PingReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("PingReq(%+v)", *p)
+}
+
+type PingResp struct {
+	Msg string `thrift:"msg,1" frugal:"1,default,string" json:"msg"`
+}
+
+func NewPingResp() *PingResp {
+	return &PingResp{}
+}
+
+func (p *PingResp) InitDefault() {
+	*p = PingResp{}
+}
+
+func (p *PingResp) GetMsg() (v string) {
+	return p.Msg
+}
+func (p *PingResp) SetMsg(val string) {
+	p.Msg = val
+}
+
+func (p *PingResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("PingResp(%+v)", *p)
+}
+
 type AgentService interface {
+	Ping(ctx context.Context, req *PingReq) (r *PingResp, err error)
+
 	AddRepository(ctx context.Context, req *AddRepositoryReq) (r *AddRepositoryRes, err error)
 
 	DeleteRepositories(ctx context.Context, req *DeleteRepositoriesReq) (r *DeleteRepositoriesRes, err error)
@@ -41,7 +97,7 @@ type AgentService interface {
 
 	GetTemplateItems(ctx context.Context, req *GetTemplateItemsReq) (r *GetTemplateItemsRes, err error)
 
-	UpdateTasks(ctx context.Context, req *UpdateTasksReq) (r *UpdateTasksRes, err error)
+	UpdateTask(ctx context.Context, req *task.UpdateTaskReq) (r *task.UpdateTaskResp, err error)
 
 	AddToken(ctx context.Context, req *AddTokenReq) (r *AddTokenRes, err error)
 

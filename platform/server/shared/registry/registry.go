@@ -19,12 +19,12 @@
 package registry
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/shared/service"
+	"github.com/cloudwego/cwgo/platform/server/shared/meta"
+	"github.com/cloudwego/kitex/pkg/registry"
 )
 
 type IRegistry interface {
-	GetAllService() ([]*service.Service, error)
-	Count() int // get current service num in registry
-	GetServiceById(string) (*service.Service, error)
-	ServiceExists(string) bool
+	registry.Registry
+	// GetAgents returns all agents
+	GetAgents() ([]*meta.Agent, error)
 }

@@ -19,98 +19,82 @@
 package config
 
 import (
-	"fmt"
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
+	"go.uber.org/zap"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/discovery"
 	kitexregistry "github.com/cloudwego/kitex/pkg/registry"
-	"go.uber.org/zap"
 )
 
 type IRegistryConfigManager interface {
 	GetRegistryType() consts.RegistryType
 	GetRegistry() registry.IRegistry
-	GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info)
-	GetDiscoveryResolver() discovery.Resolver
+	NewKitexRegistryInfo(serviceName, serviceId, addr string) *kitexregistry.Info
+	GetResolver() discovery.Resolver
 }
 
 type RegistryConfig struct {
-	Type    string                `mapstructure:"type"`
-	Builtin BuiltinRegistryConfig `mapstructure:"builtin"`
+	Type                string `mapstructure:"type"`
+	RedisRegistryConfig `mapstructure:"redis"`
 }
 
-func (conf *RegistryConfig) Init() {
-	conf.Type = consts.RegistryTypeBuiltin
+type RedisRegistryConfig struct{}
+
+func (c *RegistryConfig) Init() {
+	if c.Type == "" {
+		c.Type = consts.RegistryTypeRedis
+	}
 }
 
-type BuiltinRegistryConfig struct {
-	Address string `mapstructure:"address"`
-}
-
-type BuiltinRegistryConfigManager struct {
-	Config       BuiltinRegistryConfig
+type RedisRegistryManager struct {
+	Config       RedisRegistryConfig
 	storeConfig  StoreConfig
 	RegistryType consts.RegistryType
-	Registry     *registry.BuiltinRegistry
+	Registry     registry.IRegistry
 }
 
-func NewBuiltinRegistryConfigManager(config BuiltinRegistryConfig, storeConfig StoreConfig) (*BuiltinRegistryConfigManager, error) {
-	if config.Address == "" {
-		panic("builtin registry address is empty")
-	}
-
-	return &BuiltinRegistryConfigManager{
+func NewRedisRegistryManager(config RedisRegistryConfig, storeConfig StoreConfig) (*RedisRegistryManager, error) {
+	m := &RedisRegistryManager{
 		Config:       config,
 		storeConfig:  storeConfig,
-		RegistryType: consts.RegistryTypeNumBuiltin,
+		RegistryType: consts.RegistryTypeNumRedis,
 		Registry:     nil,
-	}, nil
-}
-
-func (cm *BuiltinRegistryConfigManager) GetRegistryType() consts.RegistryType {
-	return cm.RegistryType
-}
-
-func (cm *BuiltinRegistryConfigManager) GetRegistry() registry.IRegistry {
-	if cm.Registry == nil {
-		log.Info("initializing redis")
-		rdb, err := cm.storeConfig.NewRedisClient()
-		if err != nil {
-			log.Fatal("initializing redis failed", zap.Error(err))
-		}
-		log.Info("initializing redis successfully")
-
-		cm.Registry = registry.NewBuiltinRegistry(rdb)
 	}
-
-	return cm.Registry
-}
-
-func (cm *BuiltinRegistryConfigManager) GetKitexRegistry(serviceName, serviceId, addr string) (kitexregistry.Registry, *kitexregistry.Info) {
-	registryClient, err := registry.NewBuiltinKitexRegistryClient(cm.Config.Address)
+	rdb, err := m.storeConfig.NewRedisClient()
 	if err != nil {
-		panic(fmt.Sprintf("initialize builtin BuiltinRegistry client failed, err: %v", err))
+		return nil, err
 	}
+	m.Registry = registry.NewRedisRegistry(rdb)
+	return m, nil
+}
 
+func (m *RedisRegistryManager) GetRegistryType() consts.RegistryType {
+	return consts.RegistryTypeNumRedis
+}
+
+func (m *RedisRegistryManager) GetRegistry() registry.IRegistry {
+	return m.Registry
+}
+
+func (m *RedisRegistryManager) NewKitexRegistryInfo(serviceName, serviceID, addr string) *kitexregistry.Info {
+	netAddr := utils.NewNetAddr("tcp", addr)
 	registryInfo := &kitexregistry.Info{
-		ServiceName: serviceName,
-		Addr:        utils.NewNetAddr("tcp", addr),
+		ServiceName: consts.ServiceNameAgent,
+		Addr:        netAddr,
 		Tags: map[string]string{
-			"service_id": serviceId,
+			"service_id": serviceID,
 		},
 	}
-
-	return registryClient, registryInfo
+	return registryInfo
 }
 
-func (cm *BuiltinRegistryConfigManager) GetDiscoveryResolver() discovery.Resolver {
-	resolver, err := registry.NewBuiltinRegistryResolver(cm.Registry)
+func (m *RedisRegistryManager) GetResolver() discovery.Resolver {
+	rdb, err := m.storeConfig.NewRedisClient()
 	if err != nil {
-		panic(fmt.Sprintf("initialize builtin BuiltinRegistry resolver failed, err: %v", err))
+		log.Fatal("init redis failed", zap.Error(err))
 	}
-
-	return resolver
+	return registry.NewRedisResolver(rdb)
 }

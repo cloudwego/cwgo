@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/apache/thrift/lib/go/thrift"
+
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/task"
 )
 
 // unused protection
@@ -18,7 +20,84 @@ var (
 	_ = (*strings.Builder)(nil)
 	_ = reflect.Type(nil)
 	_ = thrift.TProtocol(nil)
+	_ = task.KitexUnusedProtection
 )
+
+type AgentServicePingArgs struct {
+	Req *PingReq `thrift:"req,1" frugal:"1,default,PingReq" json:"req"`
+}
+
+func NewAgentServicePingArgs() *AgentServicePingArgs {
+	return &AgentServicePingArgs{}
+}
+
+func (p *AgentServicePingArgs) InitDefault() {
+	*p = AgentServicePingArgs{}
+}
+
+var AgentServicePingArgs_Req_DEFAULT *PingReq
+
+func (p *AgentServicePingArgs) GetReq() (v *PingReq) {
+	if !p.IsSetReq() {
+		return AgentServicePingArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+func (p *AgentServicePingArgs) SetReq(val *PingReq) {
+	p.Req = val
+}
+
+func (p *AgentServicePingArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AgentServicePingArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServicePingArgs(%+v)", *p)
+}
+func (p *AgentServicePingArgs) GetFirstArgument() interface{} {
+	return p.Req
+}
+
+type AgentServicePingResult struct {
+	Success *PingResp `thrift:"success,0,optional" frugal:"0,optional,PingResp" json:"success,omitempty"`
+}
+
+func NewAgentServicePingResult() *AgentServicePingResult {
+	return &AgentServicePingResult{}
+}
+
+func (p *AgentServicePingResult) InitDefault() {
+	*p = AgentServicePingResult{}
+}
+
+var AgentServicePingResult_Success_DEFAULT *PingResp
+
+func (p *AgentServicePingResult) GetSuccess() (v *PingResp) {
+	if !p.IsSetSuccess() {
+		return AgentServicePingResult_Success_DEFAULT
+	}
+	return p.Success
+}
+func (p *AgentServicePingResult) SetSuccess(x interface{}) {
+	p.Success = x.(*PingResp)
+}
+
+func (p *AgentServicePingResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AgentServicePingResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AgentServicePingResult(%+v)", *p)
+}
+func (p *AgentServicePingResult) GetResult() interface{} {
+	return p.Success
+}
 
 type AgentServiceAddRepositoryArgs struct {
 	Req *AddRepositoryReq `thrift:"req,1" frugal:"1,default,AddRepositoryReq" json:"req"`
@@ -1312,79 +1391,79 @@ func (p *AgentServiceGetTemplateItemsResult) GetResult() interface{} {
 	return p.Success
 }
 
-type AgentServiceUpdateTasksArgs struct {
-	Req *UpdateTasksReq `thrift:"req,1" frugal:"1,default,UpdateTasksReq" json:"req"`
+type AgentServiceUpdateTaskArgs struct {
+	Req *task.UpdateTaskReq `thrift:"req,1" frugal:"1,default,task.UpdateTaskReq" json:"req"`
 }
 
-func NewAgentServiceUpdateTasksArgs() *AgentServiceUpdateTasksArgs {
-	return &AgentServiceUpdateTasksArgs{}
+func NewAgentServiceUpdateTaskArgs() *AgentServiceUpdateTaskArgs {
+	return &AgentServiceUpdateTaskArgs{}
 }
 
-func (p *AgentServiceUpdateTasksArgs) InitDefault() {
-	*p = AgentServiceUpdateTasksArgs{}
+func (p *AgentServiceUpdateTaskArgs) InitDefault() {
+	*p = AgentServiceUpdateTaskArgs{}
 }
 
-var AgentServiceUpdateTasksArgs_Req_DEFAULT *UpdateTasksReq
+var AgentServiceUpdateTaskArgs_Req_DEFAULT *task.UpdateTaskReq
 
-func (p *AgentServiceUpdateTasksArgs) GetReq() (v *UpdateTasksReq) {
+func (p *AgentServiceUpdateTaskArgs) GetReq() (v *task.UpdateTaskReq) {
 	if !p.IsSetReq() {
-		return AgentServiceUpdateTasksArgs_Req_DEFAULT
+		return AgentServiceUpdateTaskArgs_Req_DEFAULT
 	}
 	return p.Req
 }
-func (p *AgentServiceUpdateTasksArgs) SetReq(val *UpdateTasksReq) {
+func (p *AgentServiceUpdateTaskArgs) SetReq(val *task.UpdateTaskReq) {
 	p.Req = val
 }
 
-func (p *AgentServiceUpdateTasksArgs) IsSetReq() bool {
+func (p *AgentServiceUpdateTaskArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *AgentServiceUpdateTasksArgs) String() string {
+func (p *AgentServiceUpdateTaskArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AgentServiceUpdateTasksArgs(%+v)", *p)
+	return fmt.Sprintf("AgentServiceUpdateTaskArgs(%+v)", *p)
 }
-func (p *AgentServiceUpdateTasksArgs) GetFirstArgument() interface{} {
+func (p *AgentServiceUpdateTaskArgs) GetFirstArgument() interface{} {
 	return p.Req
 }
 
-type AgentServiceUpdateTasksResult struct {
-	Success *UpdateTasksRes `thrift:"success,0,optional" frugal:"0,optional,UpdateTasksRes" json:"success,omitempty"`
+type AgentServiceUpdateTaskResult struct {
+	Success *task.UpdateTaskResp `thrift:"success,0,optional" frugal:"0,optional,task.UpdateTaskResp" json:"success,omitempty"`
 }
 
-func NewAgentServiceUpdateTasksResult() *AgentServiceUpdateTasksResult {
-	return &AgentServiceUpdateTasksResult{}
+func NewAgentServiceUpdateTaskResult() *AgentServiceUpdateTaskResult {
+	return &AgentServiceUpdateTaskResult{}
 }
 
-func (p *AgentServiceUpdateTasksResult) InitDefault() {
-	*p = AgentServiceUpdateTasksResult{}
+func (p *AgentServiceUpdateTaskResult) InitDefault() {
+	*p = AgentServiceUpdateTaskResult{}
 }
 
-var AgentServiceUpdateTasksResult_Success_DEFAULT *UpdateTasksRes
+var AgentServiceUpdateTaskResult_Success_DEFAULT *task.UpdateTaskResp
 
-func (p *AgentServiceUpdateTasksResult) GetSuccess() (v *UpdateTasksRes) {
+func (p *AgentServiceUpdateTaskResult) GetSuccess() (v *task.UpdateTaskResp) {
 	if !p.IsSetSuccess() {
-		return AgentServiceUpdateTasksResult_Success_DEFAULT
+		return AgentServiceUpdateTaskResult_Success_DEFAULT
 	}
 	return p.Success
 }
-func (p *AgentServiceUpdateTasksResult) SetSuccess(x interface{}) {
-	p.Success = x.(*UpdateTasksRes)
+func (p *AgentServiceUpdateTaskResult) SetSuccess(x interface{}) {
+	p.Success = x.(*task.UpdateTaskResp)
 }
 
-func (p *AgentServiceUpdateTasksResult) IsSetSuccess() bool {
+func (p *AgentServiceUpdateTaskResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *AgentServiceUpdateTasksResult) String() string {
+func (p *AgentServiceUpdateTaskResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AgentServiceUpdateTasksResult(%+v)", *p)
+	return fmt.Sprintf("AgentServiceUpdateTaskResult(%+v)", *p)
 }
-func (p *AgentServiceUpdateTasksResult) GetResult() interface{} {
+func (p *AgentServiceUpdateTaskResult) GetResult() interface{} {
 	return p.Success
 }
 

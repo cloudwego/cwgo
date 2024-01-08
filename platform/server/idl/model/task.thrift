@@ -1,20 +1,12 @@
 namespace go model
 
-enum Type {
-    sync_idl_data,
-}
-
-union Data {
-    1: SyncIdlData syncIdlData,
+enum TaskType {
+    Sync = 1
 }
 
 struct Task {
-    1: string Id,
-    2: Type Type,
-    3: string ScheduleTime,
-    4: Data Data,
-}
-
-struct SyncIdlData {
-    1: i64 IdlId,
+    1: string ID
+    2: TaskType Type
+    3: string ScheduleTime
+    4: i64 IdlID
 }

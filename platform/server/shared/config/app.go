@@ -36,7 +36,9 @@ const (
 )
 
 func (conf *AppConfig) Init() {
-	conf.RunMode = consts.ServerRunModeCluster
+	if conf.RunMode == "" {
+		conf.RunMode = consts.ServerRunModeCluster
+	}
 }
 
 func (conf *AppConfig) GetSyncAgentServiceInterval() time.Duration {

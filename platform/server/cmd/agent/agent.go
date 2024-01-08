@@ -23,12 +23,13 @@ import (
 	"errors"
 	"os"
 
+	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/processor"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/args"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/handler"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/generator"
-	"github.com/cloudwego/cwgo/platform/server/cmd/agent/pkg/processor"
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
@@ -66,25 +67,25 @@ func run(args *args.AgentArgs) error {
 			EncodeCaller: loggerConfig.EncodeCaller,
 		},
 		config.GetManager().ServerType,
-		config.GetManager().ServiceId,
+		config.GetManager().ServiceID,
 		config.GetManager().ServerMode,
 	)
 
 	// init dao manager
-	log.Info("initializing dao manager")
+	log.Info("init dao manager")
 	daoManager, err := dao.NewDaoManager(config.GetManager().Config.Store)
 	if err != nil {
-		log.Error("initialize dao manager failed", zap.Error(err))
+		log.Error("init dao manager failed", zap.Error(err))
 		return err
 	}
-	log.Info("initialize dao manager successfully")
+	log.Info("init dao manager successfully")
 
-	log.Info("initializing dao manager")
+	log.Info("init dao manager")
 	repoManager, err := repository.NewRepoManager(daoManager)
 	if err != nil {
-		log.Fatal("initialize repository manager failed", zap.Error(err))
+		log.Fatal("init repository manager failed", zap.Error(err))
 	}
-	log.Info("initialize dao manager successfully")
+	log.Info("init dao manager successfully")
 
 	ctx := context.Background()
 
@@ -94,7 +95,7 @@ func run(args *args.AgentArgs) error {
 	log.Info("getting kitex server options successfully")
 
 	// init agent service
-	log.Info("initializing agent service impl")
+	log.Info("init agent service impl")
 	agentService := handler.NewAgentServiceImpl(
 		ctx,
 		&svc.ServiceContext{
@@ -103,12 +104,14 @@ func run(args *args.AgentArgs) error {
 			Generator:   generator.NewCwgoGenerator(),
 		},
 	)
-	log.Info("initialize agent service impl successfully")
+	log.Info("init agent service impl successfully")
 
 	// init processor
-	log.Info("initializing processor")
+	log.Info("init processor")
+
 	processor.InitProcessor(agentService)
-	log.Info("initialize processor successfully")
+
+	log.Info("init processor successfully")
 
 	// start service
 	log.Info("register agent service")
@@ -122,6 +125,14 @@ func run(args *args.AgentArgs) error {
 	if err != nil {
 		log.Error("kitex server run failed", zap.Error(err))
 	}
+
+	// graceful shutdown
+	defer func() {
+		err = svr.Stop()
+		if err != nil {
+			log.Error("kitex server gracefully shutdown failed", zap.Error(err))
+		}
+	}()
 
 	return nil
 }
@@ -146,7 +157,7 @@ func validateArgs(opts *args.AgentArgs) (metaData interface{}, serverMode consts
 			}
 		}
 		if serverMode == 0 {
-			serverMode = consts.ServerModeNumPro
+			serverMode = consts.ServerModeNumProd
 		}
 	}
 

@@ -20,7 +20,6 @@ package idl
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
@@ -76,7 +75,7 @@ func (l *DeleteIDLLogic) DeleteIDL(req *idl.DeleteIDLsReq) (res *idl.DeleteIDLsR
 	go func() {
 		// delete task
 		for _, id := range req.Ids {
-			_ = l.svcCtx.Manager.DeleteTask(strconv.FormatInt(id, 10))
+			_ = l.svcCtx.Manager.DeleteTask(consts.Sync, id, true)
 		}
 	}()
 

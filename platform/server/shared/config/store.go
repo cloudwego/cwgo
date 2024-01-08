@@ -107,11 +107,6 @@ func (conf *StoreConfig) NewRedisClient() (redis.UniversalClient, error) {
 	var rdb redis.UniversalClient
 
 	if conf.Redis.Type == "standalone" {
-		log.Info("connecting redis",
-			zap.String("type", conf.Redis.Type),
-			zap.Reflect("config", conf.Redis.StandAlone),
-		)
-
 		rdb = redis.NewClient(&redis.Options{
 			Addr:     conf.Redis.StandAlone.Addr,
 			Username: conf.Redis.StandAlone.Username,
@@ -119,11 +114,6 @@ func (conf *StoreConfig) NewRedisClient() (redis.UniversalClient, error) {
 			DB:       conf.Redis.StandAlone.Db,
 		})
 	} else if conf.Redis.Type == "cluster" || conf.Redis.Type == "" {
-		log.Info("connecting redis",
-			zap.String("type", conf.Redis.Type),
-			zap.Reflect("config", conf.Redis.Cluster),
-		)
-
 		addrs := make([]string, len(conf.Redis.Cluster.Addrs))
 		for i, addr := range conf.Redis.Cluster.Addrs {
 			addrs[i] = fmt.Sprintf("%s:%s", addr.Ip, addr.Port)
@@ -135,13 +125,11 @@ func (conf *StoreConfig) NewRedisClient() (redis.UniversalClient, error) {
 			Password: conf.Redis.Cluster.Password,
 		})
 	} else {
-		log.Error("invalid redis type", zap.String("type", conf.Redis.Type))
 		return nil, errors.New("invalid redis type")
 	}
 
 	err := rdb.Ping(context.Background()).Err()
 	if err != nil {
-		log.Error("ping redis failed", zap.Error(err))
 		return nil, err
 	}
 

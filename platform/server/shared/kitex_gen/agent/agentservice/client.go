@@ -5,12 +5,14 @@ package agentservice
 import (
 	"context"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	task "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/task"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
 )
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
+	Ping(ctx context.Context, req *agent.PingReq, callOptions ...callopt.Option) (r *agent.PingResp, err error)
 	AddRepository(ctx context.Context, req *agent.AddRepositoryReq, callOptions ...callopt.Option) (r *agent.AddRepositoryRes, err error)
 	DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq, callOptions ...callopt.Option) (r *agent.DeleteRepositoriesRes, err error)
 	UpdateRepository(ctx context.Context, req *agent.UpdateRepositoryReq, callOptions ...callopt.Option) (r *agent.UpdateRepositoryRes, err error)
@@ -28,7 +30,7 @@ type Client interface {
 	DeleteTemplateItem(ctx context.Context, req *agent.DeleteTemplateItemReq, callOptions ...callopt.Option) (r *agent.DeleteTemplateItemRes, err error)
 	UpdateTemplateItem(ctx context.Context, req *agent.UpdateTemplateItemReq, callOptions ...callopt.Option) (r *agent.UpdateTemplateItemRes, err error)
 	GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq, callOptions ...callopt.Option) (r *agent.GetTemplateItemsRes, err error)
-	UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error)
+	UpdateTask(ctx context.Context, req *task.UpdateTaskReq, callOptions ...callopt.Option) (r *task.UpdateTaskResp, err error)
 	AddToken(ctx context.Context, req *agent.AddTokenReq, callOptions ...callopt.Option) (r *agent.AddTokenRes, err error)
 	DeleteToken(ctx context.Context, req *agent.DeleteTokenReq, callOptions ...callopt.Option) (r *agent.DeleteTokenRes, err error)
 	GetToken(ctx context.Context, req *agent.GetTokenReq, callOptions ...callopt.Option) (r *agent.GetTokenRes, err error)
@@ -62,6 +64,11 @@ func MustNewClient(destService string, opts ...client.Option) Client {
 
 type kAgentServiceClient struct {
 	*kClient
+}
+
+func (p *kAgentServiceClient) Ping(ctx context.Context, req *agent.PingReq, callOptions ...callopt.Option) (r *agent.PingResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.Ping(ctx, req)
 }
 
 func (p *kAgentServiceClient) AddRepository(ctx context.Context, req *agent.AddRepositoryReq, callOptions ...callopt.Option) (r *agent.AddRepositoryRes, err error) {
@@ -149,9 +156,9 @@ func (p *kAgentServiceClient) GetTemplateItems(ctx context.Context, req *agent.G
 	return p.kClient.GetTemplateItems(ctx, req)
 }
 
-func (p *kAgentServiceClient) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq, callOptions ...callopt.Option) (r *agent.UpdateTasksRes, err error) {
+func (p *kAgentServiceClient) UpdateTask(ctx context.Context, req *task.UpdateTaskReq, callOptions ...callopt.Option) (r *task.UpdateTaskResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UpdateTasks(ctx, req)
+	return p.kClient.UpdateTask(ctx, req)
 }
 
 func (p *kAgentServiceClient) AddToken(ctx context.Context, req *agent.AddTokenReq, callOptions ...callopt.Option) (r *agent.AddTokenRes, err error) {

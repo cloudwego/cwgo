@@ -23,7 +23,6 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 	"github.com/cloudwego/cwgo/platform/server/shared/task"
 
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
@@ -105,14 +104,11 @@ func (l *AddIDLLogic) AddIDL(req *idl.AddIDLReq) (res *idl.AddIDLRes) {
 		// add task
 		_ = l.svcCtx.Manager.AddTask(
 			task.NewTask(
-				model.Type_sync_idl_data,
+				consts.Sync,
 				"",
-				&model.Data{
-					SyncIdlData: &model.SyncIdlData{
-						IdlId: rpcRes.Data.IdlId,
-					},
-				},
+				rpcRes.Data.IdlId,
 			),
+			true,
 		)
 	}()
 

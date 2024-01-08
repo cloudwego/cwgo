@@ -57,6 +57,7 @@ struct GetIDLsResData{
 struct SyncIDLsByIdReq{
     1: list<i64> ids
 }
+
 struct SyncIDLsByIdRes{
     1: i32 code
     2: string msg

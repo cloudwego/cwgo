@@ -21,9 +21,10 @@ package token
 import (
 	"context"
 
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/response"
+
 	tokenlogic "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/logic/token"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/model/response"
 	tokenmodel "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/token"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -52,14 +53,14 @@ func DeleteToken(ctx context.Context, rCtx *app.RequestContext) {
 
 	l := tokenlogic.NewDeleteTokenLogic(ctx, svc.Svc)
 
-	res := l.DeleteToken(&req)
+	resp := l.DeleteToken(&req)
 
-	log.Debug("http response args", zap.Reflect("args", res))
+	log.Debug("http response args", zap.Reflect("args", resp))
 
-	if res.Code != 0 {
-		response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)
+	if resp.Code != 0 {
+		response.Fail(rCtx, hertzconsts.StatusBadRequest, resp.Code, resp.Msg)
 		return
 	}
 
-	response.Ok(rCtx, res.Msg)
+	response.Ok(rCtx, resp.Msg)
 }

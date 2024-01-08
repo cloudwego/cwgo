@@ -20,16 +20,15 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 )
 
-// IDispatcher is a task dispatcher that dispatch tasks to agent services
+// IDispatcher is a task dispatcher that dispatch taskMap to agent services
 // the task will be assigned to a unique agent service at single point in time
 type IDispatcher interface {
-	AddService(serviceId string) error
-	DelService(serviceId string) error
+	AddService(serviceID string) error
+	DelService(serviceID string) error
 
 	AddTask(task *model.Task) error
-	RemoveTask(taskId string) error
+	RemoveTaskByIdlID(idlID int64) error
+	GetAllTasks() []*model.Task
 
-	GetTaskByServiceId(serviceId string) []*model.Task
-	GetServiceIdByTaskId(taskId string) string
-	GetTotalTaskNum() int
+	GetTasksByServiceID(serviceID string) []*model.Task
 }

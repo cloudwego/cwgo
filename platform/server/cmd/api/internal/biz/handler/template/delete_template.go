@@ -21,9 +21,10 @@ package template
 import (
 	"context"
 
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/response"
+
 	templatelogic "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/logic/template"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/model/response"
 	templatemodel "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/template"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -52,14 +53,14 @@ func DeleteTemplate(ctx context.Context, rCtx *app.RequestContext) {
 
 	l := templatelogic.NewDeleteTemplateLogic(ctx, svc.Svc)
 
-	res := l.DeleteTemplate(&req)
+	resp := l.DeleteTemplate(&req)
 
-	log.Debug("http response args", zap.Reflect("args", res))
+	log.Debug("http response args", zap.Reflect("args", resp))
 
-	if res.Code != 0 {
-		response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)
+	if resp.Code != 0 {
+		response.Fail(rCtx, hertzconsts.StatusBadRequest, resp.Code, resp.Msg)
 		return
 	}
 
-	response.Ok(rCtx, res.Msg)
+	response.Ok(rCtx, resp.Msg)
 }

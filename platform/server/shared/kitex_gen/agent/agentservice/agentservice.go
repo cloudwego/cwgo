@@ -5,6 +5,7 @@ package agentservice
 import (
 	"context"
 	agent "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	task "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/task"
 	frugal "github.com/cloudwego/frugal"
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
@@ -22,6 +23,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "AgentService"
 	handlerType := (*agent.AgentService)(nil)
 	methods := map[string]kitex.MethodInfo{
+		"Ping":               kitex.NewMethodInfo(pingHandler, newAgentServicePingArgs, newAgentServicePingResult, false),
 		"AddRepository":      kitex.NewMethodInfo(addRepositoryHandler, newAgentServiceAddRepositoryArgs, newAgentServiceAddRepositoryResult, false),
 		"DeleteRepositories": kitex.NewMethodInfo(deleteRepositoriesHandler, newAgentServiceDeleteRepositoriesArgs, newAgentServiceDeleteRepositoriesResult, false),
 		"UpdateRepository":   kitex.NewMethodInfo(updateRepositoryHandler, newAgentServiceUpdateRepositoryArgs, newAgentServiceUpdateRepositoryResult, false),
@@ -39,7 +41,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"DeleteTemplateItem": kitex.NewMethodInfo(deleteTemplateItemHandler, newAgentServiceDeleteTemplateItemArgs, newAgentServiceDeleteTemplateItemResult, false),
 		"UpdateTemplateItem": kitex.NewMethodInfo(updateTemplateItemHandler, newAgentServiceUpdateTemplateItemArgs, newAgentServiceUpdateTemplateItemResult, false),
 		"GetTemplateItems":   kitex.NewMethodInfo(getTemplateItemsHandler, newAgentServiceGetTemplateItemsArgs, newAgentServiceGetTemplateItemsResult, false),
-		"UpdateTasks":        kitex.NewMethodInfo(updateTasksHandler, newAgentServiceUpdateTasksArgs, newAgentServiceUpdateTasksResult, false),
+		"UpdateTask":         kitex.NewMethodInfo(updateTaskHandler, newAgentServiceUpdateTaskArgs, newAgentServiceUpdateTaskResult, false),
 		"AddToken":           kitex.NewMethodInfo(addTokenHandler, newAgentServiceAddTokenArgs, newAgentServiceAddTokenResult, false),
 		"DeleteToken":        kitex.NewMethodInfo(deleteTokenHandler, newAgentServiceDeleteTokenArgs, newAgentServiceDeleteTokenResult, false),
 		"GetToken":           kitex.NewMethodInfo(getTokenHandler, newAgentServiceGetTokenArgs, newAgentServiceGetTokenResult, false),
@@ -57,6 +59,24 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		Extra:           extra,
 	}
 	return svcInfo
+}
+
+func pingHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServicePingArgs)
+	realResult := result.(*agent.AgentServicePingResult)
+	success, err := handler.(agent.AgentService).Ping(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newAgentServicePingArgs() interface{} {
+	return agent.NewAgentServicePingArgs()
+}
+
+func newAgentServicePingResult() interface{} {
+	return agent.NewAgentServicePingResult()
 }
 
 func addRepositoryHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -365,22 +385,22 @@ func newAgentServiceGetTemplateItemsResult() interface{} {
 	return agent.NewAgentServiceGetTemplateItemsResult()
 }
 
-func updateTasksHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*agent.AgentServiceUpdateTasksArgs)
-	realResult := result.(*agent.AgentServiceUpdateTasksResult)
-	success, err := handler.(agent.AgentService).UpdateTasks(ctx, realArg.Req)
+func updateTaskHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*agent.AgentServiceUpdateTaskArgs)
+	realResult := result.(*agent.AgentServiceUpdateTaskResult)
+	success, err := handler.(agent.AgentService).UpdateTask(ctx, realArg.Req)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newAgentServiceUpdateTasksArgs() interface{} {
-	return agent.NewAgentServiceUpdateTasksArgs()
+func newAgentServiceUpdateTaskArgs() interface{} {
+	return agent.NewAgentServiceUpdateTaskArgs()
 }
 
-func newAgentServiceUpdateTasksResult() interface{} {
-	return agent.NewAgentServiceUpdateTasksResult()
+func newAgentServiceUpdateTaskResult() interface{} {
+	return agent.NewAgentServiceUpdateTaskResult()
 }
 
 func addTokenHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -445,6 +465,16 @@ func newServiceClient(c client.Client) *kClient {
 	return &kClient{
 		c: c,
 	}
+}
+
+func (p *kClient) Ping(ctx context.Context, req *agent.PingReq) (r *agent.PingResp, err error) {
+	var _args agent.AgentServicePingArgs
+	_args.Req = req
+	var _result agent.AgentServicePingResult
+	if err = p.c.Call(ctx, "Ping", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
 }
 
 func (p *kClient) AddRepository(ctx context.Context, req *agent.AddRepositoryReq) (r *agent.AddRepositoryRes, err error) {
@@ -617,11 +647,11 @@ func (p *kClient) GetTemplateItems(ctx context.Context, req *agent.GetTemplateIt
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq) (r *agent.UpdateTasksRes, err error) {
-	var _args agent.AgentServiceUpdateTasksArgs
+func (p *kClient) UpdateTask(ctx context.Context, req *task.UpdateTaskReq) (r *task.UpdateTaskResp, err error) {
+	var _args agent.AgentServiceUpdateTaskArgs
 	_args.Req = req
-	var _result agent.AgentServiceUpdateTasksResult
-	if err = p.c.Call(ctx, "UpdateTasks", &_args, &_result); err != nil {
+	var _result agent.AgentServiceUpdateTaskResult
+	if err = p.c.Call(ctx, "UpdateTask", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -662,6 +692,14 @@ var pretouchOnce sync.Once
 func pretouch() {
 	pretouchOnce.Do(func() {
 		var err error
+		err = frugal.Pretouch(reflect.TypeOf(agent.NewAgentServicePingArgs()))
+		if err != nil {
+			goto PRETOUCH_ERR
+		}
+		err = frugal.Pretouch(reflect.TypeOf(agent.NewAgentServicePingResult()))
+		if err != nil {
+			goto PRETOUCH_ERR
+		}
 		err = frugal.Pretouch(reflect.TypeOf(agent.NewAgentServiceAddRepositoryArgs()))
 		if err != nil {
 			goto PRETOUCH_ERR
@@ -798,11 +836,11 @@ func pretouch() {
 		if err != nil {
 			goto PRETOUCH_ERR
 		}
-		err = frugal.Pretouch(reflect.TypeOf(agent.NewAgentServiceUpdateTasksArgs()))
+		err = frugal.Pretouch(reflect.TypeOf(agent.NewAgentServiceUpdateTaskArgs()))
 		if err != nil {
 			goto PRETOUCH_ERR
 		}
-		err = frugal.Pretouch(reflect.TypeOf(agent.NewAgentServiceUpdateTasksResult()))
+		err = frugal.Pretouch(reflect.TypeOf(agent.NewAgentServiceUpdateTaskResult()))
 		if err != nil {
 			goto PRETOUCH_ERR
 		}

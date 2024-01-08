@@ -19,14 +19,10 @@
 package router
 
 import (
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/router/base"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/router/idl"
-	registry "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/router/registry"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/router/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/router/template"
-	token "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/router/token"
-	"github.com/cloudwego/cwgo/platform/server/shared/config"
-	"github.com/cloudwego/cwgo/platform/server/shared/consts"
+	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/router/token"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -37,16 +33,7 @@ func GeneratedRegister(r *server.Hertz) {
 	g := r.Group("", rootMw()...)
 
 	token.Register(g)
-
-	if config.GetManager().ApiConfigManager.RegistryConfigManager.GetRegistryType() == consts.RegistryTypeNumBuiltin {
-		registry.Register(g)
-	}
-
 	template.Register(g)
-
 	repository.Register(g)
-
 	idl.Register(g)
-
-	base.Register(g)
 }

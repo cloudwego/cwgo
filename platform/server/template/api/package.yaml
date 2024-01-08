@@ -28,10 +28,12 @@ layouts:
 
       import (
       	"context"
+        "go.uber.org/zap"
+      
       	"github.com/cloudwego/hertz/pkg/app"
         hertzconsts "github.com/cloudwego/hertz/pkg/protocol/consts"
-        "go.uber.org/zap"
-        "github.com/cloudwego/cwgo/platform/shared/logger"
+        "github.com/cloudwego/cwgo/platform/server/shared/log"
+        "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/response"
         {{- range $k, $v := .Imports}}
           {{$k}}model "{{$v.Package}}"
           {{$k}}logic "{{$.ProjPackage}}/internal/biz/logic/{{$v.PackageName}}"
@@ -39,6 +41,7 @@ layouts:
         "{{.ProjPackage}}/internal/consts"
         "{{.ProjPackage}}/internal/svc"
         "{{.ProjPackage}}/pkg/model/response"
+      
       )
 
       {{range $_, $MethodInfo := .Methods}}
@@ -49,7 +52,7 @@ layouts:
       	var req {{$.PackageName}}model.{{$MethodInfo.Name}}Req
       	err = rCtx.BindAndValidate(&req)
       	if err != nil {
-          logger.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
+          log.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
           response.Fail(
             rCtx,
             hertzconsts.StatusBadRequest,
@@ -60,20 +63,20 @@ layouts:
       	}
       	{{end}}
       
-        logger.Debug("http request args", zap.Reflect("args", req))
+        log.Debug("http request args", zap.Reflect("args", req))
       
         l := {{$.PackageName}}logic.New{{$MethodInfo.Name}}Logic(ctx, svc.Svc)
       
-      	res := l.{{$MethodInfo.Name}}(&req)
+      	resp := l.{{$MethodInfo.Name}}(&req)
       
-        logger.Debug("http response args", zap.Reflect("args", res))
+        log.Debug("http response args", zap.Reflect("args", res))
       
-        if res.Code != 0 {
-          response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)
+        if resp.Code != 0 {
+          response.Fail(rCtx, hertzconsts.StatusBadRequest, resp.Code, resp.Msg)
           return
         }
       
-        response.OkWithData(rCtx, res.Msg, res.Data)
+        response.OkWithData(rCtx, resp.Msg, resp.Data)
       }
       {{end}}
   # handler_single only represent it's a single handler template
@@ -90,7 +93,7 @@ layouts:
       	var req {{.ServiceInfo.Name}}model.{{.Name}}Req
       	err = rCtx.BindAndValidate(&req)
       	if err != nil {
-          logger.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
+          log.Debug("parse http request failed", zap.Error(err), zap.Reflect("http request", req))
           response.Fail(
             rCtx,
             hertzconsts.StatusBadRequest,
@@ -101,20 +104,20 @@ layouts:
       	}
       	{{end}}
       
-        logger.Debug("http request args", zap.Reflect("args", req))
+        log.Debug("http request args", zap.Reflect("args", req))
       
         l := {{.ServiceInfo.Name}}logic.New{{.Name}}Logic(ctx, svc.Svc)
       
-      	res := l.{{.Name}}(&req)
+      	resp := l.{{.Name}}(&req)
       
-        logger.Debug("http response args", zap.Reflect("args", res))
+        log.Debug("http response args", zap.Reflect("args", res))
       
-        if res.Code != 0 {
-          response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)
+        if resp.Code != 0 {
+          response.Fail(rCtx, hertzconsts.StatusBadRequest, resp.Code, resp.Msg)
           return
         }
       
-        response.OkWithData(rCtx, res.Msg, res.Data)
+        response.OkWithData(rCtx, resp.Msg, resp.Data)
       }
   - path: 'internal/biz/logic/{{index (Split (ToSnakeCase .ServiceName) "_") 0}}/{{ToSnakeCase .MethodName}}.go'
     loop_method: true

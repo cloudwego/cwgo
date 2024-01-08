@@ -24,6 +24,7 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/biz/service"
 	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
 	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/task"
 )
 
 // AgentServiceImpl implements the last service interface defined in the IDL.
@@ -56,13 +57,6 @@ func (s *AgentServiceImpl) AddIDL(ctx context.Context, req *agent.AddIDLReq) (re
 // SyncIDLsById implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq) (resp *agent.SyncIDLsByIdRes, err error) {
 	resp, err = service.NewSyncIDLsByIdService(ctx, s.svcCtx, s).Run(req)
-
-	return resp, err
-}
-
-// UpdateTasks implements the AgentServiceImpl interface.
-func (s *AgentServiceImpl) UpdateTasks(ctx context.Context, req *agent.UpdateTasksReq) (resp *agent.UpdateTasksRes, err error) {
-	resp, err = service.NewUpdateTasksService(ctx, s.svcCtx).Run(req)
 
 	return resp, err
 }
@@ -182,6 +176,20 @@ func (s *AgentServiceImpl) DeleteToken(ctx context.Context, req *agent.DeleteTok
 // GetToken implements the AgentServiceImpl interface.
 func (s *AgentServiceImpl) GetToken(ctx context.Context, req *agent.GetTokenReq) (resp *agent.GetTokenRes, err error) {
 	resp, err = service.NewGetTokenService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// Ping implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) Ping(ctx context.Context, req *agent.PingReq) (resp *agent.PingResp, err error) {
+	resp, err = service.NewPingService(ctx, s.svcCtx).Run(req)
+
+	return resp, err
+}
+
+// UpdateTask implements the AgentServiceImpl interface.
+func (s *AgentServiceImpl) UpdateTask(ctx context.Context, req *task.UpdateTaskReq) (resp *task.UpdateTaskResp, err error) {
+	resp, err = service.NewUpdateTaskService(ctx, s.svcCtx).Run(req)
 
 	return resp, err
 }

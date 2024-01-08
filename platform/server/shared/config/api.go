@@ -1,4 +1,5 @@
 /*
+ *
  * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
 package config
@@ -21,11 +23,12 @@ import (
 	"time"
 
 	"github.com/bytedance/gopkg/util/gopool"
+	"github.com/hertz-contrib/pprof"
+
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	http2config "github.com/hertz-contrib/http2/config"
 	http2factory "github.com/hertz-contrib/http2/factory"
-	"github.com/hertz-contrib/pprof"
 )
 
 type ApiConfig struct {
@@ -59,25 +62,28 @@ func (conf *ApiConfig) Init() {
 }
 
 type ApiManager struct {
-	config                ApiConfig
-	RegistryConfigManager IRegistryConfigManager
-	Server                *server.Hertz
-	ServiceId             string
-	ServiceName           string
+	config          ApiConfig
+	RegistryManager IRegistryConfigManager
+	Server          *server.Hertz
+	ServiceId       string
+	ServiceName     string
 }
 
-func NewApiManager(config ApiConfig, registryConfig RegistryConfig, storeConfig StoreConfig, serviceId string) *ApiManager {
-	var registryConfigManager IRegistryConfigManager
+func NewApiManager(config ApiConfig, registryConfig RegistryConfig, storeConfig StoreConfig, apiID string) *ApiManager {
+	var registryManager IRegistryConfigManager
 	var err error
 
 	switch registryConfig.Type {
-	case consts.RegistryTypeBuiltin:
-		registryConfigManager, err = NewBuiltinRegistryConfigManager(registryConfig.Builtin, storeConfig)
+	case consts.RegistryTypeRedis:
+		registryManager, err = NewRedisRegistryManager(registryConfig.RedisRegistryConfig, storeConfig)
 		if err != nil {
 			panic(err)
 		}
 	default:
-
+		panic("not support registryConfigType")
+	}
+	if err != nil {
+		panic(fmt.Sprintf("init registry failed, err: %v", err))
 	}
 
 	hertzServer := server.New(
@@ -92,6 +98,7 @@ func NewApiManager(config ApiConfig, registryConfig RegistryConfig, storeConfig 
 		server.WithKeepAlive(true),
 		server.WithH2C(false),
 		server.WithReadBufferSize(1<<10*4),
+		server.WithDisablePrintRoute(true),
 	)
 
 	gopool.SetCap(10000) // max connections
@@ -108,10 +115,10 @@ func NewApiManager(config ApiConfig, registryConfig RegistryConfig, storeConfig 
 	pprof.Register(hertzServer)
 
 	return &ApiManager{
-		config:                config,
-		Server:                hertzServer,
-		RegistryConfigManager: registryConfigManager,
-		ServiceId:             serviceId,
-		ServiceName:           fmt.Sprintf("%s-%s-%s", "cwgo", consts.ServerTypeAgent, serviceId),
+		config:          config,
+		Server:          hertzServer,
+		RegistryManager: registryManager,
+		ServiceId:       apiID,
+		ServiceName:     fmt.Sprintf("%s-%s-%s", "cwgo", consts.ServerTypeAgent, apiID),
 	}
 }

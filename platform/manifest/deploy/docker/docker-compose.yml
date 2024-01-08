@@ -23,9 +23,8 @@ services:
       --static_file_path ./dist
     depends_on:
       - redis
+      - cwgo-agent
   cwgo-agent:
-    depends_on:
-      - cwgo-api
     container_name: cwgo-agent
     build:
       context: ../../../

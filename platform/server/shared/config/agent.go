@@ -13,20 +13,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
 package config
 
 import (
 	"fmt"
-	"log"
 	"net"
 
 	"github.com/cloudwego/cwgo/platform/server/shared/consts"
-
+	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/cwgo/platform/server/shared/utils"
 	"github.com/cloudwego/kitex/pkg/limit"
-	"github.com/cloudwego/kitex/pkg/registry"
 	"github.com/cloudwego/kitex/pkg/remote/codec/thrift"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/transmeta"
@@ -43,7 +42,7 @@ type AgentConfig struct {
 }
 
 type Metadata struct {
-	ServiceId string `yaml:"service_id"`
+	ServiceID string `yaml:"service_id"`
 }
 
 func (conf *AgentConfig) Init() {
@@ -58,50 +57,57 @@ func (conf *AgentConfig) Init() {
 	if conf.MaxQPS == 0 {
 		conf.MaxQPS = 500
 	}
+
+	if conf.WorkerNum == 0 {
+		conf.WorkerNum = consts.DefaultWorkerNumber
+	}
 }
 
 type AgentManager struct {
 	config                AgentConfig
 	RegistryConfigManager IRegistryConfigManager
-	ServiceId             string
-	ServiceName           string
+	AgentID               string
+	Name                  string
 }
 
-func NewAgentManager(config AgentConfig, registryConfig RegistryConfig, storeConfig StoreConfig, serviceId string) *AgentManager {
+func NewAgentManager(config AgentConfig, registryConfig RegistryConfig, storeConfig StoreConfig, agentID string) *AgentManager {
 	var registryConfigManager IRegistryConfigManager
 	var err error
 
 	switch registryConfig.Type {
-	case consts.RegistryTypeBuiltin:
-		registryConfigManager, err = NewBuiltinRegistryConfigManager(registryConfig.Builtin, storeConfig)
-		if err != nil {
-			panic(fmt.Sprintf("initialize registry failed, err: %v", err))
-		}
+	case consts.RegistryTypeRedis:
+		registryConfigManager, err = NewRedisRegistryManager(registryConfig.RedisRegistryConfig, storeConfig)
 	default:
-		panic("not support registryConfigType")
+		panic("not support registry config type")
+	}
+	if err != nil {
+		panic(fmt.Sprintf("init registry failed, err: %v", err))
 	}
 
 	return &AgentManager{
 		config:                config,
 		RegistryConfigManager: registryConfigManager,
-		ServiceId:             serviceId,
-		ServiceName:           fmt.Sprintf("%s-%s-%s", "cwgo", consts.ServerTypeAgent, serviceId),
+		AgentID:               agentID,
+		Name:                  fmt.Sprintf("%s-%s-%s", "cwgo", consts.ServerTypeAgent, agentID),
 	}
 }
 
-func (cm *AgentManager) GetKitexServerOptions() []server.Option {
-	tcpAddr := getTCPAddr(cm.config.Addr)
-	kxRegistry, registryInfo := cm.getRegistryAndInfo()
+func (m *AgentManager) GetKitexServerOptions() []server.Option {
+	tcpAddr := getTCPAddr(m.config.Addr)
+
+	info := m.RegistryConfigManager.
+		NewKitexRegistryInfo(m.Name, m.AgentID, utils.FigureOutListenOn(m.config.Addr))
 
 	return []server.Option{
 		server.WithServiceAddr(tcpAddr),
-		server.WithRegistry(kxRegistry),
+		// registry config
+		server.WithRegistry(m.RegistryConfigManager.GetRegistry()),
+		server.WithRegistryInfo(info),
 		// open frugal
 		server.WithPayloadCodec(thrift.NewThriftCodecWithConfig(thrift.FrugalRead | thrift.FrugalWrite)),
-		server.WithRegistryInfo(registryInfo),
 		server.WithLimit(&limit.Option{MaxConnections: 2000, MaxQPS: 500}),
 		server.WithSuite(tracing.NewServerSuite()),
-		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: cm.ServiceName}),
+		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: m.Name}),
 		server.WithMetaHandler(transmeta.ServerTTHeaderHandler),
 	}
 }
@@ -113,10 +119,4 @@ func getTCPAddr(addr string) *net.TCPAddr {
 		log.Fatal("resolve tcp addr failed", zap.Error(err), zap.String("addr", addr))
 	}
 	return tcpAddr
-}
-
-// GetRegistryAndInfo extracts registry-related logic
-func (cm *AgentManager) getRegistryAndInfo() (registry.Registry, *registry.Info) {
-	pubListenOn := utils.FigureOutListenOn(cm.config.Addr)
-	return cm.RegistryConfigManager.GetKitexRegistry(cm.ServiceName, cm.ServiceId, pubListenOn)
 }

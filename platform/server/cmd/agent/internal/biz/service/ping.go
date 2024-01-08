@@ -1,5 +1,5 @@
 /*
-*
+ *
  * Copyright 2023 CloudWeGo Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,37 +13,36 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*
-*/
+ *
+ */
 
-package base
+package service
 
 import (
 	"context"
+	"errors"
 
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	base "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/base"
+	"github.com/cloudwego/cwgo/platform/server/cmd/agent/internal/svc"
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/agent"
 )
 
-const (
-	successMsgPing = "ping successfully"
-)
-
-type PingLogic struct {
+type PingService struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewPingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PingLogic {
-	return &PingLogic{
+func NewPingService(ctx context.Context, svcCtx *svc.ServiceContext) *PingService {
+	return &PingService{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *PingLogic) Ping(req *base.PingReq) (res *base.PingRes) {
-	return &base.PingRes{
-		Code: 0,
-		Msg:  successMsgPing,
+func (s *PingService) Run(req *agent.PingReq) (resp *agent.PingResp, err error) {
+	if req.Msg == "" {
+		return nil, errors.New("not receive api request")
 	}
+	return &agent.PingResp{
+		Msg: req.Msg,
+	}, nil
 }

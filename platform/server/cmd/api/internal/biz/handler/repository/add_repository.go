@@ -21,9 +21,10 @@ package repository
 import (
 	"context"
 
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/response"
+
 	repositorylogic "github.com/cloudwego/cwgo/platform/server/cmd/api/internal/biz/logic/repository"
 	"github.com/cloudwego/cwgo/platform/server/cmd/api/internal/svc"
-	"github.com/cloudwego/cwgo/platform/server/cmd/api/pkg/model/response"
 	repositorymodel "github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/repository"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -52,14 +53,14 @@ func AddRepository(ctx context.Context, rCtx *app.RequestContext) {
 
 	l := repositorylogic.NewAddRepositoryLogic(ctx, svc.Svc)
 
-	res := l.AddRepository(&req)
+	resp := l.AddRepository(&req)
 
-	log.Debug("http response args", zap.Reflect("args", res))
+	log.Debug("http response args", zap.Reflect("args", resp))
 
-	if res.Code != 0 {
-		response.Fail(rCtx, hertzconsts.StatusBadRequest, res.Code, res.Msg)
+	if resp.Code != 0 {
+		response.Fail(rCtx, hertzconsts.StatusBadRequest, resp.Code, resp.Msg)
 		return
 	}
 
-	response.Ok(rCtx, res.Msg)
+	response.Ok(rCtx, resp.Msg)
 }

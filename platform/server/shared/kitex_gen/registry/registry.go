@@ -32,12 +32,15 @@ func (p *RegisterReq) GetHost() (v string) {
 func (p *RegisterReq) GetPort() (v int32) {
 	return p.Port
 }
+
 func (p *RegisterReq) SetServiceId(val string) {
 	p.ServiceId = val
 }
+
 func (p *RegisterReq) SetHost(val string) {
 	p.Host = val
 }
+
 func (p *RegisterReq) SetPort(val int32) {
 	p.Port = val
 }
@@ -69,9 +72,11 @@ func (p *RegisterRes) GetCode() (v int32) {
 func (p *RegisterRes) GetMsg() (v string) {
 	return p.Msg
 }
+
 func (p *RegisterRes) SetCode(val int32) {
 	p.Code = val
 }
+
 func (p *RegisterRes) SetMsg(val string) {
 	p.Msg = val
 }
@@ -98,6 +103,7 @@ func (p *DeregisterReq) InitDefault() {
 func (p *DeregisterReq) GetServiceId() (v string) {
 	return p.ServiceId
 }
+
 func (p *DeregisterReq) SetServiceId(val string) {
 	p.ServiceId = val
 }
@@ -129,9 +135,11 @@ func (p *DeRegisterRes) GetCode() (v int32) {
 func (p *DeRegisterRes) GetMsg() (v string) {
 	return p.Msg
 }
+
 func (p *DeRegisterRes) SetCode(val int32) {
 	p.Code = val
 }
+
 func (p *DeRegisterRes) SetMsg(val string) {
 	p.Msg = val
 }
@@ -158,6 +166,7 @@ func (p *UpdateReq) InitDefault() {
 func (p *UpdateReq) GetServiceId() (v string) {
 	return p.ServiceId
 }
+
 func (p *UpdateReq) SetServiceId(val string) {
 	p.ServiceId = val
 }
@@ -189,9 +198,11 @@ func (p *UpdateRes) GetCode() (v int32) {
 func (p *UpdateRes) GetMsg() (v string) {
 	return p.Msg
 }
+
 func (p *UpdateRes) SetCode(val int32) {
 	p.Code = val
 }
+
 func (p *UpdateRes) SetMsg(val string) {
 	p.Msg = val
 }

@@ -38,13 +38,13 @@ type Manager struct {
 func NewDaoManager(conf config.StoreConfig) (*Manager, error) {
 	switch conf.GetStoreType() {
 	case consts.StoreTypeNumMysql:
-		log.Info("initializing mysql")
+		log.Info("init mysql")
 		mysqlDb, err := conf.NewMysqlDB()
 		if err != nil {
-			log.Error("initializing mysql failed", zap.Error(err))
+			log.Error("init mysql failed", zap.Error(err))
 			return nil, err
 		}
-		log.Info("initialize mysql successfully")
+		log.Info("init mysql successfully")
 
 		idlDaoManager := NewMysqlIDL(mysqlDb)
 		repositoryDaoManager := NewMysqlRepository(mysqlDb)

@@ -23,33 +23,38 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/config"
 	"github.com/cloudwego/cwgo/platform/server/shared/dao"
 	"github.com/cloudwego/cwgo/platform/server/shared/log"
-	"github.com/cloudwego/cwgo/platform/server/shared/registry"
 	"go.uber.org/zap"
 )
 
 type ServiceContext struct {
-	BuiltinRegistry *registry.BuiltinRegistry
-	Manager         *manager.Manager
+	Manager *manager.Manager
 }
 
 var Svc *ServiceContext
 
 func InitServiceContext() {
 	// init dao manager
-	log.Info("initializing dao manager")
+	log.Info("init dao manager")
 	daoManager, err := dao.NewDaoManager(config.GetManager().Config.Store)
 	if err != nil {
-		log.Fatal("initialize dao manager failed", zap.Error(err))
+		log.Fatal("init dao manager failed", zap.Error(err))
 	}
-	log.Info("initialize dao manager successfully")
+
+	rdb, err := config.GetManager().Config.Store.NewRedisClient()
+	if err != nil {
+		log.Fatal("init redis failed", zap.Error(err))
+	}
+
+	log.Info("init dao manager successfully")
 	Svc = &ServiceContext{
-		BuiltinRegistry: config.GetManager().ApiConfigManager.RegistryConfigManager.GetRegistry().(*registry.BuiltinRegistry),
-		Manager: manager.NewManager(
+		Manager: manager.NewApiManager(
 			config.GetManager().Config.App,
+			config.GetManager().ServiceID,
+			rdb,
 			daoManager,
 			config.GetManager().Config.Api.Dispatcher.NewDispatcher(),
-			config.GetManager().ApiConfigManager.RegistryConfigManager.GetRegistry(),
-			config.GetManager().ApiConfigManager.RegistryConfigManager.GetDiscoveryResolver(),
+			config.GetManager().ApiConfigManager.RegistryManager.GetRegistry(),
+			config.GetManager().ApiConfigManager.RegistryManager.GetResolver(),
 		),
 	}
 }

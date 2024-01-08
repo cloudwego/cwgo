@@ -18,7 +18,6 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -35,7 +34,7 @@ var manager *Manager
 type Manager struct {
 	ServerType         consts.ServerType
 	ServerMode         consts.ServerMode
-	ServiceId          string
+	ServiceID          string
 	Config             Config
 	ApiConfigManager   *ApiManager
 	AgentConfigManager *AgentManager
@@ -63,7 +62,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 		configPath = filepath.ToSlash(filepath.Join(configPath, fmt.Sprintf("config-%s.yaml", consts.ServerModeMapToStr[serverMode])))
 
-		fmt.Printf("get config path: %s", configPath)
+		fmt.Printf("get config path: %s\n", configPath)
 
 		v := viper.New()
 		v.SetConfigType("yaml")
@@ -95,18 +94,19 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 	}
 
 	// get service id
-	var serviceId string
+	var serviceID string
+	// cwgo-agent.yaml
 	_, err = os.Stat(consts.AgentMetadataFile)
 	if os.IsNotExist(err) {
 		// agent file not exist
 		// generate a new service id
-		serviceId, err = utils.NewServiceId()
+		serviceID, err = utils.NewServiceID()
 		if err != nil {
 			return err
 		}
 	} else {
 		// use exist service id
-		yamlFileBytes, err := ioutil.ReadFile("config.yaml")
+		yamlFileBytes, err := os.ReadFile("config.yaml")
 		if err != nil {
 			panic(fmt.Sprintf("read agent metadata file failed, err: %v", err))
 		}
@@ -117,7 +117,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 			panic(fmt.Sprintf("unmarshal agent metadata file failed, err: %v", err))
 		}
 
-		serviceId = agentMetadata.ServiceId
+		serviceID = agentMetadata.ServiceID
 	}
 
 	switch serverType {
@@ -125,18 +125,20 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 		manager = &Manager{
 			ServerType:       serverType,
 			ServerMode:       serverMode,
-			ServiceId:        serviceId,
+			ServiceID:        serviceID,
 			Config:           config,
-			ApiConfigManager: NewApiManager(config.Api, config.Registry, config.Store, serviceId),
+			ApiConfigManager: NewApiManager(config.Api, config.Registry, config.Store, serviceID),
 		}
 	case consts.ServerTypeNumAgent:
 		manager = &Manager{
 			ServerType:         serverType,
 			ServerMode:         serverMode,
-			ServiceId:          serviceId,
+			ServiceID:          serviceID,
 			Config:             config,
-			AgentConfigManager: NewAgentManager(config.Agent, config.Registry, config.Store, serviceId),
+			AgentConfigManager: NewAgentManager(config.Agent, config.Registry, config.Store, serviceID),
 		}
+	default:
+		panic("unhandled default case")
 	}
 
 	return nil
@@ -144,7 +146,7 @@ func InitManager(serverType consts.ServerType, serverMode consts.ServerMode, con
 
 func GetManager() *Manager {
 	if manager == nil {
-		panic("config manager not initialized")
+		panic("config manager not init")
 	}
 
 	return manager

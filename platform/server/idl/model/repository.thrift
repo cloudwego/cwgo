@@ -7,7 +7,7 @@ struct Repository{
     4: string repository_owner // repository owner
     5: string repository_name // repository name
     6: string repository_branch // repository branch
-    7: i32 store_type // repository store type (1: stores idl file, 2: stores service code)
+    7: i32 store_type // repository store type (1: stores idl file, 2: stores meta code)
     8: i64 token_id // token id which repo currently using
     9: i32 status // repository status (need sync or not)
     10: string last_update_time // repo file last update time

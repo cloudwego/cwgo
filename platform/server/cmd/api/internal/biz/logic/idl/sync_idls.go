@@ -46,6 +46,7 @@ func NewSyncIDLsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SyncIDLs
 }
 
 func (l *SyncIDLsLogic) SyncIDLs(req *idl.SyncIDLsByIdReq) (res *idl.SyncIDLsByIdRes) {
+	// get kitex client
 	client, err := l.svcCtx.Manager.GetAgentClient()
 	if err != nil {
 		log.Error(consts.ErrMsgRpcGetClient, zap.Error(err))

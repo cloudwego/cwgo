@@ -21,18 +21,21 @@ package consts
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/cloudwego/cwgo/platform/server/shared/kitex_gen/model"
 )
 
 const (
 	ProjectName = "cwgo"
 
-	ServiceNameApi   = ProjectName + "-" + ServerTypeApi
-	ServiceNameAgent = ProjectName + "-" + ServerTypeAgent
-
+	ServiceNameAgent  = "cwgo-agent"
 	AgentMetadataFile = ServiceNameAgent + ".yaml"
 
 	ServerRunModeStandalone = "standalone"
 	ServerRunModeCluster    = "cluster"
+
+	Sync                model.TaskType = 1
+	DefaultWorkerNumber                = 3
 )
 
 const (
@@ -40,7 +43,8 @@ const (
 )
 
 const (
-	RdbKeyRegistryService = ProjectName + ":" + "registry:service:%s"
+	RdbKeyApiMaster = "cwgo:api:master"
+	RdbKeyTask      = "cwgo:task"
 )
 
 const (

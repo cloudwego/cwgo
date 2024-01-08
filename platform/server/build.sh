@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-api_files=(base idl registry repository template token)
+api_files=(base idl repository template token)
 
 function api_gen() {
   cd cmd/api

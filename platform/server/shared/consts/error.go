@@ -22,10 +22,144 @@ import (
 	"github.com/cloudwego/cwgo/platform/server/shared/errx"
 )
 
+const (
+	ErrNumCommon = (iota + 1) * 10000
+	ErrNumRegistry
+	ErrNumRpc
+	ErrNumDatabase
+	ErrNumParam
+	ErrNumToken
+	ErrNumRepo
+	ErrNumIdl
+)
+
+// common err
+
+const (
+	ErrNumCommonCreateTempDir = ErrNumCommon + iota + 1
+	ErrNumCommonGenerateCode
+	ErrNumCommonProcessFolders
+	ErrNumCommonMkdir
+	ErrNumCommonRepoApiService
+	ErrNumCommonJsonMarshal
+	ErrNumCommonJsonUnmarshal
+)
+
+const (
+	ErrMsgCommon               = "common err"
+	ErrMsgCommonCreateTempDir  = "create temp dir failed"
+	ErrMsgCommonGenerateCode   = "generate code failed"
+	ErrMsgCommonProcessFolders = "process folders failed"
+	ErrMsgCommonMkdir          = "mkdir failed"
+	ErrMsgCommonRepoApiService = "repo api service is down"
+	ErrMsgCommonJsonMarshal
+	ErrMsgCommonJsonUnmarshal
+)
+
+var (
+	ErrCommon               = errx.New(ErrNumCommon, ErrMsgCommon)
+	ErrCommonCreateTempDir  = errx.New(ErrNumCommonCreateTempDir, ErrMsgCommonCreateTempDir)
+	ErrCommonGenerateCode   = errx.New(ErrNumCommonGenerateCode, ErrMsgCommonGenerateCode)
+	ErrCommonProcessFolders = errx.New(ErrNumCommonProcessFolders, ErrMsgCommonProcessFolders)
+	ErrCommonMkdir          = errx.New(ErrNumCommonMkdir, ErrMsgCommonMkdir)
+	ErrCommonRepoApiService = errx.New(ErrNumCommonRepoApiService, ErrMsgCommonRepoApiService)
+	ErrCommonJsonMarshal    = errx.New(ErrNumCommonJsonMarshal, ErrMsgCommonJsonMarshal)
+	ErrCommonJsonUnmarshal  = errx.New(ErrNumCommonJsonUnmarshal, ErrMsgCommonJsonUnmarshal)
+)
+
+// registry err
+
+const (
+	ErrNumRegistryServiceNotFound = ErrNumRegistry + iota + 1
+	ErrNumRegistryRegisterService
+	ErrNumRegistryDeregisterService
+)
+
+const (
+	ErrMsgRegistry                  = "registry err"
+	ErrMsgRegistryServiceNotFound   = "service not found"
+	ErrMsgRegistryRegisterService   = "register service failed"
+	ErrMsgRegistryDeregisterService = "deregister service failed"
+)
+
+var (
+	ErrRegistry                  = errx.New(ErrNumRegistry, ErrMsgRegistry)
+	ErrRegistryServiceNotFound   = errx.New(ErrNumRegistryServiceNotFound, ErrMsgRegistryServiceNotFound)
+	ErrRegistryRegisterService   = errx.New(ErrNumRegistryRegisterService, ErrMsgRegistryRegisterService)
+	ErrRegistryDeregisterService = errx.New(ErrNumRegistryDeregisterService, ErrMsgRegistryDeregisterService)
+)
+
+// rpc err
+const (
+	ErrNumRpcGetClient = ErrNumRpc + iota + 1
+	ErrNumRpcConnectClient
+)
+
+const (
+	ErrMsgRpc              = "rpc err"
+	ErrMsgRpcGetClient     = "get rpc client failed"
+	ErrMsgRpcConnectClient = "connect to rpc client failed"
+)
+
+var (
+	ErrRpc              = errx.New(ErrNumRpc, ErrMsgRpc)
+	ErrRpcGetClient     = errx.New(ErrNumRpcGetClient, ErrMsgRpcGetClient)
+	ErrRpcConnectClient = errx.New(ErrNumRpcConnectClient, ErrMsgRpcConnectClient)
+)
+
+// database err
+
+const (
+	ErrNumDatabaseRecordNotFound = ErrNumDatabase + iota + 1
+	ErrNumDatabaseDuplicateRecord
+
+	ErrNumDatabaseRedisSet
+	ErrNumDatabaseRedisPubSubClose
+	ErrNumDatabaseRedisRunScript
+	ErrNumDatabaseRedisTTL
+	ErrNumDatabaseRedisExpire
+	ErrNumDatabaseRedisSetNX
+	ErrNumDatabaseRedisPublish
+	ErrNumDatabaseRedisGet
+	ErrNumDatabaseRedisHDel
+	ErrNumDatabaseRedisHGelAll
+)
+
+const (
+	ErrMsgDatabase                 = "database err"
+	ErrMsgDatabaseRecordNotFound   = "record not found"
+	ErrMsgDatabaseDuplicateRecord  = "duplicate record"
+	ErrMsgDatabaseRedisSet         = "redis set failed"
+	ErrMsgDatabaseRedisPubSubClose = "redis pubsub connection close failed"
+	ErrMsgDatabaseRedisRunScript   = "redis run script failed"
+	ErrMsgDatabaseRedisTTL         = "redis exec TTL command failed"
+	ErrMsgDatabaseRedisExpire      = "redis exec EXPIRE command failed"
+	ErrMsgDatabaseRedisSetNX       = "redis exec SETNX command failed"
+	ErrMsgDatabaseRedisPublish     = "redis exec PUBLISH command failed"
+	ErrMsgDatabaseRedisGet         = "redis exec GET command failed"
+	ErrMsgDatabaseRedisHDel        = "redis exec HDEL command failed"
+	ErrMsgDatabaseRedisHGelAll     = "redis exec HGETALL command failed"
+)
+
+var (
+	ErrDatabase                 = errx.New(ErrNumDatabase, ErrMsgDatabase)
+	ErrDatabaseRecordNotFound   = errx.New(ErrNumDatabaseRecordNotFound, ErrMsgDatabaseRecordNotFound)
+	ErrDatabaseDuplicateRecord  = errx.New(ErrNumDatabaseDuplicateRecord, ErrMsgDatabaseDuplicateRecord)
+	ErrDatabaseRedisSet         = errx.New(ErrNumDatabaseRedisSet, ErrMsgDatabaseRedisSet)
+	ErrDatabaseRedisPubSubClose = errx.New(ErrNumDatabaseRedisPubSubClose, ErrMsgDatabaseRedisPubSubClose)
+	ErrDatabaseRedisRunScript   = errx.New(ErrNumDatabaseRedisRunScript, ErrMsgDatabaseRedisRunScript)
+	ErrDatabaseRedisTTL         = errx.New(ErrNumDatabaseRedisTTL, ErrMsgDatabaseRedisTTL)
+	ErrDatabaseRedisExpire      = errx.New(ErrNumDatabaseRedisExpire, ErrMsgDatabaseRedisExpire)
+	ErrDatabaseRedisSetNX       = errx.New(ErrNumDatabaseRedisSetNX, ErrMsgDatabaseRedisSetNX)
+	ErrDatabaseRedisPublish     = errx.New(ErrNumDatabaseRedisPublish, ErrMsgDatabaseRedisPublish)
+	ErrDatabaseRedisGet         = errx.New(ErrNumDatabaseRedisGet, ErrMsgDatabaseRedisGet)
+	ErrDatabaseRedisHDel        = errx.New(ErrNumDatabaseRedisHDel, ErrMsgDatabaseRedisHDel)
+	ErrDatabaseRedisHGelAll     = errx.New(ErrNumDatabaseRedisHGelAll, ErrMsgDatabaseRedisHGelAll)
+)
+
 // params err
 const (
-	ErrNumParam = iota + 10000
-	ErrNumParamOrderNum
+	ErrNumParamOrderNum = ErrNumParam + iota + 1
 	ErrNumParamOrderBy
 	ErrNumParamRepositoryType
 	ErrNumParamStoreType
@@ -69,50 +203,10 @@ var (
 	ErrParamRepositoryBranch = errx.New(ErrNumParamRepositoryBranch, ErrMsgParamRepositoryBranch)
 )
 
-// rpc err
-const (
-	ErrNumRpc = iota + 20000
-	ErrNumRpcGetClient
-	ErrNumRpcConnectClient
-)
-
-const (
-	ErrMsgRpc              = "rpc err"
-	ErrMsgRpcGetClient     = "get rpc client failed"
-	ErrMsgRpcConnectClient = "connect to rpc client failed"
-)
-
-var (
-	ErrRpc              = errx.New(ErrNumRpc, ErrMsgRpc)
-	ErrRpcGetClient     = errx.New(ErrNumRpcGetClient, ErrMsgRpcGetClient)
-	ErrRpcConnectClient = errx.New(ErrNumRpcConnectClient, ErrMsgRpcConnectClient)
-)
-
-// database err
-
-const (
-	ErrNumDatabase = iota + 30000
-	ErrNumDatabaseRecordNotFound
-	ErrNumDatabaseDuplicateRecord
-)
-
-const (
-	ErrMsgDatabase                = "database err"
-	ErrMsgDatabaseRecordNotFound  = "record not found"
-	ErrMsgDatabaseDuplicateRecord = "duplicate record"
-)
-
-var (
-	ErrDatabase                = errx.New(ErrNumDatabase, ErrMsgDatabase)
-	ErrDatabaseRecordNotFound  = errx.New(ErrNumDatabaseRecordNotFound, ErrMsgDatabaseRecordNotFound)
-	ErrDatabaseDuplicateRecord = errx.New(ErrNumDatabaseDuplicateRecord, ErrMsgDatabaseDuplicateRecord)
-)
-
 // token err
 
 const (
-	ErrNumToken = iota + 40000
-	ErrNumTokenInvalid
+	ErrNumTokenInvalid = ErrNumToken + iota + 1
 	ErrNumTokenInvalidType
 )
 
@@ -128,34 +222,10 @@ var (
 	ErrTokenInvalidType = errx.New(ErrNumTokenInvalidType, ErrMsgTokenInvalidType)
 )
 
-// idl err
-
-const (
-	ErrNumIdl = iota + 50000
-	ErrNumIdlAlreadyExist
-	ErrNumIdlFileExtension
-	ErrNumIdlGetDependentFilePath
-)
-
-const (
-	ErrMsgIdl                     = "idl err"
-	ErrMsgIdlAlreadyExist         = "idl is already exist"
-	ErrMsgIdlFileExtension        = "invalid idl file extension"
-	ErrMsgIdlGetDependentFilePath = "get dependent file paths from idl failed"
-)
-
-var (
-	ErrIdl                     = errx.New(ErrNumIdl, ErrMsgIdl)
-	ErrIdlAlreadyExist         = errx.New(ErrNumIdlAlreadyExist, ErrMsgIdlAlreadyExist)
-	ErrIdlFileExtension        = errx.New(ErrNumIdlFileExtension, ErrMsgIdlFileExtension)
-	ErrIdlGetDependentFilePath = errx.New(ErrNumIdlGetDependentFilePath, ErrMsgIdlGetDependentFilePath)
-)
-
 // repo err
 
 const (
-	ErrNumRepo = iota + 60000
-	ErrNumRepoGetFile
+	ErrNumRepoGetFile = ErrNumRepo + iota + 1
 	ErrNumRepoGetCommitHash
 	ErrNumRepoGetArchive
 	ErrNumRepoParseArchive
@@ -192,31 +262,24 @@ var (
 	ErrRepoValidateBranch = errx.New(ErrNumRepoValidateBranch, ErrMsgRepoValidateBranch)
 )
 
-// common err
+// idl err
 
 const (
-	ErrNumCommon = iota + 70000
-	ErrNumCommonCreateTempDir
-	ErrNumCommonGenerateCode
-	ErrNumCommonProcessFolders
-	ErrNumCommonMkdir
-	ErrNumCommonRepoApiService
+	ErrNumIdlAlreadyExist = ErrNumIdl + iota + 1
+	ErrNumIdlFileExtension
+	ErrNumIdlGetDependentFilePath
 )
 
 const (
-	ErrMsgCommon               = "common err"
-	ErrMsgCommonCreateTempDir  = "create temp dir failed"
-	ErrMsgCommonGenerateCode   = "generate code failed"
-	ErrMsgCommonProcessFolders = "process folders failed"
-	ErrMsgCommonMkdir          = "mkdir failed"
-	ErrMsgCommonRepoApiService = "repo api service is down"
+	ErrMsgIdl                     = "idl err"
+	ErrMsgIdlAlreadyExist         = "idl is already exist"
+	ErrMsgIdlFileExtension        = "invalid idl file extension"
+	ErrMsgIdlGetDependentFilePath = "get dependent file paths from idl failed"
 )
 
 var (
-	ErrCommon               = errx.New(ErrNumCommon, ErrMsgCommon)
-	ErrCommonCreateTempDir  = errx.New(ErrNumCommonCreateTempDir, ErrMsgCommonCreateTempDir)
-	ErrCommonGenerateCode   = errx.New(ErrNumCommonGenerateCode, ErrMsgCommonGenerateCode)
-	ErrCommonProcessFolders = errx.New(ErrNumCommonProcessFolders, ErrMsgCommonProcessFolders)
-	ErrCommonMkdir          = errx.New(ErrNumCommonMkdir, ErrMsgCommonMkdir)
-	ErrCommonRepoApiService = errx.New(ErrNumCommonRepoApiService, ErrMsgCommonRepoApiService)
+	ErrIdl                     = errx.New(ErrNumIdl, ErrMsgIdl)
+	ErrIdlAlreadyExist         = errx.New(ErrNumIdlAlreadyExist, ErrMsgIdlAlreadyExist)
+	ErrIdlFileExtension        = errx.New(ErrNumIdlFileExtension, ErrMsgIdlFileExtension)
+	ErrIdlGetDependentFilePath = errx.New(ErrNumIdlGetDependentFilePath, ErrMsgIdlGetDependentFilePath)
 )
