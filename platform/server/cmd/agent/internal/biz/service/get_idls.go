@@ -39,7 +39,7 @@ func NewGetIDLsService(ctx context.Context, svcCtx *svc.ServiceContext) *GetIDLs
 }
 
 // Run create note info
-func (s *GetIDLsService) Run(req *agent.GetIDLsReq) (resp *agent.GetIDLsRes, err error) {
+func (s *GetIDLsService) Run(req *agent.GetIDLsReq) (resp *agent.GetIDLsResp, err error) {
 	idls, total, err := s.svcCtx.DaoManager.Idl.GetIDLList(s.ctx,
 		model.IDL{
 			ServiceName: req.ServiceName,
@@ -47,17 +47,17 @@ func (s *GetIDLsService) Run(req *agent.GetIDLsReq) (resp *agent.GetIDLsRes, err
 		req.Page, req.Limit, req.Order, req.OrderBy,
 	)
 	if err != nil {
-		return &agent.GetIDLsRes{
+		return &agent.GetIDLsResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 			Data: nil,
 		}, err
 	}
 
-	return &agent.GetIDLsRes{
+	return &agent.GetIDLsResp{
 		Code: 0,
 		Msg:  "get idls successfully",
-		Data: &agent.GetIDLsResData{
+		Data: &agent.GetIDLsRespData{
 			Idls:  idls,
 			Total: int32(total),
 		},

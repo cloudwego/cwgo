@@ -39,23 +39,23 @@ func NewDeleteTokenService(ctx context.Context, svcCtx *svc.ServiceContext) *Del
 }
 
 // Run create note info
-func (s *DeleteTokenService) Run(req *agent.DeleteTokenReq) (resp *agent.DeleteTokenRes, err error) {
+func (s *DeleteTokenService) Run(req *agent.DeleteTokenReq) (resp *agent.DeleteTokenResp, err error) {
 	err = s.svcCtx.DaoManager.Token.DeleteToken(s.ctx, req.Ids)
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
-			return &agent.DeleteTokenRes{
+			return &agent.DeleteTokenResp{
 				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "token id not exist",
 			}, nil
 		}
 
-		return &agent.DeleteTokenRes{
+		return &agent.DeleteTokenResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 
-	return &agent.DeleteTokenRes{
+	return &agent.DeleteTokenResp{
 		Code: 0,
 		Msg:  "delete tokens successfully",
 	}, nil

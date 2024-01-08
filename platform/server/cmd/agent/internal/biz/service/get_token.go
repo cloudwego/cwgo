@@ -39,7 +39,7 @@ func NewGetTokenService(ctx context.Context, svcCtx *svc.ServiceContext) *GetTok
 }
 
 // Run create note info
-func (s *GetTokenService) Run(req *agent.GetTokenReq) (resp *agent.GetTokenRes, err error) {
+func (s *GetTokenService) Run(req *agent.GetTokenReq) (resp *agent.GetTokenResp, err error) {
 	tokens, total, err := s.svcCtx.DaoManager.Token.GetTokenList(s.ctx,
 		model.Token{
 			RepositoryType:   req.RepositoryType,
@@ -49,17 +49,17 @@ func (s *GetTokenService) Run(req *agent.GetTokenReq) (resp *agent.GetTokenRes, 
 		req.Page, req.Limit, req.Order, req.OrderBy,
 	)
 	if err != nil {
-		return &agent.GetTokenRes{
+		return &agent.GetTokenResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 			Data: nil,
 		}, nil
 	}
 
-	return &agent.GetTokenRes{
+	return &agent.GetTokenResp{
 		Code: 0,
 		Msg:  "get tokens successfully",
-		Data: &agent.GetTokenResData{
+		Data: &agent.GetTokenRespData{
 			Tokens: tokens,
 			Total:  int32(total),
 		},

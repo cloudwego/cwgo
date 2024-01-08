@@ -40,7 +40,7 @@ func NewAddRepositoryService(ctx context.Context, svcCtx *svc.ServiceContext) *A
 }
 
 // Run create note info
-func (s *AddRepositoryService) Run(req *agent.AddRepositoryReq) (resp *agent.AddRepositoryRes, err error) {
+func (s *AddRepositoryService) Run(req *agent.AddRepositoryReq) (resp *agent.AddRepositoryResp, err error) {
 	repo := model.Repository{
 		RepositoryType:   req.RepositoryType,
 		RepositoryDomain: req.RepositoryDomain,
@@ -54,13 +54,13 @@ func (s *AddRepositoryService) Run(req *agent.AddRepositoryReq) (resp *agent.Add
 	err = s.svcCtx.RepoManager.AddClient(&repo)
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumTokenInvalid {
-			return &agent.AddRepositoryRes{
+			return &agent.AddRepositoryResp{
 				Code: consts.ErrNumTokenInvalid,
 				Msg:  err.Error(),
 			}, nil
 		}
 
-		return &agent.AddRepositoryRes{
+		return &agent.AddRepositoryResp{
 			Code: -1,
 			Msg:  err.Error(),
 		}, nil
@@ -70,19 +70,19 @@ func (s *AddRepositoryService) Run(req *agent.AddRepositoryReq) (resp *agent.Add
 	_, err = s.svcCtx.DaoManager.Repository.AddRepository(s.ctx, repo)
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseDuplicateRecord {
-			return &agent.AddRepositoryRes{
+			return &agent.AddRepositoryResp{
 				Code: consts.ErrNumDatabaseDuplicateRecord,
 				Msg:  "repository is already exist",
 			}, nil
 		}
 
-		return &agent.AddRepositoryRes{
+		return &agent.AddRepositoryResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 
-	return &agent.AddRepositoryRes{
+	return &agent.AddRepositoryResp{
 		Code: 0,
 		Msg:  "add repository successfully",
 	}, nil

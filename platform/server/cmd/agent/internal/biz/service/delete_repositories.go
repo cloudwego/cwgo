@@ -39,17 +39,17 @@ func NewDeleteRepositoriesService(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 // Run create note info
-func (s *DeleteRepositoriesService) Run(req *agent.DeleteRepositoriesReq) (resp *agent.DeleteRepositoriesRes, err error) {
+func (s *DeleteRepositoriesService) Run(req *agent.DeleteRepositoriesReq) (resp *agent.DeleteRepositoriesResp, err error) {
 	err = s.svcCtx.DaoManager.Repository.DeleteRepository(s.ctx, req.Ids)
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
-			return &agent.DeleteRepositoriesRes{
+			return &agent.DeleteRepositoriesResp{
 				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "repo id not exist",
 			}, nil
 		}
 
-		return &agent.DeleteRepositoriesRes{
+		return &agent.DeleteRepositoriesResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
@@ -59,7 +59,7 @@ func (s *DeleteRepositoriesService) Run(req *agent.DeleteRepositoriesReq) (resp 
 		s.svcCtx.RepoManager.DelClient(id)
 	}
 
-	return &agent.DeleteRepositoriesRes{
+	return &agent.DeleteRepositoriesResp{
 		Code: 0,
 		Msg:  "delete repositories successfully",
 	}, nil

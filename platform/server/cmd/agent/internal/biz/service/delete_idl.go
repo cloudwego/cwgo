@@ -39,23 +39,23 @@ func NewDeleteIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *Delet
 }
 
 // Run create note info
-func (s *DeleteIDLService) Run(req *agent.DeleteIDLsReq) (resp *agent.DeleteIDLsRes, err error) {
+func (s *DeleteIDLService) Run(req *agent.DeleteIDLsReq) (resp *agent.DeleteIDLsResp, err error) {
 	err = s.svcCtx.DaoManager.Idl.DeleteIDLs(s.ctx, req.Ids)
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
-			return &agent.DeleteIDLsRes{
+			return &agent.DeleteIDLsResp{
 				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "repo id not exist",
 			}, nil
 		}
 
-		return &agent.DeleteIDLsRes{
+		return &agent.DeleteIDLsResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 
-	return &agent.DeleteIDLsRes{
+	return &agent.DeleteIDLsResp{
 		Code: 0,
 		Msg:  "delete idl successfully",
 	}, nil

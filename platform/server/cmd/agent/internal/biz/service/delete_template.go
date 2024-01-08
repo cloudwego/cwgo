@@ -38,16 +38,16 @@ func NewDeleteTemplateService(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 // Run create note info
-func (s *DeleteTemplateService) Run(req *agent.DeleteTemplateReq) (resp *agent.DeleteTemplateRes, err error) {
+func (s *DeleteTemplateService) Run(req *agent.DeleteTemplateReq) (resp *agent.DeleteTemplateResp, err error) {
 	err = s.svcCtx.DaoManager.Template.DeleteTemplate(s.ctx, req.Ids)
 	if err != nil {
-		return &agent.DeleteTemplateRes{
+		return &agent.DeleteTemplateResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 
-	return &agent.DeleteTemplateRes{
+	return &agent.DeleteTemplateResp{
 		Code: 0,
 		Msg:  "delete template successfully",
 	}, nil

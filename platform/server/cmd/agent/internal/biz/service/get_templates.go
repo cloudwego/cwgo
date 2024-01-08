@@ -38,20 +38,20 @@ func NewGetTemplatesService(ctx context.Context, svcCtx *svc.ServiceContext) *Ge
 }
 
 // Run create note info
-func (s *GetTemplatesService) Run(req *agent.GetTemplatesReq) (resp *agent.GetTemplatesRes, err error) {
+func (s *GetTemplatesService) Run(req *agent.GetTemplatesReq) (resp *agent.GetTemplatesResp, err error) {
 	templates, err := s.svcCtx.DaoManager.Template.GetTemplateList(s.ctx, req.Page, req.Limit, req.Order, req.OrderBy)
 	if err != nil {
-		return &agent.GetTemplatesRes{
+		return &agent.GetTemplatesResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 			Data: nil,
 		}, nil
 	}
 
-	return &agent.GetTemplatesRes{
+	return &agent.GetTemplatesResp{
 		Code: 0,
 		Msg:  "get templates successfully",
-		Data: &agent.GetTemplatesResData{
+		Data: &agent.GetTemplatesRespData{
 			Templates: templates,
 		},
 	}, nil

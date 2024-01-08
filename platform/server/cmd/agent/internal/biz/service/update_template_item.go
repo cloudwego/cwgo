@@ -39,20 +39,20 @@ func NewUpdateTemplateItemService(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 // Run create note info
-func (s *UpdateTemplateItemService) Run(req *agent.UpdateTemplateItemReq) (resp *agent.UpdateTemplateItemRes, err error) {
+func (s *UpdateTemplateItemService) Run(req *agent.UpdateTemplateItemReq) (resp *agent.UpdateTemplateItemResp, err error) {
 	err = s.svcCtx.DaoManager.Template.UpdateTemplateItem(s.ctx, model.TemplateItem{
 		Id:      req.Id,
 		Name:    req.Name,
 		Content: req.Content,
 	})
 	if err != nil {
-		return &agent.UpdateTemplateItemRes{
+		return &agent.UpdateTemplateItemResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 
-	return &agent.UpdateTemplateItemRes{
+	return &agent.UpdateTemplateItemResp{
 		Code: 0,
 		Msg:  "update template item successfully",
 	}, nil

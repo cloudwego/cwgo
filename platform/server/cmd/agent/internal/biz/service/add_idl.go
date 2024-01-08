@@ -49,10 +49,10 @@ func NewAddIDLService(ctx context.Context, svcCtx *svc.ServiceContext, agentServ
 }
 
 // Run create note info
-func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err error) {
+func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLResp, err error) {
 	repoClient, err := s.svcCtx.RepoManager.GetClient(req.RepositoryId)
 	if err != nil {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: errx.GetCode(err),
 			Msg:  err.Error(),
 		}, nil
@@ -60,7 +60,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	idlPid, owner, repoName, err := repoClient.ParseFileUrl(req.MainIdlPath)
 	if err != nil {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumParamMainIdlPath,
 			Msg:  consts.ErrMsgParamMainIdlPath,
 		}, nil
@@ -69,13 +69,13 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// check main idl path
 	isExist, err := s.svcCtx.DaoManager.Idl.CheckMainIdlIfExist(s.ctx, req.RepositoryId, idlPid)
 	if err != nil {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: errx.GetCode(err),
 			Msg:  err.Error(),
 		}, nil
 	}
 	if isExist {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumIdlAlreadyExist,
 			Msg:  consts.ErrMsgIdlAlreadyExist,
 		}, nil
@@ -85,7 +85,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// check main idl if exist in repo at the same time
 	mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, repoClient.GetBranch())
 	if err != nil {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumRepoGetCommitHash,
 			Msg:  consts.ErrMsgRepoGetCommitHash,
 		}, nil
@@ -94,7 +94,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	idlRepoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.RepositoryId)
 	if err != nil {
 		log.Error("get repository failed", zap.Error(err))
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
@@ -104,7 +104,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, repoClient.GetBranch())
 	if err != nil {
 		log.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumRepoGetArchive,
 			Msg:  consts.ErrMsgRepoGetArchive,
 		}, nil
@@ -117,7 +117,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			err = os.Mkdir(consts.TempDir, 0o700)
 			if err != nil {
 				log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
-				return &agent.AddIDLRes{
+				return &agent.AddIDLResp{
 					Code: consts.ErrNumCommonCreateTempDir,
 					Msg:  consts.ErrMsgCommonCreateTempDir,
 				}, nil
@@ -125,14 +125,14 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 			tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
 			if err != nil {
 				log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
-				return &agent.AddIDLRes{
+				return &agent.AddIDLResp{
 					Code: consts.ErrNumCommonCreateTempDir,
 					Msg:  consts.ErrMsgCommonCreateTempDir,
 				}, nil
 			}
 		} else {
 			log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
-			return &agent.AddIDLRes{
+			return &agent.AddIDLResp{
 				Code: consts.ErrNumCommonCreateTempDir,
 				Msg:  consts.ErrMsgCommonCreateTempDir,
 			}, nil
@@ -151,7 +151,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	archiveName, err := utils.UnTar(archiveData, tempDirRepo, isTarBall)
 	if err != nil {
 		log.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumRepoParseArchive,
 			Msg:  consts.ErrMsgRepoParseArchive,
 		}, nil
@@ -160,7 +160,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	// determine the idl type for subsequent calculations of different types
 	idlType, err := utils.DetermineIdlType(idlPid)
 	if err != nil {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumIdlFileExtension,
 			Msg:  consts.ErrMsgIdlFileExtension,
 		}, nil
@@ -168,7 +168,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	idlParser := parser.NewParser(idlType)
 	if idlParser == nil {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumIdlFileExtension,
 			Msg:  consts.ErrMsgIdlFileExtension,
 		}, nil
@@ -177,7 +177,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	var importBaseDirPath string
 	importBaseDirPath, importPaths, err = idlParser.GetDependentFilePaths(tempDirRepo+"/"+archiveName, idlPid)
 	if err != nil {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumIdlGetDependentFilePath,
 			Msg:  consts.ErrMsgIdlGetDependentFilePath,
 		}, nil
@@ -191,7 +191,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, repoClient.GetBranch())
 		if err != nil {
 			log.Error(consts.ErrMsgRepoGetCommitHash, zap.Error(err))
-			return &agent.AddIDLRes{
+			return &agent.AddIDLResp{
 				Code: consts.ErrNumRepoGetCommitHash,
 				Msg:  consts.ErrMsgRepoGetCommitHash,
 			}, nil
@@ -206,7 +206,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	isPrivacy, err := repoClient.GetRepositoryPrivacy(owner, repoName)
 	if err != nil {
 		log.Error(consts.ErrMsgRepoCreate, zap.Error(err))
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumRepoCreate,
 			Msg:  consts.ErrMsgRepoCreate,
 		}, nil
@@ -215,7 +215,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	serviceRepoURL, err := repoClient.AutoCreateRepository(owner, req.ServiceRepositoryName, isPrivacy)
 	if err != nil {
 		log.Error(consts.ErrMsgRepoCreate, zap.Error(err))
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumRepoCreate,
 			Msg:  consts.ErrMsgRepoCreate,
 		}, nil
@@ -223,7 +223,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 
 	domain, owner, repoName, err := utils.ParseRepoUrl(serviceRepoURL)
 	if err != nil {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumParamRepositoryUrl,
 			Msg:  consts.ErrMsgParamRepositoryUrl,
 		}, nil
@@ -239,7 +239,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 	})
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseDuplicateRecord {
-			return &agent.AddIDLRes{
+			return &agent.AddIDLResp{
 				Code: consts.ErrNumDatabaseDuplicateRecord,
 				Msg:  consts.ErrMsgDatabaseDuplicateRecord,
 			}, nil
@@ -257,7 +257,7 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		Status:              consts.IdlStatusNumActive,
 	})
 	if err != nil {
-		return &agent.AddIDLRes{
+		return &agent.AddIDLResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
@@ -287,10 +287,10 @@ func (s *AddIDLService) Run(req *agent.AddIDLReq) (resp *agent.AddIDLRes, err er
 		}
 	}()
 
-	return &agent.AddIDLRes{
+	return &agent.AddIDLResp{
 		Code: 0,
 		Msg:  "add idl successfully",
-		Data: &agent.AddIDLResData{
+		Data: &agent.AddIDLRespData{
 			IdlId: mainIdlId,
 		},
 	}, nil

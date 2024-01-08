@@ -40,12 +40,12 @@ func NewUpdateRepositoryService(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 // Run create note info
-func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *agent.UpdateRepositoryRes, err error) {
+func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *agent.UpdateRepositoryResp, err error) {
 	// validate repo info
 	repoModel, err := s.svcCtx.DaoManager.Repository.GetRepository(s.ctx, req.Id)
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
-			return &agent.UpdateRepositoryRes{
+			return &agent.UpdateRepositoryResp{
 				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "repo id not exist",
 			}, nil
@@ -53,7 +53,7 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 	}
 
 	if req.Branch == repoModel.RepositoryBranch {
-		return &agent.UpdateRepositoryRes{
+		return &agent.UpdateRepositoryResp{
 			Code: consts.ErrNumParamRepositoryBranch,
 			Msg:  "repo branch already switched",
 		}, nil
@@ -62,7 +62,7 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 	if req.Branch != "" {
 		repoClient, err := s.svcCtx.RepoManager.GetClient(req.Id)
 		if err != nil {
-			return &agent.UpdateRepositoryRes{
+			return &agent.UpdateRepositoryResp{
 				Code: errx.GetCode(err),
 				Msg:  err.Error(),
 			}, nil
@@ -70,14 +70,14 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 
 		isValid, err := repoClient.ValidateRepoBranch(req.Branch)
 		if err != nil {
-			return &agent.UpdateRepositoryRes{
+			return &agent.UpdateRepositoryResp{
 				Code: consts.ErrNumRepoValidateBranch,
 				Msg:  consts.ErrMsgRepoValidateBranch,
 			}, nil
 		}
 
 		if !isValid {
-			return &agent.UpdateRepositoryRes{
+			return &agent.UpdateRepositoryResp{
 				Code: consts.ErrNumParamRepositoryBranch,
 				Msg:  consts.ErrMsgParamRepositoryBranch,
 			}, nil
@@ -92,12 +92,12 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 	})
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
-			return &agent.UpdateRepositoryRes{
+			return &agent.UpdateRepositoryResp{
 				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "repo id not exist",
 			}, nil
 		}
-		return &agent.UpdateRepositoryRes{
+		return &agent.UpdateRepositoryResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
@@ -109,7 +109,7 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 	if req.Branch != "" {
 		client, err := s.svcCtx.RepoManager.GetClient(req.Id)
 		if err != nil {
-			return &agent.UpdateRepositoryRes{
+			return &agent.UpdateRepositoryResp{
 				Code: errx.GetCode(err),
 				Msg:  err.Error(),
 			}, nil
@@ -118,7 +118,7 @@ func (s *UpdateRepositoryService) Run(req *agent.UpdateRepositoryReq) (resp *age
 		client.UpdateBranch(req.Branch)
 	}
 
-	return &agent.UpdateRepositoryRes{
+	return &agent.UpdateRepositoryResp{
 		Code: 0,
 		Msg:  "update repository successfully",
 	}, nil

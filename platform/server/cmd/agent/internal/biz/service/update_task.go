@@ -40,7 +40,6 @@ func NewUpdateTaskService(ctx context.Context, svcCtx *svc.ServiceContext) *Upda
 
 // Run create note info
 func (s *UpdateTaskService) Run(req *task.UpdateTaskReq) (resp *task.UpdateTaskResp, err error) {
-	// Finish your business logic.
 	tasks := make([]model.Task, 0)
 	for _, _task := range req.Tasks {
 		tasks = append(tasks, *_task)

@@ -7,12 +7,13 @@ import (
 )
 
 type Template struct {
-	Id         int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
-	Name       string `thrift:"name,2" frugal:"2,default,string" json:"name"`
-	Type       int32  `thrift:"type,3" frugal:"3,default,i32" json:"type"`
-	IsDeleted  bool   `thrift:"is_deleted,4" frugal:"4,default,bool" json:"is_deleted"`
-	CreateTime string `thrift:"create_time,5" frugal:"5,default,string" json:"create_time"`
-	UpdateTime string `thrift:"update_time,6" frugal:"6,default,string" json:"update_time"`
+	Id   int64  `thrift:"id,1" frugal:"1,default,i64" form:"id" json:"id" query:"id"`
+	Name string `thrift:"name,2" frugal:"2,default,string" form:"name" json:"name" query:"name"`
+	// 1: hz, 2: kitex
+	Type       int32  `thrift:"type,3" frugal:"3,default,i32" form:"type" json:"type" query:"type"`
+	IsDeleted  bool   `thrift:"is_deleted,4" frugal:"4,default,bool" form:"is_deleted" json:"is_deleted" query:"is_deleted"`
+	CreateTime string `thrift:"create_time,5" frugal:"5,default,string" form:"create_time" json:"create_time" query:"create_time"`
+	UpdateTime string `thrift:"update_time,6" frugal:"6,default,string" form:"update_time" json:"update_time" query:"update_time"`
 }
 
 func NewTemplate() *Template {
@@ -73,13 +74,13 @@ func (p *Template) String() string {
 }
 
 type TemplateItem struct {
-	Id         int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
-	TemplateId int64  `thrift:"template_id,2" frugal:"2,default,i64" json:"template_id"`
-	Name       string `thrift:"name,3" frugal:"3,default,string" json:"name"`
-	Content    string `thrift:"content,4" frugal:"4,default,string" json:"content"`
-	IsDeleted  bool   `thrift:"is_deleted,5" frugal:"5,default,bool" json:"is_deleted"`
-	CreateTime string `thrift:"create_time,6" frugal:"6,default,string" json:"create_time"`
-	UpdateTime string `thrift:"update_time,7" frugal:"7,default,string" json:"update_time"`
+	Id         int64  `thrift:"id,1" frugal:"1,default,i64" form:"id" json:"id" query:"id"`
+	TemplateId int64  `thrift:"template_id,2" frugal:"2,default,i64" form:"template_id" json:"template_id" query:"template_id"`
+	Name       string `thrift:"name,3" frugal:"3,default,string" form:"name" json:"name" query:"name"`
+	Content    string `thrift:"content,4" frugal:"4,default,string" form:"content" json:"content" query:"content"`
+	IsDeleted  bool   `thrift:"is_deleted,5" frugal:"5,default,bool" form:"is_deleted" json:"is_deleted" query:"is_deleted"`
+	CreateTime string `thrift:"create_time,6" frugal:"6,default,string" form:"create_time" json:"create_time" query:"create_time"`
+	UpdateTime string `thrift:"update_time,7" frugal:"7,default,string" form:"update_time" json:"update_time" query:"update_time"`
 }
 
 func NewTemplateItem() *TemplateItem {
@@ -147,8 +148,8 @@ func (p *TemplateItem) String() string {
 }
 
 type TemplateWithItemInfo struct {
-	Template *Template       `thrift:"template,1" frugal:"1,default,Template" json:"template"`
-	Items    []*TemplateItem `thrift:"items,2" frugal:"2,default,list<TemplateItem>" json:"items"`
+	Template *Template       `thrift:"template,1" frugal:"1,default,Template" form:"template" json:"template" query:"template"`
+	Items    []*TemplateItem `thrift:"items,2" frugal:"2,default,list<TemplateItem>" form:"items" json:"items" query:"items"`
 }
 
 func NewTemplateWithItemInfo() *TemplateWithItemInfo {

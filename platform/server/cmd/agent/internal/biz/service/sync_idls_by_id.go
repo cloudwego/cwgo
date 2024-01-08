@@ -52,7 +52,7 @@ func NewSyncIDLsByIdService(ctx context.Context, svcCtx *svc.ServiceContext, age
 }
 
 // Run create note info
-func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncIDLsByIdRes, err error) {
+func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncIDLsByIdResp, err error) {
 	for _, syncMainIdlId := range req.Ids {
 		idlEntityWithRepoInfo, err := s.svcCtx.DaoManager.Idl.GetIDL(s.ctx, syncMainIdlId)
 		if err != nil {
@@ -74,7 +74,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		if err != nil {
 			//if errx.GetCode(err) == consts.ErrNumTokenInvalid {
 			//	//// repo token is invalid or expired
-			//	//return &agent.SyncIDLsByIdRes{
+			//	//return &agent.SyncIDLsByIdResp{
 			//	//	Code: consts.ErrNumTokenInvalid,
 			//	//	Msg:  consts.ErrMsgTokenInvalid,
 			//	//}, nil
@@ -82,7 +82,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 			//}
 
 			log.Error(consts.ErrMsgRepoGetClient, zap.Error(err), zap.Int64("repo_id", idlRepoModel.Id))
-			//return &agent.SyncIDLsByIdRes{
+			//return &agent.SyncIDLsByIdResp{
 			//	Code: consts.ErrNumRepoGetClient,
 			//	Msg:  consts.ErrMsgRepoGetClient,
 			//}, nil
@@ -103,7 +103,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		)
 		if err != nil {
 			//log.Error(consts.ErrMsgParamRepositoryUrl, zap.Error(err))
-			//return &agent.SyncIDLsByIdRes{
+			//return &agent.SyncIDLsByIdResp{
 			//	Code: consts.ErrNumParamRepositoryUrl,
 			//	Msg:  consts.ErrMsgParamRepositoryUrl,
 			//}, nil
@@ -114,7 +114,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		archiveData, err := repoClient.GetRepositoryArchive(owner, repoName, idlRepoModel.RepositoryBranch)
 		if err != nil {
 			//log.Error(consts.ErrMsgRepoGetArchive, zap.Error(err))
-			//return &agent.SyncIDLsByIdRes{
+			//return &agent.SyncIDLsByIdResp{
 			//	Code: consts.ErrNumRepoGetArchive,
 			//	Msg:  consts.ErrMsgRepoGetArchive,
 			//}, nil
@@ -128,7 +128,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 				err = os.Mkdir(consts.TempDir, 0o700)
 				if err != nil {
 					//log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
-					//return &agent.SyncIDLsByIdRes{
+					//return &agent.SyncIDLsByIdResp{
 					//	Code: consts.ErrNumCommonCreateTempDir,
 					//	Msg:  consts.ErrMsgCommonCreateTempDir,
 					//}, nil
@@ -138,7 +138,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 				tempDir, err = os.MkdirTemp(consts.TempDir, strconv.FormatInt(idlRepoModel.Id, 10))
 				if err != nil {
 					log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
-					//return &agent.SyncIDLsByIdRes{
+					//return &agent.SyncIDLsByIdResp{
 					//	Code: consts.ErrNumCommonCreateTempDir,
 					//	Msg:  consts.ErrMsgCommonCreateTempDir,
 					//}, nil
@@ -146,7 +146,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 				}
 			} else {
 				//log.Error(consts.ErrMsgCommonCreateTempDir, zap.Error(err))
-				//return &agent.SyncIDLsByIdRes{
+				//return &agent.SyncIDLsByIdResp{
 				//	Code: consts.ErrNumCommonCreateTempDir,
 				//	Msg:  consts.ErrMsgCommonCreateTempDir,
 				//}, nil
@@ -167,7 +167,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		archiveName, err := utils.UnTar(archiveData, tempDirRepo, isTarBall)
 		if err != nil {
 			//log.Error(consts.ErrMsgRepoParseArchive, zap.Error(err))
-			//return &agent.SyncIDLsByIdRes{
+			//return &agent.SyncIDLsByIdResp{
 			//	Code: consts.ErrNumRepoParseArchive,
 			//	Msg:  consts.ErrMsgRepoParseArchive,
 			//}, nil
@@ -177,7 +177,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		// determine the idl type for subsequent calculations of different types
 		idlType, err := utils.DetermineIdlType(idlPid)
 		if err != nil {
-			//return &agent.SyncIDLsByIdRes{
+			//return &agent.SyncIDLsByIdResp{
 			//	Code: consts.ErrNumIdlFileExtension,
 			//	Msg:  consts.ErrMsgIdlFileExtension,
 			//}, nil
@@ -186,7 +186,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 
 		idlParser := parser.NewParser(idlType)
 		if idlParser == nil {
-			return &agent.SyncIDLsByIdRes{
+			return &agent.SyncIDLsByIdResp{
 				Code: consts.ErrNumIdlFileExtension,
 				Msg:  consts.ErrMsgIdlFileExtension,
 			}, nil
@@ -195,7 +195,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		var importBaseDirPath string
 		importBaseDirPath, importPaths, err = idlParser.GetDependentFilePaths(tempDirRepo+"/"+archiveName, idlPid)
 		if err != nil {
-			//return &agent.SyncIDLsByIdRes{
+			//return &agent.SyncIDLsByIdResp{
 			//	Code: consts.ErrNumIdlGetDependentFilePath,
 			//	Msg:  consts.ErrMsgIdlGetDependentFilePath,
 			//}, nil
@@ -209,7 +209,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		mainIdlHash, err := repoClient.GetLatestCommitHash(owner, repoName, idlPid, idlRepoModel.RepositoryBranch)
 		if err != nil {
 			//log.Error("get latest commit hash failed", zap.Error(err))
-			//return &agent.SyncIDLsByIdRes{
+			//return &agent.SyncIDLsByIdResp{
 			//	Code: consts.ErrNumRepoGetCommitHash,
 			//	Msg:  consts.ErrMsgRepoGetCommitHash,
 			//}, nil
@@ -227,7 +227,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 				calculatedPath := filepath.ToSlash(filepath.Join(importBaseDirPath, importPath))
 				commitHash, err := repoClient.GetLatestCommitHash(owner, repoName, calculatedPath, idlRepoModel.RepositoryBranch)
 				if err != nil {
-					//return &agent.SyncIDLsByIdRes{
+					//return &agent.SyncIDLsByIdResp{
 					//	Code: consts.ErrNumRepoGetCommitHash,
 					//	Msg:  "cannot get depended idl latest commit hash",
 					//}, nil
@@ -267,7 +267,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		}
 
 		if !needToSync {
-			return &agent.SyncIDLsByIdRes{
+			return &agent.SyncIDLsByIdResp{
 				Code: -1,
 				Msg:  "不需要强制更新, IDL 没有变化, 无需同步",
 			}, nil
@@ -282,7 +282,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		err = s.svcCtx.GenerateCode(s.ctx, repoClient,
 			tempDir, importBaseDirPath, idlEntityWithRepoInfo, idlRepoModel, archiveName)
 		if err != nil {
-			//return &agent.SyncIDLsByIdRes{
+			//return &agent.SyncIDLsByIdResp{
 			//	Code: errx.GetCode(err),
 			//	Msg:  err.Error(),
 			//}, nil
@@ -296,7 +296,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		})
 		if err != nil {
 			//log.Error("sync idl content to dao failed", zap.Error(err))
-			//return &agent.SyncIDLsByIdRes{
+			//return &agent.SyncIDLsByIdResp{
 			//	Code: consts.ErrNumDatabase,
 			//	Msg:  consts.ErrMsgDatabase,
 			//}, nil
@@ -304,7 +304,7 @@ func (s *SyncIDLsByIdService) Run(req *agent.SyncIDLsByIdReq) (resp *agent.SyncI
 		}
 	}
 
-	return &agent.SyncIDLsByIdRes{
+	return &agent.SyncIDLsByIdResp{
 		Code: 0,
 		Msg:  "sync idls successfully",
 	}, nil

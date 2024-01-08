@@ -57,81 +57,81 @@ func (p *AddIDLReq) String() string {
 	return fmt.Sprintf("AddIDLReq(%+v)", *p)
 }
 
-type AddIDLRes struct {
-	Code int32          `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string         `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
-	Data *AddIDLResData `thrift:"data,3" frugal:"3,default,AddIDLResData" json:"data"`
+type AddIDLResp struct {
+	Code int32           `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string          `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *AddIDLRespData `thrift:"data,3" frugal:"3,default,AddIDLRespData" json:"data"`
 }
 
-func NewAddIDLRes() *AddIDLRes {
-	return &AddIDLRes{}
+func NewAddIDLResp() *AddIDLResp {
+	return &AddIDLResp{}
 }
 
-func (p *AddIDLRes) InitDefault() {
-	*p = AddIDLRes{}
+func (p *AddIDLResp) InitDefault() {
+	*p = AddIDLResp{}
 }
 
-func (p *AddIDLRes) GetCode() (v int32) {
+func (p *AddIDLResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *AddIDLRes) GetMsg() (v string) {
+func (p *AddIDLResp) GetMsg() (v string) {
 	return p.Msg
 }
 
-var AddIDLRes_Data_DEFAULT *AddIDLResData
+var AddIDLResp_Data_DEFAULT *AddIDLRespData
 
-func (p *AddIDLRes) GetData() (v *AddIDLResData) {
+func (p *AddIDLResp) GetData() (v *AddIDLRespData) {
 	if !p.IsSetData() {
-		return AddIDLRes_Data_DEFAULT
+		return AddIDLResp_Data_DEFAULT
 	}
 	return p.Data
 }
-func (p *AddIDLRes) SetCode(val int32) {
+func (p *AddIDLResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *AddIDLRes) SetMsg(val string) {
+func (p *AddIDLResp) SetMsg(val string) {
 	p.Msg = val
 }
-func (p *AddIDLRes) SetData(val *AddIDLResData) {
+func (p *AddIDLResp) SetData(val *AddIDLRespData) {
 	p.Data = val
 }
 
-func (p *AddIDLRes) IsSetData() bool {
+func (p *AddIDLResp) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *AddIDLRes) String() string {
+func (p *AddIDLResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AddIDLRes(%+v)", *p)
+	return fmt.Sprintf("AddIDLResp(%+v)", *p)
 }
 
-type AddIDLResData struct {
+type AddIDLRespData struct {
 	IdlId int64 `thrift:"idl_id,1" frugal:"1,default,i64" json:"idl_id"`
 }
 
-func NewAddIDLResData() *AddIDLResData {
-	return &AddIDLResData{}
+func NewAddIDLRespData() *AddIDLRespData {
+	return &AddIDLRespData{}
 }
 
-func (p *AddIDLResData) InitDefault() {
-	*p = AddIDLResData{}
+func (p *AddIDLRespData) InitDefault() {
+	*p = AddIDLRespData{}
 }
 
-func (p *AddIDLResData) GetIdlId() (v int64) {
+func (p *AddIDLRespData) GetIdlId() (v int64) {
 	return p.IdlId
 }
-func (p *AddIDLResData) SetIdlId(val int64) {
+func (p *AddIDLRespData) SetIdlId(val int64) {
 	p.IdlId = val
 }
 
-func (p *AddIDLResData) String() string {
+func (p *AddIDLRespData) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AddIDLResData(%+v)", *p)
+	return fmt.Sprintf("AddIDLRespData(%+v)", *p)
 }
 
 type DeleteIDLsReq struct {
@@ -160,38 +160,38 @@ func (p *DeleteIDLsReq) String() string {
 	return fmt.Sprintf("DeleteIDLsReq(%+v)", *p)
 }
 
-type DeleteIDLsRes struct {
+type DeleteIDLsResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewDeleteIDLsRes() *DeleteIDLsRes {
-	return &DeleteIDLsRes{}
+func NewDeleteIDLsResp() *DeleteIDLsResp {
+	return &DeleteIDLsResp{}
 }
 
-func (p *DeleteIDLsRes) InitDefault() {
-	*p = DeleteIDLsRes{}
+func (p *DeleteIDLsResp) InitDefault() {
+	*p = DeleteIDLsResp{}
 }
 
-func (p *DeleteIDLsRes) GetCode() (v int32) {
+func (p *DeleteIDLsResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *DeleteIDLsRes) GetMsg() (v string) {
+func (p *DeleteIDLsResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *DeleteIDLsRes) SetCode(val int32) {
+func (p *DeleteIDLsResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *DeleteIDLsRes) SetMsg(val string) {
+func (p *DeleteIDLsResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *DeleteIDLsRes) String() string {
+func (p *DeleteIDLsResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("DeleteIDLsRes(%+v)", *p)
+	return fmt.Sprintf("DeleteIDLsResp(%+v)", *p)
 }
 
 type UpdateIDLReq struct {
@@ -252,38 +252,38 @@ func (p *UpdateIDLReq) String() string {
 	return fmt.Sprintf("UpdateIDLReq(%+v)", *p)
 }
 
-type UpdateIDLRes struct {
+type UpdateIDLResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewUpdateIDLRes() *UpdateIDLRes {
-	return &UpdateIDLRes{}
+func NewUpdateIDLResp() *UpdateIDLResp {
+	return &UpdateIDLResp{}
 }
 
-func (p *UpdateIDLRes) InitDefault() {
-	*p = UpdateIDLRes{}
+func (p *UpdateIDLResp) InitDefault() {
+	*p = UpdateIDLResp{}
 }
 
-func (p *UpdateIDLRes) GetCode() (v int32) {
+func (p *UpdateIDLResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *UpdateIDLRes) GetMsg() (v string) {
+func (p *UpdateIDLResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *UpdateIDLRes) SetCode(val int32) {
+func (p *UpdateIDLResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *UpdateIDLRes) SetMsg(val string) {
+func (p *UpdateIDLResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *UpdateIDLRes) String() string {
+func (p *UpdateIDLResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UpdateIDLRes(%+v)", *p)
+	return fmt.Sprintf("UpdateIDLResp(%+v)", *p)
 }
 
 type GetIDLsReq struct {
@@ -344,89 +344,89 @@ func (p *GetIDLsReq) String() string {
 	return fmt.Sprintf("GetIDLsReq(%+v)", *p)
 }
 
-type GetIDLsRes struct {
-	Code int32           `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string          `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
-	Data *GetIDLsResData `thrift:"data,3" frugal:"3,default,GetIDLsResData" json:"data"`
+type GetIDLsResp struct {
+	Code int32            `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string           `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *GetIDLsRespData `thrift:"data,3" frugal:"3,default,GetIDLsRespData" json:"data"`
 }
 
-func NewGetIDLsRes() *GetIDLsRes {
-	return &GetIDLsRes{}
+func NewGetIDLsResp() *GetIDLsResp {
+	return &GetIDLsResp{}
 }
 
-func (p *GetIDLsRes) InitDefault() {
-	*p = GetIDLsRes{}
+func (p *GetIDLsResp) InitDefault() {
+	*p = GetIDLsResp{}
 }
 
-func (p *GetIDLsRes) GetCode() (v int32) {
+func (p *GetIDLsResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *GetIDLsRes) GetMsg() (v string) {
+func (p *GetIDLsResp) GetMsg() (v string) {
 	return p.Msg
 }
 
-var GetIDLsRes_Data_DEFAULT *GetIDLsResData
+var GetIDLsResp_Data_DEFAULT *GetIDLsRespData
 
-func (p *GetIDLsRes) GetData() (v *GetIDLsResData) {
+func (p *GetIDLsResp) GetData() (v *GetIDLsRespData) {
 	if !p.IsSetData() {
-		return GetIDLsRes_Data_DEFAULT
+		return GetIDLsResp_Data_DEFAULT
 	}
 	return p.Data
 }
-func (p *GetIDLsRes) SetCode(val int32) {
+func (p *GetIDLsResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *GetIDLsRes) SetMsg(val string) {
+func (p *GetIDLsResp) SetMsg(val string) {
 	p.Msg = val
 }
-func (p *GetIDLsRes) SetData(val *GetIDLsResData) {
+func (p *GetIDLsResp) SetData(val *GetIDLsRespData) {
 	p.Data = val
 }
 
-func (p *GetIDLsRes) IsSetData() bool {
+func (p *GetIDLsResp) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *GetIDLsRes) String() string {
+func (p *GetIDLsResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetIDLsRes(%+v)", *p)
+	return fmt.Sprintf("GetIDLsResp(%+v)", *p)
 }
 
-type GetIDLsResData struct {
+type GetIDLsRespData struct {
 	Idls  []*model.IDLWithRepositoryInfo `thrift:"idls,1" frugal:"1,default,list<model.IDLWithRepositoryInfo>" json:"idls"`
 	Total int32                          `thrift:"total,2" frugal:"2,default,i32" json:"total"`
 }
 
-func NewGetIDLsResData() *GetIDLsResData {
-	return &GetIDLsResData{}
+func NewGetIDLsRespData() *GetIDLsRespData {
+	return &GetIDLsRespData{}
 }
 
-func (p *GetIDLsResData) InitDefault() {
-	*p = GetIDLsResData{}
+func (p *GetIDLsRespData) InitDefault() {
+	*p = GetIDLsRespData{}
 }
 
-func (p *GetIDLsResData) GetIdls() (v []*model.IDLWithRepositoryInfo) {
+func (p *GetIDLsRespData) GetIdls() (v []*model.IDLWithRepositoryInfo) {
 	return p.Idls
 }
 
-func (p *GetIDLsResData) GetTotal() (v int32) {
+func (p *GetIDLsRespData) GetTotal() (v int32) {
 	return p.Total
 }
-func (p *GetIDLsResData) SetIdls(val []*model.IDLWithRepositoryInfo) {
+func (p *GetIDLsRespData) SetIdls(val []*model.IDLWithRepositoryInfo) {
 	p.Idls = val
 }
-func (p *GetIDLsResData) SetTotal(val int32) {
+func (p *GetIDLsRespData) SetTotal(val int32) {
 	p.Total = val
 }
 
-func (p *GetIDLsResData) String() string {
+func (p *GetIDLsRespData) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetIDLsResData(%+v)", *p)
+	return fmt.Sprintf("GetIDLsRespData(%+v)", *p)
 }
 
 type SyncIDLsByIdReq struct {
@@ -455,36 +455,36 @@ func (p *SyncIDLsByIdReq) String() string {
 	return fmt.Sprintf("SyncIDLsByIdReq(%+v)", *p)
 }
 
-type SyncIDLsByIdRes struct {
+type SyncIDLsByIdResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewSyncIDLsByIdRes() *SyncIDLsByIdRes {
-	return &SyncIDLsByIdRes{}
+func NewSyncIDLsByIdResp() *SyncIDLsByIdResp {
+	return &SyncIDLsByIdResp{}
 }
 
-func (p *SyncIDLsByIdRes) InitDefault() {
-	*p = SyncIDLsByIdRes{}
+func (p *SyncIDLsByIdResp) InitDefault() {
+	*p = SyncIDLsByIdResp{}
 }
 
-func (p *SyncIDLsByIdRes) GetCode() (v int32) {
+func (p *SyncIDLsByIdResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *SyncIDLsByIdRes) GetMsg() (v string) {
+func (p *SyncIDLsByIdResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *SyncIDLsByIdRes) SetCode(val int32) {
+func (p *SyncIDLsByIdResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *SyncIDLsByIdRes) SetMsg(val string) {
+func (p *SyncIDLsByIdResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *SyncIDLsByIdRes) String() string {
+func (p *SyncIDLsByIdResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("SyncIDLsByIdRes(%+v)", *p)
+	return fmt.Sprintf("SyncIDLsByIdResp(%+v)", *p)
 }

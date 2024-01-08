@@ -8,19 +8,19 @@ struct AddIDLReq{
     3: string service_name
     4: string service_repository_name
 }
-struct AddIDLRes{
+struct AddIDLResp{
     1: i32 code
     2: string msg
-    3: AddIDLResData data
+    3: AddIDLRespData data
 }
-struct AddIDLResData{
+struct AddIDLRespData{
     1: i64 idl_id
 }
 
 struct DeleteIDLsReq{
     1: list<i64> ids
 }
-struct DeleteIDLsRes{
+struct DeleteIDLsResp{
     1: i32 code
     2: string msg
 }
@@ -32,7 +32,7 @@ struct UpdateIDLReq{
     4: i32 status
     5: string service_name
 }
-struct UpdateIDLRes{
+struct UpdateIDLResp{
     1: i32 code
     2: string msg
 }
@@ -44,12 +44,12 @@ struct GetIDLsReq{
     4: string order_by
     5: string service_name
 }
-struct GetIDLsRes{
+struct GetIDLsResp{
     1: i32 code
     2: string msg
-    3: GetIDLsResData data
+    3: GetIDLsRespData data
 }
-struct GetIDLsResData{
+struct GetIDLsRespData{
     1: list<idl.IDLWithRepositoryInfo> idls
     2: i32 total
 }
@@ -58,7 +58,7 @@ struct SyncIDLsByIdReq{
     1: list<i64> ids
 }
 
-struct SyncIDLsByIdRes{
+struct SyncIDLsByIdResp{
     1: i32 code
     2: string msg
 }

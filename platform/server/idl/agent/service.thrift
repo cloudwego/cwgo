@@ -1,6 +1,5 @@
 namespace go agent
 
-include "agent.thrift"
 include "repository.thrift"
 include "idl.thrift"
 include "template.thrift"
@@ -18,29 +17,29 @@ struct PingResp {
 service AgentService {
     PingResp Ping(1: PingReq req)
 
-    repository.AddRepositoryRes AddRepository(1: repository.AddRepositoryReq req)
-    repository.DeleteRepositoriesRes DeleteRepositories(1: repository.DeleteRepositoriesReq req)
-    repository.UpdateRepositoryRes UpdateRepository(1: repository.UpdateRepositoryReq req)
-    repository.GetRepositoriesRes GetRepositories(1: repository.GetRepositoriesReq req)
+    repository.AddRepositoryResp AddRepository(1: repository.AddRepositoryReq req)
+    repository.DeleteRepositoriesResp DeleteRepositories(1: repository.DeleteRepositoriesReq req)
+    repository.UpdateRepositoryResp UpdateRepository(1: repository.UpdateRepositoryReq req)
+    repository.GetRepositoriesResp GetRepositories(1: repository.GetRepositoriesReq req)
 
-    idl.AddIDLRes AddIDL(1: idl.AddIDLReq req)
-    idl.DeleteIDLsRes DeleteIDL(1: idl.DeleteIDLsReq req)
-    idl.UpdateIDLRes UpdateIDL(1: idl.UpdateIDLReq req)
-    idl.GetIDLsRes GetIDLs(1: idl.GetIDLsReq req)
-    idl.SyncIDLsByIdRes SyncIDLsById(1: idl.SyncIDLsByIdReq req)
+    idl.AddIDLResp AddIDL(1: idl.AddIDLReq req)
+    idl.DeleteIDLsResp DeleteIDL(1: idl.DeleteIDLsReq req)
+    idl.UpdateIDLResp UpdateIDL(1: idl.UpdateIDLReq req)
+    idl.GetIDLsResp GetIDLs(1: idl.GetIDLsReq req)
+    idl.SyncIDLsByIdResp SyncIDLsById(1: idl.SyncIDLsByIdReq req)
 
-    template.AddTemplateRes AddTemplate(1: template.AddTemplateReq req)
-    template.DeleteTemplateRes DeleteTemplate(1: template.DeleteTemplateReq req)
-    template.UpdateTemplateRes UpdateTemplate(1: template.UpdateTemplateReq req)
-    template.GetTemplatesRes GetTemplates(1: template.GetTemplatesReq req)
-    template.AddTemplateItemRes AddTemplateItem(1: template.AddTemplateItemReq req)
-    template.DeleteTemplateItemRes DeleteTemplateItem(1: template.DeleteTemplateItemReq req)
-    template.UpdateTemplateItemRes UpdateTemplateItem(1: template.UpdateTemplateItemReq req)
-    template.GetTemplateItemsRes GetTemplateItems(1: template.GetTemplateItemsReq req)
+    template.AddTemplateResp AddTemplate(1: template.AddTemplateReq req)
+    template.DeleteTemplateResp DeleteTemplate(1: template.DeleteTemplateReq req)
+    template.UpdateTemplateResp UpdateTemplate(1: template.UpdateTemplateReq req)
+    template.GetTemplatesResp GetTemplates(1: template.GetTemplatesReq req)
+    template.AddTemplateItemResp AddTemplateItem(1: template.AddTemplateItemReq req)
+    template.DeleteTemplateItemResp DeleteTemplateItem(1: template.DeleteTemplateItemReq req)
+    template.UpdateTemplateItemResp UpdateTemplateItem(1: template.UpdateTemplateItemReq req)
+    template.GetTemplateItemsResp GetTemplateItems(1: template.GetTemplateItemsReq req)
 
     task.UpdateTaskResp UpdateTask(1: task.UpdateTaskReq req)
 
-    token.AddTokenRes AddToken(1: token.AddTokenReq req)
-    token.DeleteTokenRes DeleteToken(1: token.DeleteTokenReq req)
-    token.GetTokenRes GetToken(1: token.GetTokenReq req)
+    token.AddTokenResp AddToken(1: token.AddTokenReq req)
+    token.DeleteTokenResp DeleteToken(1: token.DeleteTokenReq req)
+    token.GetTokenResp GetToken(1: token.GetTokenReq req)
 }

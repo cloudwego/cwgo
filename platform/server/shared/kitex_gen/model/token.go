@@ -7,18 +7,30 @@ import (
 )
 
 type Token struct {
-	Id               int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
-	RepositoryType   int32  `thrift:"repository_type,2" frugal:"2,default,i32" json:"repository_type"`
-	RepositoryDomain string `thrift:"repository_domain,3" frugal:"3,default,string" json:"repository_domain"`
-	Owner            string `thrift:"owner,4" frugal:"4,default,string" json:"owner"`
-	OwnerId          int64  `thrift:"owner_id,5" frugal:"5,default,i64" json:"owner_id"`
-	TokenType        int32  `thrift:"token_type,6" frugal:"6,default,i32" json:"token_type"`
-	Token            string `thrift:"token,7" frugal:"7,default,string" json:"token"`
-	Status           int32  `thrift:"status,8" frugal:"8,default,i32" json:"status"`
-	ExpirationTime   string `thrift:"expiration_time,9" frugal:"9,default,string" json:"expiration_time"`
-	IsDeleted        bool   `thrift:"is_deleted,10" frugal:"10,default,bool" json:"is_deleted"`
-	CreateTime       string `thrift:"create_time,11" frugal:"11,default,string" json:"create_time"`
-	UpdateTime       string `thrift:"update_time,12" frugal:"12,default,string" json:"update_time"`
+	// id
+	Id int64 `thrift:"id,1" frugal:"1,default,i64" form:"id" json:"id" query:"id"`
+	// repository type (1: gitlab, 2: github)
+	RepositoryType int32 `thrift:"repository_type,2" frugal:"2,default,i32" form:"repository_type" json:"repository_type" query:"repository_type"`
+	// repository api domain
+	RepositoryDomain string `thrift:"repository_domain,3" frugal:"3,default,string" form:"repository_domain" json:"repository_domain" query:"repository_domain"`
+	// token owner
+	Owner string `thrift:"owner,4" frugal:"4,default,string" form:"owner" json:"owner" query:"owner"`
+	// token owner id
+	OwnerId int64 `thrift:"owner_id,5" frugal:"5,default,i64" form:"owner_id" json:"owner_id" query:"owner_id"`
+	// token type (1: personal, 2: organization)
+	TokenType int32 `thrift:"token_type,6" frugal:"6,default,i32" form:"token_type" json:"token_type" query:"token_type"`
+	// repository token
+	Token string `thrift:"token,7" frugal:"7,default,string" form:"token" json:"token" query:"token"`
+	// token status (1: expired, 2: valid)
+	Status int32 `thrift:"status,8" frugal:"8,default,i32" form:"status" json:"status" query:"status"`
+	// token expiration time
+	ExpirationTime string `thrift:"expiration_time,9" frugal:"9,default,string" form:"expiration_time" json:"expiration_time" query:"expiration_time"`
+	// is deleted
+	IsDeleted bool `thrift:"is_deleted,10" frugal:"10,default,bool" form:"is_deleted" json:"is_deleted" query:"is_deleted"`
+	// create time
+	CreateTime string `thrift:"create_time,11" frugal:"11,default,string" form:"create_time" json:"create_time" query:"create_time"`
+	// update time
+	UpdateTime string `thrift:"update_time,12" frugal:"12,default,string" form:"update_time" json:"update_time" query:"update_time"`
 }
 
 func NewToken() *Token {

@@ -73,38 +73,38 @@ func (p *AddRepositoryReq) String() string {
 	return fmt.Sprintf("AddRepositoryReq(%+v)", *p)
 }
 
-type AddRepositoryRes struct {
+type AddRepositoryResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewAddRepositoryRes() *AddRepositoryRes {
-	return &AddRepositoryRes{}
+func NewAddRepositoryResp() *AddRepositoryResp {
+	return &AddRepositoryResp{}
 }
 
-func (p *AddRepositoryRes) InitDefault() {
-	*p = AddRepositoryRes{}
+func (p *AddRepositoryResp) InitDefault() {
+	*p = AddRepositoryResp{}
 }
 
-func (p *AddRepositoryRes) GetCode() (v int32) {
+func (p *AddRepositoryResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *AddRepositoryRes) GetMsg() (v string) {
+func (p *AddRepositoryResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *AddRepositoryRes) SetCode(val int32) {
+func (p *AddRepositoryResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *AddRepositoryRes) SetMsg(val string) {
+func (p *AddRepositoryResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *AddRepositoryRes) String() string {
+func (p *AddRepositoryResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AddRepositoryRes(%+v)", *p)
+	return fmt.Sprintf("AddRepositoryResp(%+v)", *p)
 }
 
 type DeleteRepositoriesReq struct {
@@ -133,38 +133,38 @@ func (p *DeleteRepositoriesReq) String() string {
 	return fmt.Sprintf("DeleteRepositoriesReq(%+v)", *p)
 }
 
-type DeleteRepositoriesRes struct {
+type DeleteRepositoriesResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewDeleteRepositoriesRes() *DeleteRepositoriesRes {
-	return &DeleteRepositoriesRes{}
+func NewDeleteRepositoriesResp() *DeleteRepositoriesResp {
+	return &DeleteRepositoriesResp{}
 }
 
-func (p *DeleteRepositoriesRes) InitDefault() {
-	*p = DeleteRepositoriesRes{}
+func (p *DeleteRepositoriesResp) InitDefault() {
+	*p = DeleteRepositoriesResp{}
 }
 
-func (p *DeleteRepositoriesRes) GetCode() (v int32) {
+func (p *DeleteRepositoriesResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *DeleteRepositoriesRes) GetMsg() (v string) {
+func (p *DeleteRepositoriesResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *DeleteRepositoriesRes) SetCode(val int32) {
+func (p *DeleteRepositoriesResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *DeleteRepositoriesRes) SetMsg(val string) {
+func (p *DeleteRepositoriesResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *DeleteRepositoriesRes) String() string {
+func (p *DeleteRepositoriesResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("DeleteRepositoriesRes(%+v)", *p)
+	return fmt.Sprintf("DeleteRepositoriesResp(%+v)", *p)
 }
 
 type UpdateRepositoryReq struct {
@@ -209,38 +209,38 @@ func (p *UpdateRepositoryReq) String() string {
 	return fmt.Sprintf("UpdateRepositoryReq(%+v)", *p)
 }
 
-type UpdateRepositoryRes struct {
+type UpdateRepositoryResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewUpdateRepositoryRes() *UpdateRepositoryRes {
-	return &UpdateRepositoryRes{}
+func NewUpdateRepositoryResp() *UpdateRepositoryResp {
+	return &UpdateRepositoryResp{}
 }
 
-func (p *UpdateRepositoryRes) InitDefault() {
-	*p = UpdateRepositoryRes{}
+func (p *UpdateRepositoryResp) InitDefault() {
+	*p = UpdateRepositoryResp{}
 }
 
-func (p *UpdateRepositoryRes) GetCode() (v int32) {
+func (p *UpdateRepositoryResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *UpdateRepositoryRes) GetMsg() (v string) {
+func (p *UpdateRepositoryResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *UpdateRepositoryRes) SetCode(val int32) {
+func (p *UpdateRepositoryResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *UpdateRepositoryRes) SetMsg(val string) {
+func (p *UpdateRepositoryResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *UpdateRepositoryRes) String() string {
+func (p *UpdateRepositoryResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UpdateRepositoryRes(%+v)", *p)
+	return fmt.Sprintf("UpdateRepositoryResp(%+v)", *p)
 }
 
 type GetRepositoriesReq struct {
@@ -333,87 +333,87 @@ func (p *GetRepositoriesReq) String() string {
 	return fmt.Sprintf("GetRepositoriesReq(%+v)", *p)
 }
 
-type GetRepositoriesRes struct {
-	Code int32                   `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string                  `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
-	Data *GetRepositoriesResData `thrift:"data,3" frugal:"3,default,GetRepositoriesResData" json:"data"`
+type GetRepositoriesResp struct {
+	Code int32                    `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string                   `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *GetRepositoriesRespData `thrift:"data,3" frugal:"3,default,GetRepositoriesRespData" json:"data"`
 }
 
-func NewGetRepositoriesRes() *GetRepositoriesRes {
-	return &GetRepositoriesRes{}
+func NewGetRepositoriesResp() *GetRepositoriesResp {
+	return &GetRepositoriesResp{}
 }
 
-func (p *GetRepositoriesRes) InitDefault() {
-	*p = GetRepositoriesRes{}
+func (p *GetRepositoriesResp) InitDefault() {
+	*p = GetRepositoriesResp{}
 }
 
-func (p *GetRepositoriesRes) GetCode() (v int32) {
+func (p *GetRepositoriesResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *GetRepositoriesRes) GetMsg() (v string) {
+func (p *GetRepositoriesResp) GetMsg() (v string) {
 	return p.Msg
 }
 
-var GetRepositoriesRes_Data_DEFAULT *GetRepositoriesResData
+var GetRepositoriesResp_Data_DEFAULT *GetRepositoriesRespData
 
-func (p *GetRepositoriesRes) GetData() (v *GetRepositoriesResData) {
+func (p *GetRepositoriesResp) GetData() (v *GetRepositoriesRespData) {
 	if !p.IsSetData() {
-		return GetRepositoriesRes_Data_DEFAULT
+		return GetRepositoriesResp_Data_DEFAULT
 	}
 	return p.Data
 }
-func (p *GetRepositoriesRes) SetCode(val int32) {
+func (p *GetRepositoriesResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *GetRepositoriesRes) SetMsg(val string) {
+func (p *GetRepositoriesResp) SetMsg(val string) {
 	p.Msg = val
 }
-func (p *GetRepositoriesRes) SetData(val *GetRepositoriesResData) {
+func (p *GetRepositoriesResp) SetData(val *GetRepositoriesRespData) {
 	p.Data = val
 }
 
-func (p *GetRepositoriesRes) IsSetData() bool {
+func (p *GetRepositoriesResp) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *GetRepositoriesRes) String() string {
+func (p *GetRepositoriesResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetRepositoriesRes(%+v)", *p)
+	return fmt.Sprintf("GetRepositoriesResp(%+v)", *p)
 }
 
-type GetRepositoriesResData struct {
+type GetRepositoriesRespData struct {
 	Repositories []*model.Repository `thrift:"repositories,1" frugal:"1,default,list<model.Repository>" json:"repositories"`
 	Total        int32               `thrift:"total,2" frugal:"2,default,i32" json:"total"`
 }
 
-func NewGetRepositoriesResData() *GetRepositoriesResData {
-	return &GetRepositoriesResData{}
+func NewGetRepositoriesRespData() *GetRepositoriesRespData {
+	return &GetRepositoriesRespData{}
 }
 
-func (p *GetRepositoriesResData) InitDefault() {
-	*p = GetRepositoriesResData{}
+func (p *GetRepositoriesRespData) InitDefault() {
+	*p = GetRepositoriesRespData{}
 }
 
-func (p *GetRepositoriesResData) GetRepositories() (v []*model.Repository) {
+func (p *GetRepositoriesRespData) GetRepositories() (v []*model.Repository) {
 	return p.Repositories
 }
 
-func (p *GetRepositoriesResData) GetTotal() (v int32) {
+func (p *GetRepositoriesRespData) GetTotal() (v int32) {
 	return p.Total
 }
-func (p *GetRepositoriesResData) SetRepositories(val []*model.Repository) {
+func (p *GetRepositoriesRespData) SetRepositories(val []*model.Repository) {
 	p.Repositories = val
 }
-func (p *GetRepositoriesResData) SetTotal(val int32) {
+func (p *GetRepositoriesRespData) SetTotal(val int32) {
 	p.Total = val
 }
 
-func (p *GetRepositoriesResData) String() string {
+func (p *GetRepositoriesRespData) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetRepositoriesResData(%+v)", *p)
+	return fmt.Sprintf("GetRepositoriesRespData(%+v)", *p)
 }

@@ -41,38 +41,38 @@ func (p *AddTemplateReq) String() string {
 	return fmt.Sprintf("AddTemplateReq(%+v)", *p)
 }
 
-type AddTemplateRes struct {
+type AddTemplateResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewAddTemplateRes() *AddTemplateRes {
-	return &AddTemplateRes{}
+func NewAddTemplateResp() *AddTemplateResp {
+	return &AddTemplateResp{}
 }
 
-func (p *AddTemplateRes) InitDefault() {
-	*p = AddTemplateRes{}
+func (p *AddTemplateResp) InitDefault() {
+	*p = AddTemplateResp{}
 }
 
-func (p *AddTemplateRes) GetCode() (v int32) {
+func (p *AddTemplateResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *AddTemplateRes) GetMsg() (v string) {
+func (p *AddTemplateResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *AddTemplateRes) SetCode(val int32) {
+func (p *AddTemplateResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *AddTemplateRes) SetMsg(val string) {
+func (p *AddTemplateResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *AddTemplateRes) String() string {
+func (p *AddTemplateResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AddTemplateRes(%+v)", *p)
+	return fmt.Sprintf("AddTemplateResp(%+v)", *p)
 }
 
 type DeleteTemplateReq struct {
@@ -101,38 +101,38 @@ func (p *DeleteTemplateReq) String() string {
 	return fmt.Sprintf("DeleteTemplateReq(%+v)", *p)
 }
 
-type DeleteTemplateRes struct {
+type DeleteTemplateResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewDeleteTemplateRes() *DeleteTemplateRes {
-	return &DeleteTemplateRes{}
+func NewDeleteTemplateResp() *DeleteTemplateResp {
+	return &DeleteTemplateResp{}
 }
 
-func (p *DeleteTemplateRes) InitDefault() {
-	*p = DeleteTemplateRes{}
+func (p *DeleteTemplateResp) InitDefault() {
+	*p = DeleteTemplateResp{}
 }
 
-func (p *DeleteTemplateRes) GetCode() (v int32) {
+func (p *DeleteTemplateResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *DeleteTemplateRes) GetMsg() (v string) {
+func (p *DeleteTemplateResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *DeleteTemplateRes) SetCode(val int32) {
+func (p *DeleteTemplateResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *DeleteTemplateRes) SetMsg(val string) {
+func (p *DeleteTemplateResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *DeleteTemplateRes) String() string {
+func (p *DeleteTemplateResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("DeleteTemplateRes(%+v)", *p)
+	return fmt.Sprintf("DeleteTemplateResp(%+v)", *p)
 }
 
 type UpdateTemplateReq struct {
@@ -169,38 +169,38 @@ func (p *UpdateTemplateReq) String() string {
 	return fmt.Sprintf("UpdateTemplateReq(%+v)", *p)
 }
 
-type UpdateTemplateRes struct {
+type UpdateTemplateResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewUpdateTemplateRes() *UpdateTemplateRes {
-	return &UpdateTemplateRes{}
+func NewUpdateTemplateResp() *UpdateTemplateResp {
+	return &UpdateTemplateResp{}
 }
 
-func (p *UpdateTemplateRes) InitDefault() {
-	*p = UpdateTemplateRes{}
+func (p *UpdateTemplateResp) InitDefault() {
+	*p = UpdateTemplateResp{}
 }
 
-func (p *UpdateTemplateRes) GetCode() (v int32) {
+func (p *UpdateTemplateResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *UpdateTemplateRes) GetMsg() (v string) {
+func (p *UpdateTemplateResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *UpdateTemplateRes) SetCode(val int32) {
+func (p *UpdateTemplateResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *UpdateTemplateRes) SetMsg(val string) {
+func (p *UpdateTemplateResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *UpdateTemplateRes) String() string {
+func (p *UpdateTemplateResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UpdateTemplateRes(%+v)", *p)
+	return fmt.Sprintf("UpdateTemplateResp(%+v)", *p)
 }
 
 type GetTemplatesReq struct {
@@ -253,81 +253,81 @@ func (p *GetTemplatesReq) String() string {
 	return fmt.Sprintf("GetTemplatesReq(%+v)", *p)
 }
 
-type GetTemplatesRes struct {
-	Code int32                `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string               `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
-	Data *GetTemplatesResData `thrift:"data,3" frugal:"3,default,GetTemplatesResData" json:"data"`
+type GetTemplatesResp struct {
+	Code int32                 `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string                `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *GetTemplatesRespData `thrift:"data,3" frugal:"3,default,GetTemplatesRespData" json:"data"`
 }
 
-func NewGetTemplatesRes() *GetTemplatesRes {
-	return &GetTemplatesRes{}
+func NewGetTemplatesResp() *GetTemplatesResp {
+	return &GetTemplatesResp{}
 }
 
-func (p *GetTemplatesRes) InitDefault() {
-	*p = GetTemplatesRes{}
+func (p *GetTemplatesResp) InitDefault() {
+	*p = GetTemplatesResp{}
 }
 
-func (p *GetTemplatesRes) GetCode() (v int32) {
+func (p *GetTemplatesResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *GetTemplatesRes) GetMsg() (v string) {
+func (p *GetTemplatesResp) GetMsg() (v string) {
 	return p.Msg
 }
 
-var GetTemplatesRes_Data_DEFAULT *GetTemplatesResData
+var GetTemplatesResp_Data_DEFAULT *GetTemplatesRespData
 
-func (p *GetTemplatesRes) GetData() (v *GetTemplatesResData) {
+func (p *GetTemplatesResp) GetData() (v *GetTemplatesRespData) {
 	if !p.IsSetData() {
-		return GetTemplatesRes_Data_DEFAULT
+		return GetTemplatesResp_Data_DEFAULT
 	}
 	return p.Data
 }
-func (p *GetTemplatesRes) SetCode(val int32) {
+func (p *GetTemplatesResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *GetTemplatesRes) SetMsg(val string) {
+func (p *GetTemplatesResp) SetMsg(val string) {
 	p.Msg = val
 }
-func (p *GetTemplatesRes) SetData(val *GetTemplatesResData) {
+func (p *GetTemplatesResp) SetData(val *GetTemplatesRespData) {
 	p.Data = val
 }
 
-func (p *GetTemplatesRes) IsSetData() bool {
+func (p *GetTemplatesResp) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *GetTemplatesRes) String() string {
+func (p *GetTemplatesResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplatesRes(%+v)", *p)
+	return fmt.Sprintf("GetTemplatesResp(%+v)", *p)
 }
 
-type GetTemplatesResData struct {
+type GetTemplatesRespData struct {
 	Templates []*model.Template `thrift:"templates,1" frugal:"1,default,list<model.Template>" json:"templates"`
 }
 
-func NewGetTemplatesResData() *GetTemplatesResData {
-	return &GetTemplatesResData{}
+func NewGetTemplatesRespData() *GetTemplatesRespData {
+	return &GetTemplatesRespData{}
 }
 
-func (p *GetTemplatesResData) InitDefault() {
-	*p = GetTemplatesResData{}
+func (p *GetTemplatesRespData) InitDefault() {
+	*p = GetTemplatesRespData{}
 }
 
-func (p *GetTemplatesResData) GetTemplates() (v []*model.Template) {
+func (p *GetTemplatesRespData) GetTemplates() (v []*model.Template) {
 	return p.Templates
 }
-func (p *GetTemplatesResData) SetTemplates(val []*model.Template) {
+func (p *GetTemplatesRespData) SetTemplates(val []*model.Template) {
 	p.Templates = val
 }
 
-func (p *GetTemplatesResData) String() string {
+func (p *GetTemplatesRespData) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplatesResData(%+v)", *p)
+	return fmt.Sprintf("GetTemplatesRespData(%+v)", *p)
 }
 
 type AddTemplateItemReq struct {
@@ -372,38 +372,38 @@ func (p *AddTemplateItemReq) String() string {
 	return fmt.Sprintf("AddTemplateItemReq(%+v)", *p)
 }
 
-type AddTemplateItemRes struct {
+type AddTemplateItemResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewAddTemplateItemRes() *AddTemplateItemRes {
-	return &AddTemplateItemRes{}
+func NewAddTemplateItemResp() *AddTemplateItemResp {
+	return &AddTemplateItemResp{}
 }
 
-func (p *AddTemplateItemRes) InitDefault() {
-	*p = AddTemplateItemRes{}
+func (p *AddTemplateItemResp) InitDefault() {
+	*p = AddTemplateItemResp{}
 }
 
-func (p *AddTemplateItemRes) GetCode() (v int32) {
+func (p *AddTemplateItemResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *AddTemplateItemRes) GetMsg() (v string) {
+func (p *AddTemplateItemResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *AddTemplateItemRes) SetCode(val int32) {
+func (p *AddTemplateItemResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *AddTemplateItemRes) SetMsg(val string) {
+func (p *AddTemplateItemResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *AddTemplateItemRes) String() string {
+func (p *AddTemplateItemResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AddTemplateItemRes(%+v)", *p)
+	return fmt.Sprintf("AddTemplateItemResp(%+v)", *p)
 }
 
 type DeleteTemplateItemReq struct {
@@ -432,38 +432,38 @@ func (p *DeleteTemplateItemReq) String() string {
 	return fmt.Sprintf("DeleteTemplateItemReq(%+v)", *p)
 }
 
-type DeleteTemplateItemRes struct {
+type DeleteTemplateItemResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewDeleteTemplateItemRes() *DeleteTemplateItemRes {
-	return &DeleteTemplateItemRes{}
+func NewDeleteTemplateItemResp() *DeleteTemplateItemResp {
+	return &DeleteTemplateItemResp{}
 }
 
-func (p *DeleteTemplateItemRes) InitDefault() {
-	*p = DeleteTemplateItemRes{}
+func (p *DeleteTemplateItemResp) InitDefault() {
+	*p = DeleteTemplateItemResp{}
 }
 
-func (p *DeleteTemplateItemRes) GetCode() (v int32) {
+func (p *DeleteTemplateItemResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *DeleteTemplateItemRes) GetMsg() (v string) {
+func (p *DeleteTemplateItemResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *DeleteTemplateItemRes) SetCode(val int32) {
+func (p *DeleteTemplateItemResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *DeleteTemplateItemRes) SetMsg(val string) {
+func (p *DeleteTemplateItemResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *DeleteTemplateItemRes) String() string {
+func (p *DeleteTemplateItemResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("DeleteTemplateItemRes(%+v)", *p)
+	return fmt.Sprintf("DeleteTemplateItemResp(%+v)", *p)
 }
 
 type UpdateTemplateItemReq struct {
@@ -508,38 +508,38 @@ func (p *UpdateTemplateItemReq) String() string {
 	return fmt.Sprintf("UpdateTemplateItemReq(%+v)", *p)
 }
 
-type UpdateTemplateItemRes struct {
+type UpdateTemplateItemResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewUpdateTemplateItemRes() *UpdateTemplateItemRes {
-	return &UpdateTemplateItemRes{}
+func NewUpdateTemplateItemResp() *UpdateTemplateItemResp {
+	return &UpdateTemplateItemResp{}
 }
 
-func (p *UpdateTemplateItemRes) InitDefault() {
-	*p = UpdateTemplateItemRes{}
+func (p *UpdateTemplateItemResp) InitDefault() {
+	*p = UpdateTemplateItemResp{}
 }
 
-func (p *UpdateTemplateItemRes) GetCode() (v int32) {
+func (p *UpdateTemplateItemResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *UpdateTemplateItemRes) GetMsg() (v string) {
+func (p *UpdateTemplateItemResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *UpdateTemplateItemRes) SetCode(val int32) {
+func (p *UpdateTemplateItemResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *UpdateTemplateItemRes) SetMsg(val string) {
+func (p *UpdateTemplateItemResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *UpdateTemplateItemRes) String() string {
+func (p *UpdateTemplateItemResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("UpdateTemplateItemRes(%+v)", *p)
+	return fmt.Sprintf("UpdateTemplateItemResp(%+v)", *p)
 }
 
 type GetTemplateItemsReq struct {
@@ -600,79 +600,79 @@ func (p *GetTemplateItemsReq) String() string {
 	return fmt.Sprintf("GetTemplateItemsReq(%+v)", *p)
 }
 
-type GetTemplateItemsRes struct {
-	Code int32                    `thrift:"code,1" frugal:"1,default,i32" json:"code"`
-	Msg  string                   `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
-	Data *GetTemplateItemsResData `thrift:"data,3" frugal:"3,default,GetTemplateItemsResData" json:"data"`
+type GetTemplateItemsResp struct {
+	Code int32                     `thrift:"code,1" frugal:"1,default,i32" json:"code"`
+	Msg  string                    `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
+	Data *GetTemplateItemsRespData `thrift:"data,3" frugal:"3,default,GetTemplateItemsRespData" json:"data"`
 }
 
-func NewGetTemplateItemsRes() *GetTemplateItemsRes {
-	return &GetTemplateItemsRes{}
+func NewGetTemplateItemsResp() *GetTemplateItemsResp {
+	return &GetTemplateItemsResp{}
 }
 
-func (p *GetTemplateItemsRes) InitDefault() {
-	*p = GetTemplateItemsRes{}
+func (p *GetTemplateItemsResp) InitDefault() {
+	*p = GetTemplateItemsResp{}
 }
 
-func (p *GetTemplateItemsRes) GetCode() (v int32) {
+func (p *GetTemplateItemsResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *GetTemplateItemsRes) GetMsg() (v string) {
+func (p *GetTemplateItemsResp) GetMsg() (v string) {
 	return p.Msg
 }
 
-var GetTemplateItemsRes_Data_DEFAULT *GetTemplateItemsResData
+var GetTemplateItemsResp_Data_DEFAULT *GetTemplateItemsRespData
 
-func (p *GetTemplateItemsRes) GetData() (v *GetTemplateItemsResData) {
+func (p *GetTemplateItemsResp) GetData() (v *GetTemplateItemsRespData) {
 	if !p.IsSetData() {
-		return GetTemplateItemsRes_Data_DEFAULT
+		return GetTemplateItemsResp_Data_DEFAULT
 	}
 	return p.Data
 }
-func (p *GetTemplateItemsRes) SetCode(val int32) {
+func (p *GetTemplateItemsResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *GetTemplateItemsRes) SetMsg(val string) {
+func (p *GetTemplateItemsResp) SetMsg(val string) {
 	p.Msg = val
 }
-func (p *GetTemplateItemsRes) SetData(val *GetTemplateItemsResData) {
+func (p *GetTemplateItemsResp) SetData(val *GetTemplateItemsRespData) {
 	p.Data = val
 }
 
-func (p *GetTemplateItemsRes) IsSetData() bool {
+func (p *GetTemplateItemsResp) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *GetTemplateItemsRes) String() string {
+func (p *GetTemplateItemsResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplateItemsRes(%+v)", *p)
+	return fmt.Sprintf("GetTemplateItemsResp(%+v)", *p)
 }
 
-type GetTemplateItemsResData struct {
+type GetTemplateItemsRespData struct {
 	TemplateItems []*model.TemplateItem `thrift:"template_items,1" frugal:"1,default,list<model.TemplateItem>" json:"template_items"`
 }
 
-func NewGetTemplateItemsResData() *GetTemplateItemsResData {
-	return &GetTemplateItemsResData{}
+func NewGetTemplateItemsRespData() *GetTemplateItemsRespData {
+	return &GetTemplateItemsRespData{}
 }
 
-func (p *GetTemplateItemsResData) InitDefault() {
-	*p = GetTemplateItemsResData{}
+func (p *GetTemplateItemsRespData) InitDefault() {
+	*p = GetTemplateItemsRespData{}
 }
 
-func (p *GetTemplateItemsResData) GetTemplateItems() (v []*model.TemplateItem) {
+func (p *GetTemplateItemsRespData) GetTemplateItems() (v []*model.TemplateItem) {
 	return p.TemplateItems
 }
-func (p *GetTemplateItemsResData) SetTemplateItems(val []*model.TemplateItem) {
+func (p *GetTemplateItemsRespData) SetTemplateItems(val []*model.TemplateItem) {
 	p.TemplateItems = val
 }
 
-func (p *GetTemplateItemsResData) String() string {
+func (p *GetTemplateItemsRespData) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTemplateItemsResData(%+v)", *p)
+	return fmt.Sprintf("GetTemplateItemsRespData(%+v)", *p)
 }

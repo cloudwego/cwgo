@@ -477,7 +477,7 @@ func (p *kClient) Ping(ctx context.Context, req *agent.PingReq) (r *agent.PingRe
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) AddRepository(ctx context.Context, req *agent.AddRepositoryReq) (r *agent.AddRepositoryRes, err error) {
+func (p *kClient) AddRepository(ctx context.Context, req *agent.AddRepositoryReq) (r *agent.AddRepositoryResp, err error) {
 	var _args agent.AgentServiceAddRepositoryArgs
 	_args.Req = req
 	var _result agent.AgentServiceAddRepositoryResult
@@ -487,7 +487,7 @@ func (p *kClient) AddRepository(ctx context.Context, req *agent.AddRepositoryReq
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq) (r *agent.DeleteRepositoriesRes, err error) {
+func (p *kClient) DeleteRepositories(ctx context.Context, req *agent.DeleteRepositoriesReq) (r *agent.DeleteRepositoriesResp, err error) {
 	var _args agent.AgentServiceDeleteRepositoriesArgs
 	_args.Req = req
 	var _result agent.AgentServiceDeleteRepositoriesResult
@@ -497,7 +497,7 @@ func (p *kClient) DeleteRepositories(ctx context.Context, req *agent.DeleteRepos
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) UpdateRepository(ctx context.Context, req *agent.UpdateRepositoryReq) (r *agent.UpdateRepositoryRes, err error) {
+func (p *kClient) UpdateRepository(ctx context.Context, req *agent.UpdateRepositoryReq) (r *agent.UpdateRepositoryResp, err error) {
 	var _args agent.AgentServiceUpdateRepositoryArgs
 	_args.Req = req
 	var _result agent.AgentServiceUpdateRepositoryResult
@@ -507,7 +507,7 @@ func (p *kClient) UpdateRepository(ctx context.Context, req *agent.UpdateReposit
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq) (r *agent.GetRepositoriesRes, err error) {
+func (p *kClient) GetRepositories(ctx context.Context, req *agent.GetRepositoriesReq) (r *agent.GetRepositoriesResp, err error) {
 	var _args agent.AgentServiceGetRepositoriesArgs
 	_args.Req = req
 	var _result agent.AgentServiceGetRepositoriesResult
@@ -517,7 +517,7 @@ func (p *kClient) GetRepositories(ctx context.Context, req *agent.GetRepositorie
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) AddIDL(ctx context.Context, req *agent.AddIDLReq) (r *agent.AddIDLRes, err error) {
+func (p *kClient) AddIDL(ctx context.Context, req *agent.AddIDLReq) (r *agent.AddIDLResp, err error) {
 	var _args agent.AgentServiceAddIDLArgs
 	_args.Req = req
 	var _result agent.AgentServiceAddIDLResult
@@ -527,7 +527,7 @@ func (p *kClient) AddIDL(ctx context.Context, req *agent.AddIDLReq) (r *agent.Ad
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) DeleteIDL(ctx context.Context, req *agent.DeleteIDLsReq) (r *agent.DeleteIDLsRes, err error) {
+func (p *kClient) DeleteIDL(ctx context.Context, req *agent.DeleteIDLsReq) (r *agent.DeleteIDLsResp, err error) {
 	var _args agent.AgentServiceDeleteIDLArgs
 	_args.Req = req
 	var _result agent.AgentServiceDeleteIDLResult
@@ -537,7 +537,7 @@ func (p *kClient) DeleteIDL(ctx context.Context, req *agent.DeleteIDLsReq) (r *a
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) UpdateIDL(ctx context.Context, req *agent.UpdateIDLReq) (r *agent.UpdateIDLRes, err error) {
+func (p *kClient) UpdateIDL(ctx context.Context, req *agent.UpdateIDLReq) (r *agent.UpdateIDLResp, err error) {
 	var _args agent.AgentServiceUpdateIDLArgs
 	_args.Req = req
 	var _result agent.AgentServiceUpdateIDLResult
@@ -547,7 +547,7 @@ func (p *kClient) UpdateIDL(ctx context.Context, req *agent.UpdateIDLReq) (r *ag
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) GetIDLs(ctx context.Context, req *agent.GetIDLsReq) (r *agent.GetIDLsRes, err error) {
+func (p *kClient) GetIDLs(ctx context.Context, req *agent.GetIDLsReq) (r *agent.GetIDLsResp, err error) {
 	var _args agent.AgentServiceGetIDLsArgs
 	_args.Req = req
 	var _result agent.AgentServiceGetIDLsResult
@@ -557,7 +557,7 @@ func (p *kClient) GetIDLs(ctx context.Context, req *agent.GetIDLsReq) (r *agent.
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq) (r *agent.SyncIDLsByIdRes, err error) {
+func (p *kClient) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq) (r *agent.SyncIDLsByIdResp, err error) {
 	var _args agent.AgentServiceSyncIDLsByIdArgs
 	_args.Req = req
 	var _result agent.AgentServiceSyncIDLsByIdResult
@@ -567,7 +567,7 @@ func (p *kClient) SyncIDLsById(ctx context.Context, req *agent.SyncIDLsByIdReq) 
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) AddTemplate(ctx context.Context, req *agent.AddTemplateReq) (r *agent.AddTemplateRes, err error) {
+func (p *kClient) AddTemplate(ctx context.Context, req *agent.AddTemplateReq) (r *agent.AddTemplateResp, err error) {
 	var _args agent.AgentServiceAddTemplateArgs
 	_args.Req = req
 	var _result agent.AgentServiceAddTemplateResult
@@ -577,7 +577,7 @@ func (p *kClient) AddTemplate(ctx context.Context, req *agent.AddTemplateReq) (r
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) DeleteTemplate(ctx context.Context, req *agent.DeleteTemplateReq) (r *agent.DeleteTemplateRes, err error) {
+func (p *kClient) DeleteTemplate(ctx context.Context, req *agent.DeleteTemplateReq) (r *agent.DeleteTemplateResp, err error) {
 	var _args agent.AgentServiceDeleteTemplateArgs
 	_args.Req = req
 	var _result agent.AgentServiceDeleteTemplateResult
@@ -587,7 +587,7 @@ func (p *kClient) DeleteTemplate(ctx context.Context, req *agent.DeleteTemplateR
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) UpdateTemplate(ctx context.Context, req *agent.UpdateTemplateReq) (r *agent.UpdateTemplateRes, err error) {
+func (p *kClient) UpdateTemplate(ctx context.Context, req *agent.UpdateTemplateReq) (r *agent.UpdateTemplateResp, err error) {
 	var _args agent.AgentServiceUpdateTemplateArgs
 	_args.Req = req
 	var _result agent.AgentServiceUpdateTemplateResult
@@ -597,7 +597,7 @@ func (p *kClient) UpdateTemplate(ctx context.Context, req *agent.UpdateTemplateR
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) GetTemplates(ctx context.Context, req *agent.GetTemplatesReq) (r *agent.GetTemplatesRes, err error) {
+func (p *kClient) GetTemplates(ctx context.Context, req *agent.GetTemplatesReq) (r *agent.GetTemplatesResp, err error) {
 	var _args agent.AgentServiceGetTemplatesArgs
 	_args.Req = req
 	var _result agent.AgentServiceGetTemplatesResult
@@ -607,7 +607,7 @@ func (p *kClient) GetTemplates(ctx context.Context, req *agent.GetTemplatesReq) 
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) AddTemplateItem(ctx context.Context, req *agent.AddTemplateItemReq) (r *agent.AddTemplateItemRes, err error) {
+func (p *kClient) AddTemplateItem(ctx context.Context, req *agent.AddTemplateItemReq) (r *agent.AddTemplateItemResp, err error) {
 	var _args agent.AgentServiceAddTemplateItemArgs
 	_args.Req = req
 	var _result agent.AgentServiceAddTemplateItemResult
@@ -617,7 +617,7 @@ func (p *kClient) AddTemplateItem(ctx context.Context, req *agent.AddTemplateIte
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) DeleteTemplateItem(ctx context.Context, req *agent.DeleteTemplateItemReq) (r *agent.DeleteTemplateItemRes, err error) {
+func (p *kClient) DeleteTemplateItem(ctx context.Context, req *agent.DeleteTemplateItemReq) (r *agent.DeleteTemplateItemResp, err error) {
 	var _args agent.AgentServiceDeleteTemplateItemArgs
 	_args.Req = req
 	var _result agent.AgentServiceDeleteTemplateItemResult
@@ -627,7 +627,7 @@ func (p *kClient) DeleteTemplateItem(ctx context.Context, req *agent.DeleteTempl
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) UpdateTemplateItem(ctx context.Context, req *agent.UpdateTemplateItemReq) (r *agent.UpdateTemplateItemRes, err error) {
+func (p *kClient) UpdateTemplateItem(ctx context.Context, req *agent.UpdateTemplateItemReq) (r *agent.UpdateTemplateItemResp, err error) {
 	var _args agent.AgentServiceUpdateTemplateItemArgs
 	_args.Req = req
 	var _result agent.AgentServiceUpdateTemplateItemResult
@@ -637,7 +637,7 @@ func (p *kClient) UpdateTemplateItem(ctx context.Context, req *agent.UpdateTempl
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq) (r *agent.GetTemplateItemsRes, err error) {
+func (p *kClient) GetTemplateItems(ctx context.Context, req *agent.GetTemplateItemsReq) (r *agent.GetTemplateItemsResp, err error) {
 	var _args agent.AgentServiceGetTemplateItemsArgs
 	_args.Req = req
 	var _result agent.AgentServiceGetTemplateItemsResult
@@ -657,7 +657,7 @@ func (p *kClient) UpdateTask(ctx context.Context, req *task.UpdateTaskReq) (r *t
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) AddToken(ctx context.Context, req *agent.AddTokenReq) (r *agent.AddTokenRes, err error) {
+func (p *kClient) AddToken(ctx context.Context, req *agent.AddTokenReq) (r *agent.AddTokenResp, err error) {
 	var _args agent.AgentServiceAddTokenArgs
 	_args.Req = req
 	var _result agent.AgentServiceAddTokenResult
@@ -667,7 +667,7 @@ func (p *kClient) AddToken(ctx context.Context, req *agent.AddTokenReq) (r *agen
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) DeleteToken(ctx context.Context, req *agent.DeleteTokenReq) (r *agent.DeleteTokenRes, err error) {
+func (p *kClient) DeleteToken(ctx context.Context, req *agent.DeleteTokenReq) (r *agent.DeleteTokenResp, err error) {
 	var _args agent.AgentServiceDeleteTokenArgs
 	_args.Req = req
 	var _result agent.AgentServiceDeleteTokenResult
@@ -677,7 +677,7 @@ func (p *kClient) DeleteToken(ctx context.Context, req *agent.DeleteTokenReq) (r
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) GetToken(ctx context.Context, req *agent.GetTokenReq) (r *agent.GetTokenRes, err error) {
+func (p *kClient) GetToken(ctx context.Context, req *agent.GetTokenReq) (r *agent.GetTokenResp, err error) {
 	var _args agent.AgentServiceGetTokenArgs
 	_args.Req = req
 	var _result agent.AgentServiceGetTokenResult

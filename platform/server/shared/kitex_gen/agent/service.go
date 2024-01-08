@@ -63,45 +63,45 @@ func (p *PingResp) String() string {
 type AgentService interface {
 	Ping(ctx context.Context, req *PingReq) (r *PingResp, err error)
 
-	AddRepository(ctx context.Context, req *AddRepositoryReq) (r *AddRepositoryRes, err error)
+	AddRepository(ctx context.Context, req *AddRepositoryReq) (r *AddRepositoryResp, err error)
 
-	DeleteRepositories(ctx context.Context, req *DeleteRepositoriesReq) (r *DeleteRepositoriesRes, err error)
+	DeleteRepositories(ctx context.Context, req *DeleteRepositoriesReq) (r *DeleteRepositoriesResp, err error)
 
-	UpdateRepository(ctx context.Context, req *UpdateRepositoryReq) (r *UpdateRepositoryRes, err error)
+	UpdateRepository(ctx context.Context, req *UpdateRepositoryReq) (r *UpdateRepositoryResp, err error)
 
-	GetRepositories(ctx context.Context, req *GetRepositoriesReq) (r *GetRepositoriesRes, err error)
+	GetRepositories(ctx context.Context, req *GetRepositoriesReq) (r *GetRepositoriesResp, err error)
 
-	AddIDL(ctx context.Context, req *AddIDLReq) (r *AddIDLRes, err error)
+	AddIDL(ctx context.Context, req *AddIDLReq) (r *AddIDLResp, err error)
 
-	DeleteIDL(ctx context.Context, req *DeleteIDLsReq) (r *DeleteIDLsRes, err error)
+	DeleteIDL(ctx context.Context, req *DeleteIDLsReq) (r *DeleteIDLsResp, err error)
 
-	UpdateIDL(ctx context.Context, req *UpdateIDLReq) (r *UpdateIDLRes, err error)
+	UpdateIDL(ctx context.Context, req *UpdateIDLReq) (r *UpdateIDLResp, err error)
 
-	GetIDLs(ctx context.Context, req *GetIDLsReq) (r *GetIDLsRes, err error)
+	GetIDLs(ctx context.Context, req *GetIDLsReq) (r *GetIDLsResp, err error)
 
-	SyncIDLsById(ctx context.Context, req *SyncIDLsByIdReq) (r *SyncIDLsByIdRes, err error)
+	SyncIDLsById(ctx context.Context, req *SyncIDLsByIdReq) (r *SyncIDLsByIdResp, err error)
 
-	AddTemplate(ctx context.Context, req *AddTemplateReq) (r *AddTemplateRes, err error)
+	AddTemplate(ctx context.Context, req *AddTemplateReq) (r *AddTemplateResp, err error)
 
-	DeleteTemplate(ctx context.Context, req *DeleteTemplateReq) (r *DeleteTemplateRes, err error)
+	DeleteTemplate(ctx context.Context, req *DeleteTemplateReq) (r *DeleteTemplateResp, err error)
 
-	UpdateTemplate(ctx context.Context, req *UpdateTemplateReq) (r *UpdateTemplateRes, err error)
+	UpdateTemplate(ctx context.Context, req *UpdateTemplateReq) (r *UpdateTemplateResp, err error)
 
-	GetTemplates(ctx context.Context, req *GetTemplatesReq) (r *GetTemplatesRes, err error)
+	GetTemplates(ctx context.Context, req *GetTemplatesReq) (r *GetTemplatesResp, err error)
 
-	AddTemplateItem(ctx context.Context, req *AddTemplateItemReq) (r *AddTemplateItemRes, err error)
+	AddTemplateItem(ctx context.Context, req *AddTemplateItemReq) (r *AddTemplateItemResp, err error)
 
-	DeleteTemplateItem(ctx context.Context, req *DeleteTemplateItemReq) (r *DeleteTemplateItemRes, err error)
+	DeleteTemplateItem(ctx context.Context, req *DeleteTemplateItemReq) (r *DeleteTemplateItemResp, err error)
 
-	UpdateTemplateItem(ctx context.Context, req *UpdateTemplateItemReq) (r *UpdateTemplateItemRes, err error)
+	UpdateTemplateItem(ctx context.Context, req *UpdateTemplateItemReq) (r *UpdateTemplateItemResp, err error)
 
-	GetTemplateItems(ctx context.Context, req *GetTemplateItemsReq) (r *GetTemplateItemsRes, err error)
+	GetTemplateItems(ctx context.Context, req *GetTemplateItemsReq) (r *GetTemplateItemsResp, err error)
 
 	UpdateTask(ctx context.Context, req *task.UpdateTaskReq) (r *task.UpdateTaskResp, err error)
 
-	AddToken(ctx context.Context, req *AddTokenReq) (r *AddTokenRes, err error)
+	AddToken(ctx context.Context, req *AddTokenReq) (r *AddTokenResp, err error)
 
-	DeleteToken(ctx context.Context, req *DeleteTokenReq) (r *DeleteTokenRes, err error)
+	DeleteToken(ctx context.Context, req *DeleteTokenReq) (r *DeleteTokenResp, err error)
 
-	GetToken(ctx context.Context, req *GetTokenReq) (r *GetTokenRes, err error)
+	GetToken(ctx context.Context, req *GetTokenReq) (r *GetTokenResp, err error)
 }

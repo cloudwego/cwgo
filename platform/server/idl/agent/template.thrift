@@ -6,7 +6,7 @@ struct AddTemplateReq{
     1: string name
     2: i32 type
 }
-struct AddTemplateRes{
+struct AddTemplateResp{
     1: i32 code
     2: string msg
 }
@@ -14,7 +14,7 @@ struct AddTemplateRes{
 struct DeleteTemplateReq{
     1: list<i64> ids
 }
-struct DeleteTemplateRes{
+struct DeleteTemplateResp{
     1: i32 code
     2: string msg
 }
@@ -23,7 +23,7 @@ struct UpdateTemplateReq{
     1: i64 id
     2: string name
 }
-struct UpdateTemplateRes{
+struct UpdateTemplateResp{
     1: i32 code
     2: string msg
 }
@@ -34,12 +34,12 @@ struct GetTemplatesReq{
     3: i32 order
     4: string order_by
 }
-struct GetTemplatesRes{
+struct GetTemplatesResp{
     1: i32 code
     2: string msg
-    3: GetTemplatesResData data
+    3: GetTemplatesRespData data
 }
-struct GetTemplatesResData{
+struct GetTemplatesRespData{
     1: list<template.Template> templates
 }
 
@@ -48,7 +48,7 @@ struct AddTemplateItemReq{
     2: string name
     3: string content
 }
-struct AddTemplateItemRes{
+struct AddTemplateItemResp{
     1: i32 code
     2: string msg
 }
@@ -56,7 +56,7 @@ struct AddTemplateItemRes{
 struct DeleteTemplateItemReq{
     1: list<i64> ids
 }
-struct DeleteTemplateItemRes{
+struct DeleteTemplateItemResp{
     1: i32 code
     2: string msg
 }
@@ -66,7 +66,7 @@ struct UpdateTemplateItemReq{
     2: string name
     3: string content
 }
-struct UpdateTemplateItemRes{
+struct UpdateTemplateItemResp{
     1: i32 code
     2: string msg
 }
@@ -78,11 +78,11 @@ struct GetTemplateItemsReq{
     4: i32 order
     5: string order_by
 }
-struct GetTemplateItemsRes{
+struct GetTemplateItemsResp{
     1: i32 code
     2: string msg
-    3: GetTemplateItemsResData data
+    3: GetTemplateItemsRespData data
 }
-struct GetTemplateItemsResData{
+struct GetTemplateItemsRespData{
     1: list<template.TemplateItem> template_items
 }

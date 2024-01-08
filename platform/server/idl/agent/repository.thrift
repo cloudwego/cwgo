@@ -10,7 +10,7 @@ struct AddRepositoryReq{
     5: string branch
     6: i32 store_type
 }
-struct AddRepositoryRes{
+struct AddRepositoryResp{
     1: i32 code
     2: string msg
 }
@@ -18,7 +18,7 @@ struct AddRepositoryRes{
 struct DeleteRepositoriesReq{
     1: list<i64> ids
 }
-struct DeleteRepositoriesRes{
+struct DeleteRepositoriesResp{
     1: i32 code
     2: string msg
 }
@@ -28,7 +28,7 @@ struct UpdateRepositoryReq{
     2: string branch
     3: i32 status
 }
-struct UpdateRepositoryRes{
+struct UpdateRepositoryResp{
     1: i32 code
     2: string msg
 }
@@ -44,12 +44,12 @@ struct GetRepositoriesReq{
     8: string repository_owner
     9: string repository_name
 }
-struct GetRepositoriesRes{
+struct GetRepositoriesResp{
     1: i32 code
     2: string msg
-    3: GetRepositoriesResData data
+    3: GetRepositoriesRespData data
 }
-struct GetRepositoriesResData{
+struct GetRepositoriesRespData{
     1: list<repository.Repository> repositories
     2: i32 total
 }

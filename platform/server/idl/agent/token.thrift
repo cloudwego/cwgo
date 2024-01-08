@@ -11,7 +11,7 @@ struct AddTokenResData{
     1: string owner
     2: string expiration_time
 }
-struct AddTokenRes{
+struct AddTokenResp{
     1: i32 code
     2: string msg
     3: AddTokenResData data
@@ -20,7 +20,7 @@ struct AddTokenRes{
 struct DeleteTokenReq{
     1: list<i64> ids
 }
-struct DeleteTokenRes{
+struct DeleteTokenResp{
     1: i32 code
     2: string msg
 }
@@ -38,7 +38,7 @@ struct GetTokenResData{
     1: list<token.Token> tokens
     2: i32 total
 }
-struct GetTokenRes{
+struct GetTokenResp{
     1: i32 code
     2: string msg
     3: GetTokenResData data

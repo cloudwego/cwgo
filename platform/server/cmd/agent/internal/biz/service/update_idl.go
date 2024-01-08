@@ -40,7 +40,7 @@ func NewUpdateIDLService(ctx context.Context, svcCtx *svc.ServiceContext) *Updat
 }
 
 // Run create note info
-func (s *UpdateIDLService) Run(req *agent.UpdateIDLReq) (resp *agent.UpdateIDLRes, err error) {
+func (s *UpdateIDLService) Run(req *agent.UpdateIDLReq) (resp *agent.UpdateIDLResp, err error) {
 	err = s.svcCtx.DaoManager.Idl.UpdateIDL(s.ctx, model.IDL{
 		Id:              req.Id,
 		IdlRepositoryId: req.RepositoryId,
@@ -50,19 +50,19 @@ func (s *UpdateIDLService) Run(req *agent.UpdateIDLReq) (resp *agent.UpdateIDLRe
 	})
 	if err != nil {
 		if errx.GetCode(err) == consts.ErrNumDatabaseRecordNotFound {
-			return &agent.UpdateIDLRes{
+			return &agent.UpdateIDLResp{
 				Code: consts.ErrNumDatabaseRecordNotFound,
 				Msg:  "idl id not exist",
 			}, nil
 		}
 
-		return &agent.UpdateIDLRes{
+		return &agent.UpdateIDLResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 
-	return &agent.UpdateIDLRes{
+	return &agent.UpdateIDLResp{
 		Code: 0,
 		Msg:  "update idl successfully",
 	}, nil

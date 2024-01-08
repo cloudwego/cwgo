@@ -138,7 +138,7 @@ func (p *AgentServiceAddRepositoryArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceAddRepositoryResult struct {
-	Success *AddRepositoryRes `thrift:"success,0,optional" frugal:"0,optional,AddRepositoryRes" json:"success,omitempty"`
+	Success *AddRepositoryResp `thrift:"success,0,optional" frugal:"0,optional,AddRepositoryResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceAddRepositoryResult() *AgentServiceAddRepositoryResult {
@@ -149,16 +149,16 @@ func (p *AgentServiceAddRepositoryResult) InitDefault() {
 	*p = AgentServiceAddRepositoryResult{}
 }
 
-var AgentServiceAddRepositoryResult_Success_DEFAULT *AddRepositoryRes
+var AgentServiceAddRepositoryResult_Success_DEFAULT *AddRepositoryResp
 
-func (p *AgentServiceAddRepositoryResult) GetSuccess() (v *AddRepositoryRes) {
+func (p *AgentServiceAddRepositoryResult) GetSuccess() (v *AddRepositoryResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceAddRepositoryResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceAddRepositoryResult) SetSuccess(x interface{}) {
-	p.Success = x.(*AddRepositoryRes)
+	p.Success = x.(*AddRepositoryResp)
 }
 
 func (p *AgentServiceAddRepositoryResult) IsSetSuccess() bool {
@@ -214,7 +214,7 @@ func (p *AgentServiceDeleteRepositoriesArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceDeleteRepositoriesResult struct {
-	Success *DeleteRepositoriesRes `thrift:"success,0,optional" frugal:"0,optional,DeleteRepositoriesRes" json:"success,omitempty"`
+	Success *DeleteRepositoriesResp `thrift:"success,0,optional" frugal:"0,optional,DeleteRepositoriesResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceDeleteRepositoriesResult() *AgentServiceDeleteRepositoriesResult {
@@ -225,16 +225,16 @@ func (p *AgentServiceDeleteRepositoriesResult) InitDefault() {
 	*p = AgentServiceDeleteRepositoriesResult{}
 }
 
-var AgentServiceDeleteRepositoriesResult_Success_DEFAULT *DeleteRepositoriesRes
+var AgentServiceDeleteRepositoriesResult_Success_DEFAULT *DeleteRepositoriesResp
 
-func (p *AgentServiceDeleteRepositoriesResult) GetSuccess() (v *DeleteRepositoriesRes) {
+func (p *AgentServiceDeleteRepositoriesResult) GetSuccess() (v *DeleteRepositoriesResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceDeleteRepositoriesResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceDeleteRepositoriesResult) SetSuccess(x interface{}) {
-	p.Success = x.(*DeleteRepositoriesRes)
+	p.Success = x.(*DeleteRepositoriesResp)
 }
 
 func (p *AgentServiceDeleteRepositoriesResult) IsSetSuccess() bool {
@@ -290,7 +290,7 @@ func (p *AgentServiceUpdateRepositoryArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceUpdateRepositoryResult struct {
-	Success *UpdateRepositoryRes `thrift:"success,0,optional" frugal:"0,optional,UpdateRepositoryRes" json:"success,omitempty"`
+	Success *UpdateRepositoryResp `thrift:"success,0,optional" frugal:"0,optional,UpdateRepositoryResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceUpdateRepositoryResult() *AgentServiceUpdateRepositoryResult {
@@ -301,16 +301,16 @@ func (p *AgentServiceUpdateRepositoryResult) InitDefault() {
 	*p = AgentServiceUpdateRepositoryResult{}
 }
 
-var AgentServiceUpdateRepositoryResult_Success_DEFAULT *UpdateRepositoryRes
+var AgentServiceUpdateRepositoryResult_Success_DEFAULT *UpdateRepositoryResp
 
-func (p *AgentServiceUpdateRepositoryResult) GetSuccess() (v *UpdateRepositoryRes) {
+func (p *AgentServiceUpdateRepositoryResult) GetSuccess() (v *UpdateRepositoryResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceUpdateRepositoryResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceUpdateRepositoryResult) SetSuccess(x interface{}) {
-	p.Success = x.(*UpdateRepositoryRes)
+	p.Success = x.(*UpdateRepositoryResp)
 }
 
 func (p *AgentServiceUpdateRepositoryResult) IsSetSuccess() bool {
@@ -366,7 +366,7 @@ func (p *AgentServiceGetRepositoriesArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceGetRepositoriesResult struct {
-	Success *GetRepositoriesRes `thrift:"success,0,optional" frugal:"0,optional,GetRepositoriesRes" json:"success,omitempty"`
+	Success *GetRepositoriesResp `thrift:"success,0,optional" frugal:"0,optional,GetRepositoriesResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceGetRepositoriesResult() *AgentServiceGetRepositoriesResult {
@@ -377,16 +377,16 @@ func (p *AgentServiceGetRepositoriesResult) InitDefault() {
 	*p = AgentServiceGetRepositoriesResult{}
 }
 
-var AgentServiceGetRepositoriesResult_Success_DEFAULT *GetRepositoriesRes
+var AgentServiceGetRepositoriesResult_Success_DEFAULT *GetRepositoriesResp
 
-func (p *AgentServiceGetRepositoriesResult) GetSuccess() (v *GetRepositoriesRes) {
+func (p *AgentServiceGetRepositoriesResult) GetSuccess() (v *GetRepositoriesResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceGetRepositoriesResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceGetRepositoriesResult) SetSuccess(x interface{}) {
-	p.Success = x.(*GetRepositoriesRes)
+	p.Success = x.(*GetRepositoriesResp)
 }
 
 func (p *AgentServiceGetRepositoriesResult) IsSetSuccess() bool {
@@ -442,7 +442,7 @@ func (p *AgentServiceAddIDLArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceAddIDLResult struct {
-	Success *AddIDLRes `thrift:"success,0,optional" frugal:"0,optional,AddIDLRes" json:"success,omitempty"`
+	Success *AddIDLResp `thrift:"success,0,optional" frugal:"0,optional,AddIDLResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceAddIDLResult() *AgentServiceAddIDLResult {
@@ -453,16 +453,16 @@ func (p *AgentServiceAddIDLResult) InitDefault() {
 	*p = AgentServiceAddIDLResult{}
 }
 
-var AgentServiceAddIDLResult_Success_DEFAULT *AddIDLRes
+var AgentServiceAddIDLResult_Success_DEFAULT *AddIDLResp
 
-func (p *AgentServiceAddIDLResult) GetSuccess() (v *AddIDLRes) {
+func (p *AgentServiceAddIDLResult) GetSuccess() (v *AddIDLResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceAddIDLResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceAddIDLResult) SetSuccess(x interface{}) {
-	p.Success = x.(*AddIDLRes)
+	p.Success = x.(*AddIDLResp)
 }
 
 func (p *AgentServiceAddIDLResult) IsSetSuccess() bool {
@@ -518,7 +518,7 @@ func (p *AgentServiceDeleteIDLArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceDeleteIDLResult struct {
-	Success *DeleteIDLsRes `thrift:"success,0,optional" frugal:"0,optional,DeleteIDLsRes" json:"success,omitempty"`
+	Success *DeleteIDLsResp `thrift:"success,0,optional" frugal:"0,optional,DeleteIDLsResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceDeleteIDLResult() *AgentServiceDeleteIDLResult {
@@ -529,16 +529,16 @@ func (p *AgentServiceDeleteIDLResult) InitDefault() {
 	*p = AgentServiceDeleteIDLResult{}
 }
 
-var AgentServiceDeleteIDLResult_Success_DEFAULT *DeleteIDLsRes
+var AgentServiceDeleteIDLResult_Success_DEFAULT *DeleteIDLsResp
 
-func (p *AgentServiceDeleteIDLResult) GetSuccess() (v *DeleteIDLsRes) {
+func (p *AgentServiceDeleteIDLResult) GetSuccess() (v *DeleteIDLsResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceDeleteIDLResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceDeleteIDLResult) SetSuccess(x interface{}) {
-	p.Success = x.(*DeleteIDLsRes)
+	p.Success = x.(*DeleteIDLsResp)
 }
 
 func (p *AgentServiceDeleteIDLResult) IsSetSuccess() bool {
@@ -594,7 +594,7 @@ func (p *AgentServiceUpdateIDLArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceUpdateIDLResult struct {
-	Success *UpdateIDLRes `thrift:"success,0,optional" frugal:"0,optional,UpdateIDLRes" json:"success,omitempty"`
+	Success *UpdateIDLResp `thrift:"success,0,optional" frugal:"0,optional,UpdateIDLResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceUpdateIDLResult() *AgentServiceUpdateIDLResult {
@@ -605,16 +605,16 @@ func (p *AgentServiceUpdateIDLResult) InitDefault() {
 	*p = AgentServiceUpdateIDLResult{}
 }
 
-var AgentServiceUpdateIDLResult_Success_DEFAULT *UpdateIDLRes
+var AgentServiceUpdateIDLResult_Success_DEFAULT *UpdateIDLResp
 
-func (p *AgentServiceUpdateIDLResult) GetSuccess() (v *UpdateIDLRes) {
+func (p *AgentServiceUpdateIDLResult) GetSuccess() (v *UpdateIDLResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceUpdateIDLResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceUpdateIDLResult) SetSuccess(x interface{}) {
-	p.Success = x.(*UpdateIDLRes)
+	p.Success = x.(*UpdateIDLResp)
 }
 
 func (p *AgentServiceUpdateIDLResult) IsSetSuccess() bool {
@@ -670,7 +670,7 @@ func (p *AgentServiceGetIDLsArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceGetIDLsResult struct {
-	Success *GetIDLsRes `thrift:"success,0,optional" frugal:"0,optional,GetIDLsRes" json:"success,omitempty"`
+	Success *GetIDLsResp `thrift:"success,0,optional" frugal:"0,optional,GetIDLsResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceGetIDLsResult() *AgentServiceGetIDLsResult {
@@ -681,16 +681,16 @@ func (p *AgentServiceGetIDLsResult) InitDefault() {
 	*p = AgentServiceGetIDLsResult{}
 }
 
-var AgentServiceGetIDLsResult_Success_DEFAULT *GetIDLsRes
+var AgentServiceGetIDLsResult_Success_DEFAULT *GetIDLsResp
 
-func (p *AgentServiceGetIDLsResult) GetSuccess() (v *GetIDLsRes) {
+func (p *AgentServiceGetIDLsResult) GetSuccess() (v *GetIDLsResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceGetIDLsResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceGetIDLsResult) SetSuccess(x interface{}) {
-	p.Success = x.(*GetIDLsRes)
+	p.Success = x.(*GetIDLsResp)
 }
 
 func (p *AgentServiceGetIDLsResult) IsSetSuccess() bool {
@@ -746,7 +746,7 @@ func (p *AgentServiceSyncIDLsByIdArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceSyncIDLsByIdResult struct {
-	Success *SyncIDLsByIdRes `thrift:"success,0,optional" frugal:"0,optional,SyncIDLsByIdRes" json:"success,omitempty"`
+	Success *SyncIDLsByIdResp `thrift:"success,0,optional" frugal:"0,optional,SyncIDLsByIdResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceSyncIDLsByIdResult() *AgentServiceSyncIDLsByIdResult {
@@ -757,16 +757,16 @@ func (p *AgentServiceSyncIDLsByIdResult) InitDefault() {
 	*p = AgentServiceSyncIDLsByIdResult{}
 }
 
-var AgentServiceSyncIDLsByIdResult_Success_DEFAULT *SyncIDLsByIdRes
+var AgentServiceSyncIDLsByIdResult_Success_DEFAULT *SyncIDLsByIdResp
 
-func (p *AgentServiceSyncIDLsByIdResult) GetSuccess() (v *SyncIDLsByIdRes) {
+func (p *AgentServiceSyncIDLsByIdResult) GetSuccess() (v *SyncIDLsByIdResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceSyncIDLsByIdResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceSyncIDLsByIdResult) SetSuccess(x interface{}) {
-	p.Success = x.(*SyncIDLsByIdRes)
+	p.Success = x.(*SyncIDLsByIdResp)
 }
 
 func (p *AgentServiceSyncIDLsByIdResult) IsSetSuccess() bool {
@@ -822,7 +822,7 @@ func (p *AgentServiceAddTemplateArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceAddTemplateResult struct {
-	Success *AddTemplateRes `thrift:"success,0,optional" frugal:"0,optional,AddTemplateRes" json:"success,omitempty"`
+	Success *AddTemplateResp `thrift:"success,0,optional" frugal:"0,optional,AddTemplateResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceAddTemplateResult() *AgentServiceAddTemplateResult {
@@ -833,16 +833,16 @@ func (p *AgentServiceAddTemplateResult) InitDefault() {
 	*p = AgentServiceAddTemplateResult{}
 }
 
-var AgentServiceAddTemplateResult_Success_DEFAULT *AddTemplateRes
+var AgentServiceAddTemplateResult_Success_DEFAULT *AddTemplateResp
 
-func (p *AgentServiceAddTemplateResult) GetSuccess() (v *AddTemplateRes) {
+func (p *AgentServiceAddTemplateResult) GetSuccess() (v *AddTemplateResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceAddTemplateResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceAddTemplateResult) SetSuccess(x interface{}) {
-	p.Success = x.(*AddTemplateRes)
+	p.Success = x.(*AddTemplateResp)
 }
 
 func (p *AgentServiceAddTemplateResult) IsSetSuccess() bool {
@@ -898,7 +898,7 @@ func (p *AgentServiceDeleteTemplateArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceDeleteTemplateResult struct {
-	Success *DeleteTemplateRes `thrift:"success,0,optional" frugal:"0,optional,DeleteTemplateRes" json:"success,omitempty"`
+	Success *DeleteTemplateResp `thrift:"success,0,optional" frugal:"0,optional,DeleteTemplateResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceDeleteTemplateResult() *AgentServiceDeleteTemplateResult {
@@ -909,16 +909,16 @@ func (p *AgentServiceDeleteTemplateResult) InitDefault() {
 	*p = AgentServiceDeleteTemplateResult{}
 }
 
-var AgentServiceDeleteTemplateResult_Success_DEFAULT *DeleteTemplateRes
+var AgentServiceDeleteTemplateResult_Success_DEFAULT *DeleteTemplateResp
 
-func (p *AgentServiceDeleteTemplateResult) GetSuccess() (v *DeleteTemplateRes) {
+func (p *AgentServiceDeleteTemplateResult) GetSuccess() (v *DeleteTemplateResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceDeleteTemplateResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceDeleteTemplateResult) SetSuccess(x interface{}) {
-	p.Success = x.(*DeleteTemplateRes)
+	p.Success = x.(*DeleteTemplateResp)
 }
 
 func (p *AgentServiceDeleteTemplateResult) IsSetSuccess() bool {
@@ -974,7 +974,7 @@ func (p *AgentServiceUpdateTemplateArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceUpdateTemplateResult struct {
-	Success *UpdateTemplateRes `thrift:"success,0,optional" frugal:"0,optional,UpdateTemplateRes" json:"success,omitempty"`
+	Success *UpdateTemplateResp `thrift:"success,0,optional" frugal:"0,optional,UpdateTemplateResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceUpdateTemplateResult() *AgentServiceUpdateTemplateResult {
@@ -985,16 +985,16 @@ func (p *AgentServiceUpdateTemplateResult) InitDefault() {
 	*p = AgentServiceUpdateTemplateResult{}
 }
 
-var AgentServiceUpdateTemplateResult_Success_DEFAULT *UpdateTemplateRes
+var AgentServiceUpdateTemplateResult_Success_DEFAULT *UpdateTemplateResp
 
-func (p *AgentServiceUpdateTemplateResult) GetSuccess() (v *UpdateTemplateRes) {
+func (p *AgentServiceUpdateTemplateResult) GetSuccess() (v *UpdateTemplateResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceUpdateTemplateResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceUpdateTemplateResult) SetSuccess(x interface{}) {
-	p.Success = x.(*UpdateTemplateRes)
+	p.Success = x.(*UpdateTemplateResp)
 }
 
 func (p *AgentServiceUpdateTemplateResult) IsSetSuccess() bool {
@@ -1050,7 +1050,7 @@ func (p *AgentServiceGetTemplatesArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceGetTemplatesResult struct {
-	Success *GetTemplatesRes `thrift:"success,0,optional" frugal:"0,optional,GetTemplatesRes" json:"success,omitempty"`
+	Success *GetTemplatesResp `thrift:"success,0,optional" frugal:"0,optional,GetTemplatesResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceGetTemplatesResult() *AgentServiceGetTemplatesResult {
@@ -1061,16 +1061,16 @@ func (p *AgentServiceGetTemplatesResult) InitDefault() {
 	*p = AgentServiceGetTemplatesResult{}
 }
 
-var AgentServiceGetTemplatesResult_Success_DEFAULT *GetTemplatesRes
+var AgentServiceGetTemplatesResult_Success_DEFAULT *GetTemplatesResp
 
-func (p *AgentServiceGetTemplatesResult) GetSuccess() (v *GetTemplatesRes) {
+func (p *AgentServiceGetTemplatesResult) GetSuccess() (v *GetTemplatesResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceGetTemplatesResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceGetTemplatesResult) SetSuccess(x interface{}) {
-	p.Success = x.(*GetTemplatesRes)
+	p.Success = x.(*GetTemplatesResp)
 }
 
 func (p *AgentServiceGetTemplatesResult) IsSetSuccess() bool {
@@ -1126,7 +1126,7 @@ func (p *AgentServiceAddTemplateItemArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceAddTemplateItemResult struct {
-	Success *AddTemplateItemRes `thrift:"success,0,optional" frugal:"0,optional,AddTemplateItemRes" json:"success,omitempty"`
+	Success *AddTemplateItemResp `thrift:"success,0,optional" frugal:"0,optional,AddTemplateItemResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceAddTemplateItemResult() *AgentServiceAddTemplateItemResult {
@@ -1137,16 +1137,16 @@ func (p *AgentServiceAddTemplateItemResult) InitDefault() {
 	*p = AgentServiceAddTemplateItemResult{}
 }
 
-var AgentServiceAddTemplateItemResult_Success_DEFAULT *AddTemplateItemRes
+var AgentServiceAddTemplateItemResult_Success_DEFAULT *AddTemplateItemResp
 
-func (p *AgentServiceAddTemplateItemResult) GetSuccess() (v *AddTemplateItemRes) {
+func (p *AgentServiceAddTemplateItemResult) GetSuccess() (v *AddTemplateItemResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceAddTemplateItemResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceAddTemplateItemResult) SetSuccess(x interface{}) {
-	p.Success = x.(*AddTemplateItemRes)
+	p.Success = x.(*AddTemplateItemResp)
 }
 
 func (p *AgentServiceAddTemplateItemResult) IsSetSuccess() bool {
@@ -1202,7 +1202,7 @@ func (p *AgentServiceDeleteTemplateItemArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceDeleteTemplateItemResult struct {
-	Success *DeleteTemplateItemRes `thrift:"success,0,optional" frugal:"0,optional,DeleteTemplateItemRes" json:"success,omitempty"`
+	Success *DeleteTemplateItemResp `thrift:"success,0,optional" frugal:"0,optional,DeleteTemplateItemResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceDeleteTemplateItemResult() *AgentServiceDeleteTemplateItemResult {
@@ -1213,16 +1213,16 @@ func (p *AgentServiceDeleteTemplateItemResult) InitDefault() {
 	*p = AgentServiceDeleteTemplateItemResult{}
 }
 
-var AgentServiceDeleteTemplateItemResult_Success_DEFAULT *DeleteTemplateItemRes
+var AgentServiceDeleteTemplateItemResult_Success_DEFAULT *DeleteTemplateItemResp
 
-func (p *AgentServiceDeleteTemplateItemResult) GetSuccess() (v *DeleteTemplateItemRes) {
+func (p *AgentServiceDeleteTemplateItemResult) GetSuccess() (v *DeleteTemplateItemResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceDeleteTemplateItemResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceDeleteTemplateItemResult) SetSuccess(x interface{}) {
-	p.Success = x.(*DeleteTemplateItemRes)
+	p.Success = x.(*DeleteTemplateItemResp)
 }
 
 func (p *AgentServiceDeleteTemplateItemResult) IsSetSuccess() bool {
@@ -1278,7 +1278,7 @@ func (p *AgentServiceUpdateTemplateItemArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceUpdateTemplateItemResult struct {
-	Success *UpdateTemplateItemRes `thrift:"success,0,optional" frugal:"0,optional,UpdateTemplateItemRes" json:"success,omitempty"`
+	Success *UpdateTemplateItemResp `thrift:"success,0,optional" frugal:"0,optional,UpdateTemplateItemResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceUpdateTemplateItemResult() *AgentServiceUpdateTemplateItemResult {
@@ -1289,16 +1289,16 @@ func (p *AgentServiceUpdateTemplateItemResult) InitDefault() {
 	*p = AgentServiceUpdateTemplateItemResult{}
 }
 
-var AgentServiceUpdateTemplateItemResult_Success_DEFAULT *UpdateTemplateItemRes
+var AgentServiceUpdateTemplateItemResult_Success_DEFAULT *UpdateTemplateItemResp
 
-func (p *AgentServiceUpdateTemplateItemResult) GetSuccess() (v *UpdateTemplateItemRes) {
+func (p *AgentServiceUpdateTemplateItemResult) GetSuccess() (v *UpdateTemplateItemResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceUpdateTemplateItemResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceUpdateTemplateItemResult) SetSuccess(x interface{}) {
-	p.Success = x.(*UpdateTemplateItemRes)
+	p.Success = x.(*UpdateTemplateItemResp)
 }
 
 func (p *AgentServiceUpdateTemplateItemResult) IsSetSuccess() bool {
@@ -1354,7 +1354,7 @@ func (p *AgentServiceGetTemplateItemsArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceGetTemplateItemsResult struct {
-	Success *GetTemplateItemsRes `thrift:"success,0,optional" frugal:"0,optional,GetTemplateItemsRes" json:"success,omitempty"`
+	Success *GetTemplateItemsResp `thrift:"success,0,optional" frugal:"0,optional,GetTemplateItemsResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceGetTemplateItemsResult() *AgentServiceGetTemplateItemsResult {
@@ -1365,16 +1365,16 @@ func (p *AgentServiceGetTemplateItemsResult) InitDefault() {
 	*p = AgentServiceGetTemplateItemsResult{}
 }
 
-var AgentServiceGetTemplateItemsResult_Success_DEFAULT *GetTemplateItemsRes
+var AgentServiceGetTemplateItemsResult_Success_DEFAULT *GetTemplateItemsResp
 
-func (p *AgentServiceGetTemplateItemsResult) GetSuccess() (v *GetTemplateItemsRes) {
+func (p *AgentServiceGetTemplateItemsResult) GetSuccess() (v *GetTemplateItemsResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceGetTemplateItemsResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceGetTemplateItemsResult) SetSuccess(x interface{}) {
-	p.Success = x.(*GetTemplateItemsRes)
+	p.Success = x.(*GetTemplateItemsResp)
 }
 
 func (p *AgentServiceGetTemplateItemsResult) IsSetSuccess() bool {
@@ -1506,7 +1506,7 @@ func (p *AgentServiceAddTokenArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceAddTokenResult struct {
-	Success *AddTokenRes `thrift:"success,0,optional" frugal:"0,optional,AddTokenRes" json:"success,omitempty"`
+	Success *AddTokenResp `thrift:"success,0,optional" frugal:"0,optional,AddTokenResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceAddTokenResult() *AgentServiceAddTokenResult {
@@ -1517,16 +1517,16 @@ func (p *AgentServiceAddTokenResult) InitDefault() {
 	*p = AgentServiceAddTokenResult{}
 }
 
-var AgentServiceAddTokenResult_Success_DEFAULT *AddTokenRes
+var AgentServiceAddTokenResult_Success_DEFAULT *AddTokenResp
 
-func (p *AgentServiceAddTokenResult) GetSuccess() (v *AddTokenRes) {
+func (p *AgentServiceAddTokenResult) GetSuccess() (v *AddTokenResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceAddTokenResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceAddTokenResult) SetSuccess(x interface{}) {
-	p.Success = x.(*AddTokenRes)
+	p.Success = x.(*AddTokenResp)
 }
 
 func (p *AgentServiceAddTokenResult) IsSetSuccess() bool {
@@ -1582,7 +1582,7 @@ func (p *AgentServiceDeleteTokenArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceDeleteTokenResult struct {
-	Success *DeleteTokenRes `thrift:"success,0,optional" frugal:"0,optional,DeleteTokenRes" json:"success,omitempty"`
+	Success *DeleteTokenResp `thrift:"success,0,optional" frugal:"0,optional,DeleteTokenResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceDeleteTokenResult() *AgentServiceDeleteTokenResult {
@@ -1593,16 +1593,16 @@ func (p *AgentServiceDeleteTokenResult) InitDefault() {
 	*p = AgentServiceDeleteTokenResult{}
 }
 
-var AgentServiceDeleteTokenResult_Success_DEFAULT *DeleteTokenRes
+var AgentServiceDeleteTokenResult_Success_DEFAULT *DeleteTokenResp
 
-func (p *AgentServiceDeleteTokenResult) GetSuccess() (v *DeleteTokenRes) {
+func (p *AgentServiceDeleteTokenResult) GetSuccess() (v *DeleteTokenResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceDeleteTokenResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceDeleteTokenResult) SetSuccess(x interface{}) {
-	p.Success = x.(*DeleteTokenRes)
+	p.Success = x.(*DeleteTokenResp)
 }
 
 func (p *AgentServiceDeleteTokenResult) IsSetSuccess() bool {
@@ -1658,7 +1658,7 @@ func (p *AgentServiceGetTokenArgs) GetFirstArgument() interface{} {
 }
 
 type AgentServiceGetTokenResult struct {
-	Success *GetTokenRes `thrift:"success,0,optional" frugal:"0,optional,GetTokenRes" json:"success,omitempty"`
+	Success *GetTokenResp `thrift:"success,0,optional" frugal:"0,optional,GetTokenResp" json:"success,omitempty"`
 }
 
 func NewAgentServiceGetTokenResult() *AgentServiceGetTokenResult {
@@ -1669,16 +1669,16 @@ func (p *AgentServiceGetTokenResult) InitDefault() {
 	*p = AgentServiceGetTokenResult{}
 }
 
-var AgentServiceGetTokenResult_Success_DEFAULT *GetTokenRes
+var AgentServiceGetTokenResult_Success_DEFAULT *GetTokenResp
 
-func (p *AgentServiceGetTokenResult) GetSuccess() (v *GetTokenRes) {
+func (p *AgentServiceGetTokenResult) GetSuccess() (v *GetTokenResp) {
 	if !p.IsSetSuccess() {
 		return AgentServiceGetTokenResult_Success_DEFAULT
 	}
 	return p.Success
 }
 func (p *AgentServiceGetTokenResult) SetSuccess(x interface{}) {
-	p.Success = x.(*GetTokenRes)
+	p.Success = x.(*GetTokenResp)
 }
 
 func (p *AgentServiceGetTokenResult) IsSetSuccess() bool {

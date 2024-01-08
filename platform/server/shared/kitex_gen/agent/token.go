@@ -83,55 +83,55 @@ func (p *AddTokenResData) String() string {
 	return fmt.Sprintf("AddTokenResData(%+v)", *p)
 }
 
-type AddTokenRes struct {
+type AddTokenResp struct {
 	Code int32            `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string           `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 	Data *AddTokenResData `thrift:"data,3" frugal:"3,default,AddTokenResData" json:"data"`
 }
 
-func NewAddTokenRes() *AddTokenRes {
-	return &AddTokenRes{}
+func NewAddTokenResp() *AddTokenResp {
+	return &AddTokenResp{}
 }
 
-func (p *AddTokenRes) InitDefault() {
-	*p = AddTokenRes{}
+func (p *AddTokenResp) InitDefault() {
+	*p = AddTokenResp{}
 }
 
-func (p *AddTokenRes) GetCode() (v int32) {
+func (p *AddTokenResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *AddTokenRes) GetMsg() (v string) {
+func (p *AddTokenResp) GetMsg() (v string) {
 	return p.Msg
 }
 
-var AddTokenRes_Data_DEFAULT *AddTokenResData
+var AddTokenResp_Data_DEFAULT *AddTokenResData
 
-func (p *AddTokenRes) GetData() (v *AddTokenResData) {
+func (p *AddTokenResp) GetData() (v *AddTokenResData) {
 	if !p.IsSetData() {
-		return AddTokenRes_Data_DEFAULT
+		return AddTokenResp_Data_DEFAULT
 	}
 	return p.Data
 }
-func (p *AddTokenRes) SetCode(val int32) {
+func (p *AddTokenResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *AddTokenRes) SetMsg(val string) {
+func (p *AddTokenResp) SetMsg(val string) {
 	p.Msg = val
 }
-func (p *AddTokenRes) SetData(val *AddTokenResData) {
+func (p *AddTokenResp) SetData(val *AddTokenResData) {
 	p.Data = val
 }
 
-func (p *AddTokenRes) IsSetData() bool {
+func (p *AddTokenResp) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *AddTokenRes) String() string {
+func (p *AddTokenResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AddTokenRes(%+v)", *p)
+	return fmt.Sprintf("AddTokenResp(%+v)", *p)
 }
 
 type DeleteTokenReq struct {
@@ -160,38 +160,38 @@ func (p *DeleteTokenReq) String() string {
 	return fmt.Sprintf("DeleteTokenReq(%+v)", *p)
 }
 
-type DeleteTokenRes struct {
+type DeleteTokenResp struct {
 	Code int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 }
 
-func NewDeleteTokenRes() *DeleteTokenRes {
-	return &DeleteTokenRes{}
+func NewDeleteTokenResp() *DeleteTokenResp {
+	return &DeleteTokenResp{}
 }
 
-func (p *DeleteTokenRes) InitDefault() {
-	*p = DeleteTokenRes{}
+func (p *DeleteTokenResp) InitDefault() {
+	*p = DeleteTokenResp{}
 }
 
-func (p *DeleteTokenRes) GetCode() (v int32) {
+func (p *DeleteTokenResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *DeleteTokenRes) GetMsg() (v string) {
+func (p *DeleteTokenResp) GetMsg() (v string) {
 	return p.Msg
 }
-func (p *DeleteTokenRes) SetCode(val int32) {
+func (p *DeleteTokenResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *DeleteTokenRes) SetMsg(val string) {
+func (p *DeleteTokenResp) SetMsg(val string) {
 	p.Msg = val
 }
 
-func (p *DeleteTokenRes) String() string {
+func (p *DeleteTokenResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("DeleteTokenRes(%+v)", *p)
+	return fmt.Sprintf("DeleteTokenResp(%+v)", *p)
 }
 
 type GetTokenReq struct {
@@ -302,53 +302,53 @@ func (p *GetTokenResData) String() string {
 	return fmt.Sprintf("GetTokenResData(%+v)", *p)
 }
 
-type GetTokenRes struct {
+type GetTokenResp struct {
 	Code int32            `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Msg  string           `thrift:"msg,2" frugal:"2,default,string" json:"msg"`
 	Data *GetTokenResData `thrift:"data,3" frugal:"3,default,GetTokenResData" json:"data"`
 }
 
-func NewGetTokenRes() *GetTokenRes {
-	return &GetTokenRes{}
+func NewGetTokenResp() *GetTokenResp {
+	return &GetTokenResp{}
 }
 
-func (p *GetTokenRes) InitDefault() {
-	*p = GetTokenRes{}
+func (p *GetTokenResp) InitDefault() {
+	*p = GetTokenResp{}
 }
 
-func (p *GetTokenRes) GetCode() (v int32) {
+func (p *GetTokenResp) GetCode() (v int32) {
 	return p.Code
 }
 
-func (p *GetTokenRes) GetMsg() (v string) {
+func (p *GetTokenResp) GetMsg() (v string) {
 	return p.Msg
 }
 
-var GetTokenRes_Data_DEFAULT *GetTokenResData
+var GetTokenResp_Data_DEFAULT *GetTokenResData
 
-func (p *GetTokenRes) GetData() (v *GetTokenResData) {
+func (p *GetTokenResp) GetData() (v *GetTokenResData) {
 	if !p.IsSetData() {
-		return GetTokenRes_Data_DEFAULT
+		return GetTokenResp_Data_DEFAULT
 	}
 	return p.Data
 }
-func (p *GetTokenRes) SetCode(val int32) {
+func (p *GetTokenResp) SetCode(val int32) {
 	p.Code = val
 }
-func (p *GetTokenRes) SetMsg(val string) {
+func (p *GetTokenResp) SetMsg(val string) {
 	p.Msg = val
 }
-func (p *GetTokenRes) SetData(val *GetTokenResData) {
+func (p *GetTokenResp) SetData(val *GetTokenResData) {
 	p.Data = val
 }
 
-func (p *GetTokenRes) IsSetData() bool {
+func (p *GetTokenResp) IsSetData() bool {
 	return p.Data != nil
 }
 
-func (p *GetTokenRes) String() string {
+func (p *GetTokenResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("GetTokenRes(%+v)", *p)
+	return fmt.Sprintf("GetTokenResp(%+v)", *p)
 }

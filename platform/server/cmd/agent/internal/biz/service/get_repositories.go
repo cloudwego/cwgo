@@ -39,7 +39,7 @@ func NewGetRepositoriesService(ctx context.Context, svcCtx *svc.ServiceContext) 
 }
 
 // Run create note info
-func (s *GetRepositoriesService) Run(req *agent.GetRepositoriesReq) (resp *agent.GetRepositoriesRes, err error) {
+func (s *GetRepositoriesService) Run(req *agent.GetRepositoriesReq) (resp *agent.GetRepositoriesResp, err error) {
 	repos, total, err := s.svcCtx.DaoManager.Repository.GetRepositoryList(s.ctx,
 		model.Repository{
 			RepositoryType:   req.RepositoryType,
@@ -51,17 +51,17 @@ func (s *GetRepositoriesService) Run(req *agent.GetRepositoriesReq) (resp *agent
 		req.Page, req.Limit, req.Order, req.OrderBy,
 	)
 	if err != nil {
-		return &agent.GetRepositoriesRes{
+		return &agent.GetRepositoriesResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 			Data: nil,
 		}, nil
 	}
 
-	return &agent.GetRepositoriesRes{
+	return &agent.GetRepositoriesResp{
 		Code: 0,
 		Msg:  "get repositories successfully",
-		Data: &agent.GetRepositoriesResData{
+		Data: &agent.GetRepositoriesRespData{
 			Repositories: repos,
 			Total:        int32(total),
 		},

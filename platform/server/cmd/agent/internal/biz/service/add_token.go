@@ -42,7 +42,7 @@ func NewAddTokenService(ctx context.Context, svcCtx *svc.ServiceContext) *AddTok
 }
 
 // Run create note info
-func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, err error) {
+func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenResp, err error) {
 	var owner string
 	var ownerId int64
 	var tokenType int32
@@ -52,7 +52,7 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, 
 	case consts.RepositoryTypeNumGitLab:
 		client, err := utils.NewGitlabClient(req.Token, "https://"+req.RepositoryDomain)
 		if err != nil {
-			return &agent.AddTokenRes{
+			return &agent.AddTokenResp{
 				Code: errx.GetCode(err),
 				Msg:  err.Error(),
 				Data: nil,
@@ -61,7 +61,7 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, 
 
 		owner, ownerId, tokenType, expirationTime, err = utils.GetGitLabTokenInfo(client)
 		if err != nil {
-			return &agent.AddTokenRes{
+			return &agent.AddTokenResp{
 				Code: errx.GetCode(err),
 				Msg:  err.Error(),
 				Data: nil,
@@ -70,7 +70,7 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, 
 	case consts.RepositoryTypeNumGithub:
 		client, err := utils.NewGithubClient(req.Token)
 		if err != nil {
-			return &agent.AddTokenRes{
+			return &agent.AddTokenResp{
 				Code: errx.GetCode(err),
 				Msg:  err.Error(),
 				Data: nil,
@@ -79,7 +79,7 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, 
 
 		owner, ownerId, tokenType, expirationTime, err = utils.GetGitHubTokenInfo(client)
 		if err != nil {
-			return &agent.AddTokenRes{
+			return &agent.AddTokenResp{
 				Code: errx.GetCode(err),
 				Msg:  err.Error(),
 				Data: nil,
@@ -100,16 +100,16 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenRes, 
 
 	_, err = s.svcCtx.DaoManager.Token.AddToken(s.ctx, tokenModel)
 	if err != nil {
-		return &agent.AddTokenRes{
+		return &agent.AddTokenResp{
 			Code: consts.ErrNumDatabase,
 			Msg:  consts.ErrMsgDatabase,
 		}, nil
 	}
 
-	return &agent.AddTokenRes{
+	return &agent.AddTokenResp{
 		Code: 0,
 		Msg:  "add token successfully",
-		Data: &agent.AddTokenResData{
+		Data: &agent.AddTokenRespData{
 			Owner:          owner,
 			ExpirationTime: expirationTime.Format(time.DateTime),
 		},

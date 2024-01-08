@@ -7,20 +7,31 @@ import (
 )
 
 type Repository struct {
-	Id               int64  `thrift:"id,1" frugal:"1,default,i64" json:"id"`
-	RepositoryType   int32  `thrift:"repository_type,2" frugal:"2,default,i32" json:"repository_type"`
-	RepositoryDomain string `thrift:"repository_domain,3" frugal:"3,default,string" json:"repository_domain"`
-	RepositoryOwner  string `thrift:"repository_owner,4" frugal:"4,default,string" json:"repository_owner"`
-	RepositoryName   string `thrift:"repository_name,5" frugal:"5,default,string" json:"repository_name"`
-	RepositoryBranch string `thrift:"repository_branch,6" frugal:"6,default,string" json:"repository_branch"`
-	StoreType        int32  `thrift:"store_type,7" frugal:"7,default,i32" json:"store_type"`
-	TokenId          int64  `thrift:"token_id,8" frugal:"8,default,i64" json:"token_id"`
-	Status           int32  `thrift:"status,9" frugal:"9,default,i32" json:"status"`
-	LastUpdateTime   string `thrift:"last_update_time,10" frugal:"10,default,string" json:"last_update_time"`
-	LastSyncTime     string `thrift:"last_sync_time,11" frugal:"11,default,string" json:"last_sync_time"`
-	IsDeleted        bool   `thrift:"is_deleted,12" frugal:"12,default,bool" json:"is_deleted"`
-	CreateTime       string `thrift:"create_time,13" frugal:"13,default,string" json:"create_time"`
-	UpdateTime       string `thrift:"update_time,14" frugal:"14,default,string" json:"update_time"`
+	// repository record id
+	Id int64 `thrift:"id,1" frugal:"1,default,i64" form:"id" json:"id" query:"id"`
+	// repository type (1: gitlab, 2: github)
+	RepositoryType int32 `thrift:"repository_type,2" frugal:"2,default,i32" form:"repository_type" json:"repository_type" query:"repository_type"`
+	// repository domain
+	RepositoryDomain string `thrift:"repository_domain,3" frugal:"3,default,string" form:"repository_domain" json:"repository_domain" query:"repository_domain"`
+	// repository owner
+	RepositoryOwner string `thrift:"repository_owner,4" frugal:"4,default,string" form:"repository_owner" json:"repository_owner" query:"repository_owner"`
+	// repository name
+	RepositoryName string `thrift:"repository_name,5" frugal:"5,default,string" form:"repository_name" json:"repository_name" query:"repository_name"`
+	// repository branch
+	RepositoryBranch string `thrift:"repository_branch,6" frugal:"6,default,string" form:"repository_branch" json:"repository_branch" query:"repository_branch"`
+	// repository store type (1: stores idl file, 2: stores meta code)
+	StoreType int32 `thrift:"store_type,7" frugal:"7,default,i32" form:"store_type" json:"store_type" query:"store_type"`
+	// token id which repo currently using
+	TokenId int64 `thrift:"token_id,8" frugal:"8,default,i64" form:"token_id" json:"token_id" query:"token_id"`
+	// repository status (need sync or not)
+	Status int32 `thrift:"status,9" frugal:"9,default,i32" form:"status" json:"status" query:"status"`
+	// repo file last update time
+	LastUpdateTime string `thrift:"last_update_time,10" frugal:"10,default,string" form:"last_update_time" json:"last_update_time" query:"last_update_time"`
+	// repo last sync time
+	LastSyncTime string `thrift:"last_sync_time,11" frugal:"11,default,string" form:"last_sync_time" json:"last_sync_time" query:"last_sync_time"`
+	IsDeleted    bool   `thrift:"is_deleted,12" frugal:"12,default,bool" form:"is_deleted" json:"is_deleted" query:"is_deleted"`
+	CreateTime   string `thrift:"create_time,13" frugal:"13,default,string" form:"create_time" json:"create_time" query:"create_time"`
+	UpdateTime   string `thrift:"update_time,14" frugal:"14,default,string" form:"update_time" json:"update_time" query:"update_time"`
 }
 
 func NewRepository() *Repository {
