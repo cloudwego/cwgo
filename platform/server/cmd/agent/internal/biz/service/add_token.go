@@ -109,7 +109,7 @@ func (s *AddTokenService) Run(req *agent.AddTokenReq) (resp *agent.AddTokenResp,
 	return &agent.AddTokenResp{
 		Code: 0,
 		Msg:  "add token successfully",
-		Data: &agent.AddTokenRespData{
+		Data: &agent.AddTokenResData{
 			Owner:          owner,
 			ExpirationTime: expirationTime.Format(time.DateTime),
 		},

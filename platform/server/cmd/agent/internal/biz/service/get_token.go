@@ -59,7 +59,7 @@ func (s *GetTokenService) Run(req *agent.GetTokenReq) (resp *agent.GetTokenResp,
 	return &agent.GetTokenResp{
 		Code: 0,
 		Msg:  "get tokens successfully",
-		Data: &agent.GetTokenRespData{
+		Data: &agent.GetTokenResData{
 			Tokens: tokens,
 			Total:  int32(total),
 		},
