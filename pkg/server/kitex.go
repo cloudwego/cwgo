@@ -308,9 +308,9 @@ func initHertz() *route.Engine {
 	if err := h.Engine.Init(); err != nil {
 		panic(err)
 	}
-	//if err := h.Engine.SetEngineRun(); err != nil {
-	//	panic(err)
-	//}
+	if err := h.Engine.MarkAsRunning(); err != nil {
+		panic(err)
+	}
 	return h.Engine
 }
 
