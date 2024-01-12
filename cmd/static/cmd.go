@@ -92,6 +92,36 @@ func Init() *cli.App {
 				return fallback.Fallback(globalArgs.FallbackArgument)
 			},
 		},
+		{
+			Name:  CompletionName,
+			Usage: CompletionUsage,
+			Subcommands: []*cli.Command{
+				{
+					Name:  CompletionZshName,
+					Usage: CompletionZshUsage,
+					Action: func(context *cli.Context) error {
+						context.App.Writer.Write([]byte(consts.ZshAutocomplete))
+						return nil
+					},
+				},
+				{
+					Name:  CompletionBashName,
+					Usage: CompletionBashUsage,
+					Action: func(context *cli.Context) error {
+						context.App.Writer.Write([]byte(consts.BashAutocomplete))
+						return nil
+					},
+				},
+				{
+					Name:  CompletionPowershellName,
+					Usage: CompletionPowershellUsage,
+					Action: func(context *cli.Context) error {
+						context.App.Writer.Write([]byte(consts.PowershellAutoComplete))
+						return nil
+					},
+				},
+			},
+		},
 	}
 	return app
 }
@@ -130,4 +160,16 @@ Examples:
 `
 	FallbackName  = "fallback"
 	FallbackUsage = "fallback to hz or kitex"
+
+	CompletionName  = "completion"
+	CompletionUsage = "Generate the autocompletion script for hugo for the specified shell"
+
+	CompletionZshName  = "zsh"
+	CompletionZshUsage = "Generate the autocompletion script for zsh"
+
+	CompletionBashName  = "bash"
+	CompletionBashUsage = "Generate the autocompletion script for bash"
+
+	CompletionPowershellName  = "powershell"
+	CompletionPowershellUsage = "Generate the autocompletion script for powershell"
 )

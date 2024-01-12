@@ -7,7 +7,6 @@ the developer experience. The main features of cwgo tool are as follows:
 
 ## Tool Characteristics
 
-
 - Supports generating project templates
 
   cwgo tool supports generating MVC project layouts. Users only need to complete their own business logic in the
@@ -30,7 +29,7 @@ the developer experience. The main features of cwgo tool are as follows:
 
 ## Install cwgo Tool
 
-```
+```bash
 # Go 1.15 and earlier version
 GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get github.com/cloudwego/cwgo@latest
 
@@ -63,52 +62,61 @@ Details information containing HOW TO Use cwgo TOOL GEN To Generate Curd Codes, 
 Instructions on how to customize templates can be found in the [document](https://www.cloudwego.io/docs/cwgo/tutorials/templete-extension/).
 
 ### How to enable auto-completion
-#### Supported in Bash
-First download Bash [autocomplete script](https://github.com/urfave/cli/blob/v2-maint/autocomplete/bash_autocomplete), assuming it is downloaded to the autocomplete/ folder in the root directory of the project (you can Define location)
-##### Temporary support for completion
-```shell
-PROG=cwgo
 
+#### Supported in Bash
+
+##### Temporary support for Bash completion
+
+```shell
+mkdir autocomplete # You can choose any location you like
+cwgo completion bash > ./autocomplete/bash_autocomplete
 source ./autocomplete/bash_autocomplete
 ```
-##### Permanent support for completion
+
+##### Permanent support for Bash completion
+
 ```shell
 sudo cp autocomplete/bash_autocomplete /etc/bash_completion.d/cwgo
 
 source /etc/bash_completion.d/cwgo
 ```
-#### Supported in Zsh
-First download Zsh [autocomplete script](https://github.com/urfave/cli/blob/v2-maint/autocomplete/zsh_autocomplete), assuming it is downloaded to the autocomplete/ folder in the root directory of the project (you can Define location)
-##### Temporary support for completion
-```shell
-PROG=cwgo
 
+#### Supported in Zsh
+
+##### Temporary support for Zsh completion
+
+```shell
+mkdir autocomplete # You can choose any location you like
+cwgo completion zsh > ./autocomplete/zsh_autocomplete
 source ./autocomplete/zsh_autocomplete
 ```
-#### Supported in PowerShell
-First download PowerShell [autocomplete script](https://github.com/urfave/cli/blob/v2-maint/autocomplete/powershell_autocomplete.ps1), assuming it is downloaded to the autocomplete/ folder in the root directory of the project ( Customizable location)
-##### Temporary support for completion
-First, rename the downloaded powershell_autocomplete.ps1 to cwgo.ps1.
 
-Then execute:
+#### Supported in PowerShell
+
+##### Temporary support for PowerShell completion
+
 ```shell
+mkdir autocomplete
+cwgo completion powershell | Out-File autocomplete/cwgo.ps1
 & autocomplete/cwgo.ps1
 ```
 
-##### Permanent support for completion
+##### Permanent support for PowerShell completion
+
 open the $profile.
 
 Add a line inside:
+
 ```shell
 & path/to/autocomplete/cwgo.ps1
 ```
+
 Note that the name and path of the ps1 script must be correctly configured here, and then permanent auto-completion can be performed.
 
 ## Open Source License
 
 cwgo is based on Apache License 2.0, [Apache License](https://github.com/cloudswego/cwgo/blob/main/LICENSE). Its dependent
 third-party component open-source licenses will include Licenses.
-
 
 ## Contact Us
 
