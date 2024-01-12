@@ -1,10 +1,10 @@
 name: Pull Request Check
 
-on: [ pull_request ]
+on: [pull_request]
 
 jobs:
   compliant:
-    runs-on: [ self-hosted, X64 ]
+    runs-on: [self-hosted, X64]
     steps:
       - uses: actions/checkout@v3
 
@@ -39,5 +39,5 @@ jobs:
         with:
           version: latest
           working-directory: ${{ matrix.workdir }}
-          args: -E gofumpt
+          args: -E gofumpt --timeout 5m
           skip-pkg-cache: true
