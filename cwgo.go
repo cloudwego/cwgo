@@ -16,6 +16,7 @@
 package main
 
 import (
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin"
 	"os"
 
 	"github.com/cloudwego/cwgo/cmd/static"
@@ -34,6 +35,9 @@ func main() {
 	app.PluginMode()
 	// run cwgo as kitex plugin mode
 	kitexPluginMode()
+	// run cwgo as mongo plugin mode
+	plugin.MongoPluginMode()
+
 	tpl.Init()
 	cli := static.Init()
 

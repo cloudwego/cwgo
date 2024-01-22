@@ -18,6 +18,7 @@ package utils
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -55,4 +56,14 @@ func GetIdlType(path string, pbName ...string) (string, error) {
 	default:
 		return "", fmt.Errorf("IDL type %s is not supported", ext)
 	}
+}
+
+func ReadFileContent(filePath string) (content []byte, err error) {
+	file, err := os.Open(filePath)
+	defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return ioutil.ReadAll(file)
 }

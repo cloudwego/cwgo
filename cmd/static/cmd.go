@@ -21,6 +21,7 @@ import (
 	"github.com/cloudwego/cwgo/meta"
 	"github.com/cloudwego/cwgo/pkg/client"
 	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/cwgo/pkg/doc"
 	"github.com/cloudwego/cwgo/pkg/fallback"
 	"github.com/cloudwego/cwgo/pkg/model"
 	"github.com/cloudwego/cwgo/pkg/server"
@@ -80,6 +81,17 @@ func Init() *cli.App {
 					return err
 				}
 				return model.Model(globalArgs.ModelArgument)
+			},
+		},
+		{
+			Name:  DocName,
+			Usage: DocUsage,
+			Flags: docFlags(),
+			Action: func(c *cli.Context) error {
+				if err := globalArgs.DocArgument.ParseCli(c); err != nil {
+					return err
+				}
+				return doc.Doc(globalArgs.DocArgument)
 			},
 		},
 		{
@@ -158,6 +170,15 @@ Examples:
   # Generate DB model code 
   cwgo  model --db_type mysql --dsn "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8mb4&parseTime=True&loc=Local"
 `
+
+	DocName  = "doc"
+	DocUsage = `generate doc model
+
+Examples:
+  # Generate doc model code
+  cwgo doc --name mongodb --idl {{path/to/IDL_file.thrift}}
+`
+
 	FallbackName  = "fallback"
 	FallbackUsage = "fallback to hz or kitex"
 
