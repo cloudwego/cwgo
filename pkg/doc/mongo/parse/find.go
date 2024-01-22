@@ -145,7 +145,7 @@ func (fp *FindParse) check(method *model.InterfaceMethod) error {
 	return nil
 }
 
-func (fp *FindParse) parseProject(tokens []string, struc *model.IdlExtractStruct) (int, error) {
+func (fp *FindParse) parseProject(tokens []string, extractStruct *model.IdlExtractStruct) (int, error) {
 	tokenIndex, err := getNextTokenIndex(tokens, 0)
 	if err != nil {
 		return 0, err
@@ -157,7 +157,7 @@ func (fp *FindParse) parseProject(tokens []string, struc *model.IdlExtractStruct
 
 	curIndex := new(int)
 	*curIndex = -1
-	result, _, err := getFieldNameType(tokens[:tokenIndex], struc, curIndex, true)
+	result, _, err := getFieldNameType(tokens[:tokenIndex], extractStruct, curIndex, true)
 	if err != nil {
 		return 0, err
 	}
@@ -233,7 +233,7 @@ func (fp *FindParse) parseFindOptions(tokens []string, method *model.InterfaceMe
 	return nil
 }
 
-func (fp *FindParse) getSortFields(tokens []string, struc *model.IdlExtractStruct) error {
+func (fp *FindParse) getSortFields(tokens []string, extractStruct *model.IdlExtractStruct) error {
 	preDescIndex := 0
 	for i := 0; i < len(tokens); i++ {
 		if tokens[i] == desc {
@@ -244,7 +244,7 @@ func (fp *FindParse) getSortFields(tokens []string, struc *model.IdlExtractStruc
 			for j := i - 1; j >= preDescIndex; j-- {
 				curIndex := new(int)
 				*curIndex = -1
-				r, _, err := getFieldNameType(tokens[j:i], struc, curIndex, true)
+				r, _, err := getFieldNameType(tokens[j:i], extractStruct, curIndex, true)
 				if err != nil && j == preDescIndex {
 					return err
 				}
@@ -253,12 +253,12 @@ func (fp *FindParse) getSortFields(tokens []string, struc *model.IdlExtractStruc
 					repeatFlag := 0
 					if j > preDescIndex {
 						*curIndex = -1
-						r, _, err = getFieldNameType(tokens[preDescIndex:j], struc, curIndex, true)
+						r, _, err = getFieldNameType(tokens[preDescIndex:j], extractStruct, curIndex, true)
 						if err != nil {
 							// To avoid bug: For example, both NameHello and Name are fields of struct,
 							// NameHelloDesc can be correctly parsed by this logic.
 							for k := j - 1; k >= preDescIndex; k-- {
-								r, _, err = getFieldNameType(tokens[k:i], struc, curIndex, true)
+								r, _, err = getFieldNameType(tokens[k:i], extractStruct, curIndex, true)
 								if err != nil && k == preDescIndex {
 									return err
 								}
@@ -266,7 +266,7 @@ func (fp *FindParse) getSortFields(tokens []string, struc *model.IdlExtractStruc
 								if len(r) != 0 {
 									fp.Order.Desc = append(fp.Order.Desc, r...)
 									if preDescIndex < k {
-										r, _, err = getFieldNameType(tokens[preDescIndex:k], struc, curIndex, true)
+										r, _, err = getFieldNameType(tokens[preDescIndex:k], extractStruct, curIndex, true)
 										if err != nil {
 											return err
 										}
@@ -283,7 +283,7 @@ func (fp *FindParse) getSortFields(tokens []string, struc *model.IdlExtractStruc
 
 					if repeatFlag == 0 {
 						*curIndex = -1
-						r, _, err = getFieldNameType(tokens[j:i], struc, curIndex, true)
+						r, _, err = getFieldNameType(tokens[j:i], extractStruct, curIndex, true)
 						if err != nil {
 							return err
 						}
@@ -300,7 +300,7 @@ func (fp *FindParse) getSortFields(tokens []string, struc *model.IdlExtractStruc
 	if len(fp.Order.Desc) == 0 {
 		curIndex := new(int)
 		*curIndex = -1
-		r, _, err := getFieldNameType(tokens, struc, curIndex, true)
+		r, _, err := getFieldNameType(tokens, extractStruct, curIndex, true)
 		if err != nil {
 			return err
 		}

@@ -123,16 +123,16 @@ func response(res *plugin.Response) error {
 }
 
 func (plu *ThriftGoPlugin) buildResponse(structs []*model.IdlExtractStruct, methodRenders [][]*template.MethodRender) (result []*plugin.Generated, err error) {
-	for index, struc := range structs {
-		pkgName := getPkgName(struc.Name)
+	for index, st := range structs {
+		pkgName := getPkgName(st.Name)
 		baseRender := &template.BaseRender{
 			Version:     cwgoMeta.Version,
 			PackageName: pkgName,
 			Imports:     codegen.BaseMongoImports,
 		}
 
-		fileMongoName, fileIfName := getFileName(struc.Name, plu.DocArgs.DaoDir)
-		if struc.Update {
+		fileMongoName, fileIfName := getFileName(st.Name, plu.DocArgs.DaoDir)
+		if st.Update {
 			// build update mongo file
 			tplMongo := &template.Template{
 				Renders: []template.Render{},
@@ -145,7 +145,7 @@ func (plu *ThriftGoPlugin) buildResponse(structs []*model.IdlExtractStruct, meth
 			if err != nil {
 				return nil, err
 			}
-			data := string(struc.UpdateMongoFileContent) + "\n" + buff.String()
+			data := string(st.UpdateMongoFileContent) + "\n" + buff.String()
 			formattedCode, err := imports.Process("", []byte(data), nil)
 			if err != nil {
 				return nil, err
@@ -162,14 +162,14 @@ func (plu *ThriftGoPlugin) buildResponse(structs []*model.IdlExtractStruct, meth
 			tplIf.Renders = append(tplIf.Renders, baseRender)
 
 			methods := make(code.InterfaceMethods, 0, 10)
-			for _, preMethod := range struc.PreIfMethods {
+			for _, preMethod := range st.PreIfMethods {
 				methods = append(methods, code.InterfaceMethod{
 					Name:    preMethod.Name,
 					Params:  preMethod.Params,
 					Returns: preMethod.Returns,
 				})
 			}
-			for _, rawMethod := range struc.InterfaceInfo.Methods {
+			for _, rawMethod := range st.InterfaceInfo.Methods {
 				methods = append(methods, code.InterfaceMethod{
 					Name:    rawMethod.Name,
 					Params:  rawMethod.Params,
@@ -178,7 +178,7 @@ func (plu *ThriftGoPlugin) buildResponse(structs []*model.IdlExtractStruct, meth
 			}
 
 			ifRender := &template.InterfaceRender{
-				Name:    struc.Name + "Repository",
+				Name:    st.Name + "Repository",
 				Methods: methods,
 			}
 			tplIf.Renders = append(tplIf.Renders, ifRender)
@@ -202,8 +202,8 @@ func (plu *ThriftGoPlugin) buildResponse(structs []*model.IdlExtractStruct, meth
 			}
 
 			tplMongo.Renders = append(tplMongo.Renders, baseRender)
-			tplMongo.Renders = append(tplMongo.Renders, codegen.GetFuncRender(struc))
-			tplMongo.Renders = append(tplMongo.Renders, codegen.GetStructRender(struc))
+			tplMongo.Renders = append(tplMongo.Renders, codegen.GetFuncRender(st))
+			tplMongo.Renders = append(tplMongo.Renders, codegen.GetStructRender(st))
 			for _, methodRender := range methodRenders[index] {
 				tplMongo.Renders = append(tplMongo.Renders, methodRender)
 			}
@@ -228,7 +228,7 @@ func (plu *ThriftGoPlugin) buildResponse(structs []*model.IdlExtractStruct, meth
 			tplIf.Renders = append(tplIf.Renders, baseRender)
 
 			methods := make(code.InterfaceMethods, 0, 10)
-			for _, rawMethod := range struc.InterfaceInfo.Methods {
+			for _, rawMethod := range st.InterfaceInfo.Methods {
 				methods = append(methods, code.InterfaceMethod{
 					Name:    rawMethod.Name,
 					Params:  rawMethod.Params,
@@ -236,7 +236,7 @@ func (plu *ThriftGoPlugin) buildResponse(structs []*model.IdlExtractStruct, meth
 				})
 			}
 			ifRender := &template.InterfaceRender{
-				Name:    struc.Name + "Repository",
+				Name:    st.Name + "Repository",
 				Methods: methods,
 			}
 			tplIf.Renders = append(tplIf.Renders, ifRender)

@@ -55,9 +55,9 @@ const (
 )
 
 func HandleOperations(structs []*model.IdlExtractStruct) (result []*InterfaceOperation, err error) {
-	for _, struc := range structs {
+	for _, st := range structs {
 		ifo := newInterfaceOperation()
-		if err = ifo.parseInterfaceMethod(struc); err != nil {
+		if err = ifo.parseInterfaceMethod(st); err != nil {
 			return nil, err
 		}
 		result = append(result, ifo)
@@ -69,8 +69,8 @@ func newInterfaceOperation() *InterfaceOperation {
 	return &InterfaceOperation{Operations: []Operation{}}
 }
 
-func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruct) error {
-	for _, method := range struc.InterfaceInfo.Methods {
+func (ifo *InterfaceOperation) parseInterfaceMethod(extractStruct *model.IdlExtractStruct) error {
+	for _, method := range extractStruct.InterfaceInfo.Methods {
 		tokens := camelcase.Split(method.ParsedTokens)
 		switch tokens[0] {
 		case Insert:
@@ -80,7 +80,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruc
 			if err := ip.parseInsert(method, curParamIndex, false); err != nil {
 				return err
 			}
-			ifo.BelongedToStruct = struc
+			ifo.BelongedToStruct = extractStruct
 			ifo.Operations = append(ifo.Operations, ip)
 
 		case Find:
@@ -90,7 +90,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruc
 			if err := fp.parseFind(tokens[1:], method, curParamIndex); err != nil {
 				return err
 			}
-			ifo.BelongedToStruct = struc
+			ifo.BelongedToStruct = extractStruct
 			ifo.Operations = append(ifo.Operations, fp)
 
 		case Update:
@@ -100,7 +100,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruc
 			if err := up.parseUpdate(tokens[1:], method, curParamIndex, false); err != nil {
 				return err
 			}
-			ifo.BelongedToStruct = struc
+			ifo.BelongedToStruct = extractStruct
 			ifo.Operations = append(ifo.Operations, up)
 
 		case Delete:
@@ -110,7 +110,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruc
 			if err := dp.parseDelete(tokens[1:], method, curParamIndex, false); err != nil {
 				return err
 			}
-			ifo.BelongedToStruct = struc
+			ifo.BelongedToStruct = extractStruct
 			ifo.Operations = append(ifo.Operations, dp)
 
 		case Count:
@@ -120,7 +120,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruc
 			if err := cp.parseCount(tokens[1:], method, curParamIndex); err != nil {
 				return err
 			}
-			ifo.BelongedToStruct = struc
+			ifo.BelongedToStruct = extractStruct
 			ifo.Operations = append(ifo.Operations, cp)
 
 		case Transaction:
@@ -130,7 +130,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruc
 			if err := tp.parseTransaction(tokens[1:], method, curParamIndex); err != nil {
 				return err
 			}
-			ifo.BelongedToStruct = struc
+			ifo.BelongedToStruct = extractStruct
 			ifo.Operations = append(ifo.Operations, tp)
 
 		case Bulk:
@@ -140,7 +140,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruc
 			if err := bp.parseBulk(tokens[1:], method, curParamIndex, false); err != nil {
 				return err
 			}
-			ifo.BelongedToStruct = struc
+			ifo.BelongedToStruct = extractStruct
 			ifo.Operations = append(ifo.Operations, bp)
 
 		default:
@@ -159,7 +159,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruc
 //	struc: the structure to which tokens belong
 //	curIndex: point to the next token to be parsed
 //	isFirst: if it is called in recursion
-func getFieldNameType(tokens []string, struc *model.IdlExtractStruct, curIndex *int, isFirst bool) (names []string,
+func getFieldNameType(tokens []string, extractStruct *model.IdlExtractStruct, curIndex *int, isFirst bool) (names []string,
 	types []code.Type, err error,
 ) {
 	if len(tokens) == 0 {
@@ -168,7 +168,7 @@ func getFieldNameType(tokens []string, struc *model.IdlExtractStruct, curIndex *
 
 	for i := 0; i < len(tokens); i++ {
 		flag := 0
-		for _, field := range struc.StructFields {
+		for _, field := range extractStruct.StructFields {
 			if field.Name == tokens[i] || strings.Index(field.Name, tokens[i]) == 0 {
 				s := ""
 				hasFieldFlag := 0
@@ -208,7 +208,7 @@ func getFieldNameType(tokens []string, struc *model.IdlExtractStruct, curIndex *
 				}
 			}
 		}
-		if isFirst == false && flag == 1 {
+		if !isFirst && flag == 1 {
 			break
 		}
 		if flag == 0 {

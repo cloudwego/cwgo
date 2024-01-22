@@ -29,7 +29,7 @@ import (
 	"github.com/fatih/camelcase"
 )
 
-func extractIdlInterface(rawInterface string, rawStruc *model.IdlExtractStruct, tokens []string) error {
+func extractIdlInterface(rawInterface string, rawStruct *model.IdlExtractStruct, tokens []string) error {
 	fSet := token.NewFileSet()
 	f, err := astParser.ParseFile(fSet, "", rawInterface, astParser.ParseComments)
 	if err != nil {
@@ -47,7 +47,7 @@ func extractIdlInterface(rawInterface string, rawStruc *model.IdlExtractStruct, 
 			case *ast.TypeSpec:
 				switch t := spec.Type.(type) {
 				case *ast.InterfaceType:
-					rawStruc.InterfaceInfo = extractInterfaceType(spec.Name.Name, t, tokens, rawStruc)
+					rawStruct.InterfaceInfo = extractInterfaceType(spec.Name.Name, t, tokens, rawStruct)
 				}
 			}
 		}
@@ -57,7 +57,7 @@ func extractIdlInterface(rawInterface string, rawStruc *model.IdlExtractStruct, 
 }
 
 func extractInterfaceType(name string, interfaceType *ast.InterfaceType, tokens []string,
-	rawStruc *model.IdlExtractStruct,
+	rawStruct *model.IdlExtractStruct,
 ) *model.InterfaceInfo {
 	intf := &model.InterfaceInfo{
 		Name:    name,
@@ -76,21 +76,21 @@ func extractInterfaceType(name string, interfaceType *ast.InterfaceType, tokens 
 			break
 		}
 
-		if rawStruc.Update {
-			if _, ok = rawStruc.PreMethodNamesMap[nam]; !ok {
+		if rawStruct.Update {
+			if _, ok = rawStruct.PreMethodNamesMap[nam]; !ok {
 				meth := extractFunction(nam, funcType, tokens[index])
-				meth.BelongedToStruct = rawStruc
+				meth.BelongedToStruct = rawStruct
 
 				intf.Methods = append(intf.Methods, meth)
 			} else {
 				meth := extractFunction(nam, funcType, tokens[index])
-				meth.BelongedToStruct = rawStruc
+				meth.BelongedToStruct = rawStruct
 
-				rawStruc.PreIfMethods = append(rawStruc.PreIfMethods, meth)
+				rawStruct.PreIfMethods = append(rawStruct.PreIfMethods, meth)
 			}
 		} else {
 			meth := extractFunction(nam, funcType, tokens[index])
-			meth.BelongedToStruct = rawStruc
+			meth.BelongedToStruct = rawStruct
 
 			intf.Methods = append(intf.Methods, meth)
 		}
@@ -165,15 +165,15 @@ func getType(expr ast.Expr) code.Type {
 	return nil
 }
 
-func getFileName(strucName, prefix string) (fileMongoName, fileIfName string) {
-	dir := getPkgName(strucName)
+func getFileName(structName, prefix string) (fileMongoName, fileIfName string) {
+	dir := getPkgName(structName)
 	fileMongoName = filepath.Join(prefix, dir, dir+"_repo_mongo.go")
 	fileIfName = filepath.Join(prefix, dir, dir+"_repo.go")
 	return
 }
 
-func getPkgName(strucName string) string {
-	tokens := camelcase.Split(strucName)
+func getPkgName(structName string) string {
+	tokens := camelcase.Split(structName)
 	dir := ""
 	for i, toke := range tokens {
 		if i != len(tokens)-1 {

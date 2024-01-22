@@ -31,9 +31,9 @@ import (
 func parseThriftIdl(plu *ThriftGoPlugin) (rawStructs []*model.IdlExtractStruct, err error) {
 	var getGenGoFilePath func(file *parser.Thrift) error
 	getGenGoFilePath = func(file *parser.Thrift) error {
-		for _, struc := range file.Structs {
+		for _, st := range file.Structs {
 			hasInterface := false
-			for _, anno := range struc.Annotations {
+			for _, anno := range st.Annotations {
 				if strings.Index(anno.Key, "mongo.") == 0 && len(anno.Key) > 6 {
 					hasInterface = true
 					break
@@ -41,8 +41,8 @@ func parseThriftIdl(plu *ThriftGoPlugin) (rawStructs []*model.IdlExtractStruct, 
 			}
 
 			if hasInterface {
-				rawStruc := &model.IdlExtractStruct{
-					Name:         struc.Name,
+				rawStruct := &model.IdlExtractStruct{
+					Name:         st.Name,
 					StructFields: make([]*model.StructField, 0, 10),
 					InterfaceInfo: &model.InterfaceInfo{
 						Methods: make([]*model.InterfaceMethod, 0, 10),
@@ -52,21 +52,21 @@ func parseThriftIdl(plu *ThriftGoPlugin) (rawStructs []*model.IdlExtractStruct, 
 						PreIfMethods:      []*model.InterfaceMethod{},
 					},
 				}
-				extractIdlStruct(struc, file, rawStruc)
+				extractIdlStruct(st, file, rawStruct)
 
-				if len(rawStruc.StructFields) != 0 {
-					rawStructs = append(rawStructs, rawStruc)
+				if len(rawStruct.StructFields) != 0 {
+					rawStructs = append(rawStructs, rawStruct)
 
 					tokens := make([]string, 0, 10)
 					methods := ""
-					for _, anno := range struc.Annotations {
+					for _, anno := range st.Annotations {
 						if strings.Index(anno.Key, "mongo.") == 0 {
 							methods += anno.GetValues()[0] + "\n"
 							tokens = append(tokens, anno.Key[6:])
 						}
 					}
 
-					fileMongoName, fileIfName := getFileName(rawStruc.Name, plu.DocArgs.DaoDir)
+					fileMongoName, fileIfName := getFileName(rawStruct.Name, plu.DocArgs.DaoDir)
 
 					isExist, err := utils.PathExist(fileMongoName)
 					if err != nil {
@@ -79,30 +79,30 @@ func parseThriftIdl(plu *ThriftGoPlugin) (rawStructs []*model.IdlExtractStruct, 
 							return err
 						}
 						if isExist {
-							rawStruc.Update = true
-							rawStruc.UpdateMongoFileContent, err = utils.ReadFileContent(fileMongoName)
+							rawStruct.Update = true
+							rawStruct.UpdateMongoFileContent, err = utils.ReadFileContent(fileMongoName)
 							if err != nil {
 								return err
 							}
-							rawStruc.UpdateIfFileContent, err = utils.ReadFileContent(fileIfName)
+							rawStruct.UpdateIfFileContent, err = utils.ReadFileContent(fileIfName)
 							if err != nil {
 								return err
 							}
-							preMethodNames, err := getInterfaceMethodNames(string(rawStruc.UpdateIfFileContent))
+							preMethodNames, err := getInterfaceMethodNames(string(rawStruct.UpdateIfFileContent))
 							if err != nil {
 								return err
 							}
 
 							for _, methodName := range preMethodNames {
-								rawStruc.PreMethodNamesMap[methodName] = struct{}{}
+								rawStruct.PreMethodNamesMap[methodName] = struct{}{}
 							}
 						}
 					}
 
 					rawInterface := fmt.Sprintf("package main\ntype %sInterface interface{\n%s\n}",
-						struc.Name,
+						st.Name,
 						methods)
-					if err = extractIdlInterface(rawInterface, rawStruc, tokens); err != nil {
+					if err = extractIdlInterface(rawInterface, rawStruct, tokens); err != nil {
 						return err
 					}
 				}
@@ -124,7 +124,7 @@ func parseThriftIdl(plu *ThriftGoPlugin) (rawStructs []*model.IdlExtractStruct, 
 	return
 }
 
-func extractIdlStruct(struc *parser.StructLike, file *parser.Thrift, rawStruc *model.IdlExtractStruct) {
+func extractIdlStruct(struc *parser.StructLike, file *parser.Thrift, rawStruct *model.IdlExtractStruct) {
 	for _, field := range struc.Fields {
 		fag := field.Annotations.Get("go.tag")
 		if len(field.Annotations) > 0 && fag != nil && strings.Contains(fag[0], "mongo.bson") {
@@ -144,7 +144,7 @@ func extractIdlStruct(struc *parser.StructLike, file *parser.Thrift, rawStruc *m
 					Type: t,
 					Tag:  tag,
 				}
-				rawStruc.StructFields = append(rawStruc.StructFields, sf)
+				rawStruct.StructFields = append(rawStruct.StructFields, sf)
 			} else if strings.Contains(field.Type.Name, ".") {
 				index := strings.Index(field.Type.Name, ".")
 				fileName := field.Type.Name[:index]
@@ -177,7 +177,7 @@ func extractIdlStruct(struc *parser.StructLike, file *parser.Thrift, rawStruc *m
 					IsBelongedToStruct: true,
 					BelongedToStruct:   rs,
 				}
-				rawStruc.StructFields = append(rawStruc.StructFields, sf)
+				rawStruct.StructFields = append(rawStruct.StructFields, sf)
 			} else {
 				var subStruct *parser.StructLike
 				for _, s := range file.Structs {
@@ -199,7 +199,7 @@ func extractIdlStruct(struc *parser.StructLike, file *parser.Thrift, rawStruc *m
 					IsBelongedToStruct: true,
 					BelongedToStruct:   rs,
 				}
-				rawStruc.StructFields = append(rawStruc.StructFields, sf)
+				rawStruct.StructFields = append(rawStruct.StructFields, sf)
 			}
 		}
 	}

@@ -57,8 +57,6 @@ func (up *UpdateParse) GetOperationName() string {
 	return Update
 }
 
-const upsert = "Upsert"
-
 // parseUpdate can be called independently or by Bulk or by Transaction, when isCalled = false,  is called independently
 //
 //	input params description:
@@ -80,7 +78,9 @@ func (up *UpdateParse) parseUpdate(tokens []string, method *model.InterfaceMetho
 		return newMethodSyntaxError(method.Name, err.Error())
 	}
 
-	up.parseUpdateOptions(tokens)
+	if tokens[0] == "Upsert" {
+		up.Upsert = true
+	}
 
 	if up.Upsert {
 		if err = up.parseUpdateField(tokens[1:fqIndex], method, curParamIndex); err != nil {
@@ -142,12 +142,6 @@ func (up *UpdateParse) check(method *model.InterfaceMethod) error {
 	up.CtxParamName = method.Params[0].Name
 
 	return nil
-}
-
-func (up *UpdateParse) parseUpdateOptions(tokens []string) {
-	if tokens[0] == upsert {
-		up.Upsert = true
-	}
 }
 
 func (up *UpdateParse) parseUpdateField(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {

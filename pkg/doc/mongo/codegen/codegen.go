@@ -156,9 +156,9 @@ var BaseMongoImports = map[string]string{
 	"go.mongodb.org/mongo-driver/mongo/options":  "",
 }
 
-func GetFuncRender(struc *model.IdlExtractStruct) *template.FuncRender {
+func GetFuncRender(extractStruct *model.IdlExtractStruct) *template.FuncRender {
 	return &template.FuncRender{
-		Name: "New" + struc.Name + "Repository",
+		Name: "New" + extractStruct.Name + "Repository",
 		Params: code.Params{
 			code.Param{
 				Name: "collection",
@@ -171,17 +171,17 @@ func GetFuncRender(struc *model.IdlExtractStruct) *template.FuncRender {
 			},
 		},
 		Returns: code.Returns{
-			code.IdentType(struc.Name + "Repository"),
+			code.IdentType(extractStruct.Name + "Repository"),
 		},
 		FuncBody: code.Body{
-			code.RawStmt("return &" + struc.Name + "RepositoryMongo{\n\tcollection: collection,\n}"),
+			code.RawStmt("return &" + extractStruct.Name + "RepositoryMongo{\n\tcollection: collection,\n}"),
 		},
 	}
 }
 
-func GetStructRender(struc *model.IdlExtractStruct) *template.StructRender {
+func GetStructRender(extractStruct *model.IdlExtractStruct) *template.StructRender {
 	return &template.StructRender{
-		Name: struc.Name + "RepositoryMongo",
+		Name: extractStruct.Name + "RepositoryMongo",
 		StructFields: code.StructFields{
 			code.StructField{
 				Name: "collection",
