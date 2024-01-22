@@ -129,7 +129,7 @@ func updateFieldsCodegen(update *parse.UpdateParse) code.MapStmt {
 }
 
 func upsertCodegen(upsert bool) code.RawStmt {
-	if upsert == true {
+	if upsert {
 		return "true"
 	}
 	return "false"

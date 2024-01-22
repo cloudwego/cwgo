@@ -124,8 +124,8 @@ func parseThriftIdl(plu *ThriftGoPlugin) (rawStructs []*model.IdlExtractStruct, 
 	return
 }
 
-func extractIdlStruct(struc *parser.StructLike, file *parser.Thrift, rawStruct *model.IdlExtractStruct) {
-	for _, field := range struc.Fields {
+func extractIdlStruct(st *parser.StructLike, file *parser.Thrift, rawStruct *model.IdlExtractStruct) {
+	for _, field := range st.Fields {
 		fag := field.Annotations.Get("go.tag")
 		if len(field.Annotations) > 0 && fag != nil && strings.Contains(fag[0], "mongo.bson") {
 			commaIndex := strings.Index(fag[0], ",")

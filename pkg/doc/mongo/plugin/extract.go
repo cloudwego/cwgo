@@ -56,11 +56,11 @@ func extractIdlInterface(rawInterface string, rawStruct *model.IdlExtractStruct,
 	return nil
 }
 
-func extractInterfaceType(name string, interfaceType *ast.InterfaceType, tokens []string,
+func extractInterfaceType(ifName string, interfaceType *ast.InterfaceType, tokens []string,
 	rawStruct *model.IdlExtractStruct,
 ) *model.InterfaceInfo {
 	intf := &model.InterfaceInfo{
-		Name:    name,
+		Name:    ifName,
 		Methods: []*model.InterfaceMethod{},
 	}
 
@@ -70,26 +70,26 @@ func extractInterfaceType(name string, interfaceType *ast.InterfaceType, tokens 
 			continue
 		}
 
-		var nam string
+		var name string
 		for _, n := range method.Names {
-			nam = n.Name
+			name = n.Name
 			break
 		}
 
 		if rawStruct.Update {
-			if _, ok = rawStruct.PreMethodNamesMap[nam]; !ok {
-				meth := extractFunction(nam, funcType, tokens[index])
+			if _, ok = rawStruct.PreMethodNamesMap[name]; !ok {
+				meth := extractFunction(name, funcType, tokens[index])
 				meth.BelongedToStruct = rawStruct
 
 				intf.Methods = append(intf.Methods, meth)
 			} else {
-				meth := extractFunction(nam, funcType, tokens[index])
+				meth := extractFunction(name, funcType, tokens[index])
 				meth.BelongedToStruct = rawStruct
 
 				rawStruct.PreIfMethods = append(rawStruct.PreIfMethods, meth)
 			}
 		} else {
-			meth := extractFunction(nam, funcType, tokens[index])
+			meth := extractFunction(name, funcType, tokens[index])
 			meth.BelongedToStruct = rawStruct
 
 			intf.Methods = append(intf.Methods, meth)

@@ -156,7 +156,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(extractStruct *model.IdlExtr
 //
 //	input params description:
 //	tokens: parsed tokens
-//	struc: the structure to which tokens belong
+//	extractStruct: the structure to which tokens belong
 //	curIndex: point to the next token to be parsed
 //	isFirst: if it is called in recursion
 func getFieldNameType(tokens []string, extractStruct *model.IdlExtractStruct, curIndex *int, isFirst bool) (names []string,
