@@ -18,11 +18,12 @@ package doc
 
 import (
 	"errors"
+	"path/filepath"
+
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin"
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
-	"path/filepath"
 )
 
 func Doc(c *config.DocArgument) error {

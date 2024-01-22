@@ -41,10 +41,11 @@ func (ip *InsertParse) GetOperationName() string {
 }
 
 // parseInsert can be called independently or by Bulk or by Transaction, when isCalled = false,  is called independently
-//   input params description:
-//   method: the method to which Insert belongs
-//   curParamIndex: current method's param index
-//   isCalled: false ==> independently true ==> called by Bulk or Transaction
+//
+//	input params description:
+//	method: the method to which Insert belongs
+//	curParamIndex: current method's param index
+//	isCalled: false ==> independently true ==> called by Bulk or Transaction
 func (ip *InsertParse) parseInsert(method *model.InterfaceMethod, curParamIndex *int, isCalled bool) error {
 	if !isCalled {
 		if err := ip.check(method); err != nil {

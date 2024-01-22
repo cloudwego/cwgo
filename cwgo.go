@@ -16,8 +16,9 @@
 package main
 
 import (
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin"
 	"os"
+
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin"
 
 	"github.com/cloudwego/cwgo/cmd/static"
 	"github.com/cloudwego/cwgo/tpl"

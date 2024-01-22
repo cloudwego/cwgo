@@ -18,6 +18,7 @@ package codegen
 
 import (
 	"fmt"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/parse"
 )

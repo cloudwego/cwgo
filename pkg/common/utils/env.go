@@ -19,9 +19,6 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"github.com/cloudwego/hertz/cmd/hz/meta"
-	"github.com/cloudwego/hertz/cmd/hz/util"
-	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 	"go/build"
 	"io/ioutil"
 	"os"
@@ -29,6 +26,10 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+
+	"github.com/cloudwego/hertz/cmd/hz/meta"
+	"github.com/cloudwego/hertz/cmd/hz/util"
+	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"

@@ -18,6 +18,7 @@ package parse
 
 import (
 	"fmt"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
 
@@ -41,10 +42,11 @@ func (cp *CountParse) GetOperationName() string {
 }
 
 // parseCount can be called independently.
-//   input params description:
-//   tokens: it contains all tokens belonging to Count except for Count token
-//   method: the method to which Count belongs
-//   curParamIndex: current method's param index
+//
+//	input params description:
+//	tokens: it contains all tokens belonging to Count except for Count token
+//	method: the method to which Count belongs
+//	curParamIndex: current method's param index
 func (cp *CountParse) parseCount(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
 	if err := cp.check(method); err != nil {
 		return err

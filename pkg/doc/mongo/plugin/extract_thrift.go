@@ -18,13 +18,14 @@ package plugin
 
 import (
 	"fmt"
+	"path/filepath"
+	"reflect"
+	"strings"
+
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 	"github.com/cloudwego/thriftgo/parser"
-	"path/filepath"
-	"reflect"
-	"strings"
 )
 
 func parseThriftIdl(plu *ThriftGoPlugin) (rawStructs []*model.IdlExtractStruct, err error) {

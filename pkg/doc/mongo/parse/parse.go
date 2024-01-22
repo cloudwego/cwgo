@@ -19,10 +19,11 @@ package parse
 import (
 	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 	"github.com/fatih/camelcase"
-	"strings"
 )
 
 // InterfaceOperation is used to store the parsing results of the structure and for use by codegen packages.
@@ -152,13 +153,15 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(struc *model.IdlExtractStruc
 }
 
 // getFieldNameType is used to get field names and types in the specified structure.
-//   input params description:
-//   tokens: parsed tokens
-//   struc: the structure to which tokens belong
-//   curIndex: point to the next token to be parsed
-//   isFirst: if it is called in recursion
+//
+//	input params description:
+//	tokens: parsed tokens
+//	struc: the structure to which tokens belong
+//	curIndex: point to the next token to be parsed
+//	isFirst: if it is called in recursion
 func getFieldNameType(tokens []string, struc *model.IdlExtractStruct, curIndex *int, isFirst bool) (names []string,
-	types []code.Type, err error) {
+	types []code.Type, err error,
+) {
 	if len(tokens) == 0 {
 		return nil, nil, errors.New("the length of the field name requested for parsing is empty")
 	}

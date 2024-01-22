@@ -18,6 +18,9 @@ package plugin
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+
 	"github.com/cloudwego/cwgo/config"
 	cwgoMeta "github.com/cloudwego/cwgo/meta"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
@@ -29,8 +32,6 @@ import (
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 	"github.com/cloudwego/thriftgo/plugin"
 	"golang.org/x/tools/imports"
-	"io/ioutil"
-	"os"
 )
 
 type ThriftGoPlugin struct {

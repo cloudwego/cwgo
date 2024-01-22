@@ -18,6 +18,7 @@ package parse
 
 import (
 	"fmt"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
 
@@ -42,11 +43,12 @@ func (bp *BulkParse) GetOperationName() string {
 }
 
 // parseBulk can be called independently or by Transaction, when isCalled = false,  is called independently
-//   input params description:
-//   tokens: it contains all tokens belonging to the Bulk except for the Bulk token
-//   method: the method to which Bulk belongs
-//   curParamIndex: current method's param index
-//   isCalled: false ==> independently true ==> called by Transaction
+//
+//	input params description:
+//	tokens: it contains all tokens belonging to the Bulk except for the Bulk token
+//	method: the method to which Bulk belongs
+//	curParamIndex: current method's param index
+//	isCalled: false ==> independently true ==> called by Transaction
 func (bp *BulkParse) parseBulk(tokens []string, method *model.InterfaceMethod, curParamIndex *int, isCalled bool) error {
 	if !isCalled {
 		if err := bp.check(method); err != nil {

@@ -18,6 +18,7 @@ package parse
 
 import (
 	"fmt"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
@@ -27,7 +28,7 @@ type UpdateParse struct {
 	OperateMode OperateMode
 
 	// UpdateStructObjName defines the method's structure point param name,
-	//is used when updating the entire structure.
+	// is used when updating the entire structure.
 	UpdateStructObjName string
 
 	// Query defines the Query information contained in the Update operation
@@ -59,11 +60,12 @@ func (up *UpdateParse) GetOperationName() string {
 const upsert = "Upsert"
 
 // parseUpdate can be called independently or by Bulk or by Transaction, when isCalled = false,  is called independently
-//   input params description:
-//   tokens: it contains all tokens belonging to Update except for Update token
-//   method: the method to which Update belongs
-//   curParamIndex: current method's param index
-//   isCalled: false ==> independently true ==> called by Bulk or Transaction
+//
+//	input params description:
+//	tokens: it contains all tokens belonging to Update except for Update token
+//	method: the method to which Update belongs
+//	curParamIndex: current method's param index
+//	isCalled: false ==> independently true ==> called by Bulk or Transaction
 func (up *UpdateParse) parseUpdate(tokens []string, method *model.InterfaceMethod, curParamIndex *int, isCalled bool) error {
 	if !isCalled {
 		if err := up.check(method); err != nil {

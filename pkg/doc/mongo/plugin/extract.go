@@ -17,12 +17,13 @@
 package plugin
 
 import (
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 	"go/ast"
 	astParser "go/parser"
 	"go/token"
 	"path/filepath"
 	"strings"
+
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"github.com/fatih/camelcase"
@@ -56,7 +57,8 @@ func extractIdlInterface(rawInterface string, rawStruc *model.IdlExtractStruct, 
 }
 
 func extractInterfaceType(name string, interfaceType *ast.InterfaceType, tokens []string,
-	rawStruc *model.IdlExtractStruct) *model.InterfaceInfo {
+	rawStruc *model.IdlExtractStruct,
+) *model.InterfaceInfo {
 	intf := &model.InterfaceInfo{
 		Name:    name,
 		Methods: []*model.InterfaceMethod{},
@@ -163,7 +165,7 @@ func getType(expr ast.Expr) code.Type {
 	return nil
 }
 
-func getFileName(strucName string, prefix string) (fileMongoName, fileIfName string) {
+func getFileName(strucName, prefix string) (fileMongoName, fileIfName string) {
 	dir := getPkgName(strucName)
 	fileMongoName = filepath.Join(prefix, dir, dir+"_repo_mongo.go")
 	fileIfName = filepath.Join(prefix, dir, dir+"_repo.go")

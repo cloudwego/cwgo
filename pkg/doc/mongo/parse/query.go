@@ -19,6 +19,7 @@ package parse
 import (
 	"errors"
 	"fmt"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
 
@@ -259,12 +260,14 @@ func (q *Query) splitConditionPairs(methodTokens []string, method *model.Interfa
 }
 
 // parseQueryConditionPair is used to parse query's condition pair
-//   return params description:
-//   1. string(queryComparator) 2. field name in structure
-//   3. input parameter values corresponding to field names
-//   4. error
+//
+//	return params description:
+//	1. string(queryComparator) 2. field name in structure
+//	3. input parameter values corresponding to field names
+//	4. error
 func (q *Query) parseQueryConditionPair(methodTokens []string, method *model.InterfaceMethod, curParamIndex *int,
-	queryComparator QueryComparator, paramCount int) (string, string, []string, error) {
+	queryComparator QueryComparator, paramCount int,
+) (string, string, []string, error) {
 	if len(methodTokens) == 0 {
 		return "", "", nil, newMethodSyntaxError(method.Name, fmt.Sprintf("there are grammar errors in %v", methodTokens))
 	}

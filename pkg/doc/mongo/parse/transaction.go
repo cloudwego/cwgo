@@ -18,8 +18,9 @@ package parse
 
 import (
 	"fmt"
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 	"strings"
+
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
 
 type TransactionParse struct {
@@ -64,10 +65,11 @@ const (
 )
 
 // parseTransaction can be called independently.
-//   input params description:
-//   tokens: it contains all tokens belonging to the Transaction except for the Transaction token
-//   method: the method to which Transaction belongs
-//   curParamIndex: current method's param index
+//
+//	input params description:
+//	tokens: it contains all tokens belonging to the Transaction except for the Transaction token
+//	method: the method to which Transaction belongs
+//	curParamIndex: current method's param index
 func (tp *TransactionParse) parseTransaction(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
 	if err := tp.check(method); err != nil {
 		return err
@@ -230,7 +232,8 @@ func (tp *TransactionParse) check(method *model.InterfaceMethod) error {
 }
 
 func (tp *TransactionParse) parseTransactionInsert(method *model.InterfaceMethod, tokens []string,
-	index int, curParamIndex *int, collectionParamName string) error {
+	index int, curParamIndex *int, collectionParamName string,
+) error {
 	if index == len(tokens)-1 {
 		return newMethodSyntaxError(method.Name, "no tokens specified after Insert")
 	}
@@ -258,7 +261,8 @@ func (tp *TransactionParse) parseTransactionInsert(method *model.InterfaceMethod
 }
 
 func (tp *TransactionParse) parseTransactionUpdate(method *model.InterfaceMethod, tokens []string,
-	index int, curParamIndex *int, collectionParamName string, hasCollection bool) (int, error) {
+	index int, curParamIndex *int, collectionParamName string, hasCollection bool,
+) (int, error) {
 	if index == len(tokens)-1 {
 		return 0, newMethodSyntaxError(method.Name, "no tokens specified after Update")
 	}
@@ -291,7 +295,8 @@ func (tp *TransactionParse) parseTransactionUpdate(method *model.InterfaceMethod
 }
 
 func (tp *TransactionParse) parseTransactionDelete(method *model.InterfaceMethod, tokens []string,
-	index int, curParamIndex *int, collectionParamName string, hasCollection bool) (int, error) {
+	index int, curParamIndex *int, collectionParamName string, hasCollection bool,
+) (int, error) {
 	if index == len(tokens)-1 {
 		return 0, newMethodSyntaxError(method.Name, "no tokens specified after Delete")
 	}
@@ -323,7 +328,8 @@ func (tp *TransactionParse) parseTransactionDelete(method *model.InterfaceMethod
 }
 
 func (tp *TransactionParse) parseTransactionBulk(method *model.InterfaceMethod, tokens []string,
-	index int, curParamIndex *int, collectionParamName string) (int, error) {
+	index int, curParamIndex *int, collectionParamName string,
+) (int, error) {
 	if index == len(tokens)-1 {
 		return 0, newMethodSyntaxError(method.Name, "no tokens specified after Bulk")
 	}

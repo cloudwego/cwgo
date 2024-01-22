@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"reflect"
+
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 )
 
 type IdlExtractStruct struct {

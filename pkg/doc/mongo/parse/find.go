@@ -19,6 +19,7 @@ package parse
 import (
 	"errors"
 	"fmt"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
@@ -73,10 +74,11 @@ func (fp *FindParse) GetOperationName() string {
 }
 
 // parseFind can be called independently.
-//   input params description:
-//   tokens: it contains all tokens belonging to Find except for Find token
-//   method: the method to which Find belongs
-//   curParamIndex: current method's param index
+//
+//	input params description:
+//	tokens: it contains all tokens belonging to Find except for Find token
+//	method: the method to which Find belongs
+//	curParamIndex: current method's param index
 func (fp *FindParse) parseFind(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
 	if err := fp.check(method); err != nil {
 		return err

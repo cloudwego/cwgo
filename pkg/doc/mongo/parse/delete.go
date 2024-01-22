@@ -18,6 +18,7 @@ package parse
 
 import (
 	"fmt"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
@@ -45,11 +46,12 @@ func (dp *DeleteParse) GetOperationName() string {
 }
 
 // parseDelete can be called independently or by Bulk or by Transaction, when isCalled = false,  is called independently
-//   input params description:
-//   tokens: it contains all tokens belonging to Delete except for Delete token
-//   method: the method to which Delete belongs
-//   curParamIndex: current method's param index
-//   isCalled: false ==> independently true ==> called by Bulk or Transaction
+//
+//	input params description:
+//	tokens: it contains all tokens belonging to Delete except for Delete token
+//	method: the method to which Delete belongs
+//	curParamIndex: current method's param index
+//	isCalled: false ==> independently true ==> called by Bulk or Transaction
 func (dp *DeleteParse) parseDelete(tokens []string, method *model.InterfaceMethod, curParamIndex *int, isCalled bool) error {
 	if !isCalled {
 		if err := dp.check(method); err != nil {
