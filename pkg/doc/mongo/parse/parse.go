@@ -182,7 +182,7 @@ func getFieldNameType(tokens []string, struc *model.IdlExtractStruct, curIndex *
 					}
 				}
 				if hasFieldFlag == 0 {
-					return nil, nil, errors.New(fmt.Sprintf("partially equal but unable to fully locate field name in %v", tokens[i:]))
+					return nil, nil, fmt.Errorf("partially equal but unable to fully locate field name in %v", tokens[i:])
 				}
 
 				flag = 1
@@ -199,7 +199,7 @@ func getFieldNameType(tokens []string, struc *model.IdlExtractStruct, curIndex *
 						break
 					}
 					if len(r) != 1 {
-						return nil, nil, errors.New(fmt.Sprintf("no field name corresponding to %v found", tokens[i:]))
+						return nil, nil, fmt.Errorf("no field name corresponding to %v found", tokens[i:])
 					}
 					i += *curIndex
 					names = append(names, field.Tag.Get("mongo.bson")+"."+r[0])
@@ -212,7 +212,7 @@ func getFieldNameType(tokens []string, struc *model.IdlExtractStruct, curIndex *
 			break
 		}
 		if flag == 0 {
-			return nil, nil, errors.New(fmt.Sprintf("no field name corresponding to %v found", tokens[i:]))
+			return nil, nil, fmt.Errorf("no field name corresponding to %v found", tokens[i:])
 		}
 	}
 
