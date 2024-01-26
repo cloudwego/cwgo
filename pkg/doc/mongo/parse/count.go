@@ -19,7 +19,7 @@ package parse
 import (
 	"fmt"
 
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
 )
 
 type CountParse struct {
@@ -30,7 +30,7 @@ type CountParse struct {
 	CtxParamName string
 
 	// BelongedToMethod defines the method to which Count belongs
-	BelongedToMethod *model.InterfaceMethod
+	BelongedToMethod *extract.InterfaceMethod
 }
 
 func newCountParse() *CountParse {
@@ -47,7 +47,7 @@ func (cp *CountParse) GetOperationName() string {
 //	tokens: it contains all tokens belonging to Count except for Count token
 //	method: the method to which Count belongs
 //	curParamIndex: current method's param index
-func (cp *CountParse) parseCount(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
+func (cp *CountParse) parseCount(tokens []string, method *extract.InterfaceMethod, curParamIndex *int) error {
 	if err := cp.check(method); err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (cp *CountParse) parseCount(tokens []string, method *model.InterfaceMethod,
 	return nil
 }
 
-func (cp *CountParse) check(method *model.InterfaceMethod) error {
+func (cp *CountParse) check(method *extract.InterfaceMethod) error {
 	if len(method.Params) < 1 {
 		return newMethodSyntaxError(method.Name, "less than one input parameters")
 	}
@@ -95,7 +95,7 @@ func (cp *CountParse) check(method *model.InterfaceMethod) error {
 	return nil
 }
 
-func (cp *CountParse) parseQuery(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
+func (cp *CountParse) parseQuery(tokens []string, method *extract.InterfaceMethod, curParamIndex *int) error {
 	fqIndex, err := getFirstQueryIndex(tokens)
 	if err != nil {
 		return newMethodSyntaxError(method.Name, err.Error())

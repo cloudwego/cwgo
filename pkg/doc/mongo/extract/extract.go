@@ -14,22 +14,111 @@
  * limitations under the License.
  */
 
-package plugin
+package extract
 
 import (
 	"go/ast"
 	astParser "go/parser"
 	"go/token"
 	"path/filepath"
+	"reflect"
 	"strings"
 
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
+	"github.com/cloudwego/cwgo/pkg/common/utils"
 
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"github.com/fatih/camelcase"
 )
 
-func extractIdlInterface(rawInterface string, rawStruct *model.IdlExtractStruct, tokens []string) error {
+type IdlExtractStruct struct {
+	Name          string
+	StructFields  []*StructField
+	InterfaceInfo *InterfaceInfo
+	UpdateInfo
+}
+
+type InterfaceInfo struct {
+	Name    string
+	Methods []*InterfaceMethod
+}
+
+type InterfaceMethod struct {
+	Name             string
+	ParsedTokens     string
+	Params           code.Params
+	Returns          code.Returns
+	BelongedToStruct *IdlExtractStruct
+}
+
+type StructField struct {
+	Name               string
+	Type               code.Type
+	Tag                reflect.StructTag
+	IsBelongedToStruct bool
+	BelongedToStruct   *IdlExtractStruct
+}
+
+type UpdateInfo struct {
+	Update                 bool
+	UpdateMongoFileContent []byte
+	UpdateIfFileContent    []byte
+	PreMethodNamesMap      map[string]struct{}
+	PreIfMethods           []*InterfaceMethod
+}
+
+func newIdlExtractStruct(name string) *IdlExtractStruct {
+	return &IdlExtractStruct{
+		Name:         name,
+		StructFields: make([]*StructField, 0, 10),
+		InterfaceInfo: &InterfaceInfo{
+			Methods: make([]*InterfaceMethod, 0, 10),
+		},
+		UpdateInfo: UpdateInfo{
+			PreMethodNamesMap: map[string]struct{}{},
+			PreIfMethods:      []*InterfaceMethod{},
+		},
+	}
+}
+
+func (st *IdlExtractStruct) recordMongoIfInfo(daoDir string) error {
+	fileMongoName, fileIfName := GetFileName(st.Name, daoDir)
+
+	isExist, err := utils.PathExist(fileMongoName)
+	if err != nil {
+		return err
+	}
+
+	if isExist {
+		isExist, err = utils.PathExist(fileIfName)
+		if err != nil {
+			return err
+		}
+
+		if isExist {
+			st.Update = true
+			st.UpdateMongoFileContent, err = utils.ReadFileContent(fileMongoName)
+			if err != nil {
+				return err
+			}
+			st.UpdateIfFileContent, err = utils.ReadFileContent(fileIfName)
+			if err != nil {
+				return err
+			}
+
+			preMethodNames, err := getInterfaceMethodNames(string(st.UpdateIfFileContent))
+			if err != nil {
+				return err
+			}
+			for _, methodName := range preMethodNames {
+				st.PreMethodNamesMap[methodName] = struct{}{}
+			}
+		}
+	}
+
+	return nil
+}
+
+func extractIdlInterface(rawInterface string, rawStruct *IdlExtractStruct, tokens []string) error {
 	fSet := token.NewFileSet()
 	f, err := astParser.ParseFile(fSet, "", rawInterface, astParser.ParseComments)
 	if err != nil {
@@ -56,12 +145,10 @@ func extractIdlInterface(rawInterface string, rawStruct *model.IdlExtractStruct,
 	return nil
 }
 
-func extractInterfaceType(ifName string, interfaceType *ast.InterfaceType, tokens []string,
-	rawStruct *model.IdlExtractStruct,
-) *model.InterfaceInfo {
-	intf := &model.InterfaceInfo{
+func extractInterfaceType(ifName string, interfaceType *ast.InterfaceType, tokens []string, rawStruct *IdlExtractStruct) *InterfaceInfo {
+	intf := &InterfaceInfo{
 		Name:    ifName,
-		Methods: []*model.InterfaceMethod{},
+		Methods: []*InterfaceMethod{},
 	}
 
 	for index, method := range interfaceType.Methods.List {
@@ -99,13 +186,13 @@ func extractInterfaceType(ifName string, interfaceType *ast.InterfaceType, token
 	return intf
 }
 
-func extractFunction(name string, funcType *ast.FuncType, token string) *model.InterfaceMethod {
-	meth := &model.InterfaceMethod{
+func extractFunction(name string, funcType *ast.FuncType, token string) *InterfaceMethod {
+	meth := &InterfaceMethod{
 		Name:         name,
 		ParsedTokens: token,
 	}
 	for _, param := range funcType.Params.List {
-		paramType := getType(param.Type)
+		paramType := getType(param.Type, "", false)
 
 		if len(param.Names) == 0 {
 			meth.Params = append(meth.Params, code.Param{Type: paramType})
@@ -122,17 +209,27 @@ func extractFunction(name string, funcType *ast.FuncType, token string) *model.I
 
 	if funcType.Results != nil {
 		for _, result := range funcType.Results.List {
-			meth.Returns = append(meth.Returns, getType(result.Type))
+			meth.Returns = append(meth.Returns, getType(result.Type, "", false))
 		}
 	}
 
 	return meth
 }
 
-func getType(expr ast.Expr) code.Type {
+func getType(expr ast.Expr, pkgName string, isPbCall bool) code.Type {
 	switch expr := expr.(type) {
 	case *ast.Ident:
-		return code.IdentType(expr.Name)
+		if !isPbCall {
+			return code.IdentType(expr.Name)
+		} else {
+			if isGoBaseType(expr.Name) {
+				return code.IdentType(expr.Name)
+			}
+			return code.SelectorExprType{
+				X:   pkgName,
+				Sel: expr.Name,
+			}
+		}
 
 	case *ast.SelectorExpr:
 		xExpr := expr.X.(*ast.Ident)
@@ -142,20 +239,20 @@ func getType(expr ast.Expr) code.Type {
 		}
 
 	case *ast.StarExpr:
-		realType := getType(expr.X)
+		realType := getType(expr.X, pkgName, isPbCall)
 		return code.StarExprType{
 			RealType: realType,
 		}
 
 	case *ast.ArrayType:
-		elementType := getType(expr.Elt)
+		elementType := getType(expr.Elt, pkgName, isPbCall)
 		return code.SliceType{
 			ElementType: elementType,
 		}
 
 	case *ast.MapType:
-		keyType := getType(expr.Key)
-		valueType := getType(expr.Value)
+		keyType := getType(expr.Key, pkgName, isPbCall)
+		valueType := getType(expr.Value, pkgName, isPbCall)
 		return code.MapType{KeyType: keyType, ValueType: valueType}
 
 	case *ast.InterfaceType:
@@ -165,14 +262,14 @@ func getType(expr ast.Expr) code.Type {
 	return nil
 }
 
-func getFileName(structName, prefix string) (fileMongoName, fileIfName string) {
-	dir := getPkgName(structName)
+func GetFileName(structName, prefix string) (fileMongoName, fileIfName string) {
+	dir := GetPkgName(structName)
 	fileMongoName = filepath.Join(prefix, dir, dir+"_repo_mongo.go")
 	fileIfName = filepath.Join(prefix, dir, dir+"_repo.go")
 	return
 }
 
-func getPkgName(structName string) string {
+func GetPkgName(structName string) string {
 	tokens := camelcase.Split(structName)
 	dir := ""
 	for i, toke := range tokens {

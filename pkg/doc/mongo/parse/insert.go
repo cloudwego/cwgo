@@ -18,7 +18,7 @@ package parse
 
 import (
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
 )
 
 type InsertParse struct {
@@ -29,7 +29,7 @@ type InsertParse struct {
 	MethodParamNames [2]string
 
 	// BelongedToMethod defines the method to which Insert belongs
-	BelongedToMethod *model.InterfaceMethod
+	BelongedToMethod *extract.InterfaceMethod
 }
 
 func newInsertParse() *InsertParse {
@@ -46,7 +46,7 @@ func (ip *InsertParse) GetOperationName() string {
 //	method: the method to which Insert belongs
 //	curParamIndex: current method's param index
 //	isCalled: false ==> independently true ==> called by Bulk or Transaction
-func (ip *InsertParse) parseInsert(method *model.InterfaceMethod, curParamIndex *int, isCalled bool) error {
+func (ip *InsertParse) parseInsert(method *extract.InterfaceMethod, curParamIndex *int, isCalled bool) error {
 	if !isCalled {
 		if err := ip.check(method); err != nil {
 			return err
@@ -70,7 +70,7 @@ func (ip *InsertParse) parseInsert(method *model.InterfaceMethod, curParamIndex 
 	return nil
 }
 
-func (ip *InsertParse) check(method *model.InterfaceMethod) error {
+func (ip *InsertParse) check(method *extract.InterfaceMethod) error {
 	if len(method.Params) != 2 {
 		return newMethodSyntaxError(method.Name, "input parameter not equal to 2")
 	}

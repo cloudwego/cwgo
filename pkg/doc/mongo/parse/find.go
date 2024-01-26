@@ -20,8 +20,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
 
 type FindParse struct {
@@ -43,7 +44,7 @@ type FindParse struct {
 	ReturnType code.Type
 
 	// BelongedToMethod defines the method to which Find belongs
-	BelongedToMethod *model.InterfaceMethod
+	BelongedToMethod *extract.InterfaceMethod
 }
 
 type Order struct {
@@ -79,7 +80,7 @@ func (fp *FindParse) GetOperationName() string {
 //	tokens: it contains all tokens belonging to Find except for Find token
 //	method: the method to which Find belongs
 //	curParamIndex: current method's param index
-func (fp *FindParse) parseFind(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
+func (fp *FindParse) parseFind(tokens []string, method *extract.InterfaceMethod, curParamIndex *int) error {
 	if err := fp.check(method); err != nil {
 		return err
 	}
@@ -112,7 +113,7 @@ func (fp *FindParse) parseFind(tokens []string, method *model.InterfaceMethod, c
 	return nil
 }
 
-func (fp *FindParse) check(method *model.InterfaceMethod) error {
+func (fp *FindParse) check(method *extract.InterfaceMethod) error {
 	if len(method.Params) < 1 {
 		return newMethodSyntaxError(method.Name, "less than one input parameters")
 	}
@@ -145,7 +146,7 @@ func (fp *FindParse) check(method *model.InterfaceMethod) error {
 	return nil
 }
 
-func (fp *FindParse) parseProject(tokens []string, extractStruct *model.IdlExtractStruct) (int, error) {
+func (fp *FindParse) parseProject(tokens []string, extractStruct *extract.IdlExtractStruct) (int, error) {
 	tokenIndex, err := getNextTokenIndex(tokens, 0)
 	if err != nil {
 		return 0, err
@@ -166,7 +167,7 @@ func (fp *FindParse) parseProject(tokens []string, extractStruct *model.IdlExtra
 	return tokenIndex, nil
 }
 
-func (fp *FindParse) parseFindOptions(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
+func (fp *FindParse) parseFindOptions(tokens []string, method *extract.InterfaceMethod, curParamIndex *int) error {
 	orderFlag, skipFlag, limitFlag := 0, 0, 0
 
 	for index, token := range tokens {
@@ -233,7 +234,7 @@ func (fp *FindParse) parseFindOptions(tokens []string, method *model.InterfaceMe
 	return nil
 }
 
-func (fp *FindParse) getSortFields(tokens []string, extractStruct *model.IdlExtractStruct) error {
+func (fp *FindParse) getSortFields(tokens []string, extractStruct *extract.IdlExtractStruct) error {
 	preDescIndex := 0
 	for i := 0; i < len(tokens); i++ {
 		if tokens[i] == desc {

@@ -25,12 +25,14 @@ import (
 )
 
 type DocArgument struct {
-	IdlPath  string
-	OutDir   string
-	Name     string
-	ModelDir string
-	DaoDir   string
-	Verbose  bool
+	IdlPaths        []string
+	IdlType         string
+	OutDir          string
+	Name            string
+	ModelDir        string
+	DaoDir          string
+	Verbose         bool
+	ProtoSearchPath []string
 }
 
 func NewDocArgument() *DocArgument {
@@ -38,12 +40,13 @@ func NewDocArgument() *DocArgument {
 }
 
 func (d *DocArgument) ParseCli(ctx *cli.Context) error {
-	d.IdlPath = ctx.String(consts.IDLPath)
+	d.IdlPaths = ctx.StringSlice(consts.IDLPath)
 	d.OutDir = ctx.String(consts.OutDir)
 	d.ModelDir = ctx.String(consts.ModelDir)
 	d.DaoDir = ctx.String(consts.DaoDir)
 	d.Name = ctx.String(consts.Name)
 	d.Verbose = ctx.Bool(consts.Verbose)
+	d.ProtoSearchPath = ctx.StringSlice(consts.ProtoSearchPath)
 	return nil
 }
 

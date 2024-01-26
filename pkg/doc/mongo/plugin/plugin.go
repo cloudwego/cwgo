@@ -20,11 +20,16 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/codegen"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/parse"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/template"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 )
 
@@ -43,6 +48,28 @@ func MongoTriggerPlugin(c *config.DocArgument) error {
 	if len(buf) != 0 {
 		fmt.Println(string(buf))
 	}
+
+	if c.IdlType == meta.IdlProto {
+		info := &extract.PbUsedInfo{
+			DocArgs: c,
+		}
+		rawStructs, err := info.ParsePbIdl()
+		if err != nil {
+			return err
+		}
+		operations, err := parse.HandleOperations(rawStructs)
+		if err != nil {
+			return err
+		}
+		methodRenders := codegen.HandleCodegen(operations)
+		if err = info.GeneratePbFile(); err != nil {
+			return err
+		}
+		if err = generatePbMongoFile(rawStructs, methodRenders, c); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -58,12 +85,7 @@ func buildPluginCmd(args *config.DocArgument) (*exec.Cmd, error) {
 	}
 	kas := strings.Join(argPacks, ",")
 
-	idlType, err := utils.GetIdlType(args.IdlPath)
-	if err != nil {
-		return nil, err
-	}
-
-	path, err := utils.LookupTool(idlType)
+	path, err := utils.LookupTool(args.IdlType)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +93,7 @@ func buildPluginCmd(args *config.DocArgument) (*exec.Cmd, error) {
 		Path: path,
 	}
 
-	if idlType == meta.IdlThrift {
+	if args.IdlType == meta.IdlThrift {
 		os.Setenv(consts.CwgoDocPluginMode, consts.ThriftCwgoDocPluginName)
 
 		cmd.Args = append(cmd.Args, meta.TpCompilerThrift)
@@ -83,8 +105,15 @@ func buildPluginCmd(args *config.DocArgument) (*exec.Cmd, error) {
 			"-p", "cwgo-doc="+exe+":"+kas,
 			"-g", "go",
 			"-r",
-			args.IdlPath,
+			args.IdlPaths[0],
 		)
+	} else {
+		cmd.Args = append(cmd.Args, meta.TpCompilerProto)
+		for _, inc := range args.ProtoSearchPath {
+			cmd.Args = append(cmd.Args, "-I", inc)
+		}
+		cmd.Args = append(cmd.Args, "--go_out="+args.ModelDir)
+		cmd.Args = append(cmd.Args, args.IdlPaths...)
 	}
 
 	return cmd, err
@@ -95,7 +124,82 @@ func MongoPluginMode() {
 	if len(os.Args) <= 1 && mode != "" {
 		switch mode {
 		case consts.ThriftCwgoDocPluginName:
-			os.Exit(pluginRun())
+			os.Exit(thriftPluginRun())
 		}
 	}
+}
+
+func generatePbMongoFile(structs []*extract.IdlExtractStruct, methodRenders [][]*template.MethodRender, args *config.DocArgument) error {
+	for index, st := range structs {
+		// get base render
+		baseRender := getBaseRender(st)
+		// get fileMongoName and fileIfName
+		fileMongoName, fileIfName := extract.GetFileName(st.Name, args.DaoDir)
+		if isExist, _ := utils.PathExist(filepath.Dir(fileMongoName)); !isExist {
+			if err := os.MkdirAll(filepath.Dir(fileMongoName), 0o755); err != nil {
+				return err
+			}
+		}
+		if isExist, _ := utils.PathExist(filepath.Dir(fileIfName)); !isExist {
+			if err := os.MkdirAll(filepath.Dir(fileIfName), 0o755); err != nil {
+				return err
+			}
+		}
+
+		if st.Update {
+			// build update mongo file
+			formattedCode, err := getUpdateMongoCode(methodRenders[index], string(st.UpdateMongoFileContent))
+			if err != nil {
+				return err
+			}
+			formattedCode, err = codegen.AddMongoImports(formattedCode)
+			if err != nil {
+				return err
+			}
+			if err = utils.CreateFile(fileMongoName, formattedCode); err != nil {
+				return err
+			}
+
+			// build update interface file
+			formattedCode, err = getUpdateIfCode(st, baseRender)
+			if err != nil {
+				return err
+			}
+			formattedCode, err = codegen.AddMongoImports(formattedCode)
+			if err != nil {
+				return err
+			}
+			if err = utils.CreateFile(fileIfName, formattedCode); err != nil {
+				return err
+			}
+		} else {
+			// build new mongo file
+			formattedCode, err := getNewMongoCode(methodRenders[index], st, baseRender)
+			if err != nil {
+				return err
+			}
+			formattedCode, err = codegen.AddMongoImports(formattedCode)
+			if err != nil {
+				return err
+			}
+			if err = utils.CreateFile(fileMongoName, formattedCode); err != nil {
+				return err
+			}
+
+			// build new interface file
+			formattedCode, err = getNewIfCode(st, baseRender)
+			if err != nil {
+				return err
+			}
+			formattedCode, err = codegen.AddMongoImports(formattedCode)
+			if err != nil {
+				return err
+			}
+			if err = utils.CreateFile(fileIfName, formattedCode); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }

@@ -18,6 +18,7 @@ package plugin
 
 import (
 	"fmt"
+	"go/format"
 	"io/ioutil"
 	"os"
 
@@ -25,22 +26,21 @@ import (
 	cwgoMeta "github.com/cloudwego/cwgo/meta"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/codegen"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/parse"
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/template"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 	"github.com/cloudwego/thriftgo/plugin"
-	"golang.org/x/tools/imports"
 )
 
-type ThriftGoPlugin struct {
-	Req     *plugin.Request
-	DocArgs *config.DocArgument
+type thriftGoPlugin struct {
+	req     *plugin.Request
+	docArgs *config.DocArgument
 }
 
-func pluginRun() int {
-	plu := &ThriftGoPlugin{}
+func thriftPluginRun() int {
+	plu := &thriftGoPlugin{}
 
 	if err := plu.handleRequest(); err != nil {
 		logs.Errorf("handle request failed: %s", err.Error())
@@ -52,7 +52,11 @@ func pluginRun() int {
 		return meta.PluginError
 	}
 
-	rawStructs, err := parseThriftIdl(plu)
+	tfUsedInfo := &extract.ThriftUsedInfo{
+		Req:     plu.req,
+		DocArgs: plu.docArgs,
+	}
+	rawStructs, err := tfUsedInfo.ParseThriftIdl()
 	if err != nil {
 		logs.Errorf("parse thrift idl failed: %s", err.Error())
 		return meta.PluginError
@@ -82,7 +86,7 @@ func pluginRun() int {
 	return 0
 }
 
-func (plu *ThriftGoPlugin) handleRequest() error {
+func (plu *thriftGoPlugin) handleRequest() error {
 	data, err := ioutil.ReadAll(os.Stdin)
 	if err != nil {
 		return fmt.Errorf("read request failed: %s", err.Error())
@@ -93,20 +97,20 @@ func (plu *ThriftGoPlugin) handleRequest() error {
 		return fmt.Errorf("unmarshal request failed: %s", err.Error())
 	}
 
-	plu.Req = req
+	plu.req = req
 	return nil
 }
 
-func (plu *ThriftGoPlugin) parseArgs() error {
-	if plu.Req == nil {
+func (plu *thriftGoPlugin) parseArgs() error {
+	if plu.req == nil {
 		return fmt.Errorf("request is nil")
 	}
 	args := new(config.DocArgument)
-	if err := args.Unpack(plu.Req.PluginParameters); err != nil {
+	if err := args.Unpack(plu.req.PluginParameters); err != nil {
 		logs.Errorf("unpack args failed: %s", err.Error())
 		return err
 	}
-	plu.DocArgs = args
+	plu.docArgs = args
 	return nil
 }
 
@@ -122,139 +126,197 @@ func response(res *plugin.Response) error {
 	return nil
 }
 
-func (plu *ThriftGoPlugin) buildResponse(structs []*model.IdlExtractStruct, methodRenders [][]*template.MethodRender) (result []*plugin.Generated, err error) {
+func (plu *thriftGoPlugin) buildResponse(structs []*extract.IdlExtractStruct, methodRenders [][]*template.MethodRender) (result []*plugin.Generated, err error) {
 	for index, st := range structs {
-		pkgName := getPkgName(st.Name)
-		baseRender := &template.BaseRender{
-			Version:     cwgoMeta.Version,
-			PackageName: pkgName,
-			Imports:     codegen.BaseMongoImports,
-		}
+		// get base render
+		baseRender := getBaseRender(st)
+		// get fileMongoName and fileIfName
+		fileMongoName, fileIfName := extract.GetFileName(st.Name, plu.docArgs.DaoDir)
 
-		fileMongoName, fileIfName := getFileName(st.Name, plu.DocArgs.DaoDir)
 		if st.Update {
 			// build update mongo file
-			tplMongo := &template.Template{
-				Renders: []template.Render{},
-			}
-			for _, methodRender := range methodRenders[index] {
-				tplMongo.Renders = append(tplMongo.Renders, methodRender)
-			}
-
-			buff, err := tplMongo.Build()
+			formattedCode, err := getUpdateMongoCode(methodRenders[index], string(st.UpdateMongoFileContent))
 			if err != nil {
 				return nil, err
 			}
-			data := string(st.UpdateMongoFileContent) + "\n" + buff.String()
-			formattedCode, err := imports.Process("", []byte(data), nil)
+			formattedCode, err = codegen.AddMongoImports(formattedCode)
 			if err != nil {
 				return nil, err
 			}
 			result = append(result, &plugin.Generated{
-				Content: string(formattedCode),
+				Content: formattedCode,
 				Name:    &fileMongoName,
 			})
 
 			// build update interface file
-			tplIf := &template.Template{
-				Renders: []template.Render{},
-			}
-			tplIf.Renders = append(tplIf.Renders, baseRender)
-
-			methods := make(code.InterfaceMethods, 0, 10)
-			for _, preMethod := range st.PreIfMethods {
-				methods = append(methods, code.InterfaceMethod{
-					Name:    preMethod.Name,
-					Params:  preMethod.Params,
-					Returns: preMethod.Returns,
-				})
-			}
-			for _, rawMethod := range st.InterfaceInfo.Methods {
-				methods = append(methods, code.InterfaceMethod{
-					Name:    rawMethod.Name,
-					Params:  rawMethod.Params,
-					Returns: rawMethod.Returns,
-				})
-			}
-
-			ifRender := &template.InterfaceRender{
-				Name:    st.Name + "Repository",
-				Methods: methods,
-			}
-			tplIf.Renders = append(tplIf.Renders, ifRender)
-
-			buff, err = tplIf.Build()
+			formattedCode, err = getUpdateIfCode(st, baseRender)
 			if err != nil {
 				return nil, err
 			}
-			formattedCode, err = imports.Process("", buff.Bytes(), nil)
+			formattedCode, err = codegen.AddMongoImports(formattedCode)
 			if err != nil {
 				return nil, err
 			}
 			result = append(result, &plugin.Generated{
-				Content: string(formattedCode),
+				Content: formattedCode,
 				Name:    &fileIfName,
 			})
 		} else {
 			// build new mongo file
-			tplMongo := &template.Template{
-				Renders: []template.Render{},
-			}
-
-			tplMongo.Renders = append(tplMongo.Renders, baseRender)
-			tplMongo.Renders = append(tplMongo.Renders, codegen.GetFuncRender(st))
-			tplMongo.Renders = append(tplMongo.Renders, codegen.GetStructRender(st))
-			for _, methodRender := range methodRenders[index] {
-				tplMongo.Renders = append(tplMongo.Renders, methodRender)
-			}
-
-			buff, err := tplMongo.Build()
+			formattedCode, err := getNewMongoCode(methodRenders[index], st, baseRender)
 			if err != nil {
 				return nil, err
 			}
-			formattedCode, err := imports.Process("", buff.Bytes(), nil)
+			formattedCode, err = codegen.AddMongoImports(formattedCode)
 			if err != nil {
 				return nil, err
 			}
 			result = append(result, &plugin.Generated{
-				Content: string(formattedCode),
+				Content: formattedCode,
 				Name:    &fileMongoName,
 			})
 
 			// build new interface file
-			tplIf := &template.Template{
-				Renders: []template.Render{},
-			}
-			tplIf.Renders = append(tplIf.Renders, baseRender)
-
-			methods := make(code.InterfaceMethods, 0, 10)
-			for _, rawMethod := range st.InterfaceInfo.Methods {
-				methods = append(methods, code.InterfaceMethod{
-					Name:    rawMethod.Name,
-					Params:  rawMethod.Params,
-					Returns: rawMethod.Returns,
-				})
-			}
-			ifRender := &template.InterfaceRender{
-				Name:    st.Name + "Repository",
-				Methods: methods,
-			}
-			tplIf.Renders = append(tplIf.Renders, ifRender)
-
-			buff, err = tplIf.Build()
+			formattedCode, err = getNewIfCode(st, baseRender)
 			if err != nil {
 				return nil, err
 			}
-			formattedCode, err = imports.Process("", buff.Bytes(), nil)
+			formattedCode, err = codegen.AddMongoImports(formattedCode)
 			if err != nil {
 				return nil, err
 			}
 			result = append(result, &plugin.Generated{
-				Content: string(formattedCode),
+				Content: formattedCode,
 				Name:    &fileIfName,
 			})
 		}
 	}
 
 	return
+}
+
+func getBaseRender(st *extract.IdlExtractStruct) *template.BaseRender {
+	pkgName := extract.GetPkgName(st.Name)
+	return &template.BaseRender{
+		Version:     cwgoMeta.Version,
+		PackageName: pkgName,
+		Imports:     codegen.BaseMongoImports,
+	}
+}
+
+func getUpdateMongoCode(methodRenders []*template.MethodRender, fileContent string) (string, error) {
+	tplMongo := &template.Template{
+		Renders: []template.Render{},
+	}
+	for _, methodRender := range methodRenders {
+		tplMongo.Renders = append(tplMongo.Renders, methodRender)
+	}
+
+	buff, err := tplMongo.Build()
+	if err != nil {
+		return "", err
+	}
+	data := fileContent + "\n" + buff.String()
+	formattedCode, err := format.Source([]byte(data))
+	if err != nil {
+		return "", err
+	}
+
+	return string(formattedCode), nil
+}
+
+func getUpdateIfCode(st *extract.IdlExtractStruct, baseRender *template.BaseRender) (string, error) {
+	tplIf := &template.Template{
+		Renders: []template.Render{},
+	}
+	tplIf.Renders = append(tplIf.Renders, baseRender)
+
+	methods := make(code.InterfaceMethods, 0, 10)
+	for _, preMethod := range st.PreIfMethods {
+		methods = append(methods, code.InterfaceMethod{
+			Name:    preMethod.Name,
+			Params:  preMethod.Params,
+			Returns: preMethod.Returns,
+		})
+	}
+	for _, rawMethod := range st.InterfaceInfo.Methods {
+		methods = append(methods, code.InterfaceMethod{
+			Name:    rawMethod.Name,
+			Params:  rawMethod.Params,
+			Returns: rawMethod.Returns,
+		})
+	}
+
+	ifRender := &template.InterfaceRender{
+		Name:    st.Name + "Repository",
+		Methods: methods,
+	}
+	tplIf.Renders = append(tplIf.Renders, ifRender)
+
+	buff, err := tplIf.Build()
+	if err != nil {
+		return "", err
+	}
+	formattedCode, err := format.Source(buff.Bytes())
+	if err != nil {
+		return "", err
+	}
+
+	return string(formattedCode), nil
+}
+
+func getNewMongoCode(methodRenders []*template.MethodRender, st *extract.IdlExtractStruct, baseRender *template.BaseRender) (string, error) {
+	tplMongo := &template.Template{
+		Renders: []template.Render{},
+	}
+
+	tplMongo.Renders = append(tplMongo.Renders, baseRender)
+	tplMongo.Renders = append(tplMongo.Renders, codegen.GetFuncRender(st))
+	tplMongo.Renders = append(tplMongo.Renders, codegen.GetStructRender(st))
+	for _, methodRender := range methodRenders {
+		tplMongo.Renders = append(tplMongo.Renders, methodRender)
+	}
+
+	buff, err := tplMongo.Build()
+	if err != nil {
+		return "", err
+	}
+	formattedCode, err := format.Source(buff.Bytes())
+	if err != nil {
+		return "", err
+	}
+
+	return string(formattedCode), nil
+}
+
+func getNewIfCode(st *extract.IdlExtractStruct, baseRender *template.BaseRender) (string, error) {
+	tplIf := &template.Template{
+		Renders: []template.Render{},
+	}
+	tplIf.Renders = append(tplIf.Renders, baseRender)
+
+	methods := make(code.InterfaceMethods, 0, 10)
+	for _, rawMethod := range st.InterfaceInfo.Methods {
+		methods = append(methods, code.InterfaceMethod{
+			Name:    rawMethod.Name,
+			Params:  rawMethod.Params,
+			Returns: rawMethod.Returns,
+		})
+	}
+	ifRender := &template.InterfaceRender{
+		Name:    st.Name + "Repository",
+		Methods: methods,
+	}
+	tplIf.Renders = append(tplIf.Renders, ifRender)
+
+	buff, err := tplIf.Build()
+	if err != nil {
+		return "", err
+	}
+	formattedCode, err := format.Source(buff.Bytes())
+	if err != nil {
+		return "", err
+	}
+
+	return string(formattedCode), nil
 }

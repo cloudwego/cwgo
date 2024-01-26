@@ -19,7 +19,7 @@ package parse
 import (
 	"fmt"
 
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
 )
 
 type BulkParse struct {
@@ -31,7 +31,7 @@ type BulkParse struct {
 	CtxParamName string
 
 	// BelongedToMethod defines the method to which Bulk belongs
-	BelongedToMethod *model.InterfaceMethod
+	BelongedToMethod *extract.InterfaceMethod
 }
 
 func newBulkParse() *BulkParse {
@@ -49,7 +49,7 @@ func (bp *BulkParse) GetOperationName() string {
 //	method: the method to which Bulk belongs
 //	curParamIndex: current method's param index
 //	isCalled: false ==> independently true ==> called by Transaction
-func (bp *BulkParse) parseBulk(tokens []string, method *model.InterfaceMethod, curParamIndex *int, isCalled bool) error {
+func (bp *BulkParse) parseBulk(tokens []string, method *extract.InterfaceMethod, curParamIndex *int, isCalled bool) error {
 	if !isCalled {
 		if err := bp.check(method); err != nil {
 			return err
@@ -153,7 +153,7 @@ func (bp *BulkParse) parseBulk(tokens []string, method *model.InterfaceMethod, c
 	return nil
 }
 
-func (bp *BulkParse) check(method *model.InterfaceMethod) error {
+func (bp *BulkParse) check(method *extract.InterfaceMethod) error {
 	if len(method.Params) < 1 {
 		return newMethodSyntaxError(method.Name, "less than one input parameters")
 	}

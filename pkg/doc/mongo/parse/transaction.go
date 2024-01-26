@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
 )
 
 type TransactionParse struct {
@@ -38,7 +38,7 @@ type TransactionParse struct {
 	collectionParamsMap map[string]string
 
 	// BelongedToMethod defines the method to which Transaction belongs
-	BelongedToMethod *model.InterfaceMethod
+	BelongedToMethod *extract.InterfaceMethod
 }
 
 type TransactionOperation struct {
@@ -70,7 +70,7 @@ const (
 //	tokens: it contains all tokens belonging to the Transaction except for the Transaction token
 //	method: the method to which Transaction belongs
 //	curParamIndex: current method's param index
-func (tp *TransactionParse) parseTransaction(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
+func (tp *TransactionParse) parseTransaction(tokens []string, method *extract.InterfaceMethod, curParamIndex *int) error {
 	if err := tp.check(method); err != nil {
 		return err
 	}
@@ -201,7 +201,7 @@ func (tp *TransactionParse) parseTransaction(tokens []string, method *model.Inte
 	return nil
 }
 
-func (tp *TransactionParse) check(method *model.InterfaceMethod) error {
+func (tp *TransactionParse) check(method *extract.InterfaceMethod) error {
 	if len(method.Params) < 2 {
 		return newMethodSyntaxError(method.Name, "less than two input parameters")
 	}
@@ -231,7 +231,7 @@ func (tp *TransactionParse) check(method *model.InterfaceMethod) error {
 	return nil
 }
 
-func (tp *TransactionParse) parseTransactionInsert(method *model.InterfaceMethod, tokens []string,
+func (tp *TransactionParse) parseTransactionInsert(method *extract.InterfaceMethod, tokens []string,
 	index int, curParamIndex *int, collectionParamName string,
 ) error {
 	if index == len(tokens)-1 {
@@ -260,7 +260,7 @@ func (tp *TransactionParse) parseTransactionInsert(method *model.InterfaceMethod
 	}
 }
 
-func (tp *TransactionParse) parseTransactionUpdate(method *model.InterfaceMethod, tokens []string,
+func (tp *TransactionParse) parseTransactionUpdate(method *extract.InterfaceMethod, tokens []string,
 	index int, curParamIndex *int, collectionParamName string, hasCollection bool,
 ) (int, error) {
 	if index == len(tokens)-1 {
@@ -294,7 +294,7 @@ func (tp *TransactionParse) parseTransactionUpdate(method *model.InterfaceMethod
 	}
 }
 
-func (tp *TransactionParse) parseTransactionDelete(method *model.InterfaceMethod, tokens []string,
+func (tp *TransactionParse) parseTransactionDelete(method *extract.InterfaceMethod, tokens []string,
 	index int, curParamIndex *int, collectionParamName string, hasCollection bool,
 ) (int, error) {
 	if index == len(tokens)-1 {
@@ -327,7 +327,7 @@ func (tp *TransactionParse) parseTransactionDelete(method *model.InterfaceMethod
 	}
 }
 
-func (tp *TransactionParse) parseTransactionBulk(method *model.InterfaceMethod, tokens []string,
+func (tp *TransactionParse) parseTransactionBulk(method *extract.InterfaceMethod, tokens []string,
 	index int, curParamIndex *int, collectionParamName string,
 ) (int, error) {
 	if index == len(tokens)-1 {

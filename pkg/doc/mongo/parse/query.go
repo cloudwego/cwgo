@@ -20,7 +20,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
 )
 
 type QueryMode string
@@ -81,7 +81,7 @@ func newQuery() *Query {
 	return &Query{}
 }
 
-func (q *Query) parseQuery(methodTokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
+func (q *Query) parseQuery(methodTokens []string, method *extract.InterfaceMethod, curParamIndex *int) error {
 	tokens, err := q.checkQuery(methodTokens)
 	if err != nil {
 		return newMethodSyntaxError(method.Name, err.Error())
@@ -124,7 +124,7 @@ func (q *Query) checkQuery(methodTokens []string) ([]string, error) {
 	}
 }
 
-func (q *Query) createTree(tokens []string, method *model.InterfaceMethod, curParamIndex *int) (*ConnectionOpTree, error) {
+func (q *Query) createTree(tokens []string, method *extract.InterfaceMethod, curParamIndex *int) (*ConnectionOpTree, error) {
 	stack := make([]string, 0, 5)
 	for index, token := range tokens {
 		if token == leftBracket {
@@ -188,7 +188,7 @@ func (q *Query) createTree(tokens []string, method *model.InterfaceMethod, curPa
 	return node, nil
 }
 
-func (q *Query) splitConditionPairs(methodTokens []string, method *model.InterfaceMethod, curParamIndex *int) (string, string, []string, error) {
+func (q *Query) splitConditionPairs(methodTokens []string, method *extract.InterfaceMethod, curParamIndex *int) (string, string, []string, error) {
 	if len(methodTokens) == 0 || len(methodTokens) == 1 {
 		return "", "", nil, newMethodSyntaxError(method.Name, fmt.Sprintf("there are grammar errors in %v", methodTokens))
 	}
@@ -265,7 +265,7 @@ func (q *Query) splitConditionPairs(methodTokens []string, method *model.Interfa
 //	1. string(queryComparator) 2. field name in structure
 //	3. input parameter values corresponding to field names
 //	4. error
-func (q *Query) parseQueryConditionPair(methodTokens []string, method *model.InterfaceMethod, curParamIndex *int,
+func (q *Query) parseQueryConditionPair(methodTokens []string, method *extract.InterfaceMethod, curParamIndex *int,
 	queryComparator QueryComparator, paramCount int,
 ) (string, string, []string, error) {
 	if len(methodTokens) == 0 {

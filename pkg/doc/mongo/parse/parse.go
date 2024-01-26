@@ -21,14 +21,15 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 	"github.com/fatih/camelcase"
 )
 
 // InterfaceOperation is used to store the parsing results of the structure and for use by codegen packages.
 type InterfaceOperation struct {
-	BelongedToStruct *model.IdlExtractStruct
+	BelongedToStruct *extract.IdlExtractStruct
 	Operations       []Operation
 }
 
@@ -54,7 +55,7 @@ const (
 	Many = "Many"
 )
 
-func HandleOperations(structs []*model.IdlExtractStruct) (result []*InterfaceOperation, err error) {
+func HandleOperations(structs []*extract.IdlExtractStruct) (result []*InterfaceOperation, err error) {
 	for _, st := range structs {
 		ifo := newInterfaceOperation()
 		if err = ifo.parseInterfaceMethod(st); err != nil {
@@ -69,7 +70,7 @@ func newInterfaceOperation() *InterfaceOperation {
 	return &InterfaceOperation{Operations: []Operation{}}
 }
 
-func (ifo *InterfaceOperation) parseInterfaceMethod(extractStruct *model.IdlExtractStruct) error {
+func (ifo *InterfaceOperation) parseInterfaceMethod(extractStruct *extract.IdlExtractStruct) error {
 	for _, method := range extractStruct.InterfaceInfo.Methods {
 		tokens := camelcase.Split(method.ParsedTokens)
 		switch tokens[0] {
@@ -159,7 +160,7 @@ func (ifo *InterfaceOperation) parseInterfaceMethod(extractStruct *model.IdlExtr
 //	extractStruct: the structure to which tokens belong
 //	curIndex: point to the next token to be parsed
 //	isFirst: if it is called in recursion
-func getFieldNameType(tokens []string, extractStruct *model.IdlExtractStruct, curIndex *int, isFirst bool) (names []string,
+func getFieldNameType(tokens []string, extractStruct *extract.IdlExtractStruct, curIndex *int, isFirst bool) (names []string,
 	types []code.Type, err error,
 ) {
 	if len(tokens) == 0 {

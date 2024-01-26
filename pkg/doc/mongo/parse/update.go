@@ -19,8 +19,9 @@ package parse
 import (
 	"fmt"
 
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
 
 type UpdateParse struct {
@@ -38,7 +39,7 @@ type UpdateParse struct {
 	CtxParamName string
 
 	// BelongedToMethod defines the method to which Update belongs
-	BelongedToMethod *model.InterfaceMethod
+	BelongedToMethod *extract.InterfaceMethod
 
 	Upsert       bool
 	UpdateFields []UpdateField
@@ -64,7 +65,7 @@ func (up *UpdateParse) GetOperationName() string {
 //	method: the method to which Update belongs
 //	curParamIndex: current method's param index
 //	isCalled: false ==> independently true ==> called by Bulk or Transaction
-func (up *UpdateParse) parseUpdate(tokens []string, method *model.InterfaceMethod, curParamIndex *int, isCalled bool) error {
+func (up *UpdateParse) parseUpdate(tokens []string, method *extract.InterfaceMethod, curParamIndex *int, isCalled bool) error {
 	if !isCalled {
 		if err := up.check(method); err != nil {
 			return err
@@ -106,7 +107,7 @@ func (up *UpdateParse) parseUpdate(tokens []string, method *model.InterfaceMetho
 	return nil
 }
 
-func (up *UpdateParse) check(method *model.InterfaceMethod) error {
+func (up *UpdateParse) check(method *extract.InterfaceMethod) error {
 	if len(method.Params) < 2 {
 		return newMethodSyntaxError(method.Name, "less than two input parameters")
 	}
@@ -144,7 +145,7 @@ func (up *UpdateParse) check(method *model.InterfaceMethod) error {
 	return nil
 }
 
-func (up *UpdateParse) parseUpdateField(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
+func (up *UpdateParse) parseUpdateField(tokens []string, method *extract.InterfaceMethod, curParamIndex *int) error {
 	if len(tokens) == 0 {
 		t, ok := method.Params[1].Type.(code.StarExprType)
 		if !ok {

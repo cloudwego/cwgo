@@ -18,7 +18,10 @@ package doc
 
 import (
 	"errors"
+	"os"
 	"path/filepath"
+
+	"github.com/cloudwego/cwgo/pkg/common/utils"
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/consts"
@@ -43,26 +46,52 @@ func Doc(c *config.DocArgument) error {
 	return nil
 }
 
-func check(c *config.DocArgument) error {
+func check(c *config.DocArgument) (err error) {
 	if c.Name == "" {
 		c.Name = consts.MongoDb
 	}
 	if c.Name != consts.MongoDb {
 		return errors.New("doc name not supported")
 	}
-	if c.IdlPath == "" {
+	if len(c.IdlPaths) == 0 {
 		return errors.New("must specify idl path")
+	}
+
+	c.OutDir, err = filepath.Abs(c.OutDir)
+	if err != nil {
+		return err
 	}
 
 	if c.ModelDir == "" {
 		c.ModelDir = consts.DefaultDocModelOutDir
 	}
-	c.ModelDir = filepath.Join(c.OutDir, c.ModelDir)
+	c.ModelDir, err = filepath.Abs(filepath.Join(c.OutDir, c.ModelDir))
+	if err != nil {
+		return err
+	}
+	if isExist, _ := utils.PathExist(c.ModelDir); !isExist {
+		if err = os.MkdirAll(c.ModelDir, 0o755); err != nil {
+			return err
+		}
+	}
 
 	if c.DaoDir == "" {
 		c.DaoDir = consts.DefaultDocDaoOutDir
 	}
-	c.DaoDir = filepath.Join(c.OutDir, c.DaoDir)
+	c.DaoDir, err = filepath.Abs(filepath.Join(c.OutDir, c.DaoDir))
+	if err != nil {
+		return err
+	}
+	if isExist, _ := utils.PathExist(c.DaoDir); !isExist {
+		if err = os.MkdirAll(c.DaoDir, 0o755); err != nil {
+			return err
+		}
+	}
+
+	c.IdlType, err = utils.GetIdlType(c.IdlPaths[0])
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

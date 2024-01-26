@@ -19,8 +19,9 @@ package parse
 import (
 	"fmt"
 
+	"github.com/cloudwego/cwgo/pkg/doc/mongo/extract"
+
 	"github.com/cloudwego/cwgo/pkg/doc/mongo/code"
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin/model"
 )
 
 type DeleteParse struct {
@@ -34,7 +35,7 @@ type DeleteParse struct {
 	CtxParamName string
 
 	// BelongedToMethod defines the method to which Delete belongs
-	BelongedToMethod *model.InterfaceMethod
+	BelongedToMethod *extract.InterfaceMethod
 }
 
 func newDeleteParse() *DeleteParse {
@@ -52,7 +53,7 @@ func (dp *DeleteParse) GetOperationName() string {
 //	method: the method to which Delete belongs
 //	curParamIndex: current method's param index
 //	isCalled: false ==> independently true ==> called by Bulk or Transaction
-func (dp *DeleteParse) parseDelete(tokens []string, method *model.InterfaceMethod, curParamIndex *int, isCalled bool) error {
+func (dp *DeleteParse) parseDelete(tokens []string, method *extract.InterfaceMethod, curParamIndex *int, isCalled bool) error {
 	if !isCalled {
 		if err := dp.check(method); err != nil {
 			return err
@@ -75,7 +76,7 @@ func (dp *DeleteParse) parseDelete(tokens []string, method *model.InterfaceMetho
 	return nil
 }
 
-func (dp *DeleteParse) check(method *model.InterfaceMethod) error {
+func (dp *DeleteParse) check(method *extract.InterfaceMethod) error {
 	if len(method.Params) < 1 {
 		return newMethodSyntaxError(method.Name, "less than one input parameters")
 	}
@@ -113,7 +114,7 @@ func (dp *DeleteParse) check(method *model.InterfaceMethod) error {
 	return nil
 }
 
-func (dp *DeleteParse) parseQuery(tokens []string, method *model.InterfaceMethod, curParamIndex *int) error {
+func (dp *DeleteParse) parseQuery(tokens []string, method *extract.InterfaceMethod, curParamIndex *int) error {
 	fqIndex, err := getFirstQueryIndex(tokens)
 	if err != nil {
 		return newMethodSyntaxError(method.Name, err.Error())
