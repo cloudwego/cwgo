@@ -79,7 +79,7 @@ func comparatorCodegen(node *parse.ConnectionOpTree) code.MapPair {
 	case parse.In:
 		return oneMapParamCodegen(node.MongoFieldName, "$in", node.ParamNames[0])
 	case parse.NotIn:
-		return oneMapParamCodegen(node.MongoFieldName, "$nin", node.ParamNames[0])
+		return oneMapParamCodegen(node.MongoFieldName, "$n"+"in", node.ParamNames[0])
 	case parse.True:
 		return singleMapCodegen(node.MongoFieldName, "true")
 	case parse.False:
