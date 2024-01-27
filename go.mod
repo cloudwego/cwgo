@@ -20,7 +20,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/apache/thrift v0.13.0 // indirect
 	github.com/cloudwego/fastpb v0.0.4 // indirect
-	github.com/cloudwego/thriftgo v0.3.3 // indirect
+	github.com/cloudwego/thriftgo v0.3.6 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
@@ -66,3 +66,5 @@ require (
 	gorm.io/hints v1.1.0 // indirect
 	gorm.io/plugin/dbresolver v1.3.0 // indirect
 )
+
+replace github.com/cloudwego/kitex => github.com/Skyenought/kitex v0.3.3-0.20240127041415-9842d176ddb5
