@@ -20,6 +20,7 @@ import (
 	"embed"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/cloudwego/cwgo/pkg/consts"
@@ -79,4 +80,9 @@ func RegisterTemplateFunc() {
 	for k, f := range sprig.FuncMap() {
 		generator.AddTemplateFunc(k, f)
 	}
+	generator.AddTemplateFunc("ToCamel", func(name string) string {
+		name = strings.Replace(name, "_", " ", -1)
+		name = strings.Title(name)
+		return strings.Replace(name, " ", "", -1)
+	})
 }
