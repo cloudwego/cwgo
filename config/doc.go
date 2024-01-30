@@ -18,6 +18,7 @@ package config
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/hertz/cmd/hz/util"
@@ -25,6 +26,8 @@ import (
 )
 
 type DocArgument struct {
+	GoMod           string
+	PackagePrefix   string
 	IdlPaths        []string
 	IdlType         string
 	OutDir          string
@@ -33,6 +36,8 @@ type DocArgument struct {
 	DaoDir          string
 	Verbose         bool
 	ProtoSearchPath []string
+	ProtocOptions   []string // options to pass through to protoc
+	ThriftOptions   []string // options to pass through to thriftgo for go flag
 }
 
 func NewDocArgument() *DocArgument {
@@ -41,12 +46,15 @@ func NewDocArgument() *DocArgument {
 
 func (d *DocArgument) ParseCli(ctx *cli.Context) error {
 	d.IdlPaths = ctx.StringSlice(consts.IDLPath)
+	d.GoMod = ctx.String(consts.Module)
 	d.OutDir = ctx.String(consts.OutDir)
 	d.ModelDir = ctx.String(consts.ModelDir)
 	d.DaoDir = ctx.String(consts.DaoDir)
 	d.Name = ctx.String(consts.Name)
 	d.Verbose = ctx.Bool(consts.Verbose)
 	d.ProtoSearchPath = ctx.StringSlice(consts.ProtoSearchPath)
+	d.ProtocOptions = ctx.StringSlice(consts.Protoc)
+	d.ThriftOptions = ctx.StringSlice(consts.ThriftGo)
 	return nil
 }
 
@@ -64,4 +72,10 @@ func (d *DocArgument) Pack() ([]string, error) {
 		return nil, fmt.Errorf("pack argument failed: %s", err)
 	}
 	return data, nil
+}
+
+func (d *DocArgument) GetThriftgoOptions(prefix string) (string, error) {
+	d.ThriftOptions = append(d.ThriftOptions, "package_prefix="+prefix)
+	gas := "go:" + strings.Join(d.ThriftOptions, ",")
+	return gas, nil
 }

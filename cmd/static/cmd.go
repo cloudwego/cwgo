@@ -21,7 +21,7 @@ import (
 	"github.com/cloudwego/cwgo/meta"
 	"github.com/cloudwego/cwgo/pkg/client"
 	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/cwgo/pkg/doc"
+	"github.com/cloudwego/cwgo/pkg/curd/doc"
 	"github.com/cloudwego/cwgo/pkg/fallback"
 	"github.com/cloudwego/cwgo/pkg/model"
 	"github.com/cloudwego/cwgo/pkg/server"

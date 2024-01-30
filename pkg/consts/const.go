@@ -132,6 +132,8 @@ const (
 	Registry        = "registry"
 	Pass            = "pass"
 	ProtoSearchPath = "proto_search_path"
+	ThriftGo        = "thriftgo"
+	Protoc          = "protoc"
 
 	DSN           = "dsn"
 	DBType        = "db_type"

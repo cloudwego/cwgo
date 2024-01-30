@@ -18,7 +18,7 @@ package main
 import (
 	"os"
 
-	"github.com/cloudwego/cwgo/pkg/doc/mongo/plugin"
+	"github.com/cloudwego/cwgo/pkg/curd/doc/mongo/plugin"
 
 	"github.com/cloudwego/cwgo/cmd/static"
 	"github.com/cloudwego/cwgo/tpl"
