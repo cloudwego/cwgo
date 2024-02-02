@@ -38,11 +38,11 @@ func queryCodegen(query *parse.Query) code.Statement {
 }
 
 func dfsCodegen(node *parse.ConnectionOpTree) code.MapPair {
-	// leafs node
+	// leaves node
 	if node.LeftChildren == nil {
 		return comparatorCodegen(node)
 	} else {
-		// none-leafs node
+		// none-leaves node
 		return code.MapPair{
 			Key: code.RawStmt(node.Name),
 			Value: code.SliceStmt{
