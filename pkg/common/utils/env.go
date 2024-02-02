@@ -32,7 +32,6 @@ import (
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 
 	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/kitex/tool/internal_pkg/log"
 )
 
 func GetGOPATH() (gopath string, err error) {
@@ -152,7 +151,7 @@ func ReplaceThriftVersion() {
 	if err != nil {
 		res = err.Error()
 	}
-	log.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
+	logs.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
 }
 
 func LookupTool(idlType string) (string, error) {

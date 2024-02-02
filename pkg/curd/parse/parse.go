@@ -188,14 +188,14 @@ func getFieldNameType(tokens []string, extractStruct *extract.IdlExtractStruct, 
 
 				flag = 1
 				if !field.IsBelongedToStruct {
-					names = append(names, field.Tag.Get("mongo.bson"))
+					names = append(names, field.Tag.Get("bson"))
 					types = append(types, field.Type)
 					break
 				} else {
 					r, t, err := getFieldNameType(tokens[i+1:], field.BelongedToStruct, curIndex, false)
 					// The final result of the structural field
 					if err != nil {
-						names = append(names, field.Tag.Get("mongo.bson"))
+						names = append(names, field.Tag.Get("bson"))
 						types = append(types, field.Type)
 						break
 					}
@@ -203,7 +203,7 @@ func getFieldNameType(tokens []string, extractStruct *extract.IdlExtractStruct, 
 						return nil, nil, fmt.Errorf("no field name corresponding to %v found", tokens[i:])
 					}
 					i += *curIndex
-					names = append(names, field.Tag.Get("mongo.bson")+"."+r[0])
+					names = append(names, field.Tag.Get("bson")+"."+r[0])
 					types = append(types, t[0])
 					break
 				}

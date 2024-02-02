@@ -109,7 +109,7 @@ func (info *PbUsedInfo) extractPbGoStruct(stNode *ast.StructType, rawStruct *Idl
 	for _, field := range stNode.Fields.List {
 		if field.Comment != nil {
 			if strings.Contains(field.Comment.Text(), "go.tag") &&
-				strings.Contains(field.Comment.Text(), "mongo.bson") {
+				strings.Contains(field.Comment.Text(), "bson") {
 				comment := getMongoStTag(field.Comment.Text())
 				if comment == "" {
 					return fmt.Errorf("there are grammar errors in %s", field.Comment.Text())
@@ -118,7 +118,7 @@ func (info *PbUsedInfo) extractPbGoStruct(stNode *ast.StructType, rawStruct *Idl
 				if field.Tag == nil {
 					field.Tag = &ast.BasicLit{Kind: token.STRING, Value: comment}
 				} else {
-					if !strings.Contains(field.Tag.Value, "mongo.bson") {
+					if !strings.Contains(field.Tag.Value, "bson") {
 						field.Tag = &ast.BasicLit{Kind: token.STRING, Value: field.Tag.Value[0:len(field.Tag.Value)-1] + " " + comment + "`"}
 					}
 				}
