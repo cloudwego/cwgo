@@ -146,7 +146,7 @@ func (up *UpdateParse) check(method *extract.InterfaceMethod) error {
 
 func (up *UpdateParse) parseUpdateField(tokens []string, method *extract.InterfaceMethod, curParamIndex *int) error {
 	if len(tokens) == 0 {
-		t, ok := method.Params[1].Type.(code.StarExprType)
+		t, ok := method.Params[*curParamIndex].Type.(code.StarExprType)
 		if !ok {
 			return newMethodSyntaxError(method.Name, "the input when updating the whole structure is not a structure pointer")
 		}
@@ -155,7 +155,7 @@ func (up *UpdateParse) parseUpdateField(tokens []string, method *extract.Interfa
 			return newMethodSyntaxError(method.Name, "the input when updating the whole structure is not in the form of *Package.StructName")
 		}
 
-		up.UpdateStructObjName = method.Params[1].Name
+		up.UpdateStructObjName = method.Params[*curParamIndex].Name
 		*curParamIndex += 1
 		return nil
 	}

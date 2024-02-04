@@ -52,7 +52,7 @@ type Order struct {
 }
 
 const (
-	order = "Order"
+	order = "Orderby"
 	skip  = "Skip"
 	limit = "Limit"
 	desc  = "Desc"
@@ -172,10 +172,10 @@ func (fp *FindParse) parseFindOptions(tokens []string, method *extract.Interface
 	for index, token := range tokens {
 		if token == order {
 			if orderFlag == 1 {
-				return newMethodSyntaxError(method.Name, "Order can only be used once")
+				return newMethodSyntaxError(method.Name, "Orderby can only be used once")
 			}
 			if index == len(tokens)-1 {
-				return newMethodSyntaxError(method.Name, "there are no sorted fields after the Order")
+				return newMethodSyntaxError(method.Name, "there are no sorted fields after the Orderby")
 			}
 
 			tokenIndex, err := getNextTokenIndex(tokens, index+1)
@@ -184,7 +184,7 @@ func (fp *FindParse) parseFindOptions(tokens []string, method *extract.Interface
 			}
 
 			if index+1 == tokenIndex {
-				return newMethodSyntaxError(method.Name, "there are no sorted fields after the Order")
+				return newMethodSyntaxError(method.Name, "there are no sorted fields after the Orderby")
 			}
 			if err = fp.getSortFields(tokens[index+1:tokenIndex], method.BelongedToStruct); err != nil {
 				return newMethodSyntaxError(method.Name, err.Error())

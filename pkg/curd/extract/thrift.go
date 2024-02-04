@@ -39,6 +39,8 @@ import (
 	"github.com/cloudwego/thriftgo/parser"
 )
 
+const bson = "bson"
+
 type ThriftUsedInfo struct {
 	Req         *plugin.Request
 	DocArgs     *config.DocArgument
@@ -108,7 +110,7 @@ func (info *ThriftUsedInfo) ParseThriftIdl() (rawStructs []*IdlExtractStruct, er
 func extractIdlStruct(st *parser.StructLike, file *parser.Thrift, rawStruct *IdlExtractStruct) error {
 	for _, field := range st.Fields {
 		fag := field.Annotations.Get("go.tag")
-		if len(field.Annotations) > 0 && fag != nil && strings.Contains(fag[0], "bson") {
+		if len(field.Annotations) > 0 && fag != nil && strings.Contains(fag[0], bson) {
 			tag := handleTagOmitempty(fag[0])
 
 			t := convertThriftType(field.Type, file)
