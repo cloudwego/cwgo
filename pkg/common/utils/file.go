@@ -79,3 +79,23 @@ func CreateFile(path, content string) (err error) {
 	}
 	return nil
 }
+
+func FindRootPath(absoluteFilePath, relativeFilePath string) string {
+	absRoot := filepath.Dir(absoluteFilePath)
+	return findRootPathRecursive(absRoot, relativeFilePath)
+}
+
+func findRootPathRecursive(currentDirPath, relativeFilePath string) string {
+	filePath := filepath.Join(currentDirPath, relativeFilePath)
+
+	if _, err := os.Stat(filePath); err == nil {
+		return currentDirPath
+	}
+
+	parentPath := filepath.Dir(currentDirPath)
+	if parentPath == currentDirPath {
+		return ""
+	}
+
+	return findRootPathRecursive(parentPath, relativeFilePath)
+}

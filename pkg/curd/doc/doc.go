@@ -59,7 +59,7 @@ func check(c *config.DocArgument) (err error) {
 	if c.Name != consts.MongoDb {
 		return errors.New("doc name not supported")
 	}
-	if len(c.IdlPaths) == 0 {
+	if c.IdlPath == "" {
 		return errors.New("must specify idl path")
 	}
 
@@ -94,7 +94,7 @@ func check(c *config.DocArgument) (err error) {
 		}
 	}
 
-	c.IdlType, err = utils.GetIdlType(c.IdlPaths[0])
+	c.IdlType, err = utils.GetIdlType(c.IdlPath)
 	if err != nil {
 		return err
 	}

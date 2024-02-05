@@ -23,7 +23,7 @@ import (
 
 func docFlags() []cli.Flag {
 	return []cli.Flag{
-		&cli.StringSliceFlag{Name: consts.IDLPath, Usage: "Specify the IDL file path. (.thrift or .proto)"},
+		&cli.StringFlag{Name: consts.IDLPath, Usage: "Specify the IDL file path. (.thrift or .proto)"},
 		&cli.StringFlag{Name: consts.Module, Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod."},
 		&cli.StringFlag{Name: consts.OutDir, Usage: "Specify output directory, default is current dir."},
 		&cli.StringFlag{Name: consts.ModelDir, Usage: "Specify model output directory, default is biz/doc/model."},

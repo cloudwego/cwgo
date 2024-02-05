@@ -18,6 +18,7 @@ package plugin
 
 import (
 	"fmt"
+	"github.com/cloudwego/cwgo/pkg/common/parser"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -111,18 +112,23 @@ func buildPluginCmd(args *config.DocArgument) (*exec.Cmd, error) {
 			"-p", "cwgo-doc="+exe+":"+kas,
 			"-g", thriftOpt,
 			"-r",
-			args.IdlPaths[0],
+			args.IdlPath,
 		)
 	} else {
 		cmd.Args = append(cmd.Args, meta.TpCompilerProto)
 		for _, inc := range args.ProtoSearchPath {
-			cmd.Args = append(cmd.Args, "-I", inc)
+
+			idlParser := parser.NewProtoParser()
+			importBaseDirPath, importPaths, _ := idlParser.GetDependentFilePaths(inc, args.IdlPath)
+			cmd.Args = append(cmd.Args, "-I", importBaseDirPath)
+			cmd.Args = append(cmd.Args, importPaths...)
 		}
 		cmd.Args = append(cmd.Args, "--go_out="+args.ModelDir)
 		for _, kv := range args.ProtocOptions {
 			cmd.Args = append(cmd.Args, "--"+kv)
 		}
-		cmd.Args = append(cmd.Args, args.IdlPaths...)
+
+		cmd.Args = append(cmd.Args, args.IdlPath)
 	}
 
 	return cmd, err

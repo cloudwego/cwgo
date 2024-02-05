@@ -28,7 +28,7 @@ import (
 type DocArgument struct {
 	GoMod           string
 	PackagePrefix   string
-	IdlPaths        []string
+	IdlPath         string
 	IdlType         string
 	OutDir          string
 	Name            string
@@ -45,7 +45,7 @@ func NewDocArgument() *DocArgument {
 }
 
 func (d *DocArgument) ParseCli(ctx *cli.Context) error {
-	d.IdlPaths = ctx.StringSlice(consts.IDLPath)
+	d.IdlPath = ctx.String(consts.IDLPath)
 	d.GoMod = ctx.String(consts.Module)
 	d.OutDir = ctx.String(consts.OutDir)
 	d.ModelDir = ctx.String(consts.ModelDir)
