@@ -18,11 +18,12 @@ package plugin
 
 import (
 	"fmt"
-	"github.com/cloudwego/cwgo/pkg/common/parser"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/cloudwego/cwgo/pkg/common/parser"
 
 	"github.com/cloudwego/cwgo/pkg/curd/doc/mongo/codegen"
 	"github.com/cloudwego/cwgo/pkg/curd/extract"
