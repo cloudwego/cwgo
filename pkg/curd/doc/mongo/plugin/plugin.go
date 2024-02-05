@@ -117,19 +117,31 @@ func buildPluginCmd(args *config.DocArgument) (*exec.Cmd, error) {
 		)
 	} else {
 		cmd.Args = append(cmd.Args, meta.TpCompilerProto)
-		for _, inc := range args.ProtoSearchPath {
 
+		var isFindIdl bool
+
+		var importPaths []string
+
+		for _, inc := range args.ProtoSearchPath {
 			idlParser := parser.NewProtoParser()
-			importBaseDirPath, importPaths, _ := idlParser.GetDependentFilePaths(inc, args.IdlPath)
-			cmd.Args = append(cmd.Args, "-I", importBaseDirPath)
-			cmd.Args = append(cmd.Args, importPaths...)
+
+			if !isFindIdl {
+				_, importPaths, err = idlParser.GetDependentFilePaths(inc, args.IdlPath)
+				if err == nil {
+					isFindIdl = true
+				}
+
+			}
+
+			cmd.Args = append(cmd.Args, "-I", inc)
 		}
+
 		cmd.Args = append(cmd.Args, "--go_out="+args.ModelDir)
 		for _, kv := range args.ProtocOptions {
 			cmd.Args = append(cmd.Args, "--"+kv)
 		}
 
-		cmd.Args = append(cmd.Args, args.IdlPath)
+		cmd.Args = append(cmd.Args, importPaths...)
 	}
 
 	return cmd, err
