@@ -19,7 +19,6 @@
 package parser
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -54,7 +53,7 @@ func (p *ProtoParser) GetDependentFilePaths(baseDirPath, mainIdlPath string) (st
 		}
 
 		// read the content of the Thrift file
-		protoContent, err := ioutil.ReadFile(filePath)
+		protoContent, err := os.ReadFile(filePath)
 		if err != nil {
 			return err
 		}

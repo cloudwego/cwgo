@@ -18,7 +18,7 @@ package utils
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -65,19 +65,11 @@ func ReadFileContent(filePath string) (content []byte, err error) {
 		return nil, err
 	}
 
-	return ioutil.ReadAll(file)
+	return io.ReadAll(file)
 }
 
 func CreateFile(path, content string) (err error) {
-	file, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_RDWR, os.FileMode(0o755))
-	defer file.Close()
-	if err != nil {
-		return err
-	}
-	if _, err = file.WriteString(content); err != nil {
-		return err
-	}
-	return nil
+	return os.WriteFile(path, []byte(content), os.FileMode(0o644))
 }
 
 func FindRootPath(absoluteFilePath, relativeFilePath string) string {

@@ -19,7 +19,7 @@ package plugin
 import (
 	"fmt"
 	"go/format"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/cloudwego/cwgo/pkg/curd/code"
@@ -88,7 +88,7 @@ func thriftPluginRun() int {
 }
 
 func (plu *thriftGoPlugin) handleRequest() error {
-	data, err := ioutil.ReadAll(os.Stdin)
+	data, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		return fmt.Errorf("read request failed: %s", err.Error())
 	}
