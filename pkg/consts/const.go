@@ -24,6 +24,11 @@ const (
 )
 
 const (
+	CwgoDocPluginMode       = "CWGO_DOC_PLUGIN_DOC"
+	ThriftCwgoDocPluginName = "thrift-gen-cwgo-doc"
+)
+
+const (
 	RPC  = "RPC"
 	HTTP = "HTTP"
 )
@@ -56,13 +61,15 @@ const (
 
 // Package Name
 const (
-	Src                  = "src"
-	DefaultHZModelDir    = "hertz_gen"
-	DefaultHZClientDir   = "biz/http"
-	DefaultKitexModelDir = "kitex_gen"
-	DefaultDbOutDir      = "biz/dal/query"
-	Standard             = "standard"
-	CurrentDir           = "."
+	Src                   = "src"
+	DefaultHZModelDir     = "hertz_gen"
+	DefaultHZClientDir    = "biz/http"
+	DefaultKitexModelDir  = "kitex_gen"
+	DefaultDbOutDir       = "biz/dal/query"
+	DefaultDocModelOutDir = "biz/doc/model"
+	DefaultDocDaoOutDir   = "biz/doc/dao"
+	Standard              = "standard"
+	CurrentDir            = "."
 )
 
 // File Name
@@ -113,6 +120,10 @@ const (
 	OutDir   = "out_dir"
 	Verbose  = "verbose"
 	Template = "template"
+	Name     = "name"
+
+	ModelDir = "model_dir"
+	DaoDir   = "dao_dir"
 
 	Service         = "service"
 	ServiceType     = "type"
@@ -121,6 +132,8 @@ const (
 	Registry        = "registry"
 	Pass            = "pass"
 	ProtoSearchPath = "proto_search_path"
+	ThriftGo        = "thriftgo"
+	Protoc          = "protoc"
 
 	DSN           = "dsn"
 	DBType        = "db_type"
@@ -135,6 +148,10 @@ const (
 	IndexTag      = "index_tag"
 	TypeTag       = "type_tag"
 	HexTag        = "hex"
+)
+
+const (
+	MongoDb = "mongodb"
 )
 
 const (

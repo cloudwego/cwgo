@@ -20,15 +20,17 @@ import (
 	"bytes"
 	"fmt"
 	"go/build"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/cloudwego/hertz/cmd/hz/meta"
+	"github.com/cloudwego/hertz/cmd/hz/util"
+	"github.com/cloudwego/hertz/cmd/hz/util/logs"
+
 	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/kitex/tool/internal_pkg/log"
 )
 
 func GetGOPATH() (gopath string, err error) {
@@ -86,7 +88,7 @@ var goModReg = regexp.MustCompile(`^\s*module\s+(\S+)\s*`)
 func SearchGoMod(cwd string, recurse bool) (moduleName, path string, found bool) {
 	for {
 		path = filepath.Join(cwd, consts.GoMod)
-		data, err := ioutil.ReadFile(path)
+		data, err := os.ReadFile(path)
 		if err == nil {
 			for _, line := range strings.Split(string(data), consts.LineBreak) {
 				m := goModReg.FindStringSubmatch(line)
@@ -148,5 +150,49 @@ func ReplaceThriftVersion() {
 	if err != nil {
 		res = err.Error()
 	}
-	log.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
+	logs.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
+}
+
+func LookupTool(idlType string) (string, error) {
+	tool := meta.TpCompilerThrift
+	if idlType == meta.IdlProto {
+		tool = meta.TpCompilerProto
+	}
+
+	path, err := exec.LookPath(tool)
+	logs.Debugf("[DEBUG]path:%v", path)
+	if err != nil {
+		goPath, err := util.GetGOPATH()
+		if err != nil {
+			return "", fmt.Errorf("get 'GOPATH' failed for find %s : %v", tool, path)
+		}
+		path = filepath.Join(goPath, "bin", tool)
+	}
+
+	isExist, err := util.PathExist(path)
+	if err != nil {
+		return "", fmt.Errorf("check '%s' path error: %v", path, err)
+	}
+
+	if !isExist {
+		if tool == meta.TpCompilerThrift {
+			// If thriftgo does not exist, the latest version will be installed automatically.
+			err := util.InstallAndCheckThriftgo()
+			if err != nil {
+				return "", fmt.Errorf("can't install '%s' automatically, please install it manually for https://github.com/cloudwego/thriftgo, err : %v", tool, err)
+			}
+		} else {
+			return "", fmt.Errorf("%s is not installed, please install it first", tool)
+		}
+	}
+
+	if tool == meta.TpCompilerThrift {
+		// If thriftgo exists, the version is detected; if the version is lower than v0.2.0 then the latest version of thriftgo is automatically installed.
+		err := util.CheckAndUpdateThriftgo()
+		if err != nil {
+			return "", fmt.Errorf("update thriftgo version failed, please install it manually for https://github.com/cloudwego/thriftgo, err: %v", err)
+		}
+	}
+
+	return path, nil
 }

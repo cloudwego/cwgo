@@ -18,6 +18,7 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -55,4 +56,38 @@ func GetIdlType(path string, pbName ...string) (string, error) {
 	default:
 		return "", fmt.Errorf("IDL type %s is not supported", ext)
 	}
+}
+
+func ReadFileContent(filePath string) (content []byte, err error) {
+	file, err := os.Open(filePath)
+	defer file.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	return io.ReadAll(file)
+}
+
+func CreateFile(path, content string) (err error) {
+	return os.WriteFile(path, []byte(content), os.FileMode(0o644))
+}
+
+func FindRootPath(absoluteFilePath, relativeFilePath string) string {
+	absRoot := filepath.Dir(absoluteFilePath)
+	return findRootPathRecursive(absRoot, relativeFilePath)
+}
+
+func findRootPathRecursive(currentDirPath, relativeFilePath string) string {
+	filePath := filepath.Join(currentDirPath, relativeFilePath)
+
+	if _, err := os.Stat(filePath); err == nil {
+		return currentDirPath
+	}
+
+	parentPath := filepath.Dir(currentDirPath)
+	if parentPath == currentDirPath {
+		return ""
+	}
+
+	return findRootPathRecursive(parentPath, relativeFilePath)
 }

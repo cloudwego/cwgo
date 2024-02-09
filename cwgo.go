@@ -18,6 +18,8 @@ package main
 import (
 	"os"
 
+	"github.com/cloudwego/cwgo/pkg/curd/doc/mongo/plugin"
+
 	"github.com/cloudwego/cwgo/cmd/static"
 	"github.com/cloudwego/cwgo/tpl"
 	"github.com/cloudwego/hertz/cmd/hz/app"
@@ -34,6 +36,9 @@ func main() {
 	app.PluginMode()
 	// run cwgo as kitex plugin mode
 	kitexPluginMode()
+	// run cwgo as mongo plugin mode
+	plugin.MongoPluginMode()
+
 	tpl.Init()
 	cli := static.Init()
 
