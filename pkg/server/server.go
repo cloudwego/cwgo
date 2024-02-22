@@ -85,6 +85,7 @@ func Server(c *config.ServerArgument) error {
 			}
 		}
 		utils.ReplaceThriftVersion()
+		utils.Hessian2PostProcessing(args)
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
 		utils.SetHzVerboseLog(c.Verbose)
