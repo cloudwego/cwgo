@@ -29,6 +29,8 @@ import (
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 	"github.com/cloudwego/hertz/cmd/hz/util"
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
+	"github.com/cloudwego/kitex/tool/cmd/kitex/args"
+	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/thriftgo"
 
 	"github.com/cloudwego/cwgo/pkg/consts"
 )
@@ -151,6 +153,19 @@ func ReplaceThriftVersion() {
 		res = err.Error()
 	}
 	logs.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
+}
+
+// Hessian2PostProcessing is responsible for performing hessian2-related post-processing.
+// e.g. Replace *java.Object to java.Object
+// Please refer to kitex/tool/cmd/kitex/main.go #NormalExit for detail.
+func Hessian2PostProcessing(args args.Arguments) {
+	if !thriftgo.EnableJavaExtension(args.Config) {
+		return
+	}
+
+	if err := thriftgo.Hessian2PatchByReplace(args.Config, ""); err != nil {
+		logs.Warn("replace java object fail, you can fix it then regenerate", err)
+	}
 }
 
 func LookupTool(idlType string) (string, error) {
