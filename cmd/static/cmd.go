@@ -19,6 +19,7 @@ package static
 import (
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/meta"
+	"github.com/cloudwego/cwgo/pkg/api_list"
 	"github.com/cloudwego/cwgo/pkg/client"
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/pkg/curd/doc"
@@ -92,6 +93,17 @@ func Init() *cli.App {
 					return err
 				}
 				return doc.Doc(globalArgs.DocArgument)
+			},
+		},
+		{
+			Name:  ApiListName,
+			Usage: ApiUsage,
+			Flags: apiFlags(),
+			Action: func(c *cli.Context) error {
+				if err := globalArgs.ApiArgument.ParseCli(c); err != nil {
+					return err
+				}
+				return api_list.Api(globalArgs.ApiArgument)
 			},
 		},
 		{
@@ -177,6 +189,13 @@ Examples:
 Examples:
   # Generate doc model code
   cwgo doc --name mongodb --idl {{path/to/IDL_file.thrift}}
+`
+
+	ApiListName = "api-list"
+	ApiUsage    = `analyze router codes by golang asy
+
+Examples:
+  cwgo api --project_path ./
 `
 
 	FallbackName  = "fallback"

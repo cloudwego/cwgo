@@ -29,6 +29,10 @@ const (
 )
 
 const (
+	HertzRepoDefaultUrl = "github.com/cloudwego/hertz"
+)
+
+const (
 	RPC  = "RPC"
 	HTTP = "HTTP"
 )
@@ -135,6 +139,8 @@ const (
 	ThriftGo        = "thriftgo"
 	Protoc          = "protoc"
 
+	ProjectPath   = "project_path"
+	HertzRepoUrl  = "hertz_repo_url"
 	DSN           = "dsn"
 	DBType        = "db_type"
 	Tables        = "tables"
