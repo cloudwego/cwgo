@@ -434,7 +434,6 @@ func (p *Parser) checkIsRouterGroup(importMap map[string]*ImportParsed, objDeclI
 				}
 			}
 		}
-
 	}
 
 	return false
