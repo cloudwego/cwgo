@@ -18,6 +18,7 @@ package api_list
 
 import (
 	"fmt"
+	"github.com/bytedance/sonic"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -534,26 +535,6 @@ func (p *Parser) getVarsInArgs(importMap map[string]*ImportParsed, varMap map[st
 }
 
 func (p *Parser) PrintRouters() {
-	for i, routerParsed := range p.routerParsedList {
-		if routerParsed.StartLine == routerParsed.EndLine {
-			fmt.Printf(
-				"%d -> {%s \"%s\":\"%s#L%d\"}\n",
-				i+1,
-				routerParsed.Method,
-				routerParsed.RoutePath,
-				routerParsed.FilePath,
-				routerParsed.StartLine,
-			)
-		} else {
-			fmt.Printf(
-				"%d -> {%s \"%s\":\"%s#L%d-L%d\"}\n",
-				i+1,
-				routerParsed.Method,
-				routerParsed.RoutePath,
-				routerParsed.FilePath,
-				routerParsed.StartLine,
-				routerParsed.EndLine,
-			)
-		}
-	}
+	j, _ := sonic.Marshal(p.routerParsedList)
+	fmt.Println(string(j))
 }
