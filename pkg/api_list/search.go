@@ -211,7 +211,7 @@ func (p *Parser) searchStmts(stmts []ast.Stmt, packageName string, funcParsed *F
 				}
 
 				// get relativePath func param if it has *route.RouterGroup
-				funcParams := p.getVarsInArgs(funcParsed.importMap, localGroupVarMap, exprXCallExpr)
+				funcParams := p.getVarsInArgs(localGroupVarMap, exprXCallExpr)
 				// recursively search func
 				err := p.searchFunc(packageName, exprXCallExprFun.Name, make(map[string]*Var), funcParams)
 				if err != nil {
@@ -231,7 +231,7 @@ func (p *Parser) searchStmts(stmts []ast.Stmt, packageName string, funcParsed *F
 							}
 
 							// get relativePath func param if it has *route.RouterGroup
-							funcParams := p.getVarsInArgs(funcParsed.importMap, localGroupVarMap, exprXCallExpr)
+							funcParams := p.getVarsInArgs(localGroupVarMap, exprXCallExpr)
 							// recursively search func
 							err := p.searchFunc(pkg.Path, exprXCallExprFun.Sel.Name, make(map[string]*Var), funcParams)
 							if err != nil {
@@ -407,69 +407,6 @@ func (p *Parser) searchStmts(stmts []ast.Stmt, packageName string, funcParsed *F
 	return nil
 }
 
-func (p *Parser) checkIsServerHertzVar(importMap map[string]*ImportParsed, objDeclIface interface{}) bool {
-	switch objDecl := objDeclIface.(type) {
-	case *ast.Field:
-		// defined in func param
-		if starExpr, ok := objDecl.Type.(*ast.StarExpr); ok {
-			if selectorExpr, ok := starExpr.X.(*ast.SelectorExpr); ok {
-				if xExpr, ok := selectorExpr.X.(*ast.Ident); ok {
-					if xExpr.Name == "server" && selectorExpr.Sel.Name == "Hertz" {
-						if imp, ok := importMap["server"]; ok && imp.Path == p.hertzRepoUrl+"/pkg/app/server" {
-							return true
-						}
-					}
-				}
-			}
-		}
-	case *ast.AssignStmt:
-		// assigned in func body
-		if len(objDecl.Rhs) > 0 {
-			if callExpr, ok := objDecl.Rhs[0].(*ast.CallExpr); ok {
-				if selectorExpr, ok := callExpr.Fun.(*ast.SelectorExpr); ok {
-					if xExpr, ok := selectorExpr.X.(*ast.Ident); ok {
-						if xExpr.Name == "server" && (selectorExpr.Sel.Name == "Default" || selectorExpr.Sel.Name == "New") {
-							if imp, ok := importMap["server"]; ok && imp.Path == p.hertzRepoUrl+"/pkg/app/server" {
-								return true
-							}
-						} else if xExpr.Name == "byted" && selectorExpr.Sel.Name == "Default" {
-							if imp, ok := importMap["byted"]; ok && imp.Path == p.hertzRepoUrl+"/byted" {
-								return true
-							}
-						}
-					}
-				}
-			}
-		}
-
-	default:
-		return false
-	}
-
-	return false
-}
-
-func (p *Parser) checkIsRouteEngine(importMap map[string]*ImportParsed, objDeclIface interface{}) bool {
-	switch objDecl := objDeclIface.(type) {
-	case *ast.Field:
-		if starExpr, ok := objDecl.Type.(*ast.StarExpr); ok {
-			if selectorExpr, ok := starExpr.X.(*ast.SelectorExpr); ok {
-				if xExpr, ok := selectorExpr.X.(*ast.Ident); ok {
-					if xExpr.Name == "route" && selectorExpr.Sel.Name == "Engine" {
-						if imp, ok := importMap["route"]; ok && imp.Path == p.hertzRepoUrl+"/pkg/route" {
-							return true
-						}
-					}
-				}
-			}
-		}
-	default:
-		return false
-	}
-
-	return false
-}
-
 func (p *Parser) checkIsRouterGroup(importMap map[string]*ImportParsed, objDeclIface interface{}) bool {
 	switch objDecl := objDeclIface.(type) {
 	case *ast.Field:
@@ -489,21 +426,7 @@ func (p *Parser) checkIsRouterGroup(importMap map[string]*ImportParsed, objDeclI
 	return false
 }
 
-func (p *Parser) getVarType(importMap map[string]*ImportParsed, objDeclIface interface{}) VarType {
-	if p.checkIsServerHertzVar(importMap, objDeclIface) {
-		return VarTypeServerHertz
-	}
-	if p.checkIsRouteEngine(importMap, objDeclIface) {
-		return VarTypeRouteEngine
-	}
-	if p.checkIsRouterGroup(importMap, objDeclIface) {
-		return VarTypeRouterGroup
-	}
-
-	return VarTypeOther
-}
-
-func (p *Parser) getVarsInArgs(importMap map[string]*ImportParsed, varMap map[string]*Var, expr *ast.CallExpr) []*Var {
+func (p *Parser) getVarsInArgs(varMap map[string]*Var, expr *ast.CallExpr) []*Var {
 	res := make([]*Var, 0)
 
 	for _, exprArg := range expr.Args {
@@ -512,7 +435,7 @@ func (p *Parser) getVarsInArgs(importMap map[string]*ImportParsed, varMap map[st
 			if funSelectorExpr, ok := argExpr.Fun.(*ast.SelectorExpr); ok {
 				if xIdent, ok := funSelectorExpr.X.(*ast.Ident); ok {
 					if xIdent.Obj != nil && xIdent.Obj.Kind == ast.Var {
-						if varType := p.getVarType(importMap, xIdent.Obj.Decl); varType != VarTypeOther {
+						if v, ok := varMap[xIdent.Obj.Name]; ok && v.Type != VarTypeOther {
 							if funSelectorExpr.Sel.Name == "Group" {
 								// if var called with Group Method
 
