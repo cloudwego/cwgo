@@ -18,13 +18,14 @@ package api_list
 
 import (
 	"fmt"
-	"github.com/bytedance/sonic"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"io/fs"
 	"path/filepath"
 	"strings"
+
+	"github.com/bytedance/sonic"
 )
 
 type Parser struct {
