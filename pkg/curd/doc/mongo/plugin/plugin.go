@@ -142,6 +142,7 @@ func buildPluginCmd(args *config.DocArgument) (*exec.Cmd, error) {
 		}
 
 		cmd.Args = append(cmd.Args, importPaths...)
+		cmd.Args = append(cmd.Args, args.IdlPath)
 	}
 
 	return cmd, err
