@@ -19,7 +19,6 @@
 package example
 
 import (
-	example "example.com/m/biz/handler/hello/example"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
@@ -31,6 +30,6 @@ import (
 
 // Register register routes based on the IDL 'api.${HTTP Method}' annotation.
 func Register(r *server.Hertz) {
-	root := r.Group("/", rootMw()...)
-	root.GET("/hello", append(_hellomethodMw(), example.HelloMethod)...)
+	root := r.Group("/", nil)
+	root.GET("/hello", nil)
 }
