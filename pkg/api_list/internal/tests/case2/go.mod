@@ -1,6 +1,6 @@
 module main
 
-go 1.21.6
+go 1.18
 
 require github.com/cloudwego/hertz v0.8.1
 
