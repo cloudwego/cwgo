@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package case2
+package main
 
 import "github.com/cloudwego/hertz/pkg/app/server"
 
