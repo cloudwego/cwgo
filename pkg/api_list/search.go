@@ -407,25 +407,6 @@ func (p *Parser) searchStmts(stmts []ast.Stmt, packageName string, funcParsed *F
 	return nil
 }
 
-func (p *Parser) checkIsRouterGroup(importMap map[string]*ImportParsed, objDeclIface interface{}) bool {
-	switch objDecl := objDeclIface.(type) {
-	case *ast.Field:
-		if starExpr, ok := objDecl.Type.(*ast.StarExpr); ok {
-			if selectorExpr, ok := starExpr.X.(*ast.SelectorExpr); ok {
-				if xExpr, ok := selectorExpr.X.(*ast.Ident); ok {
-					if xExpr.Name == "route" && selectorExpr.Sel.Name == "RouterGroup" {
-						if imp, ok := importMap["route"]; ok && imp.Path == "code.byted.org/middleware/hertz/pkg/route" {
-							return true
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return false
-}
-
 func (p *Parser) getVarsInArgs(varMap map[string]*Var, expr *ast.CallExpr) []*Var {
 	res := make([]*Var, 0)
 
