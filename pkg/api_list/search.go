@@ -32,9 +32,8 @@ type Parser struct {
 	moduleName   string // project module name
 	hertzRepoUrl string
 
-	fSet         *token.FileSet
-	astFileCache map[string]*ast.File
-	funcMap      map[string]map[string]*FuncParsed
+	fSet    *token.FileSet
+	funcMap map[string]map[string]*FuncParsed
 
 	// TODO: should consider external var too
 	// globalVarMap map[string]*Var
@@ -78,7 +77,6 @@ func NewParser(projectPath, hertzRepoUrl string) (*Parser, error) {
 		moduleName:       moduleName,
 		hertzRepoUrl:     hertzRepoUrl,
 		fSet:             token.NewFileSet(),
-		astFileCache:     make(map[string]*ast.File),
 		funcMap:          make(map[string]map[string]*FuncParsed),
 		routerParsedList: make([]*RouterParsed, 0),
 	}
@@ -101,8 +99,6 @@ func NewParser(projectPath, hertzRepoUrl string) (*Parser, error) {
 						// skip test file
 						continue
 					}
-
-					p.astFileCache[fileName] = astFile
 
 					// parse imports
 					importMap := make(map[string]*ImportParsed)
