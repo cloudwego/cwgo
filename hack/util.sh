@@ -9,7 +9,8 @@ function util::find_modules() {
 		-o -path './.git' \
 		-o -path '*/third_party/*' \
 		-o -path '*/vendor/*' \
-			-o -path '*/example/*' \
+	  -o -path '*/example/*' \
+	  -o -path '*/tests/*' \
 		\) -prune \
 		\) -name 'go.mod' -print0 | xargs -0 -I {} dirname {}
 }
