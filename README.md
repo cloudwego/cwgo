@@ -7,25 +7,29 @@ the developer experience. The main features of cwgo tool are as follows:
 
 ## Tool Characteristics
 
-- Supports generating project templates
+- Support for generating engineering templates
 
-  cwgo tool supports generating MVC project layouts. Users only need to complete their own business logic in the
-  corresponding locations according to the functionality of different directories, focusing on business logic.
+  The cwgo tool supports the generation of MVC project layout. Users only need to complete their own business code in the corresponding position according to the functions of different directories, focusing on business logic.
 
-- Supports generating server and client code
+- Support generating Server and Client code
 
-  cwgo supports generating Kitex and Hertz's server and client code, providing encapsulation for clients. Users can use
-  it out of the box to call downstream services, saving them from cumbersome steps such as packaging clients.
+  The cwgo tool supports generating Server and Client codes of Kitex and Hertz, and provides an encapsulation of Client. Users can call downstream out of the box, eliminating the cumbersome steps of encapsulating the Client.
 
-- Supports generating database code
+- Support for generating relational database code
 
-  cwgo tool supports generating database CURD (Create Update Read Delete) codes. Users no longer need to package
-  tedious CURD codes themselves, thereby improving work efficiency.
+  The cwgo tool supports generating relational database CURD code. Users no longer need to encapsulate the cumbersome CURD code by themselves, which improves the user's work efficiency.
 
-- Support fallback to Kitex and Hz tools
+- Support for generating document database code
 
-  If you were a user of Kitex or Hz before, you can still use the cwgo tool. With its rollback function support backward
-  compatibility with these tools.
+  The cwgo tool supports generating document database CURD code based on IDL (Thrift/protobuf), and currently supports Mongodb. Users no longer need to encapsulate the cumbersome CURD code by themselves, which improves the user's work efficiency.
+
+- Support for generating command line automatic completion scripts
+
+  The cwgo tool supports generating command line completion scripts to improve the efficiency of user command line writing.
+
+- Support fallback to Kitex, Hz tools
+
+  If you were a Kitex or Hz user before, you can still use the cwgo tool. The cwgo tool supports the fallback function and can be used as Kitex and Hz, truly realizing a tool to generate all.
 
 ## Install cwgo Tool
 
@@ -45,6 +49,10 @@ GOPROXY=https://goproxy.cn/,direct go install github.com/cloudwego/cwgo@latest
 
 Contains detailed documentation on how cwgo CLI works, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/cli/)
 
+### Template Extension
+
+Instructions on how to customize templates can be found in the [document](https://www.cloudwego.io/docs/cwgo/tutorials/templete-extension/).
+
 ### Layout
 
 This documents explains Layouts discussing how layout are generated, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/layout/).
@@ -55,63 +63,19 @@ The document details on how Generated Clients that have been Encapsulated Can be
 
 ### DB
 
-Details information containing HOW TO Use cwgo TOOL GEN To Generate Curd Codes, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/db/)
+Details information containing HOW TO Use cwgo TOOL  To Generate relational Curd Codes, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/db/)
 
-### Template Extension
+### Doc
 
-Instructions on how to customize templates can be found in the [document](https://www.cloudwego.io/docs/cwgo/tutorials/templete-extension/).
+Including how to use the cwgo tool to generate document database CURD code, see this [document](https://www.cloudwego.cn/docs/cwgo/tutorials/doc/).
 
-### How to enable auto-completion
+### Server
 
-#### Supported in Bash
+Including how to generate RPC Server and HTTP Server code, see this [document](https://www.cloudwego.cn/docs/cwgo/tutorials/server/).
 
-##### Temporary support for Bash completion
+### auto-completion
 
-```shell
-mkdir autocomplete # You can choose any location you like
-cwgo completion bash > ./autocomplete/bash_autocomplete
-source ./autocomplete/bash_autocomplete
-```
-
-##### Permanent support for Bash completion
-
-```shell
-sudo cp autocomplete/bash_autocomplete /etc/bash_completion.d/cwgo
-
-source /etc/bash_completion.d/cwgo
-```
-
-#### Supported in Zsh
-
-##### Temporary support for Zsh completion
-
-```shell
-mkdir autocomplete # You can choose any location you like
-cwgo completion zsh > ./autocomplete/zsh_autocomplete
-source ./autocomplete/zsh_autocomplete
-```
-
-#### Supported in PowerShell
-
-##### Temporary support for PowerShell completion
-
-```shell
-mkdir autocomplete
-cwgo completion powershell | Out-File autocomplete/cwgo.ps1
-& autocomplete/cwgo.ps1
-```
-
-##### Permanent support for PowerShell completion
-
-open the $profile.
-
-Add a line inside:
-
-```shell
-& path/to/autocomplete/cwgo.ps1
-```
-
-Note that the name and path of the ps1 script must be correctly configured here, and then permanent auto-completion can be performed.
+Including how to enable command line auto completion function, see this [document](https://www.cloudwego.cn/docs/cwgo/tutorials/auto-completion/).
 
 ## Open Source License
 
