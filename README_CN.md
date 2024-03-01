@@ -69,6 +69,10 @@ Layout 生成及 Layout 介绍，详见[文档](https://www.cloudwego.io/zh/docs
 
 包含如何使用 cwgo 工具生成文档型数据库 CURD 代码，详见[文档](https://www.cloudwego.cn/zh/docs/cwgo/tutorials/doc/)
 
+### Api-list
+
+支持分析 Hertz 项目代码获取路由和(路由注册)代码的关系，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/api-list)
+
 ### Server
 
 包含如何生成 RPC Server、HTTP Server 代码，详见[文档](https://www.cloudwego.cn/zh/docs/cwgo/tutorials/server/)

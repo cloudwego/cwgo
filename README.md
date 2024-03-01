@@ -69,6 +69,10 @@ Details information containing HOW TO Use cwgo TOOL  To Generate relational Curd
 
 Including how to use the cwgo tool to generate document database CURD code, see this [document](https://www.cloudwego.cn/docs/cwgo/tutorials/doc/).
 
+### Api-list
+
+supports getting the relationship between routes and (route registration) code by analyzing Hertz project code, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/api-list)
+
 ### Server
 
 Including how to generate RPC Server and HTTP Server code, see this [document](https://www.cloudwego.cn/docs/cwgo/tutorials/server/).
