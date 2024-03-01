@@ -27,6 +27,10 @@ cwgo 工具可以方便生成工程化模版，其主要功能特点如下：
 
   cwgo 工具支持生成命令行自动补全脚本，提高用户命令行编写的效率。
 
+- 支持分析 Hertz 项目路由和(路由注册)代码的关系
+
+  cwgo 支持通过分析 Hertz 项目代码获取路由和(路由注册)代码的关系。
+
 - 支持回退为 Kitex、Hz 工具
 
   如果之前是 Kitex、Hz 的用户，仍然可以使用 cwgo 工具。cwgo 工具支持回退功能，可以当作 Kitex、Hz 使用，真正实现一个工具生成所有。
@@ -68,6 +72,10 @@ Layout 生成及 Layout 介绍，详见[文档](https://www.cloudwego.io/zh/docs
 ### Doc 
 
 包含如何使用 cwgo 工具生成文档型数据库 CURD 代码，详见[文档](https://www.cloudwego.cn/zh/docs/cwgo/tutorials/doc/)
+
+### Api-list
+
+支持分析 Hertz 项目代码获取路由和(路由注册)代码的关系，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/api-list)
 
 ### Server
 
