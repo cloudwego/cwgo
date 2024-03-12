@@ -143,8 +143,7 @@ func IsWindows() bool {
 	return consts.SysType == consts.WindowsOS
 }
 
-func ReplaceThriftVersion() {
-	cmd := "go mod edit -replace github.com/apache/thrift=github.com/apache/thrift@v0.13.0"
+func commandAndNotice(cmd, notice string) {
 	argv := strings.Split(cmd, consts.BlackSpace)
 	err := exec.Command(argv[0], argv[1:]...).Run()
 
@@ -152,7 +151,19 @@ func ReplaceThriftVersion() {
 	if err != nil {
 		res = err.Error()
 	}
-	logs.Warn("Adding apache/thrift@v0.13.0 to go.mod for generated code ..........", res)
+	logs.Warn(notice, res)
+}
+
+func ReplaceThriftVersion() {
+	cmd := "go mod edit -replace github.com/apache/thrift=github.com/apache/thrift@v0.13.0"
+	notice := "Adding apache/thrift@v0.13.0 to go.mod for generated code .........."
+	commandAndNotice(cmd, notice)
+}
+
+func UpgradeGolangProtobuf() {
+	cmd := "go get github.com/golang/protobuf"
+	notice := "Upgrading github.com/golang/protobuf to 1.5.4 ........."
+	commandAndNotice(cmd, notice)
 }
 
 // Hessian2PostProcessing is responsible for performing hessian2-related post-processing.

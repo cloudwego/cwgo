@@ -192,7 +192,7 @@ Examples:
 `
 
 	ApiListName = "api-list"
-	ApiUsage    = `analyze router codes by golang asy
+	ApiUsage    = `analyze router codes by golang ast
 
 Examples:
   cwgo api --project_path ./
