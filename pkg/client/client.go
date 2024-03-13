@@ -70,6 +70,7 @@ func Client(c *config.ClientArgument) error {
 			os.Exit(1)
 		}
 		utils.ReplaceThriftVersion()
+		utils.UpgradeGolangProtobuf()
 		utils.Hessian2PostProcessing(args)
 	case consts.HTTP:
 		args := hzConfig.NewArgument()

@@ -85,6 +85,7 @@ func Server(c *config.ServerArgument) error {
 			}
 		}
 		utils.ReplaceThriftVersion()
+		utils.UpgradeGolangProtobuf()
 		utils.Hessian2PostProcessing(args)
 	case consts.HTTP:
 		args := hzConfig.NewArgument()
