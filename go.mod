@@ -4,9 +4,9 @@ go 1.18
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
-	github.com/bytedance/sonic v1.11.1
+	github.com/bytedance/sonic v1.11.2
 	github.com/cloudwego/hertz/cmd/hz v0.6.5
-	github.com/cloudwego/kitex v0.9.0
+	github.com/cloudwego/kitex v0.9.2-rc1.0.20240325130450-5a496b21439c
 	github.com/cloudwego/thriftgo v0.3.6
 	github.com/fatih/camelcase v1.0.0
 	github.com/urfave/cli/v2 v2.23.5
