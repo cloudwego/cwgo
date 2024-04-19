@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/bytedance/sonic v1.11.1
-	github.com/cloudwego/hertz/cmd/hz v0.6.5
+	github.com/cloudwego/hertz/cmd/hz v0.8.2-0.20240419023349-bd2a9b2ff0ae
 	github.com/cloudwego/kitex v0.9.0
 	github.com/cloudwego/thriftgo v0.3.6
 	github.com/fatih/camelcase v1.0.0
