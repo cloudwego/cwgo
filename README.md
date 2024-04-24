@@ -2,8 +2,8 @@
 
 [中文](./README_CN.md) | English
 
-cwgo is an all-in-one code generation tool for CloudWeGo. It integrates the advantages of various components to improve
-the developer experience. The main features of cwgo tool are as follows:
+cwgo is an all-in-one code generation tool for CloudWeGo. It integrates the advantages of the kitex and hz tools to improve
+the development efficiency and experience. The main features of cwgo tool are as follows:
 
 ## Tool Characteristics
 
@@ -21,7 +21,7 @@ the developer experience. The main features of cwgo tool are as follows:
 
 - Support for generating document database code
 
-  The cwgo tool supports generating document database CURD code based on IDL (Thrift/protobuf), and currently supports Mongodb. Users no longer need to encapsulate the cumbersome CURD code by themselves, which improves the user's work efficiency.
+  The cwgo tool supports generating document database CURD code based on IDL (Thrift/protobuf), and currently supports MongoDB. Users no longer need to encapsulate the cumbersome CURD code by themselves, which improves the user's work efficiency.
 
 - Support for generating command line automatic completion scripts
 
@@ -31,9 +31,9 @@ the developer experience. The main features of cwgo tool are as follows:
 
   Cwgo supports analyzing Hertz project code to obtain the relationship between routing and (routing registration) code.
 
-- Support fallback to Kitex, Hz tools
+- Support fallback to kitex, Hz tools
 
-  If you were a Kitex or Hz user before, you can still use the cwgo tool. The cwgo tool supports the fallback function and can be used as Kitex and Hz, truly realizing a tool to generate all.
+  If you were a kitex or Hz user before, you can still use the cwgo tool. The cwgo tool supports the fallback function and can be used as kitex and Hz, truly realizing a tool to generate all.
 
 ## Install cwgo Tool
 
@@ -59,15 +59,15 @@ Instructions on how to customize templates can be found in the [document](https:
 
 ### Layout
 
-This documents explains Layouts discussing how layout are generated, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/layout/).
+This documents explains Layouts generation and introduction, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/layout/).
 
 ### Client
 
-The document details on how Generated Clients that have been Encapsulated Can be used, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/client/)
+The document details on how generated clients that have been encapsulated can be used, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/client/)
 
 ### DB
 
-Details information containing HOW TO Use cwgo TOOL  To Generate relational Curd Codes, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/db/)
+Details information containing how to use cwgo tool to generate relational CURD codes, see this [document](https://www.cloudwego.io/docs/cwgo/tutorials/db/)
 
 ### Doc
 
@@ -83,12 +83,12 @@ Including how to generate RPC Server and HTTP Server code, see this [document](h
 
 ### auto-completion
 
-Including how to enable command line auto completion function, see this [document](https://www.cloudwego.cn/docs/cwgo/tutorials/auto-completion/).
+Including how to enable command line auto-completion function, see this [document](https://www.cloudwego.cn/docs/cwgo/tutorials/auto-completion/).
 
 ## Open Source License
 
-cwgo is based on Apache License 2.0, [Apache License](https://github.com/cloudswego/cwgo/blob/main/LICENSE). Its dependent
-third-party component open-source licenses will include Licenses.
+cwgo is based on Apache License 2.0, [Apache License](https://github.com/cloudswego/cwgo/blob/main/LICENSE). 
+See [Licenses](https://github.com/cloudwego/cwgo/blob/main/licenses) for the open source licenses of the three party components on which it depends.
 
 ## Contact Us
 
