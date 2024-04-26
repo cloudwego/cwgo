@@ -18,8 +18,9 @@ package model
 
 import (
 	"fmt"
-	"gorm.io/rawsql"
 	"strings"
+
+	"gorm.io/rawsql"
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/consts"
@@ -28,8 +29,10 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-var err error
+var (
+	db  *gorm.DB
+	err error
+)
 
 func Model(c *config.ModelArgument) error {
 	dialector := config.OpenTypeFuncMap[consts.DataBaseType(c.Type)]
