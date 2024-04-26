@@ -154,6 +154,8 @@ const (
 	IndexTag      = "index_tag"
 	TypeTag       = "type_tag"
 	HexTag        = "hex"
+
+	SQLDir = "sql_dir"
 )
 
 const (
