@@ -25,11 +25,19 @@ import (
 
 	"gorm.io/gen"
 	"gorm.io/gorm"
+	"gorm.io/rawsql"
 )
 
 func Model(c *config.ModelArgument) error {
 	dialector := config.OpenTypeFuncMap[consts.DataBaseType(c.Type)]
 	db, err := gorm.Open(dialector(c.DSN))
+	if c.SQLDir != "" {
+		db, err = gorm.Open(rawsql.New(rawsql.Config{
+			FilePath: []string{
+				c.SQLDir,
+			},
+		}))
+	}
 	if err != nil {
 		return err
 	}
@@ -71,6 +79,8 @@ func Model(c *config.ModelArgument) error {
 
 	if !c.OnlyModel {
 		g.ApplyBasic(models...)
+		g.ApplyBasic(g.GenerateAllTable()...)
+		// 从当前数据库生成所有表结构
 	}
 
 	g.Execute()

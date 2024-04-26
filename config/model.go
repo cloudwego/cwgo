@@ -37,6 +37,7 @@ type ModelArgument struct {
 	FieldSignable     bool
 	FieldWithIndexTag bool
 	FieldWithTypeTag  bool
+	SQLDir            string
 }
 
 func NewModelArgument() *ModelArgument {
@@ -60,5 +61,6 @@ func (c *ModelArgument) ParseCli(ctx *cli.Context) error {
 	c.FieldSignable = ctx.Bool(consts.Signable)
 	c.FieldWithIndexTag = ctx.Bool(consts.IndexTag)
 	c.FieldWithTypeTag = ctx.Bool(consts.TypeTag)
+	c.SQLDir = ctx.String(consts.SQLDir)
 	return nil
 }
