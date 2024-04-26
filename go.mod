@@ -9,14 +9,14 @@ require (
 	github.com/cloudwego/kitex v0.9.1
 	github.com/cloudwego/thriftgo v0.3.10
 	github.com/fatih/camelcase v1.0.0
-	github.com/urfave/cli/v2 v2.23.5
-	golang.org/x/tools v0.6.0
-	gorm.io/driver/mysql v1.5.1
-	gorm.io/driver/postgres v1.4.5
-	gorm.io/driver/sqlite v1.4.3
-	gorm.io/driver/sqlserver v1.4.1
-	gorm.io/gen v0.3.18
-	gorm.io/gorm v1.25.2
+	github.com/urfave/cli/v2 v2.27.1
+	golang.org/x/tools v0.20.0
+	gorm.io/driver/mysql v1.5.6
+	gorm.io/driver/postgres v1.5.7
+	gorm.io/driver/sqlite v1.5.5
+	gorm.io/driver/sqlserver v1.5.3
+	gorm.io/gen v0.3.26
+	gorm.io/gorm v1.25.9
 	gorm.io/rawsql v1.0.2
 )
 
@@ -69,15 +69,13 @@ require (
 	golang.org/x/arch v0.2.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp v0.0.0-20220428152302-39d4317da171 // indirect
-	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.20.0 // indirect
-	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
+	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
 	google.golang.org/grpc v1.55.0-dev // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
