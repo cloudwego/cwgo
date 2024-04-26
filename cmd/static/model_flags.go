@@ -50,5 +50,6 @@ func modelFlags() []cli.Flag {
 		&cli.BoolFlag{Name: consts.Signable, Usage: "Specify detect integer field's unsigned type, adjust generated data type", Value: false, DefaultText: "false"},
 		&cli.BoolFlag{Name: consts.TypeTag, Usage: "Specify generate field with gorm column type tag", Value: false, DefaultText: "false"},
 		&cli.BoolFlag{Name: consts.IndexTag, Usage: "Specify generate field with gorm index tag", Value: false, DefaultText: "false"},
+		&cli.StringFlag{Name: consts.SQLDir, Usage: "Specify a sql file or directory", Value: "", DefaultText: ""},
 	}
 }
