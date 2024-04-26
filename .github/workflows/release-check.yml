@@ -20,6 +20,6 @@ jobs:
           SOURCE_VERSION=$(grep 'Version\s*=\s*\"v[0-9]+\.[0-9]+\.[0-9]+\"' *.go | awk -F '\"' '{print $(NF-1)}')
           git checkout main
           MASTER_VERSION=$(grep 'Version\s*=\s*\"v[0-9]+\.[0-9]+\.[0-9]+\"' *.go | awk -F '\"' '{print $(NF-1)}')
-          git checkout ${{ github.event.pull_request.head.sha }}
+          git checkout ${{Head.SHA}}
           # 使用Python 3来比较版本
           python3 -c "import sys; sys.exit(0 if list(map(int, '${SOURCE_VERSION#v}'.split('.')[:3])) > list(map(int, '${MASTER_VERSION#v}'.split('.')[:3])) else 1)"
