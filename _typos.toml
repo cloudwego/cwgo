@@ -1,9 +1,8 @@
-# Typo check: https://github.com/crate-ci/typos
+# .typos.toml
 
 [files]
-extend-exclude = ["go.sum", "check_branch_name.sh"]
+extend-exclude = ["go.sum", "check_branch_name.sh", "go.mod"]
 
 [default.extend-identifiers]
-# *sigh* this just isn't worth the cost of fixing
 O_WRONLY = "O_WRONLY"
 WRONLY = "WRONLY"
