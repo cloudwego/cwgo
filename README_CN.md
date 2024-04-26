@@ -2,8 +2,7 @@
 
 中文 | [English](./README.md)
 
-cwgo 是 CloudWeGo All in one 代码生成工具，整合了各个组件的优势，以提高开发者的体验。
-cwgo 工具可以方便生成工程化模版，其主要功能特点如下：
+cwgo 是 CloudWeGo All in one 代码生成工具，整合了 kitex 和 hz 工具的优势，以提高开发者的编码效率和使用体验。其主要功能特点如下：
 
 ## 工具特点
 
@@ -21,7 +20,7 @@ cwgo 工具可以方便生成工程化模版，其主要功能特点如下：
 
 - 支持生成文档类数据库代码
 
-  cwgo 工具支持基于 IDL (thrift/protobuf) 生成文档类数据库 CURD 代码，目前支持 Mongodb。用户无需再自行封装繁琐的 CURD 代码，提高用户的工作效率。
+  cwgo 工具支持基于 IDL (thrift/protobuf) 生成文档类数据库 CURD 代码，目前支持 MongoDB。用户无需再自行封装繁琐的 CURD 代码，提高用户的工作效率。
 
 - 支持生成命令行自动补全脚本
 
@@ -31,9 +30,9 @@ cwgo 工具可以方便生成工程化模版，其主要功能特点如下：
 
   cwgo 支持通过分析 Hertz 项目代码获取路由和(路由注册)代码的关系。
 
-- 支持回退为 Kitex、Hz 工具
+- 支持回退为 kitex、Hz 工具
 
-  如果之前是 Kitex、Hz 的用户，仍然可以使用 cwgo 工具。cwgo 工具支持回退功能，可以当作 Kitex、Hz 使用，真正实现一个工具生成所有。
+  如果之前是 kitex、Hz 工具的用户，仍然可以使用 cwgo 工具。cwgo 工具支持回退功能，可以当作 kitex、Hz 使用，真正实现一个工具生成所有。
 
 ## 安装 cwgo 工具
 
@@ -102,7 +101,7 @@ cwgo 基于[Apache License 2.0](https://github.com/cloudwego/cwgo/blob/main/LICE
 ## Landscapes
 
 <p align="center">
-<img src="https://landscape.cncf.io/images/left-logo.svg" width="150"/>&nbsp;&nbsp;<img src="https://landscape.cncf.io/images/right-logo.svg" width="200"/>
+<img src="https://landscape.cncf.io/images/cncf-landscape-horizontal-color.svg" width="150"/>&nbsp;&nbsp;<img src="https://www.cncf.io/wp-content/uploads/2023/04/cncf-main-site-logo.svg" width="200"/>
 <br/><br/>
 CloudWeGo 丰富了 <a href="https://landscape.cncf.io/">CNCF 云原生生态</a>。
 </p>
