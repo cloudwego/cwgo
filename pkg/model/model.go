@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"strings"
 
+	"gorm.io/rawsql"
+
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/consts"
 
@@ -27,9 +29,21 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	db  *gorm.DB
+	err error
+)
+
 func Model(c *config.ModelArgument) error {
 	dialector := config.OpenTypeFuncMap[consts.DataBaseType(c.Type)]
-	db, err := gorm.Open(dialector(c.DSN))
+
+	if c.SQLDir != "" {
+		db, err = gorm.Open(rawsql.New(rawsql.Config{
+			FilePath: []string{c.SQLDir},
+		}))
+	} else {
+		db, err = gorm.Open(dialector(c.DSN))
+	}
 	if err != nil {
 		return err
 	}
@@ -71,6 +85,7 @@ func Model(c *config.ModelArgument) error {
 
 	if !c.OnlyModel {
 		g.ApplyBasic(models...)
+		g.ApplyBasic(g.GenerateAllTable()...)
 	}
 
 	g.Execute()

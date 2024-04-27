@@ -1,7 +1,7 @@
 # Typo check: https://github.com/crate-ci/typos
 
 [files]
-extend-exclude = ["go.sum", "check_branch_name.sh"]
+extend-exclude = ["go.sum", "check_branch_name.sh","go.mod"]
 
 [default.extend-identifiers]
 # *sigh* this just isn't worth the cost of fixing
