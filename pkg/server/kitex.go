@@ -111,6 +111,9 @@ Flags:
 			return err
 		}
 		gitPath = path.Join(tpl.KitexDir, consts.Server, gitPath)
+		if err = utils.GitCheckout(sa.Branch, gitPath); err != nil {
+			return err
+		}
 		kitexArgument.TemplateDir = gitPath
 	} else {
 		if len(sa.Template) != 0 {

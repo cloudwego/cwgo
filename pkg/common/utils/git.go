@@ -36,6 +36,17 @@ func GitClone(gitURL, path string) error {
 	return c.Run()
 }
 
+func GitCheckout(branch, path string) error {
+	if branch == "" {
+		return nil
+	}
+
+	c := exec.Command("git", "checkout", branch)
+	c.Dir = path
+	c.Stderr = os.Stderr
+	return c.Run()
+}
+
 func GitPath(gitURL string) (string, error) {
 	if len(gitURL) > 3 && gitURL[0:3] == "git" {
 		p := strings.Split(gitURL, consts.Slash)

@@ -28,6 +28,7 @@ type ServerArgument struct {
 	*CommonParam
 
 	Template   string
+	Branch     string
 	SliceParam *SliceParam
 	Verbose    bool
 	Hex        bool // add http listen for kitex

@@ -31,6 +31,7 @@ type ClientArgument struct {
 
 	Verbose  bool
 	Template string
+	Branch   string
 	Cwd      string
 	GoSrc    string
 	GoPkg    string
