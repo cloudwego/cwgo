@@ -139,6 +139,7 @@ const (
 	ProtoSearchPath = "proto_search_path"
 	ThriftGo        = "thriftgo"
 	Protoc          = "protoc"
+	GenBase         = "gen_base"
 
 	ProjectPath   = "project_path"
 	HertzRepoUrl  = "hertz_repo_url"
