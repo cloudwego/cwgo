@@ -84,6 +84,12 @@ func thriftPluginRun() int {
 		return meta.PluginError
 	}
 
+	if plu.docArgs.GenBase {
+		if err = generateBaseMongoFile(plu.docArgs.DaoDir, tfUsedInfo.ImportPaths, codegen.HandleBaseCodegen()); err != nil {
+			return meta.PluginError
+		}
+	}
+
 	return 0
 }
 
