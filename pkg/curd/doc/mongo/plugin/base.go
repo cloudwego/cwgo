@@ -20,8 +20,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/curd/code"
+
+	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/curd/doc/mongo/codegen"
 	"github.com/cloudwego/cwgo/pkg/curd/extract"
 	"github.com/cloudwego/cwgo/pkg/curd/template"
