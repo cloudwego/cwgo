@@ -33,5 +33,6 @@ func docFlags() []cli.Flag {
 		&cli.StringSliceFlag{Name: consts.ThriftGo, Aliases: []string{"t"}, Usage: "Specify arguments for the thriftgo. ({flag}={value})"},
 		&cli.StringSliceFlag{Name: consts.Protoc, Aliases: []string{"p"}, Usage: "Specify arguments for the protoc. ({flag}={value})"},
 		&cli.BoolFlag{Name: consts.Verbose, Usage: "Turn on verbose mode, default is false."},
+		&cli.BoolFlag{Name: consts.GenBase, Usage: "Generate base mongo code, default is false."},
 	}
 }
