@@ -288,10 +288,18 @@ func (q *Query) parseQueryConditionPair(methodTokens []string, method *extract.I
 			return "", "", nil, newMethodSyntaxError(method.Name, "insufficient number of input parameters")
 		}
 		for i := *curParamIndex; i < *curParamIndex+paramCount; i++ {
-			if method.Params[i].Type.RealName() != t[0].RealName() {
-				return "", "", nil, newMethodSyntaxError(method.Name,
-					fmt.Sprintf("the field type in the parameter transfer: %s, the actual required field type: %s",
-						method.Params[i].Type.RealName(), t[0].RealName()))
+			if queryComparator == In || queryComparator == NotIn {
+				if method.Params[i].Type.RealName() != "[]"+t[0].RealName() {
+					return "", "", nil, newMethodSyntaxError(method.Name,
+						fmt.Sprintf("the field type in the parameter transfer: %s, the actual required field type: %s",
+							method.Params[i].Type.RealName(), "[]"+t[0].RealName()))
+				}
+			} else {
+				if method.Params[i].Type.RealName() != t[0].RealName() {
+					return "", "", nil, newMethodSyntaxError(method.Name,
+						fmt.Sprintf("the field type in the parameter transfer: %s, the actual required field type: %s",
+							method.Params[i].Type.RealName(), t[0].RealName()))
+				}
 			}
 			values = append(values, method.Params[i].Name)
 		}
