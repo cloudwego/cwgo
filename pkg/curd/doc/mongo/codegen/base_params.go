@@ -18,11 +18,15 @@ package codegen
 
 import "github.com/cloudwego/cwgo/pkg/curd/code"
 
-func GetMInsertOneParams() (res []code.Param) {
-	ctx := code.Param{
+func getCtx() code.Param {
+	return code.Param{
 		Name: "ctx",
 		Type: code.IdentType("context.Context"),
 	}
+}
+
+func GetMInsertOneParams() (res []code.Param) {
+	ctx := getCtx()
 	insertOneData := code.Param{
 		Name: "insertOneData",
 		Type: code.InterfaceType{
@@ -35,10 +39,7 @@ func GetMInsertOneParams() (res []code.Param) {
 }
 
 func GetMDeleteOneParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	deleteOneData := code.Param{
 		Name: "deleteOneData",
 		Type: code.InterfaceType{
@@ -51,10 +52,7 @@ func GetMDeleteOneParams() (res []code.Param) {
 }
 
 func GetMFindOneParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	selector := code.Param{
 		Name: "selector",
 		Type: code.IdentType("bson.M"),
@@ -71,10 +69,7 @@ func GetMFindOneParams() (res []code.Param) {
 }
 
 func GetMBulkInsertParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	batchData := code.Param{
 		Name: "batchData",
 		Type: code.IdentType("[]interface{}"),
@@ -86,10 +81,7 @@ func GetMBulkInsertParams() (res []code.Param) {
 }
 
 func GetMBulkUpdateParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	filter := code.Param{
 		Name: "filter",
 		Type: code.IdentType("[]interface{}"),
@@ -105,10 +97,7 @@ func GetMBulkUpdateParams() (res []code.Param) {
 }
 
 func GetMAggregateParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	pipeline := code.Param{
 		Name: "pipeline",
 		Type: code.IdentType("[]bson.M"),
@@ -124,10 +113,7 @@ func GetMAggregateParams() (res []code.Param) {
 }
 
 func GetMCountParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	selector := code.Param{
 		Name: "selector",
 		Type: code.IdentType("bson.M"),
@@ -139,10 +125,7 @@ func GetMCountParams() (res []code.Param) {
 }
 
 func GetMUpdateOneParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	selector := code.Param{
 		Name: "selector",
 		Type: code.IdentType("bson.M"),
@@ -158,10 +141,7 @@ func GetMUpdateOneParams() (res []code.Param) {
 }
 
 func GetMUpdateManyParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	selector := code.Param{
 		Name: "selector",
 		Type: code.IdentType("bson.M"),
@@ -177,10 +157,7 @@ func GetMUpdateManyParams() (res []code.Param) {
 }
 
 func GetMFindListParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	selector := code.Param{
 		Name: "selector",
 		Type: code.IdentType("bson.M"),
@@ -197,10 +174,7 @@ func GetMFindListParams() (res []code.Param) {
 }
 
 func GetMFindPageListParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	sort := code.Param{
 		Name: "sort",
 		Type: code.IdentType("string"),
@@ -228,10 +202,7 @@ func GetMFindPageListParams() (res []code.Param) {
 }
 
 func GetMFindSortPageListParams() (res []code.Param) {
-	ctx := code.Param{
-		Name: "ctx",
-		Type: code.IdentType("context.Context"),
-	}
+	ctx := getCtx()
 	skip := code.Param{
 		Name: "skip",
 		Type: code.IdentType("int"),
