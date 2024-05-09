@@ -38,6 +38,7 @@ type DocArgument struct {
 	ProtoSearchPath []string
 	ProtocOptions   []string // options to pass through to protoc
 	ThriftOptions   []string // options to pass through to thriftgo for go flag
+	GenBase         bool
 }
 
 func NewDocArgument() *DocArgument {
@@ -55,6 +56,7 @@ func (d *DocArgument) ParseCli(ctx *cli.Context) error {
 	d.ProtoSearchPath = ctx.StringSlice(consts.ProtoSearchPath)
 	d.ProtocOptions = ctx.StringSlice(consts.Protoc)
 	d.ThriftOptions = ctx.StringSlice(consts.ThriftGo)
+	d.GenBase = ctx.Bool(consts.GenBase)
 	return nil
 }
 

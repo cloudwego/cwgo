@@ -65,6 +65,13 @@ func MongoTriggerPlugin(c *config.DocArgument) error {
 			return err
 		}
 		methodRenders := codegen.HandleCodegen(operations)
+
+		if c.GenBase {
+			if err = generateBaseMongoFile(info.DocArgs.DaoDir, info.ImportPaths, codegen.HandleBaseCodegen()); err != nil {
+				return err
+			}
+		}
+
 		if err = info.GeneratePbFile(); err != nil {
 			return err
 		}
