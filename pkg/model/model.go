@@ -85,7 +85,6 @@ func Model(c *config.ModelArgument) error {
 
 	if !c.OnlyModel {
 		g.ApplyBasic(models...)
-		g.ApplyBasic(g.GenerateAllTable()...)
 	}
 
 	g.Execute()
