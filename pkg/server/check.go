@@ -41,7 +41,7 @@ func check(sa *config.ServerArgument) error {
 		return errors.New("unsupported registry")
 	}
 
-	if sa.Service == "" && sa.ServerName == "" {
+	if sa.ServerName == "" {
 		return errors.New("must specify server name")
 	}
 

@@ -41,7 +41,7 @@ func HandleRegistry(ca *config.CommonParam, dir string) {
 		te.Dependencies["github.com/kitex-contrib/registry-etcd"] = "etcd"
 		te.ExtendServer = &generator.APIExtension{
 			ImportPaths:  append(importPath, "github.com/kitex-contrib/registry-etcd", "github.com/cloudwego/kitex/pkg/rpcinfo"),
-			ExtendOption: fmt.Sprintf(etcdServer, ca.Service),
+			ExtendOption: fmt.Sprintf(etcdServer, ca.ServerName),
 		}
 		te.ExtendClient = &generator.APIExtension{
 			ImportPaths:  append(importPath, "github.com/kitex-contrib/registry-etcd"),
@@ -64,18 +64,18 @@ func HandleRegistry(ca *config.CommonParam, dir string) {
 		te.Dependencies["github.com/cloudwego/kitex/pkg/registry"] = "registry"
 		te.ExtendServer = &generator.APIExtension{
 			ImportPaths:  []string{"github.com/cloudwego/kitex/pkg/registry", "github.com/kitex-contrib/registry-polaris", "github.com/cloudwego/kitex/pkg/klog"},
-			ExtendOption: fmt.Sprintf(polarisServer, ca.Service),
+			ExtendOption: fmt.Sprintf(polarisServer, ca.ServerName),
 		}
 		te.ExtendClient = &generator.APIExtension{
 			ImportPaths:  []string{"github.com/cloudwego/kitex/pkg/registry", "github.com/kitex-contrib/registry-polaris", "github.com/cloudwego/kitex/pkg/klog"},
-			ExtendOption: fmt.Sprintf(polarisClient, ca.Service),
+			ExtendOption: fmt.Sprintf(polarisClient, ca.ServerName),
 		}
 	case consts.Nacos:
 		te.Dependencies["github.com/kitex-contrib/registry-nacos/registry"] = "registry"
 		te.Dependencies["github.com/kitex-contrib/registry-nacos/resolver"] = "resolver"
 		te.ExtendServer = &generator.APIExtension{
 			ImportPaths:  []string{"github.com/cloudwego/kitex/pkg/klog", "github.com/kitex-contrib/registry-nacos/registry", "github.com/cloudwego/kitex/pkg/rpcinfo"},
-			ExtendOption: fmt.Sprintf(nacosServer, ca.Service),
+			ExtendOption: fmt.Sprintf(nacosServer, ca.ServerName),
 		}
 		te.ExtendClient = &generator.APIExtension{
 			ImportPaths:  []string{"github.com/cloudwego/kitex/pkg/klog", "github.com/kitex-contrib/registry-nacos/resolver"},
