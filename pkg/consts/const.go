@@ -131,6 +131,7 @@ const (
 	DaoDir   = "dao_dir"
 
 	Service         = "service"
+	ServerName      = "server_name"
 	ServiceType     = "type"
 	Module          = "module"
 	IDLPath         = "idl"

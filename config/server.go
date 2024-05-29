@@ -40,12 +40,13 @@ type ServerArgument struct {
 }
 
 type CommonParam struct {
-	Service  string // service name
-	Type     string // GenerateType: RPC or HTTP
-	GoMod    string // Go Mod name
-	IdlPath  string
-	OutDir   string // output path
-	Registry string
+	Service    string // service name
+	ServerName string //server name
+	Type       string // GenerateType: RPC or HTTP
+	GoMod      string // Go Mod name
+	IdlPath    string
+	OutDir     string // output path
+	Registry   string
 }
 
 func NewServerArgument() *ServerArgument {

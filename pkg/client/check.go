@@ -41,8 +41,8 @@ func check(ca *config.ClientArgument) error {
 		return errors.New("unsupported registry")
 	}
 
-	if ca.Service == "" {
-		return errors.New("must specify service name when use registry")
+	if ca.Service == "" && ca.ServerName == "" {
+		return errors.New("must specify server name when use registry")
 	}
 
 	// handle cwd and output dir
