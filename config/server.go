@@ -40,7 +40,7 @@ type ServerArgument struct {
 }
 
 type CommonParam struct {
-	ServerName string //server name
+	ServerName string // server name
 	Type       string // GenerateType: RPC or HTTP
 	GoMod      string // Go Mod name
 	IdlPath    string
