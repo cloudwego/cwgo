@@ -61,7 +61,7 @@ func convertHzArgument(ca *config.ClientArgument, hzArgument *hzConfig.Argument)
 
 	hzArgument.IdlPaths = []string{abPath}
 	hzArgument.Gomod = ca.GoMod
-	hzArgument.ServiceName = ca.Service
+	hzArgument.ServiceName = ca.ServerName
 	hzArgument.Includes = ca.SliceParam.ProtoSearchPath
 	hzArgument.Cwd = ca.Cwd
 	hzArgument.Gosrc = ca.GoSrc

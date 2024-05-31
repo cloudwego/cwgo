@@ -46,7 +46,7 @@ func convertKitexArgs(sa *config.ServerArgument, kitexArgument *kargs.Arguments)
 	f := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
 
 	kitexArgument.ModuleName = sa.GoMod
-	kitexArgument.ServiceName = sa.Service
+	kitexArgument.ServiceName = sa.ServerName
 	kitexArgument.Includes = sa.SliceParam.ProtoSearchPath
 	kitexArgument.Version = kitex.Version
 	kitexArgument.RecordCmd = os.Args

@@ -25,7 +25,8 @@ import (
 func serverFlags() []cli.Flag {
 	globalArgs := config.GetGlobalArgs()
 	return []cli.Flag{
-		&cli.StringFlag{Name: consts.Service, Usage: "Specify the service name.", Destination: &globalArgs.ServerArgument.Service},
+		&cli.StringFlag{Name: consts.Service, Usage: "Specify the server name.(Not recommended,Deprecate in v0.2.0)", Destination: &globalArgs.ServerArgument.ServerName},
+		&cli.StringFlag{Name: consts.ServerName, Usage: "Specify the server name.", Destination: &globalArgs.ServerArgument.ServerName},
 		&cli.StringFlag{Name: consts.ServiceType, Usage: "Specify the generate type. (RPC or HTTP)", Value: consts.RPC},
 		&cli.StringFlag{Name: consts.Module, Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ServerArgument.GoMod},
 		&cli.StringFlag{Name: consts.IDLPath, Usage: "Specify the IDL file path. (.thrift or .proto)", Destination: &globalArgs.ServerArgument.IdlPath},
