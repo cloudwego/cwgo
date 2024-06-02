@@ -73,7 +73,7 @@ const (
 	DefaultDocModelOutDir = "biz/doc/model"
 	DefaultDocDaoOutDir   = "biz/doc/dao"
 	Standard              = "standard"
-	RestApi               = "restApi"
+	RestApi               = "rest_api"
 	CurrentDir            = "."
 )
 

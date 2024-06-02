@@ -67,10 +67,11 @@ func convertHzArgument(sa *config.ServerArgument, hzArgument *hzConfig.Argument)
 				hzArgument.CustomizeLayoutData = layoutDataPath
 			}
 
-			if sa.Template == consts.RestApi {
+			if sa.Template == consts.RestApi && sa.Type == consts.HTTP {
 				hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, consts.Server, consts.RestApi, consts.LayoutFile)
 				hzArgument.CustomizePackage = path.Join(tpl.HertzDir, consts.Server, consts.RestApi, consts.PackageLayoutFile)
 			}
+
 		} else {
 			hzArgument.CustomizeLayout = path.Join(tpl.HertzDir, consts.Server, consts.Standard, consts.LayoutFile)
 			hzArgument.CustomizePackage = path.Join(tpl.HertzDir, consts.Server, consts.Standard, consts.PackageLayoutFile)
