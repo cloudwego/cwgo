@@ -1,0 +1,167 @@
+layouts:
+  - path: handler.go
+    body: |-
+      {{$OutDirs := GetUniqueHandlerOutDir .Methods}}
+      {{$PackageName := .PackageName}}
+      package {{$PackageName}}
+      import (
+       "context"
+
+       "github.com/cloudwego/hertz/pkg/app"
+       "github.com/cloudwego/hertz/pkg/protocol/consts"
+      {{- range $k, $v := .Imports}}
+       {{$k}} "{{$v.Package}}"
+      {{- end}}
+      {{- range $_, $OutDir := $OutDirs}}
+        {{if eq $OutDir "" -}}
+         service "{{$.ProjPackage}}/biz/service/{{$PackageName}}"
+        {{- else -}}
+          "{{$.ProjPackage}}/biz/service/{{$OutDir}}"
+        {{- end -}}
+      {{- end}}
+      "{{$.ProjPackage}}/biz/utils"
+      )
+      {{range $_, $MethodInfo := .Methods}}
+      {{$MethodInfo.Comment}}
+      func {{$MethodInfo.Name}}(ctx context.Context, c *app.RequestContext) {
+       var err error
+       {{if ne $MethodInfo.RequestTypeName "" -}}
+       var req {{$MethodInfo.RequestTypeName}}
+       err = c.BindAndValidate(&req)
+       if err != nil {
+          utils.SendErrResponse(ctx, c, consts.StatusBadRequest, err)
+          return
+       }
+       {{end}}
+        {{if eq $MethodInfo.OutputDir "" -}}
+          resp,err := service.New{{$MethodInfo.Name}}Service(ctx, c).Run(&req)
+          if err != nil {
+               utils.SendErrResponse(ctx, c, consts.StatusInternalServerError, err)
+               return
+          }
+        {{else}}
+          resp,err := {{$MethodInfo.OutputDir}}.New{{$MethodInfo.Name}}Service(ctx, c).Run(&req)
+          if err != nil {
+                  utils.SendErrResponse(ctx, c, consts.StatusInternalServerError, err)
+                  return
+          } 
+        {{end}}
+       utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
+      }
+      {{end}}
+    update_behavior:
+      import_tpl:
+        - |-
+          {{$OutDirs := GetUniqueHandlerOutDir .Methods}}
+          {{- range $_, $OutDir := $OutDirs}}
+            {{if eq $OutDir "" -}}
+              "{{$.ProjPackage}}/biz/service"
+            {{- else -}}
+              "{{$.ProjPackage}}/biz/service/{{$OutDir}}"
+            {{end}}
+          {{- end}}
+
+  - path: handler_single.go
+    body: |+
+      {{.Comment}}
+      func {{.Name}}(ctx context.Context, c *app.RequestContext) {
+       var err error
+       {{if ne .RequestTypeName "" -}}
+       var req {{.RequestTypeName}}
+       err = c.BindAndValidate(&req)
+       if err != nil {
+          utils.SendErrResponse(ctx, c, consts.StatusOK, err)
+          return
+       }
+       {{end}}
+       {{if eq .OutputDir "" -}}
+          resp,err := service.New{{.Name}}Service(ctx, c).Run(&req)
+        {{else}}
+          resp,err := {{.OutputDir}}.New{{.Name}}Service(ctx, c).Run(&req)
+        {{end}}
+        if err != nil {
+              utils.SendErrResponse(ctx, c, consts.StatusOK, err)
+              return
+        }
+       utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
+      }
+
+  - path: "biz/service/{{.GenPackage}}/{{.HandlerGenPath}}/{{ToSnakeCase .MethodName}}.go"
+    loop_method: true
+    update_behavior:
+      type: "skip"
+    body: |-
+      package {{.FilePackage}}
+      import (
+       "context"
+
+       "github.com/cloudwego/hertz/pkg/app"
+      {{- range $k, $v := .Models}}
+       {{$k}} "{{$v.Package}}"
+      {{- end}}
+      )
+      type {{.Name}}Service struct {
+          RequestContext  *app.RequestContext
+          Context         context.Context
+      }
+
+      func New{{.Name}}Service(Context context.Context, RequestContext *app.RequestContext) *{{.Name}}Service {
+       return &{{.Name}}Service{RequestContext: RequestContext, Context: Context}
+      }
+
+      func (h *{{.Name}}Service) Run(req *{{.RequestTypeName}}) ( resp *{{.ReturnTypeName}}, err error) {
+        //defer func() {
+        // hlog.CtxInfof(h.Context, "req = %+v", req)
+        // hlog.CtxInfof(h.Context, "resp = %+v", resp)
+        //}()
+        // todo edit your code
+       return
+      }
+
+  - path: "{{.HandlerDir}}/{{.GenPackage}}/{{ToSnakeCase .ServiceName}}_test.go"
+    loop_service: true
+    update_behavior:
+      type: "append"
+      append_key: "method"
+      insert_key: "Test{{$.Name}}"
+      append_content_tpl: |-
+        func Test{{.Name}}(t *testing.T) {
+        h := server.Default()
+        h.{{.HTTPMethod}}("{{.Path}}", {{.Name}})
+        path:= "{{.Path}}"                                          // todo: you can customize query
+        body:= &ut.Body{Body: bytes.NewBufferString(""), Len: 1} // todo: you can customize body
+        header:= ut.Header{}                                     // todo: you can customize header
+        w := ut.PerformRequest(h.Engine, "{{.HTTPMethod}}", path, body,header)
+        resp := w.Result()
+        t.Log(string(resp.Body()))
+        
+        // todo edit your unit test.
+        // assert.DeepEqual(t, 200, resp.StatusCode())
+        // assert.DeepEqual(t, "null", string(resp.Body()))
+        }
+    body: |-
+      package {{.FilePackage}}
+      import (
+        "bytes"
+        "testing"
+
+        "github.com/cloudwego/hertz/pkg/app/server"
+        //"github.com/cloudwego/hertz/pkg/common/test/assert"
+        "github.com/cloudwego/hertz/pkg/common/ut"
+      )
+      {{range $_, $MethodInfo := $.Methods}}
+        func Test{{$MethodInfo.Name}}(t *testing.T) {
+        h := server.Default()
+        h.{{$MethodInfo.HTTPMethod}}("{{$MethodInfo.Path}}", {{$MethodInfo.Name}})
+        path:= "{{$MethodInfo.Path}}"                                          // todo: you can customize query
+        body:= &ut.Body{Body: bytes.NewBufferString(""), Len: 1} // todo: you can customize body
+        header:= ut.Header{}                                     // todo: you can customize header
+        w := ut.PerformRequest(h.Engine, "{{$MethodInfo.HTTPMethod}}", path, body,header)
+        resp := w.Result()
+        t.Log(string(resp.Body()))
+      
+        // todo edit your unit test.
+        // assert.DeepEqual(t, 200, resp.StatusCode())
+        // assert.DeepEqual(t, "null", string(resp.Body()))
+        }
+      {{end}}
