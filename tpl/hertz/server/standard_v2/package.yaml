@@ -2,7 +2,8 @@ layouts:
   - path: handler.go
     body: |-
       {{$OutDirs := GetUniqueHandlerOutDir .Methods}}
-      package {{.PackageName}}
+      {{$PackageName := .PackageName}}
+      package {{$PackageName}}
       import (
        "context"
 
@@ -13,7 +14,7 @@ layouts:
       {{- end}}
       {{- range $_, $OutDir := $OutDirs}}
         {{if eq $OutDir "" -}}
-          "{{$.ProjPackage}}/biz/service"
+         service "{{$.ProjPackage}}/biz/service/{{$PackageName}}"
         {{- else -}}
           "{{$.ProjPackage}}/biz/service/{{$OutDir}}"
         {{- end -}}
@@ -85,7 +86,7 @@ layouts:
        utils.SendSuccessResponse(ctx, c, consts.StatusOK, resp)
       }
 
-  - path: "biz/service/{{.HandlerGenPath}}/{{ToSnakeCase .MethodName}}.go"
+  - path: "biz/service/{{.GenPackage}}/{{.HandlerGenPath}}/{{ToSnakeCase .MethodName}}.go"
     loop_method: true
     update_behavior:
       type: "skip"
