@@ -33,13 +33,15 @@ layouts:
        }
        {{end}}
         {{if eq $MethodInfo.OutputDir "" -}}
-          resp,err := service.New{{$MethodInfo.Name}}Service(ctx, c).Run(&req)
+          resp := &{{$MethodInfo.ReturnTypeName}}{}
+          resp,err = service.New{{$MethodInfo.Name}}Service(ctx, c).Run(&req)
           if err != nil {
                utils.SendErrResponse(ctx, c, consts.StatusOK, err)
                return
           }
         {{else}}
-          resp,err := {{$MethodInfo.OutputDir}}.New{{$MethodInfo.Name}}Service(ctx, c).Run(&req)
+          resp := &{{$MethodInfo.ReturnTypeName}}{}
+          resp,err = {{$MethodInfo.OutputDir}}.New{{$MethodInfo.Name}}Service(ctx, c).Run(&req)
           if err != nil {
                   utils.SendErrResponse(ctx, c, consts.StatusOK, err)
                   return
@@ -133,7 +135,7 @@ layouts:
         w := ut.PerformRequest(h.Engine, "{{.HTTPMethod}}", path, body,header)
         resp := w.Result()
         t.Log(string(resp.Body()))
-        
+
         // todo edit your unit test.
         // assert.DeepEqual(t, 200, resp.StatusCode())
         // assert.DeepEqual(t, "null", string(resp.Body()))
@@ -158,7 +160,7 @@ layouts:
         w := ut.PerformRequest(h.Engine, "{{$MethodInfo.HTTPMethod}}", path, body,header)
         resp := w.Result()
         t.Log(string(resp.Body()))
-      
+
         // todo edit your unit test.
         // assert.DeepEqual(t, 200, resp.StatusCode())
         // assert.DeepEqual(t, "null", string(resp.Body()))
