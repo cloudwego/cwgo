@@ -70,7 +70,7 @@ layouts:
       	if conf.GetConf().Hertz.EnablePprof {
       		pprof.Register(h)
       	}
-      
+
       	// gzip
       	if conf.GetConf().Hertz.EnableGzip {
       		h.Use(gzip.Gzip(gzip.DefaultCompression))
@@ -90,8 +90,8 @@ layouts:
 
   - path: go.mod
     delims:
-      - '{{'
-      - '}}'
+      - "{{"
+      - "}}"
     body: |-
       module {{.GoModule}}
       {{- if .UseApacheThrift}}
@@ -232,13 +232,13 @@ layouts:
       	}
       }
 
-
   - path: conf/dev/conf.yaml
     delims:
       - ""
       - ""
     body: |-
       hertz:
+        service: "{{.ServiceName}}"
         address: ":8080"
         enable_pprof: true
         enable_gzip: true
@@ -264,6 +264,7 @@ layouts:
       - ""
     body: |-
       hertz:
+        service: "{{.ServiceName}}"
         address: ":8080"
         enable_pprof: false
         enable_gzip: true
@@ -289,6 +290,7 @@ layouts:
       - ""
     body: |-
       hertz:
+        service: "{{.ServiceName}}"
         address: ":8080"
         enable_pprof: true
         enable_gzip: true
@@ -307,7 +309,6 @@ layouts:
         username: ""
         password: ""
         db: 0
-
 
   - path: biz/dal/init.go
     delims:
@@ -511,7 +512,6 @@ layouts:
       	// todo edit custom code
       	c.JSON(code, data)
       }
-
 
   - path: build.sh
     delims:
