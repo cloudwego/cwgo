@@ -166,6 +166,10 @@ const (
 )
 
 const (
+	JobName = "job_name"
+)
+
+const (
 	BashAutocomplete = `#! /bin/bash
 
 # Macs have bash3 for which the bash-completion package doesn't include
