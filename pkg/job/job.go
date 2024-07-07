@@ -30,6 +30,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/cloudwego/cwgo/meta"
+
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
@@ -324,7 +326,14 @@ func generateJobFile(GoModule, PackagePrefix string, jobNames []string, outDir s
 	}
 
 	var jobFileContent bytes.Buffer
-	err = tmpl.Execute(&jobFileContent, jobsInfo.JobInfos[0])
+	data := struct {
+		PackagePrefix string
+		Version       string
+	}{
+		PackagePrefix: PackagePrefix,
+		Version:       meta.Version,
+	}
+	err = tmpl.Execute(&jobFileContent, data)
 	if err != nil {
 		return err
 	}
