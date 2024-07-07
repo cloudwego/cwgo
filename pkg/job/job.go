@@ -63,7 +63,7 @@ func check(c *config.JobArgument) (err error) {
 
 	gopath, err := utils.GetGOPATH()
 	if err != nil {
-		return fmt.Errorf("get gopath failed: %s", err)
+		return fmt.Errorf("GET gopath failed: %s", err)
 	}
 	if gopath == "" {
 		return fmt.Errorf("GOPATH is not set")
