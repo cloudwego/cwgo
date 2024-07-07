@@ -24,6 +24,7 @@ import (
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/pkg/curd/doc"
 	"github.com/cloudwego/cwgo/pkg/fallback"
+	"github.com/cloudwego/cwgo/pkg/job"
 	"github.com/cloudwego/cwgo/pkg/model"
 	"github.com/cloudwego/cwgo/pkg/server"
 	"github.com/urfave/cli/v2"
@@ -93,6 +94,17 @@ func Init() *cli.App {
 					return err
 				}
 				return doc.Doc(globalArgs.DocArgument)
+			},
+		},
+		{
+			Name:  JobName,
+			Usage: JobUsage,
+			Flags: jobFlags(),
+			Action: func(c *cli.Context) error {
+				if err := globalArgs.JobArgument.ParseCli(c); err != nil {
+					return err
+				}
+				return job.Job(globalArgs.JobArgument)
 			},
 		},
 		{
@@ -197,7 +209,12 @@ Examples:
 Examples:
   cwgo api --project_path ./
 `
+	JobName  = "job"
+	JobUsage = `generate job code
 
+Examples:
+	cwgo job --job_name jobOne --job_name jobTwo --module my_job
+`
 	FallbackName  = "fallback"
 	FallbackUsage = "fallback to hz or kitex"
 

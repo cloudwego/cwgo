@@ -38,6 +38,7 @@ type Argument struct {
 	*ClientArgument
 	*ModelArgument
 	*DocArgument
+	*JobArgument
 	*ApiArgument
 	*FallbackArgument
 }
@@ -48,6 +49,7 @@ func NewArgument() *Argument {
 		ClientArgument:   NewClientArgument(),
 		ModelArgument:    NewModelArgument(),
 		DocArgument:      NewDocArgument(),
+		JobArgument:      NewJobArgument(),
 		ApiArgument:      NewApiArgument(),
 		FallbackArgument: NewFallbackArgument(),
 	}
