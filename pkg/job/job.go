@@ -20,20 +20,22 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/cloudwego/cwgo/config"
-	"github.com/cloudwego/cwgo/pkg/common/utils"
-	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/kitex/tool/internal_pkg/log"
 	"go/ast"
 	"go/parser"
 	"go/printer"
 	"go/token"
-	"golang.org/x/tools/go/ast/astutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"text/template"
+
+	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/kitex/tool/internal_pkg/log"
+
+	"golang.org/x/tools/go/ast/astutil"
 )
 
 func Job(c *config.JobArgument) error {
@@ -292,14 +294,14 @@ func createRunCall(jobName string) []ast.Stmt {
 
 func generateJobFile(GoModule, PackagePrefix string, jobNames []string, outDir string) error {
 	// Ensure the base output directory exists
-	err := os.MkdirAll(outDir, 0755)
+	err := os.MkdirAll(outDir, 0o755)
 	if err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
 	// Create cmd/main.go and overwrite each time
 	cmdDir := filepath.Join(outDir, "cmd")
-	err = os.MkdirAll(cmdDir, 0755)
+	err = os.MkdirAll(cmdDir, 0o755)
 	if err != nil {
 		return fmt.Errorf("failed to create cmd directory: %w", err)
 	}
@@ -368,7 +370,7 @@ func generateJobFile(GoModule, PackagePrefix string, jobNames []string, outDir s
 
 	// Create or append to run.sh
 	scriptsDir := filepath.Join(outDir, "scripts")
-	err = os.MkdirAll(scriptsDir, 0755)
+	err = os.MkdirAll(scriptsDir, 0o755)
 	if err != nil {
 		return fmt.Errorf("failed to create scripts directory: %w", err)
 	}
@@ -398,7 +400,7 @@ func generateJobFile(GoModule, PackagePrefix string, jobNames []string, outDir s
 		internalJobDir := filepath.Join(jobDir, "job")
 
 		// Create directories
-		err = os.MkdirAll(internalJobDir, 0755)
+		err = os.MkdirAll(internalJobDir, 0o755)
 		if err != nil {
 			return fmt.Errorf("failed to create internal job directory for %s: %w", jobName, err)
 		}
