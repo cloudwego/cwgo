@@ -167,6 +167,7 @@ const (
 
 const (
 	JobName = "job_name"
+	JobFile = "job_file"
 )
 
 const (
