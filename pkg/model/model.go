@@ -56,6 +56,7 @@ func Model(c *config.ModelArgument) error {
 		FieldNullable:     c.FieldNullable,
 		FieldSignable:     c.FieldSignable,
 		FieldWithIndexTag: c.FieldWithIndexTag,
+		FieldWithTypeTag:  c.FieldWithTypeTag,
 	}
 
 	if len(c.ExcludeTables) > 0 || c.Type == string(consts.Sqlite) {
