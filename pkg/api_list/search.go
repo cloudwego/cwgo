@@ -17,6 +17,7 @@
 package api_list
 
 import (
+	"encoding/json"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -24,8 +25,6 @@ import (
 	"io/fs"
 	"path/filepath"
 	"strings"
-
-	"github.com/bytedance/sonic"
 )
 
 type Parser struct {
@@ -472,6 +471,6 @@ func (p *Parser) getVarsInArgs(varMap map[string]*Var, expr *ast.CallExpr) []*Va
 }
 
 func (p *Parser) PrintRouters() {
-	j, _ := sonic.Marshal(p.routerParsedList)
+	j, _ := json.Marshal(p.routerParsedList)
 	fmt.Println(string(j))
 }
