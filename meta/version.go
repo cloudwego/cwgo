@@ -18,5 +18,5 @@ package meta
 
 const (
 	Name    = "cwgo"
-	Version = "v0.1.1"
+	Version = "v0.1.2"
 )
