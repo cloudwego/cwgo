@@ -22,6 +22,7 @@ import (
 	"github.com/cloudwego/cwgo/pkg/api_list"
 	"github.com/cloudwego/cwgo/pkg/client"
 	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/cwgo/pkg/cronjob"
 	"github.com/cloudwego/cwgo/pkg/curd/doc"
 	"github.com/cloudwego/cwgo/pkg/fallback"
 	"github.com/cloudwego/cwgo/pkg/job"
@@ -105,6 +106,17 @@ func Init() *cli.App {
 					return err
 				}
 				return job.Job(globalArgs.JobArgument)
+			},
+		},
+		{
+			Name:  CronJobName,
+			Usage: CronJobUsage,
+			Flags: cronjobFlags(),
+			Action: func(c *cli.Context) error {
+				if err := globalArgs.CronJobArgument.ParseCli(c); err != nil {
+					return err
+				}
+				return cronjob.Cronjob(globalArgs.CronJobArgument)
 			},
 		},
 		{
@@ -214,6 +226,12 @@ Examples:
 
 Examples:
 	cwgo job --job_name jobOne --job_name jobTwo --module my_job
+`
+	CronJobName  = "cronjob"
+	CronJobUsage = `generate cronjob code
+
+Examples:
+	cwgo cronjob --job_name jobOne --job_name jobTwo --module my_cronjob
 `
 	FallbackName  = "fallback"
 	FallbackUsage = "fallback to hz or kitex"
