@@ -95,7 +95,7 @@ See [Licenses](https://github.com/cloudwego/cwgo/blob/main/licenses) for the ope
 - Email: conduct@cloudwego.io
 - How to become a member: [COMMUNITY MEMBERSHIP](https://github.com/cloudwego/community/blob/main/COMMUNITY_MEMBERSHIP.md)
 - Issues: [Issues](https://github.com/cloudwego/cwgo/issues)
-- Slack: Join our [Slack channel](https://join.slack.com/t/cloudwego/shared_invite/zt-tmcbzewn-UjXMF3ZQsPhl7W3tEDZboA)
+- Discord: Join our [Discord channel](https://discord.gg/jceZSE7DsW)
 - Feishu group (Register for [Feishu](https://www.larksuite.com/en-US/download) and join the group)
 
   ![LarkGroup](images/lark_group.png)

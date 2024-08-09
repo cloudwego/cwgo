@@ -93,7 +93,7 @@ cwgo 基于[Apache License 2.0](https://github.com/cloudwego/cwgo/blob/main/LICE
 - Email: conduct@cloudwego.io
 - 如何成为 member: [COMMUNITY MEMBERSHIP](https://github.com/cloudwego/community/blob/main/COMMUNITY_MEMBERSHIP.md)
 - Issues: [Issues](https://github.com/cloudwego/cwgo/issues)
-- Slack: 加入我们的 [Slack 频道](https://join.slack.com/t/cloudwego/shared_invite/zt-tmcbzewn-UjXMF3ZQsPhl7W3tEDZboA)
+- Discord: 加入我们的 [Discord 频道](https://discord.gg/jceZSE7DsW)
 - 飞书用户群（[注册飞书](https://www.larksuite.com/zh_cn/download)进群）
 
   ![LarkGroup](images/lark_group_cn.png)
