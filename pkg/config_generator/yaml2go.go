@@ -26,13 +26,13 @@ import (
 )
 
 // New creates Yaml2Go object
-func New(key, desc, kind string, fileType ConfigValueType) Yaml2Go {
+func New(key, desc, kind string, configValueType ConfigValueType) Yaml2Go {
 	return Yaml2Go{
 		StructsMeta: &ConfigGenerateMeta{
 			Key:             key,
 			Kind:            kind,
 			Desc:            desc,
-			ConfigValueType: fileType,
+			ConfigValueType: configValueType,
 			structTree:      make(map[string]Struct),
 		},
 	}

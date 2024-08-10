@@ -32,7 +32,7 @@ kitex:
 `
 
 func TestYaml2Go(t *testing.T) {
-	yaml2Go := New("key", "desc", "group", "YamlType")
+	yaml2Go := New("key", "desc", "group", ConfigValueType_YamlType)
 	s, err := yaml2Go.Convert("config", []byte(value))
 	if err != nil {
 		t.Fatal(err)

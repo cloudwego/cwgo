@@ -16,12 +16,6 @@
 
 package config_generator
 
-const (
-	Yaml = "yaml"
-	Json = "json"
-	Text = "text"
-)
-
 type ConfigGenerateMeta struct {
 	Desc            string          `json:"desc,omitempty"`
 	Kind            string          `json:"kind,omitempty"`
