@@ -30,12 +30,14 @@ func serverFlags() []cli.Flag {
 		&cli.StringFlag{Name: consts.ServiceType, Usage: "Specify the generate type. (RPC or HTTP)", Value: consts.RPC},
 		&cli.StringFlag{Name: consts.Module, Aliases: []string{"mod"}, Usage: "Specify the Go module name to generate go.mod.", Destination: &globalArgs.ServerArgument.GoMod},
 		&cli.StringFlag{Name: consts.IDLPath, Usage: "Specify the IDL file path. (.thrift or .proto)", Destination: &globalArgs.ServerArgument.IdlPath},
-		&cli.StringFlag{Name: consts.Template, Usage: "Specify the template path. Currently cwgo supports git templates, such as `--template https://github.com/***/cwgo_template.git`", Destination: &globalArgs.ServerArgument.Template},
+		&cli.StringFlag{Name: consts.Template, Usage: "Specify the template path. Currently cwgo supports git templates, such as `--template https://github.com/***/cwgo_template.git`", Destination: &globalArgs.ServerArgument.HertzTemplate},
 		&cli.StringFlag{Name: consts.Branch, Usage: "Specify the git template's branch, default is main branch.", Destination: &globalArgs.ServerArgument.Branch},
 		&cli.StringFlag{Name: consts.Registry, Usage: "Specify the registry, default is None."},
 		&cli.StringSliceFlag{Name: consts.ProtoSearchPath, Aliases: []string{"I"}, Usage: "Add an IDL search path for includes."},
 		&cli.StringSliceFlag{Name: consts.Pass, Usage: "Pass param to hz or Kitex."},
 		&cli.BoolFlag{Name: consts.Verbose, Usage: "Turn on verbose mode."},
 		&cli.BoolFlag{Name: consts.HexTag, Usage: "Add HTTP listen for Kitex.", Destination: &globalArgs.Hex},
+		&cli.StringFlag{Name: consts.HertzTemplate, Usage: "When using--hex, specify the Hertz template", Destination: &globalArgs.ServerArgument.HertzTemplate},
+		&cli.StringFlag{Name: consts.KitexTemplate, Usage: "When using--hex, specify the Kitex template", Destination: &globalArgs.ServerArgument.KitexTemplate},
 	}
 }

@@ -37,6 +37,9 @@ type ServerArgument struct {
 	GoSrc  string
 	GoPkg  string
 	GoPath string
+
+	KitexTemplate string
+	HertzTemplate string
 }
 
 type CommonParam struct {

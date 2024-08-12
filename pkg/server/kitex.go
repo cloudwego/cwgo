@@ -100,6 +100,10 @@ Flags:
 		return
 	}
 
+	if sa.KitexTemplate != "" {
+		sa.Template = sa.KitexTemplate
+	}
+
 	// Non-standard template
 	if strings.HasSuffix(sa.Template, consts.SuffixGit) {
 		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, consts.Server))

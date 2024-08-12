@@ -37,6 +37,10 @@ func convertHzArgument(sa *config.ServerArgument, hzArgument *hzConfig.Argument)
 		return fmt.Errorf("idl path %s is not absolute", sa.IdlPath)
 	}
 
+	if sa.HertzTemplate != "" {
+		sa.Template = sa.HertzTemplate
+	}
+
 	if strings.HasSuffix(sa.Template, consts.SuffixGit) {
 		err = utils.GitClone(sa.Template, path.Join(tpl.HertzDir, consts.Server))
 		if err != nil {

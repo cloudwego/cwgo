@@ -159,6 +159,9 @@ const (
 	TypeTag       = "type_tag"
 	HexTag        = "hex"
 	SQLDir        = "sql_dir"
+
+	HertzTemplate = "hertz_template"
+	KitexTemplate = "kitex_template"
 )
 
 const (
