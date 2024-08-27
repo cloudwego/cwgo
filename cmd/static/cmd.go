@@ -23,8 +23,10 @@ import (
 	"github.com/cloudwego/cwgo/pkg/client"
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/pkg/curd/doc"
+	"github.com/cloudwego/cwgo/pkg/docker"
 	"github.com/cloudwego/cwgo/pkg/fallback"
 	"github.com/cloudwego/cwgo/pkg/job"
+	"github.com/cloudwego/cwgo/pkg/kube"
 	"github.com/cloudwego/cwgo/pkg/model"
 	"github.com/cloudwego/cwgo/pkg/server"
 	"github.com/urfave/cli/v2"
@@ -119,6 +121,28 @@ func Init() *cli.App {
 			},
 		},
 		{
+			Name:  DockerName,
+			Usage: DockerUsage,
+			Flags: dockerFlags(),
+			Action: func(c *cli.Context) error {
+				if err := globalArgs.DockerArgument.ParseCli(c); err != nil {
+					return err
+				}
+				return docker.Docker(globalArgs.DockerArgument)
+			},
+		},
+		{
+			Name:  KubeName,
+			Usage: KubeUsage,
+			Flags: kubeFlags(),
+			Action: func(c *cli.Context) error {
+				if err := globalArgs.KubeArgument.ParseCli(c); err != nil {
+					return err
+				}
+				return kube.Kube(globalArgs.KubeArgument)
+			},
+		},
+		{
 			Name:  FallbackName,
 			Usage: FallbackUsage,
 			Action: func(c *cli.Context) error {
@@ -209,6 +233,21 @@ Examples:
 Examples:
   cwgo api --project_path ./
 `
+
+	DockerName  = "docker"
+	DockerUsage = `generate docker file
+
+Examples:
+  cwgo docker [args]
+`
+
+	KubeName  = "kube"
+	KubeUsage = `generate kube file
+
+Examples:
+  cwgo kube [args]
+`
+
 	JobName  = "job"
 	JobUsage = `generate job code
 

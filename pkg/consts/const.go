@@ -21,6 +21,9 @@ import "runtime"
 const (
 	Kitex = "kitex"
 	Hertz = "hertz"
+
+	Docker = "docker"
+	Kube   = "kube"
 )
 
 const (
@@ -159,6 +162,33 @@ const (
 	TypeTag       = "type_tag"
 	HexTag        = "hex"
 	SQLDir        = "sql_dir"
+
+	GoVersion     = "go_version"
+	EnableGoProxy = "enable_go_proxy"
+	GoProxy       = "go_proxy"
+	Timezone      = "timezone"
+	BaseImage     = "base_image"
+	Port          = "port"
+	GoFileName    = "go_file"
+	ExeFileName   = "exe_file"
+	RunArgs       = "run_args"
+
+	Namespace       = "namespace"
+	Image           = "image"
+	Secret          = "secret"
+	RequestCpu      = "requestCpu"
+	RequestMem      = "requestMem"
+	LimitCpu        = "limitCpu"
+	LimitMem        = "limitMem"
+	O               = "o"
+	Replicas        = "replicas"
+	Revisions       = "revisions"
+	NodePort        = "nodePort"
+	TargetPort      = "targetPort"
+	MinReplicas     = "minReplicas"
+	MaxReplicas     = "maxReplicas"
+	ImagePullPolicy = "imagePullPolicy"
+	ServiceAccount  = "serviceAccount"
 )
 
 const (
