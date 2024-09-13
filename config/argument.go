@@ -40,6 +40,8 @@ type Argument struct {
 	*DocArgument
 	*JobArgument
 	*ApiArgument
+	*DockerArgument
+	*KubeArgument
 	*FallbackArgument
 }
 
