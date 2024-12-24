@@ -197,6 +197,36 @@ const (
 )
 
 const (
+	Kube                 = "kube"
+	Namespace            = "namespace"
+	Image                = "image"
+	ImagePullPolicy      = "imagePullPolicy"
+	LimitCpu             = "limitCpu"
+	LimitMem             = "limitMem"
+	MaxReplicas          = "maxReplicas"
+	MinReplicas          = "minReplicas"
+	Output               = "output"
+	Replicas             = "replicas"
+	RequestCpu           = "requestCpu"
+	RequestMem           = "requestMem"
+	Revisions            = "revisions"
+	Secret               = "secret"
+	ServiceAccount       = "serviceAccount"
+	NodePort             = "nodePort"
+	TargetPort           = "targetPort"
+	DefaultKubeDeployTpl = "deployment_tpl.yaml"
+
+	DefaultLimitCpu    = 1000
+	DefaultLimitMem    = 1024
+	DefaultMaxReplicas = 10
+	DefaultMinReplicas = 3
+	DefaultReplicas    = 3
+	DefaultRequestCpu  = 500
+	DefaultRequestMem  = 512
+	DefaultRevisions   = 512
+)
+
+const (
 	BashAutocomplete = `#! /bin/bash
 
 # Macs have bash3 for which the bash-completion package doesn't include

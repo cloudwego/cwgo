@@ -26,6 +26,7 @@ import (
 	"github.com/cloudwego/cwgo/pkg/docker"
 	"github.com/cloudwego/cwgo/pkg/fallback"
 	"github.com/cloudwego/cwgo/pkg/job"
+	"github.com/cloudwego/cwgo/pkg/kube"
 	"github.com/cloudwego/cwgo/pkg/model"
 	"github.com/cloudwego/cwgo/pkg/server"
 	"github.com/urfave/cli/v2"
@@ -128,6 +129,17 @@ func Init() *cli.App {
 					return err
 				}
 				return docker.Docker(globalArgs.DockerArgument)
+			},
+		},
+		{
+			Name:  KubeName,
+			Usage: KubeUsage,
+			Flags: kubeFlags(),
+			Action: func(c *cli.Context) error {
+				if err := globalArgs.DockerArgument.ParseCli(c); err != nil {
+					return err
+				}
+				return kube.Kube(globalArgs.KubeArgument)
 			},
 		},
 		{
@@ -245,4 +257,7 @@ Examples:
 
 	DockerName  = "docker"
 	DockerUsage = "Generate Dockerfile"
+
+	KubeName  = "kube"
+	KubeUsage = "Generate kubernetes files"
 )

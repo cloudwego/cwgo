@@ -5,11 +5,15 @@ import (
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/cwgo/tpl"
 	"path/filepath"
 	"strings"
 )
 
 func check(c *config.DockerArgument) error {
+	if c.Template == consts.Docker {
+		c.Template = tpl.DockerDir
+	}
 	if c.Main == "" {
 		return errors.New("go main file must be provided")
 	}

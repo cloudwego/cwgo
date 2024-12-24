@@ -79,7 +79,7 @@ func FillInfo(c *config.DockerArgument) *DockerfileInfo {
 		EtcDirs:    etcPaths,               // Etc directory containing
 		Argument:   argsStr,                // List of Docker build arguments
 		Version:    c.Version,              // Version number of the application
-		Timezone:   c.Tz,                   // Timezone setting
+		Timezone:   c.TZ,                   // Timezone setting
 	}
 }
 

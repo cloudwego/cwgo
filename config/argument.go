@@ -42,6 +42,7 @@ type Argument struct {
 	*ApiArgument
 	*FallbackArgument
 	*DockerArgument
+	*KubeArgument
 }
 
 func NewArgument() *Argument {
@@ -54,6 +55,7 @@ func NewArgument() *Argument {
 		DockerArgument:   NewDockerArgument(),
 		ApiArgument:      NewApiArgument(),
 		FallbackArgument: NewFallbackArgument(),
+		KubeArgument:     NewKubeArgument(),
 	}
 }
 
