@@ -35,9 +35,9 @@ func dockerFlags() []cli.Flag {
 		&cli.StringFlag{Name: consts.Go, Usage: "The file that contains main function", Value: consts.Main, Destination: &globalArgs.DockerArgument.Main},
 		&cli.UintFlag{Name: consts.Port, Usage: "The port to expose, default 0 will not expose any port", Destination: &globalArgs.DockerArgument.Port},
 		&cli.StringFlag{Name: consts.TZ, Value: consts.AsizShangHai, Usage: "The timezone of the container (default \"Asia/Shanghai\")"},
-		&cli.StringFlag{Name: consts.Version, Usage: "The builder golang image version"},
+		&cli.StringFlag{Name: consts.Version, Value: consts.Alpine, Usage: "The builder golang image version"},
 		&cli.StringSliceFlag{Name: consts.Mirror, Usage: "The mirror site to use in go update"},
-		&cli.StringSliceFlag{Name: consts.Etc, Usage: "The ets file dirs path of the project", Value: cli.NewStringSlice(consts.CurrentDir)},
-		&cli.StringSliceFlag{Name: consts.Arguments, Usage: "cmd arguments also checkout if /etc has yaml file with -f)"},
+		&cli.StringSliceFlag{Name: consts.Arguments, Usage: "arguments will used in go run"},
+		&cli.StringSliceFlag{Name: consts.Etc, Usage: "The ets file dirs path of the project", Value: cli.NewStringSlice(consts.Etc)},
 	}
 }

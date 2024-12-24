@@ -44,6 +44,23 @@ func PathExist(path string) (bool, error) {
 	return true, nil
 }
 
+// PathExist is used to find all file's in the path.
+func GetAllFile(pathname string, s []string) ([]string, error) {
+	rd, err := os.ReadDir(pathname)
+	if err != nil {
+		fmt.Println("read dir fail:", err)
+		return s, err
+	}
+
+	for _, fi := range rd {
+		if !fi.IsDir() {
+			fullName := pathname + "/" + fi.Name()
+			s = append(s, fullName)
+		}
+	}
+	return s, nil
+}
+
 // GetIdlType is used to return the idl type.
 func GetIdlType(path string, pbName ...string) (string, error) {
 	ext := filepath.Ext(path)
