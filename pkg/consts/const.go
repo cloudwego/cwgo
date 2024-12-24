@@ -185,14 +185,15 @@ const (
 	MainBranch   = "main"
 	Mirror       = "mirror"
 
-	HttpsPrefix  = "https://"
-	MirrorSep    = ","
-	MirrorDirect = "direct"
-	Arguments    = "arguments"
-	Etc          = "etc"
-	Dockerfile   = "Dockerfile"
-
+	HttpsPrefix          = "https://"
+	MirrorSep            = ","
+	MirrorDirect         = "direct"
+	Arguments            = "arguments"
+	Etc                  = "etc"
+	Dockerfile           = "Dockerfile"
+	Alpine               = "alpine"
 	DefaultDockerfileTpl = "dockerfile_tpl.yaml"
+	Yaml                 = ".yaml"
 )
 
 const (

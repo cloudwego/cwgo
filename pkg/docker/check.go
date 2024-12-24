@@ -6,6 +6,7 @@ import (
 	"github.com/cloudwego/cwgo/pkg/common/utils"
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"path/filepath"
+	"strings"
 )
 
 func check(c *config.DockerArgument) error {
@@ -37,12 +38,14 @@ func check(c *config.DockerArgument) error {
 		return errors.New("port must between 1024 and 65535")
 	}
 
-	isExist, err := utils.PathExist(c.Template)
-	if err != nil {
-		return err
-	}
-	if !isExist {
-		return errors.New("DockerFile template not exist")
+	if !strings.HasSuffix(c.Template, consts.SuffixGit) {
+		isExist, err := utils.PathExist(c.Template)
+		if err != nil {
+			return err
+		}
+		if !isExist {
+			return errors.New("DockerFile template not exist")
+		}
 	}
 	return nil
 }
