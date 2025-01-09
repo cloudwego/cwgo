@@ -24,10 +24,11 @@ import (
 	"github.com/cloudwego/cwgo/pkg/common/kx_registry"
 	"github.com/cloudwego/cwgo/pkg/consts"
 
-	"github.com/cloudwego/cwgo/pkg/common/utils"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"
 	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/thriftgo"
+
+	"github.com/cloudwego/cwgo/pkg/common/utils"
 
 	"github.com/cloudwego/hertz/cmd/hz/app"
 
@@ -58,7 +59,10 @@ func Client(c *config.ClientArgument) error {
 		defer kx_registry.RemoveExtension()
 
 		out := new(bytes.Buffer)
-		cmd := args.BuildCmd(out)
+		cmd, buildErr := args.BuildCmd(out)
+		if buildErr != nil {
+			os.Exit(1)
+		}
 		err = cmd.Run()
 		if err != nil {
 			if args.Use != "" {

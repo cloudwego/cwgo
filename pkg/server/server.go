@@ -23,10 +23,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/cloudwego/cwgo/config"
-	"github.com/cloudwego/cwgo/pkg/common/kx_registry"
-	"github.com/cloudwego/cwgo/pkg/common/utils"
-	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/hertz/cmd/hz/app"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
@@ -34,6 +30,11 @@ import (
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"
 	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/thriftgo"
 	"github.com/urfave/cli/v2"
+
+	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/common/kx_registry"
+	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/pkg/consts"
 )
 
 func Server(c *config.ServerArgument) error {
@@ -55,7 +56,10 @@ func Server(c *config.ServerArgument) error {
 		defer kx_registry.RemoveExtension()
 
 		out := new(bytes.Buffer)
-		cmd := args.BuildCmd(out)
+		cmd, buildErr := args.BuildCmd(out)
+		if buildErr != nil {
+			os.Exit(1)
+		}
 		err = cmd.Run()
 		if err != nil {
 			if args.Use != "" {

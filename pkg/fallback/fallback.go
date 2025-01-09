@@ -19,15 +19,17 @@ package fallback
 import (
 	"bytes"
 	"os"
+	"path/filepath"
 	"strings"
 
-	"github.com/cloudwego/cwgo/config"
-	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/hertz/cmd/hz/app"
 	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 	"github.com/cloudwego/kitex"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/pluginmode/thriftgo"
+
+	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/consts"
 )
 
 func Fallback(c *config.FallbackArgument) error {
@@ -35,11 +37,18 @@ func Fallback(c *config.FallbackArgument) error {
 	case consts.KitexTool:
 		os.Args = c.Args
 		var args kargs.Arguments
-		args.ParseArgs(kitex.Version)
+		curpath, err := filepath.Abs(".")
+		if err != nil {
+			os.Exit(1)
+		}
+		args.ParseArgs(kitex.Version, curpath, os.Args[1:])
 
 		out := new(bytes.Buffer)
-		cmd := args.BuildCmd(out)
-		err := cmd.Run()
+		cmd, buildErr := args.BuildCmd(out)
+		if buildErr != nil {
+			os.Exit(1)
+		}
+		err = cmd.Run()
 		if err != nil {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
