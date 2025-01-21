@@ -30,16 +30,17 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/cloudwego/cwgo/config"
-	"github.com/cloudwego/cwgo/pkg/common/utils"
-	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/cwgo/tpl"
 	hzConfig "github.com/cloudwego/hertz/cmd/hz/config"
 	"github.com/cloudwego/hertz/cmd/hz/meta"
 	"github.com/cloudwego/kitex"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/generator"
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"
+
+	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/cwgo/tpl"
 )
 
 func convertKitexArgs(sa *config.ServerArgument, kitexArgument *kargs.Arguments) (err error) {
@@ -101,18 +102,21 @@ Flags:
 	}
 
 	// Non-standard template
-	if strings.HasSuffix(sa.Template, consts.SuffixGit) {
-		err = utils.GitClone(sa.Template, path.Join(tpl.KitexDir, consts.Server))
+	if gitTml, subDir, ok := tryProcessGitPath(sa.Template); ok {
+		err = utils.GitClone(gitTml, path.Join(tpl.KitexDir, consts.Server))
 		if err != nil {
 			return err
 		}
-		gitPath, err := utils.GitPath(sa.Template)
+		gitPath, err := utils.GitPath(gitTml)
 		if err != nil {
 			return err
 		}
 		gitPath = path.Join(tpl.KitexDir, consts.Server, gitPath)
 		if err = utils.GitCheckout(sa.Branch, gitPath); err != nil {
 			return err
+		}
+		if subDir != "" {
+			gitPath = path.Join(gitPath, subDir)
 		}
 		kitexArgument.TemplateDir = gitPath
 	} else {
@@ -126,6 +130,20 @@ Flags:
 	kitexArgument.GenerateMain = false
 
 	return checkKitexArgs(kitexArgument)
+}
+
+func tryProcessGitPath(input string) (gitUrl string, subDir string, ok bool) {
+	idx := strings.LastIndex(input, consts.SuffixGit)
+	if idx < 0 {
+		return "", "", false
+	}
+	// no subDir
+	// e.g a/b/c.git
+	subDirStartIDx := idx + len(consts.SuffixGit)
+	if len(input) < subDirStartIDx {
+		return input, "", true
+	}
+	return input[:subDirStartIDx], input[subDirStartIDx:], true
 }
 
 func checkKitexArgs(a *kargs.Arguments) (err error) {
