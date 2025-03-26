@@ -135,9 +135,8 @@ layouts:
       	jsonContentType = "application/json; charset=utf-8"
       	formContentType = "multipart/form-data"
 
-        jsonCheck = regexp.MustCompile(`(?i:(application|text)/(json|.*\+json|json\-.*)(; |$))`)
-        xmlCheck  = regexp.MustCompile(`(?i:(application|text)/(xml|.*\+xml)(; |$))`)
-
+        jsonCheck = regexp.MustCompile(`(?i)^(application|text)/(json|.*\+json|json-[a-z]+)(;\s*|$)`)
+        xmlCheck  = regexp.MustCompile(`(?i)^(application|text)/(xml|.*\+xml$)(;\s*|$)`)
       )
 
       // Configuration of client
