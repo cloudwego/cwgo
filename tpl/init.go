@@ -33,18 +33,32 @@ var kitexTpl embed.FS
 //go:embed hertz
 var hertzTpl embed.FS
 
+//go:embed docker
+var dockerTpl embed.FS
+
+//go:embed kube
+var kubeTpl embed.FS
+
 var (
-	KitexDir = path.Join(os.TempDir(), consts.Kitex)
-	HertzDir = path.Join(os.TempDir(), consts.Hertz)
+	KitexDir  = path.Join(os.TempDir(), consts.Kitex)
+	HertzDir  = path.Join(os.TempDir(), consts.Hertz)
+	DockerDir = path.Join(os.TempDir(), consts.Docker)
+	KubeDir   = path.Join(os.TempDir(), consts.Kube)
 )
 
 func Init() {
 	os.RemoveAll(KitexDir)
 	os.RemoveAll(HertzDir)
+	os.RemoveAll(DockerDir)
+	os.RemoveAll(KubeDir)
 	os.Mkdir(KitexDir, 0o755)
 	os.Mkdir(HertzDir, 0o755)
+	os.Mkdir(DockerDir, 0o755)
+	os.Mkdir(KubeDir, 0o755)
 	initDir(kitexTpl, consts.Kitex, KitexDir)
 	initDir(hertzTpl, consts.Hertz, HertzDir)
+	initDir(dockerTpl, consts.Docker, DockerDir)
+	initDir(kubeTpl, consts.Kube, KubeDir)
 }
 
 func initDir(fs embed.FS, srcDir, dstDir string) {

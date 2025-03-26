@@ -16,11 +16,14 @@
 
 package consts
 
-import "runtime"
+import (
+	"runtime"
+)
 
 const (
-	Kitex = "kitex"
-	Hertz = "hertz"
+	Kitex  = "kitex"
+	Hertz  = "hertz"
+	Docker = "docker"
 )
 
 const (
@@ -61,6 +64,7 @@ const (
 	Comma      = ";"
 	Tilde      = "~"
 	LineBreak  = "\n"
+	Dash       = "-"
 )
 
 // Package Name
@@ -167,6 +171,59 @@ const (
 
 const (
 	JobName = "job_name"
+)
+
+const (
+	Base    = "base"
+	Exe     = "exe"
+	Port    = "port"
+	TZ      = "tz"
+	Version = "version"
+
+	Scratch      = "scratch"
+	AsizShangHai = "Asia/Shanghai"
+	MainBranch   = "main"
+	Mirror       = "mirror"
+
+	HttpsPrefix          = "https://"
+	MirrorSep            = ","
+	MirrorDirect         = "direct"
+	Arguments            = "arguments"
+	Etc                  = "etc"
+	Dockerfile           = "Dockerfile"
+	Alpine               = "alpine"
+	DefaultDockerfileTpl = "dockerfile_tpl.yaml"
+	Yaml                 = ".yaml"
+)
+
+const (
+	Kube                 = "kube"
+	Namespace            = "namespace"
+	Image                = "image"
+	ImagePullPolicy      = "imagePullPolicy"
+	LimitCpu             = "limitCpu"
+	LimitMem             = "limitMem"
+	MaxReplicas          = "maxReplicas"
+	MinReplicas          = "minReplicas"
+	Output               = "output"
+	Replicas             = "replicas"
+	RequestCpu           = "requestCpu"
+	RequestMem           = "requestMem"
+	Revisions            = "revisions"
+	Secret               = "secret"
+	ServiceAccount       = "serviceAccount"
+	NodePort             = "nodePort"
+	TargetPort           = "targetPort"
+	DefaultKubeDeployTpl = "deployment_tpl.yaml"
+
+	DefaultLimitCpu    = 1000
+	DefaultLimitMem    = 1024
+	DefaultMaxReplicas = 10
+	DefaultMinReplicas = 3
+	DefaultReplicas    = 3
+	DefaultRequestCpu  = 500
+	DefaultRequestMem  = 512
+	DefaultRevisions   = 512
 )
 
 const (

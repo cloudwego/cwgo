@@ -33,9 +33,32 @@ func PathExist(path string) (bool, error) {
 	}
 	_, err = os.Stat(abPath)
 	if err != nil {
-		return os.IsExist(err), nil
+		// Check if the error is due to the path not existing
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		// For other errors (e.g., permission issues), return them
+		return false, err
 	}
+	// Path exists
 	return true, nil
+}
+
+// PathExist is used to find all file's in the path.
+func GetAllFile(pathname string, s []string) ([]string, error) {
+	rd, err := os.ReadDir(pathname)
+	if err != nil {
+		fmt.Println("read dir fail:", err)
+		return s, err
+	}
+
+	for _, fi := range rd {
+		if !fi.IsDir() {
+			fullName := pathname + "/" + fi.Name()
+			s = append(s, fullName)
+		}
+	}
+	return s, nil
 }
 
 // GetIdlType is used to return the idl type.
@@ -66,6 +89,16 @@ func ReadFileContent(filePath string) (content []byte, err error) {
 	}
 
 	return io.ReadAll(file)
+}
+
+func WriteFile(path string) (wr *os.File, err error) {
+	_, err = os.Stat(path)
+	if os.IsNotExist(err) {
+		return os.Create(path)
+	} else {
+		return os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0o644)
+	}
+
 }
 
 func CreateFile(path, content string) (err error) {

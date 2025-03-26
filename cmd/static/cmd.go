@@ -23,8 +23,10 @@ import (
 	"github.com/cloudwego/cwgo/pkg/client"
 	"github.com/cloudwego/cwgo/pkg/consts"
 	"github.com/cloudwego/cwgo/pkg/curd/doc"
+	"github.com/cloudwego/cwgo/pkg/docker"
 	"github.com/cloudwego/cwgo/pkg/fallback"
 	"github.com/cloudwego/cwgo/pkg/job"
+	"github.com/cloudwego/cwgo/pkg/kube"
 	"github.com/cloudwego/cwgo/pkg/model"
 	"github.com/cloudwego/cwgo/pkg/server"
 	"github.com/urfave/cli/v2"
@@ -119,8 +121,31 @@ func Init() *cli.App {
 			},
 		},
 		{
+			Name:  DockerName,
+			Usage: DockerUsage,
+			Flags: dockerFlags(),
+			Action: func(c *cli.Context) error {
+				if err := globalArgs.DockerArgument.ParseCli(c); err != nil {
+					return err
+				}
+				return docker.Docker(globalArgs.DockerArgument)
+			},
+		},
+		{
+			Name:  KubeName,
+			Usage: KubeUsage,
+			Flags: kubeFlags(),
+			Action: func(c *cli.Context) error {
+				if err := globalArgs.DockerArgument.ParseCli(c); err != nil {
+					return err
+				}
+				return kube.Kube(globalArgs.KubeArgument)
+			},
+		},
+		{
 			Name:  FallbackName,
 			Usage: FallbackUsage,
+
 			Action: func(c *cli.Context) error {
 				if err := globalArgs.FallbackArgument.ParseCli(c); err != nil {
 					return err
@@ -229,4 +254,10 @@ Examples:
 
 	CompletionPowershellName  = "powershell"
 	CompletionPowershellUsage = "Generate the autocompletion script for powershell"
+
+	DockerName  = "docker"
+	DockerUsage = "Generate Dockerfile"
+
+	KubeName  = "kube"
+	KubeUsage = "Generate kubernetes files"
 )
