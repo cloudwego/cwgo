@@ -38,8 +38,11 @@ func Fallback(c *config.FallbackArgument) error {
 		args.ParseArgs(kitex.Version)
 
 		out := new(bytes.Buffer)
-		cmd := args.BuildCmd(out)
-		err := cmd.Run()
+		cmd, err := args.BuildCmd(out)
+		if err != nil {
+			return err
+		}
+		err = cmd.Run()
 		if err != nil {
 			if args.Use != "" {
 				out := strings.TrimSpace(out.String())
