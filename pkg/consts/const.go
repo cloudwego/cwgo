@@ -159,6 +159,7 @@ const (
 	TypeTag       = "type_tag"
 	HexTag        = "hex"
 	SQLDir        = "sql_dir"
+	Mode          = "mode"
 )
 
 const (

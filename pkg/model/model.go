@@ -18,6 +18,9 @@ package model
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"regexp"
 	"strings"
 
 	"gorm.io/rawsql"
@@ -57,6 +60,7 @@ func Model(c *config.ModelArgument) error {
 		FieldSignable:     c.FieldSignable,
 		FieldWithIndexTag: c.FieldWithIndexTag,
 		FieldWithTypeTag:  c.FieldWithTypeTag,
+		Mode:              buildGenMode(c.Mode),
 	}
 
 	if len(c.ExcludeTables) > 0 || c.Type == string(consts.Sqlite) {
@@ -87,9 +91,12 @@ func Model(c *config.ModelArgument) error {
 	if !c.OnlyModel {
 		g.ApplyBasic(models...)
 	}
-
 	g.Execute()
-	return nil
+	getwd, _ := os.Getwd()
+	outPath := filepath.Join(getwd, c.OutPath)
+	genMainFileRootDir := filepath.Dir(outPath)
+	buf, err := execTmpl(c)
+	return os.WriteFile(filepath.Join(genMainFileRootDir, "gen.go"), buf, 0o644)
 }
 
 func genModels(g *gen.Generator, db *gorm.DB, tables []string) (models []interface{}, err error) {
@@ -108,4 +115,22 @@ func genModels(g *gen.Generator, db *gorm.DB, tables []string) (models []interfa
 		models[i] = g.GenerateModel(tableName)
 	}
 	return models, nil
+}
+
+func buildGenMode(mode string) gen.GenerateMode {
+	var generateMode gen.GenerateMode
+	ss := regexp.MustCompile(`[,;\s]+`).Split(strings.ToLower(mode), -1)
+	for _, s := range ss {
+		s = strings.TrimSpace(s)
+		switch s {
+		case "withoutcontext", "noctx":
+			generateMode |= gen.WithoutContext
+		case "withdefaultquery", "defaultquery":
+			generateMode |= gen.WithDefaultQuery
+		case "withqueryinterface", "queryinterface":
+			generateMode |= gen.WithQueryInterface
+		default:
+		}
+	}
+	return generateMode
 }

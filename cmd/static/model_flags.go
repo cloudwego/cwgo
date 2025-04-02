@@ -51,5 +51,15 @@ func modelFlags() []cli.Flag {
 		&cli.BoolFlag{Name: consts.TypeTag, Usage: "Specify generate field with gorm column type tag", Value: false, DefaultText: "false"},
 		&cli.BoolFlag{Name: consts.IndexTag, Usage: "Specify generate field with gorm index tag", Value: false, DefaultText: "false"},
 		&cli.StringFlag{Name: consts.SQLDir, Usage: "Specify a sql file or directory", Value: "", DefaultText: ""},
+		&cli.StringFlag{Name: consts.Mode, Usage: modeUsage, Value: "noctx,defaultquery,queryinterface", DefaultText: "noctx,defaultquery,queryinterface"},
 	}
 }
+
+const modeUsage = `Specify gorm/gen generator mode 
+(https://gorm.io/gen/dao.html#Generator-Modes).
+There is no need to follow strict case, we offer some abbreviations
+
+- WithoutContext (noctx)
+- WithDefaultQuery (defaultquery)
+- WithQueryInterface (queryinterface)
+`
