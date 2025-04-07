@@ -54,7 +54,7 @@ GOPROXY=https://goproxy.cn/,direct go install github.com/cloudwego/cwgo@latest
 
 ### 模板拓展
 
-包含用户自定义模板的使用，详见[文档](https://www.cloudwego.cn/zh/docs/cwgo/tutorials/templete-extension/)
+包含用户自定义模板的使用，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/templete-extension/)
 
 ### Layout
 
@@ -70,7 +70,7 @@ Layout 生成及 Layout 介绍，详见[文档](https://www.cloudwego.io/zh/docs
 
 ### Doc 
 
-包含如何使用 cwgo 工具生成文档型数据库 CURD 代码，详见[文档](https://www.cloudwego.cn/zh/docs/cwgo/tutorials/doc/)
+包含如何使用 cwgo 工具生成文档型数据库 CURD 代码，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/doc/)
 
 ### Api-list
 
@@ -78,11 +78,11 @@ Layout 生成及 Layout 介绍，详见[文档](https://www.cloudwego.io/zh/docs
 
 ### Server
 
-包含如何生成 RPC Server、HTTP Server 代码，详见[文档](https://www.cloudwego.cn/zh/docs/cwgo/tutorials/server/)
+包含如何生成 RPC Server、HTTP Server 代码，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/server/)
 
 ### 命令行自动补全
 
-包含如何启用命令行自动补全功能，详见[文档](https://www.cloudwego.cn/zh/docs/cwgo/tutorials/auto-completion/)
+包含如何启用命令行自动补全功能，详见[文档](https://www.cloudwego.io/zh/docs/cwgo/tutorials/auto-completion/)
 
 ## 开源许可
 
