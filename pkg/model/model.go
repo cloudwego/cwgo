@@ -92,6 +92,8 @@ func Model(c *config.ModelArgument) error {
 		g.ApplyBasic(models...)
 	}
 	g.Execute()
+
+	// generate gen.go to update dal code
 	getwd, _ := os.Getwd()
 	outPath := filepath.Join(getwd, c.OutPath)
 	genMainFileRootDir := filepath.Dir(outPath)
