@@ -36,5 +36,3 @@ output/*
 /platform/manifest/config/config-dev.yaml
 /platform/manifest/config/config-pro.yaml
 /platform/dist/
-
-
