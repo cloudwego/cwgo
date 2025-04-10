@@ -96,6 +96,10 @@ func Model(c *config.ModelArgument) error {
 	outPath := filepath.Join(getwd, c.OutPath)
 	genMainFileRootDir := filepath.Dir(outPath)
 	buf, err := execTmpl(c)
+	if err != nil {
+		return fmt.Errorf("exec template fail: %w", err)
+	}
+
 	return os.WriteFile(filepath.Join(genMainFileRootDir, "gen.go"), buf, 0o644)
 }
 
