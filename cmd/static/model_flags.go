@@ -35,7 +35,7 @@ func modelFlags() []cli.Flag {
 		}},
 		&cli.StringFlag{Name: consts.DBType, Usage: "Specify database type. (mysql or sqlserver or sqlite or postgres)", Value: string(consts.MySQL), DefaultText: string(consts.MySQL), Action: func(context *cli.Context, s string) error {
 			if _, ok := config.OpenTypeFuncMap[consts.DataBaseType(strings.ToLower(s))]; !ok {
-				return fmt.Errorf("unknow db type %s (support mysql || postgres || sqlite || sqlserver for now)", s)
+				return fmt.Errorf("unknown db type %s (support mysql || postgres || sqlite || sqlserver for now)", s)
 			}
 			return nil
 		}},
