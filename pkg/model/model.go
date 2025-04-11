@@ -102,7 +102,11 @@ func Model(c *config.ModelArgument) error {
 		return fmt.Errorf("exec template fail: %w", err)
 	}
 
-	return os.WriteFile(filepath.Join(genMainFileRootDir, "gen.go"), buf, 0o644)
+	if err := os.MkdirAll(filepath.Join(genMainFileRootDir, "gen_exec"), 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	return os.WriteFile(filepath.Join(genMainFileRootDir, "gen_exec", "main.go"), buf, 0o644)
 }
 
 func genModels(g *gen.Generator, db *gorm.DB, tables []string) (models []interface{}, err error) {

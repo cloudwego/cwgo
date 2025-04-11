@@ -30,7 +30,7 @@ import (
 	"gorm.io/gen"
 )
 
-//go:embed model_tpl.txt
+//go:embed model_gen.tpl
 var mergedTemplate string
 
 type GenMethodTmpl struct {
