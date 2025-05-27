@@ -24,14 +24,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/cloudwego/cwgo/config"
-	"github.com/cloudwego/cwgo/pkg/common/utils"
-	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/cwgo/tpl"
 	"github.com/cloudwego/kitex"
 	kargs "github.com/cloudwego/kitex/tool/cmd/kitex/args"
 	"github.com/cloudwego/kitex/tool/internal_pkg/generator"
 	"github.com/cloudwego/kitex/tool/internal_pkg/log"
+
+	"github.com/cloudwego/cwgo/config"
+	"github.com/cloudwego/cwgo/pkg/common/utils"
+	"github.com/cloudwego/cwgo/pkg/consts"
+	"github.com/cloudwego/cwgo/tpl"
 )
 
 func convertKitexArgs(sa *config.ClientArgument, kitexArgument *kargs.Arguments) (err error) {
@@ -76,6 +77,7 @@ func convertKitexArgs(sa *config.ClientArgument, kitexArgument *kargs.Arguments)
 	f.Var(&kitexArgument.ProtobufPlugins, "protobuf-plugin", "Specify protobuf plugin arguments for the protobuf compiler.(plugin_name:options:out_dir)")
 	f.StringVar(&kitexArgument.Protocol, "protocol", "", "Specify a protocol for codec.")
 	f.Var(&kitexArgument.Hessian2Options, "hessian2", "Specify arguments for the hessian2 codec.")
+	f.Var(&kitexArgument.BuiltinTpl, "tpl", "Specify kitex built-in template.")
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, `Version %s

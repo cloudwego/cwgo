@@ -38,8 +38,8 @@ github.com/cloudwego/fastpb v0.0.5 h1:vYnBPsfbAtU5TVz5+f9UTlmSCixG9F9vRwaqE0mZPZ
 github.com/cloudwego/fastpb v0.0.5/go.mod h1:Bho7aAKBUtT9RPD2cNVkTdx4yQumfSv3If7wYnm1izk=
 github.com/cloudwego/hertz/cmd/hz v0.8.1 h1:FUsxqb62nked6HhseUFBVeVLA+Bl4yT2gKhiBdUF/84=
 github.com/cloudwego/hertz/cmd/hz v0.8.1/go.mod h1:6SroAwvZkyL54CiPANDkTR3YoX2MY4ZOW1+gtmWhRJE=
-github.com/cloudwego/kitex v0.12.2-0.20250121115721-347186b68dc5 h1:08wCJj2VvltfRka5vph0UZEky41BFunJeXGNW3LAmUk=
-github.com/cloudwego/kitex v0.12.2-0.20250121115721-347186b68dc5/go.mod h1:o9Vaz/Kpu0uAj7go0+0jq3hr4e+Im/BunlmhnUAyqkQ=
+github.com/cloudwego/kitex v0.12.2-0.20250527233702-b7d451d22c57 h1:h5e6Ym+Y5bda4y5/lwALaSwKFN5YDUjabSI0VZQTIEM=
+github.com/cloudwego/kitex v0.12.2-0.20250527233702-b7d451d22c57/go.mod h1:o9Vaz/Kpu0uAj7go0+0jq3hr4e+Im/BunlmhnUAyqkQ=
 github.com/cloudwego/thriftgo v0.1.7/go.mod h1:LzeafuLSiHA9JTiWC8TIMIq64iadeObgRUhmVG1OC/w=
 github.com/cloudwego/thriftgo v0.3.18 h1:gnr1vz7G3RbwwCK9AMKHZf63VYGa7ene6WbI9VrBJSw=
 github.com/cloudwego/thriftgo v0.3.18/go.mod h1:AdLEJJVGW/ZJYvkkYAZf5SaJH+pA3OyC801WSwqcBwI=

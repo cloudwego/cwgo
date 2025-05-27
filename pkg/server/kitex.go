@@ -85,6 +85,7 @@ func convertKitexArgs(sa *config.ServerArgument, kitexArgument *kargs.Arguments)
 		"Specify a code gen path.")
 	f.StringVar(&kitexArgument.Protocol, "protocol", "", "Specify a protocol for codec.")
 	f.Var(&kitexArgument.Hessian2Options, "hessian2", "Specify arguments for the hessian2 codec.")
+	f.Var(&kitexArgument.BuiltinTpl, "tpl", "Specify kitex built-in template.")
 
 	f.Usage = func() {
 		fmt.Fprintf(os.Stderr, `Version %s

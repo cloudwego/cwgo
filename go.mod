@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/apache/thrift v0.13.0
 	github.com/cloudwego/hertz/cmd/hz v0.8.1
-	github.com/cloudwego/kitex v0.12.2-0.20250121115721-347186b68dc5
+	github.com/cloudwego/kitex v0.12.2-0.20250527233702-b7d451d22c57
 	github.com/cloudwego/thriftgo v0.3.18
 	github.com/fatih/camelcase v1.0.0
 	github.com/stretchr/testify v1.9.0
