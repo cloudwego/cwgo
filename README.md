@@ -1,5 +1,15 @@
 # cwgo
 
+## This repository has been archived.
+
+Due to the widespread use of the built-in tools of Kitex and Hertz by internal ByteDance users, and the lack of internal adoption scenarios for cwgo, we are unable to ensure sufficient code quality and manpower investment for new feature development. In the spirit of being responsible to our users, we have decided to archive the cwgo project. We sincerely thank you all for your support and attention to the cwgo project.
+
+For users of Kitex and Hertz, it is recommended to directly use the original tools to generate projects. For the custom layout and template functions, please refer to  [Kitex Custom Scaffold Template](https://www.cloudwego.io/docs/kitex/tutorials/code-gen/custom_tpl/)、 [Hz custom template use](https://www.cloudwego.io/docs/hertz/tutorials/toolkit/more-feature/template/)
+
+The generation of gorm, MongoDB, etc. is temporarily no longer supported.
+
+If you have other requirements, please feel free to contact us.
+
 [中文](./README_CN.md) | English
 
 cwgo is an all-in-one code generation tool for CloudWeGo. It integrates the advantages of the kitex and hz tools to improve
