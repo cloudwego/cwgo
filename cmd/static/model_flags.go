@@ -35,7 +35,7 @@ func modelFlags() []cli.Flag {
 		}},
 		&cli.StringFlag{Name: consts.DBType, Usage: "Specify database type. (mysql or sqlserver or sqlite or postgres)", Value: string(consts.MySQL), DefaultText: string(consts.MySQL), Action: func(context *cli.Context, s string) error {
 			if _, ok := config.OpenTypeFuncMap[consts.DataBaseType(strings.ToLower(s))]; !ok {
-				return fmt.Errorf("unknow db type %s (support mysql || postgres || sqlite || sqlserver for now)", s)
+				return fmt.Errorf("unknown db type %s (support mysql || postgres || sqlite || sqlserver for now)", s)
 			}
 			return nil
 		}},
@@ -51,5 +51,15 @@ func modelFlags() []cli.Flag {
 		&cli.BoolFlag{Name: consts.TypeTag, Usage: "Specify generate field with gorm column type tag", Value: false, DefaultText: "false"},
 		&cli.BoolFlag{Name: consts.IndexTag, Usage: "Specify generate field with gorm index tag", Value: false, DefaultText: "false"},
 		&cli.StringFlag{Name: consts.SQLDir, Usage: "Specify a sql file or directory", Value: "", DefaultText: ""},
+		&cli.StringFlag{Name: consts.Mode, Usage: modeUsage, Value: "noctx,defaultquery,queryinterface", DefaultText: "noctx,defaultquery,queryinterface"},
 	}
 }
+
+const modeUsage = `Specify gorm/gen generator mode 
+(https://gorm.io/gen/dao.html#Generator-Modes).
+There is no need to follow strict case, we offer some abbreviations
+
+- WithoutContext (noctx)
+- WithDefaultQuery (defaultquery)
+- WithQueryInterface (queryinterface)
+`
