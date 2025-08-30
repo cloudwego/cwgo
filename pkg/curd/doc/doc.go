@@ -30,7 +30,6 @@ import (
 
 	"github.com/cloudwego/cwgo/config"
 	"github.com/cloudwego/cwgo/pkg/consts"
-	"github.com/cloudwego/hertz/cmd/hz/util/logs"
 )
 
 func Doc(c *config.DocArgument) error {
@@ -40,7 +39,7 @@ func Doc(c *config.DocArgument) error {
 
 	switch c.Name {
 	case consts.MongoDb:
-		setLogVerbose(c.Verbose)
+		utils.SetHzVerboseLog(c.Verbose)
 		if err := plugin.MongoTriggerPlugin(c); err != nil {
 			return err
 		}
@@ -190,12 +189,4 @@ func check(c *config.DocArgument) (err error) {
 	c.PackagePrefix = strings.ReplaceAll(c.PackagePrefix, consts.BackSlash, consts.Slash)
 
 	return nil
-}
-
-func setLogVerbose(verbose bool) {
-	if verbose {
-		logs.SetLevel(logs.LevelDebug)
-	} else {
-		logs.SetLevel(logs.LevelWarn)
-	}
 }
