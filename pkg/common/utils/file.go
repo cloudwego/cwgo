@@ -91,3 +91,13 @@ func findRootPathRecursive(currentDirPath, relativeFilePath string) string {
 
 	return findRootPathRecursive(parentPath, relativeFilePath)
 }
+
+// CreateIfNotExist creates a file if it is not exists.
+func CreateIfNotExist(file string) (*os.File, error) {
+	_, err := os.Stat(file)
+	if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("%s already exist", file)
+	}
+
+	return os.Create(file)
+}
